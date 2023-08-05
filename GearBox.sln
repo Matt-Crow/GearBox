@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GearBox.Core", "GearBox.Core\GearBox.Core.csproj", "{66EE3A4C-CC32-49D1-8345-9DC25DB1CDA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GearBox.Web", "GearBox.Web\GearBox.Web.csproj", "{AD19059C-994A-469C-AC4D-E4EAB2805083}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GearBox.Core.Tests", "GearBox.Core.Tests\GearBox.Core.Tests.csproj", "{F9A3EBFF-F1AB-424A-8555-9341A95D982D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66EE3A4C-CC32-49D1-8345-9DC25DB1CDA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66EE3A4C-CC32-49D1-8345-9DC25DB1CDA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66EE3A4C-CC32-49D1-8345-9DC25DB1CDA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66EE3A4C-CC32-49D1-8345-9DC25DB1CDA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD19059C-994A-469C-AC4D-E4EAB2805083}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD19059C-994A-469C-AC4D-E4EAB2805083}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD19059C-994A-469C-AC4D-E4EAB2805083}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD19059C-994A-469C-AC4D-E4EAB2805083}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9A3EBFF-F1AB-424A-8555-9341A95D982D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9A3EBFF-F1AB-424A-8555-9341A95D982D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9A3EBFF-F1AB-424A-8555-9341A95D982D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9A3EBFF-F1AB-424A-8555-9341A95D982D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
