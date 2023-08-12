@@ -10,18 +10,25 @@ using System;
 /// </summary>
 public class World
 {
+    private readonly Map _map = new();
     private readonly List<IStaticGameObject> _staticObjects = new();
     private readonly List<IDynamicGameObject> _dynamicObjects = new();
 
 
-    public World() : this(Guid.NewGuid())
+    public World() : this(Guid.NewGuid(), new Map())
     {
 
     }
 
-    public World(Guid id)
+    public World(Guid id) : this(id, new Map())
+    {
+        
+    }
+
+    public World(Guid id, Map map)
     {
         Id = id;
+        _map = map;
     }
 
 
