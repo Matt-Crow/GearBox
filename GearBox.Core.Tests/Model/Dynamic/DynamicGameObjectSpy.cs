@@ -1,6 +1,6 @@
-namespace GearBox.Core.Tests.Model;
+namespace GearBox.Core.Tests.Model.Dynamic;
 
-using GearBox.Core.Model;
+using GearBox.Core.Model.Dynamic;
 
 public class DynamicGameObjectSpy : IDynamicGameObject
 {

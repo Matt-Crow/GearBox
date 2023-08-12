@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model;
+namespace GearBox.Core.Model.Static;
 
 /// <summary>
 /// Marker interface for something which exists in a world but needn't be

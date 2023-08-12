@@ -1,6 +1,7 @@
 namespace GearBox.Core.Tests.Model;
 
 using GearBox.Core.Model;
+using GearBox.Core.Tests.Model.Dynamic;
 using Xunit;
 
 public class WorldTester
