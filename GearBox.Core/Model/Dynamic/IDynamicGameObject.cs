@@ -3,7 +3,7 @@ namespace GearBox.Core.Model.Dynamic;
 /// <summary>
 /// An object in a world which updates every game tick
 /// </summary>
-public interface IDynamicGameObject
+public interface IDynamicGameObject : IGameObject
 {
     /// <summary>
     /// Called each game tick.

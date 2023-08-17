@@ -11,6 +11,13 @@ using System;
 public class World
 {
     private readonly Map _map = new();
+
+    /*
+        List is probably more efficient for iteration,
+        whereas Dictionary is more efficient for searching.
+        I can change this implementation based on which of those two operations
+        are needed more frequently... or I can do a more complex data structure.
+    */
     private readonly List<IStaticGameObject> _staticObjects = new();
     private readonly List<IDynamicGameObject> _dynamicObjects = new();
 
@@ -39,12 +46,22 @@ public class World
 
     public void AddStaticObject(IStaticGameObject obj)
     {
+        EnsureNotYetAdded(obj);
         _staticObjects.Add(obj);
     }
 
     public void AddDynamicObject(IDynamicGameObject obj)
     {
+        EnsureNotYetAdded(obj);
         _dynamicObjects.Add(obj);
+    }
+
+    private void EnsureNotYetAdded(IGameObject obj)
+    {
+        if (_dynamicObjects.Contains(obj) || _staticObjects.Contains(obj))
+        {
+            throw new ArgumentException();
+        }
     }
 
     /// <summary>
