@@ -1,5 +1,7 @@
 namespace GearBox.Core.Model.Dynamic;
 
+using GearBox.Core.Model.Units;
+
 /// <summary>
 /// Rather than implementing a different interface, mobile dynamic objects 
 /// should have an instance of this object.

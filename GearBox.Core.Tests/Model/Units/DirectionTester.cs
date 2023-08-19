@@ -1,6 +1,5 @@
-namespace GearBox.Core.Tests.Model;
-
-using GearBox.Core.Model;
+namespace GearBox.Core.Tests.Model.Units;
+using GearBox.Core.Model.Units;
 using Xunit;
 
 public class DirectionTester

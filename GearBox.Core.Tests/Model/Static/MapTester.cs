@@ -1,7 +1,7 @@
 namespace GearBox.Core.Tests.Model.Static;
 
-using GearBox.Core.Model;
 using GearBox.Core.Model.Static;
+using GearBox.Core.Model.Units;
 using System.Drawing;
 using Xunit;
 

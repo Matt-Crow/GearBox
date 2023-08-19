@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Units;
 
 public class Tile
 {

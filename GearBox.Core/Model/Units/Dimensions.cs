@@ -1,6 +1,4 @@
-namespace GearBox.Core.Model;
-
-using GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Units;
 
 public readonly struct Dimensions
 {

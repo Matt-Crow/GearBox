@@ -1,8 +1,6 @@
 namespace GearBox.Core.Model.Dynamic;
 
-using GearBox.Core.Model;
-using GearBox.Core.Model.Dynamic;
-using GearBox.Core.Model.Static;
+using GearBox.Core.Model.Units;
 
 /// <summary>
 /// A Character is something sentient in the game world.

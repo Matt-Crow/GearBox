@@ -1,7 +1,4 @@
-namespace GearBox.Core.Model;
-
-using GearBox.Core.Model.Dynamic;
-using GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Units;
 
 public struct Coordinates
 {

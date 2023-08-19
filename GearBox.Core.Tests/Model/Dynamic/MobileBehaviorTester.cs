@@ -1,7 +1,7 @@
 namespace GearBox.Core.Tests.Model.Dynamic;
 
-using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Units;
 using Xunit;
 
 public class MobileBehaviorTester

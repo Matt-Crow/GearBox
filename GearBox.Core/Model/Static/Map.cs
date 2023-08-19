@@ -1,5 +1,6 @@
 namespace GearBox.Core.Model.Static;
 
+using GearBox.Core.Model.Units;
 using System.Drawing;
 
 /// <summary>

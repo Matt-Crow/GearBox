@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model;
+namespace GearBox.Core.Model.Units;
 
 public class Direction
 {
