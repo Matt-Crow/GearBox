@@ -1,6 +1,6 @@
 namespace GearBox.Core.Model;
 
-public class Time
+public readonly struct Time
 {
     public static readonly int FRAMES_PER_SECOND = 20;
 }

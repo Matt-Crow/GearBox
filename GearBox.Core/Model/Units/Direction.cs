@@ -1,6 +1,6 @@
 namespace GearBox.Core.Model.Units;
 
-public class Direction
+public readonly struct Direction
 {
     private readonly int _bearingInDegrees;
     private readonly double _bearingInRadians;

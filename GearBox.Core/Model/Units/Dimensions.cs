@@ -2,32 +2,29 @@ namespace GearBox.Core.Model.Units;
 
 public readonly struct Dimensions
 {
-    private readonly int _width;
-    private readonly int _height;
+    private readonly Distance _width;
+    private readonly Distance _height;
 
 
-    private Dimensions(int width, int height)
+    private Dimensions(Distance width, Distance height)
     {
-        if (width < 0)
-        {
-            throw new ArgumentException("width must be at least 0");
-        }
-        if (height < 0)
-        {
-            throw new ArgumentException("height must be at least 0");
-        }
         _width = width;
         _height = height;
     }
 
     public static Dimensions InTiles(int length)
     {
-        return new Dimensions(length * Tile.SIZE, length * Tile.SIZE);
+        if (length < 0)
+        {
+            throw new ArgumentException("length must be non-negative");
+        }
+        var distance = Distance.FromTiles(length);
+        return new Dimensions(distance, distance);
     }
 
 
-    public int WidthInPixels { get => _width; }
-    public int WidthInTiles { get => _width / Tile.SIZE; }
-    public int HeightInPixels { get => _height; }
-    public int HeightInTiles { get => _height / Tile.SIZE; }
+    public int WidthInPixels { get => _width.InPixels; }
+    public int WidthInTiles { get => _width.InTiles; }
+    public int HeightInPixels { get => _height.InPixels; }
+    public int HeightInTiles { get => _height.InTiles; }
 }

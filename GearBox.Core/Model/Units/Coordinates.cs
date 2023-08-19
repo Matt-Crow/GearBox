@@ -1,43 +1,38 @@
 namespace GearBox.Core.Model.Units;
 
-public struct Coordinates
+public readonly struct Coordinates
 {
-    private double _x;
-    private double _y;
+    private readonly Distance _x;
+    private readonly Distance _y;
+    public static readonly Coordinates ORIGIN = new Coordinates(Distance.NONE, Distance.NONE);
 
-
-    private Coordinates(double x, double y)
+    private Coordinates(Distance x2, Distance y2)
     {
-        _x = x;
-        _y = y;
+        _x = x2;
+        _y = y2;
     }
 
-
-    public static Coordinates ORIGIN { get; } = new Coordinates(0, 0);
-
-
-    public static Coordinates InPixels(double x, double y)
+    public static Coordinates FromPixels(int x, int y)
     {
-        return new Coordinates(x, y);
+        return new Coordinates(Distance.FromPixels(x), Distance.FromPixels(y));
     }
 
-    public static Coordinates InTiles(double x, double y)
+    public static Coordinates FromTiles(int x, int y)
     {
-        return InPixels(x * Tile.SIZE, y * Tile.SIZE);
+        return new Coordinates(Distance.FromTiles(x), Distance.FromTiles(y));
     }
 
-
-    public double XInPixels { get => _x; }
-    public int XInTiles { get => (int)(_x / Tile.SIZE); }
+    public int XInPixels { get => _x.InPixels; }
+    public int XInTiles { get => _x.InTiles; }
     
-    public double YInPixels { get => _y; }
-    public int YInTiles { get => (int)(_y / Tile.SIZE); }
+    public int YInPixels { get => _y.InPixels; }
+    public int YInTiles { get => _y.InTiles; }
 
     public Coordinates Plus(Velocity v)
     {
-        return Coordinates.InPixels(
-            XInPixels + v.ChangeInXInPixels,
-            YInPixels + v.ChangeInYInPixels
+        return Coordinates.FromPixels(
+            (int)(XInPixels + v.ChangeInXInPixels),
+            (int)(YInPixels + v.ChangeInYInPixels)
         );
     }
 

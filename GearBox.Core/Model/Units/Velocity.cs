@@ -1,6 +1,6 @@
 namespace GearBox.Core.Model.Units;
 
-public class Velocity
+public readonly struct Velocity
 {
     private Velocity(Speed magnitude, Direction angle)
     {

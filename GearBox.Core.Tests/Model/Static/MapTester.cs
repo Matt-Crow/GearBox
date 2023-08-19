@@ -55,6 +55,6 @@ public class MapTester
         var aTileType = TileType.Tangible(Color.Green);
         sut.SetTileTypeForKey(1, aTileType);
 
-        Assert.Throws<ArgumentException>(() => sut.SetTileAt(Coordinates.InTiles(x, y), 1));
+        Assert.Throws<ArgumentException>(() => sut.SetTileAt(Coordinates.FromTiles(x, y), 1));
     }
 }

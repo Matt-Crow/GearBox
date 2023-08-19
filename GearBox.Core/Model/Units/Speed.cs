@@ -1,8 +1,8 @@
 namespace GearBox.Core.Model.Units;
 
-public class Speed
+public readonly struct Speed
 {
-    private double _pixelsPerFrame;
+    private readonly double _pixelsPerFrame;
 
 
     private Speed(double pixelsPerFrame)
@@ -10,14 +10,15 @@ public class Speed
         _pixelsPerFrame = pixelsPerFrame;
     }
 
-    public static Speed InTilesPerSecond(double tilesPerSecond)
+    public static Speed InTilesPerSecond(int tilesPerSecond)
     {
         /*
             tile     pixel   second
             ------ x ----- x ------
             second   tile    frame
         */
-        var result = tilesPerSecond * Tile.SIZE / Time.FRAMES_PER_SECOND;
+        var pixelsPerSecond = Distance.FromTiles(tilesPerSecond).InPixels;
+        var result = pixelsPerSecond / Time.FRAMES_PER_SECOND;
         return new Speed(result);
     }
 
