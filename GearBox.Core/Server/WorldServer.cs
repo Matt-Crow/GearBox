@@ -23,14 +23,14 @@ public class WorldServer
     /// <summary>
     /// Adds the given connection, then sends the world
     /// </summary>
-    public Task AddConnection(IConnection connection)
+    public async Task AddConnection(IConnection connection)
     {
         if (!_connections.Contains(connection))
         {
             _connections.Add(connection);
-            //TODO send world
+            var message = new Message(MessageType.WorldInit, _world.StaticContent);
+            await connection.Send(message);
         }
-        return Task.CompletedTask;
     }
 
     public Task RemoveConnection(IConnection connection)

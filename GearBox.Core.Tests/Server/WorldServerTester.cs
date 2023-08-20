@@ -30,4 +30,15 @@ public class WorldServerTester
         await sut.RemoveConnection(spy);
         Assert.Equal(0, sut.TotalConnections);
     }
+
+    [Fact]
+    public async Task ClientReceivesWorldUponConnecting()
+    {
+        var spy = new SpyConnection();
+        var sut = new WorldServer();
+
+        await sut.AddConnection(spy);
+
+        Assert.Contains(spy.MessagesReceived, message => message.Type == MessageType.WorldInit);
+    }
 }

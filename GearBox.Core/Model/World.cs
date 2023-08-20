@@ -10,45 +10,36 @@ using System;
 /// </summary>
 public class World
 {
-    private readonly Map _map = new();
-
     /*
         List is probably more efficient for iteration,
         whereas Dictionary is more efficient for searching.
         I can change this implementation based on which of those two operations
         are needed more frequently... or I can do a more complex data structure.
     */
-    private readonly List<IStaticGameObject> _staticObjects = new();
     private readonly List<IDynamicGameObject> _dynamicObjects = new();
 
 
-    public World() : this(Guid.NewGuid(), new Map())
+    public World() : this(Guid.NewGuid(), StaticWorldContent.EMPTY)
     {
 
     }
 
-    public World(Guid id) : this(id, new Map())
+    public World(Guid id) : this(id, StaticWorldContent.EMPTY)
     {
         
     }
 
-    public World(Guid id, Map map)
+    public World(Guid id, StaticWorldContent staticContent)
     {
         Id = id;
-        _map = map;
+        StaticContent = staticContent;
     }
 
 
     public Guid Id { get; init; }
-    public IEnumerable<IStaticGameObject> StaticObjects { get => _staticObjects.AsEnumerable(); }
+    public StaticWorldContent StaticContent { get; init; }
     public IEnumerable<IDynamicGameObject> DynamicObjects { get => _dynamicObjects.AsEnumerable(); }
 
-
-    public void AddStaticObject(IStaticGameObject obj)
-    {
-        EnsureNotYetAdded(obj);
-        _staticObjects.Add(obj);
-    }
 
     public void AddDynamicObject(IDynamicGameObject obj)
     {
@@ -58,7 +49,7 @@ public class World
 
     private void EnsureNotYetAdded(IGameObject obj)
     {
-        if (_dynamicObjects.Contains(obj) || _staticObjects.Contains(obj))
+        if (_dynamicObjects.Contains(obj))
         {
             throw new ArgumentException();
         }

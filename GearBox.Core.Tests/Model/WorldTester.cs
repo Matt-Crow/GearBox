@@ -43,26 +43,4 @@ public class WorldTester
         sut.AddDynamicObject(anObject);
         Assert.Throws<ArgumentException>(() => sut.AddDynamicObject(anObject));
     }
-
-    [Fact]
-    public void ObjectCannotBeAddedToMultipleCollections()
-    {
-        var sut = new World();
-        var anObject = new DynamicStaticGameObject();
-
-        // note dynamic here, static later
-        sut.AddDynamicObject(anObject);
-        Assert.Throws<ArgumentException>(() => 
-        {
-            sut.AddStaticObject(anObject);
-        });
-    }
-
-    private class DynamicStaticGameObject : IDynamicGameObject, IStaticGameObject
-    {
-        public void Update()
-        {
-            
-        }
-    }
 }
