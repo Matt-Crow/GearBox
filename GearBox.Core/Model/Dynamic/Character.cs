@@ -9,9 +9,28 @@ public class Character : IDynamicGameObject
 {
     private readonly MobileBehavior _mobility;
 
+    public Character() : this(Velocity.FromPolar(Speed.InTilesPerSecond(5), Direction.DOWN))
+    {
+
+    }
+
     public Character(Velocity velocity)
     {
         _mobility = new MobileBehavior(velocity);
+    }
+
+
+    public Coordinates Coordinates { get => _mobility.Coordinates; set => _mobility.Coordinates = value; }
+
+
+    public void StartMovingIn(Direction direction)
+    {
+        _mobility.StartMovingIn(direction);
+    }
+
+    public void StopMovingIn(Direction direction)
+    {
+        _mobility.StopMovingIn(direction);
     }
 
     public void Update()

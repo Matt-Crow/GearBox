@@ -25,4 +25,32 @@ public class DirectionTester
         Assert.Equal(1.0, Math.Round(dx, 3));
         Assert.Equal(0, Math.Round(dy, 3));
     }
+
+    [Theory]
+    [InlineData(0, 45, 90)]
+    [InlineData(180, 135, 90)]
+    public void Between_ReturnsCorrect(int leg1, int diag, int leg2)
+    {
+        var angle1 = Direction.FromBearingDegrees(leg1);
+        var angle2 = Direction.FromBearingDegrees(leg2);
+        var expected = Direction.FromBearingDegrees(diag);
+
+        var actual = Direction.Between(angle1, angle2);
+        
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData(0, 45, 90)]
+    [InlineData(180, 135, 90)]
+    public void UnBetween_ReturnsCorrect(int leg1, int diag, int leg2)
+    {
+        var angle1 = Direction.FromBearingDegrees(leg1);
+        var angle2 = Direction.FromBearingDegrees(leg2);
+        var angle3 = Direction.FromBearingDegrees(diag);
+
+        var actual = Direction.UnBetween(angle3, angle2);
+        
+        Assert.Equal(angle1, actual);
+    }
 }

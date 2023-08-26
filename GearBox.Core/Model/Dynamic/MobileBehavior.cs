@@ -17,6 +17,48 @@ public class MobileBehavior
     public Velocity Velocity { get; set; }
     public bool IsMoving { get; set; } = false;
 
+    public void StartMovingIn(Direction direction)
+    {
+        // might make these only accept cardinal directions later...
+        if (IsMoving)
+        {
+            // already moving, check if we need to merge directions
+            var oldDirection = Velocity.Angle;
+            if (oldDirection.IsOrthogonalTo(direction))
+            {
+                var newDirection = Direction.Between(oldDirection, direction);
+                Velocity = Velocity.InDirection(newDirection);
+            }
+            else if (oldDirection.IsOpposite(direction))
+            {
+                IsMoving = false;
+            }
+            else
+            {
+                Velocity = Velocity.InDirection(direction);
+            }
+        }
+        else 
+        {
+            IsMoving = true;
+            Velocity = Velocity.InDirection(direction);
+        }
+    }
+
+    public void StopMovingIn(Direction direction)
+    {
+        var currentDirection = Velocity.Angle;
+        if (currentDirection.Equals(direction))
+        {
+            IsMoving = false;
+        }
+        else if (direction.IsCardinal && Direction.DegreesBetween(currentDirection, direction) == 45)
+        {
+            var newDirection = Direction.UnBetween(currentDirection, direction);
+            Velocity = Velocity.InDirection(newDirection);
+        }
+    }
+
     public void UpdateMovement()
     {
         if (IsMoving)
