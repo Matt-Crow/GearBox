@@ -40,6 +40,9 @@ public class DynamicWorldContent : ISerializable<DynamicWorldContentJson>
 
     public DynamicWorldContentJson ToJson()
     {
-        return new DynamicWorldContentJson();
+        var objs = _dynamicObjects
+            .Select(obj => obj.ToJson())
+            .ToList();
+        return new DynamicWorldContentJson(objs);
     }
 }

@@ -9,7 +9,6 @@ public class WorldServer
 {
     private readonly World _world;
     private readonly HashSet<IConnection> _connections;
-    private bool _running = false;
     private readonly Timer _timer;
 
     public WorldServer() : this(new World())
