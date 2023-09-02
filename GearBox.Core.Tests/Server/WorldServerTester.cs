@@ -41,4 +41,19 @@ public class WorldServerTester
 
         Assert.Contains(spy.MessagesReceived, message => message.Type == MessageType.WorldInit);
     }
+
+    [Fact]
+    public async Task EachClientReceivesWorldUponUpdate()
+    {
+        var client1 = new SpyConnection();
+        var client2 = new SpyConnection();
+        var sut = new WorldServer();
+        await sut.AddConnection(client1);
+        await sut.AddConnection(client2);
+
+        await sut.Update();
+
+        Assert.Contains(client1.MessagesReceived, message => message.Type == MessageType.WorldUpdate);
+        Assert.Contains(client2.MessagesReceived, message => message.Type == MessageType.WorldUpdate);
+    }
 }

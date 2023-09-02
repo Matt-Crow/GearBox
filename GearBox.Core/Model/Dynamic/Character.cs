@@ -33,6 +33,14 @@ public class Character : IDynamicGameObject
         _mobility.StopMovingIn(direction);
     }
 
+    public IDynamicGameObjectJson ToJson()
+    {
+        return new CharacterJson(
+            _mobility.Coordinates.XInPixels, 
+            _mobility.Coordinates.YInPixels
+        );
+    }
+
     public void Update()
     {
         _mobility.UpdateMovement();

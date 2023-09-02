@@ -10,15 +10,6 @@ using System;
 /// </summary>
 public class World
 {
-    /*
-        List is probably more efficient for iteration,
-        whereas Dictionary is more efficient for searching.
-        I can change this implementation based on which of those two operations
-        are needed more frequently... or I can do a more complex data structure.
-    */
-    private readonly List<IDynamicGameObject> _dynamicObjects = new();
-
-
     public World() : this(Guid.NewGuid(), StaticWorldContent.EMPTY)
     {
 
@@ -33,26 +24,19 @@ public class World
     {
         Id = id;
         StaticContent = staticContent;
+        DynamicContent = new DynamicWorldContent();
     }
 
 
     public Guid Id { get; init; }
     public StaticWorldContent StaticContent { get; init; }
-    public IEnumerable<IDynamicGameObject> DynamicObjects { get => _dynamicObjects.AsEnumerable(); }
+    public DynamicWorldContent DynamicContent { get; init; }
+    public IEnumerable<IDynamicGameObject> DynamicObjects { get => DynamicContent.DynamicObjects; }
 
 
     public void AddDynamicObject(IDynamicGameObject obj)
     {
-        EnsureNotYetAdded(obj);
-        _dynamicObjects.Add(obj);
-    }
-
-    private void EnsureNotYetAdded(IGameObject obj)
-    {
-        if (_dynamicObjects.Contains(obj))
-        {
-            throw new ArgumentException();
-        }
+        DynamicContent.AddDynamicObject(obj);
     }
 
     /// <summary>
@@ -61,7 +45,7 @@ public class World
     /// </summary>
     public void Update()
     {
-        _dynamicObjects.ForEach(x => x.Update());
+        DynamicContent.Update();
     }
 
     public override bool Equals(object? other)

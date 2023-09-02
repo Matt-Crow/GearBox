@@ -9,6 +9,11 @@ public class DynamicGameObjectSpy : IDynamicGameObject
     public int TimesUpdated { get => _timesUpdated; }
     public bool HasBeenUpdated { get => _timesUpdated > 0; }
 
+    public IDynamicGameObjectJson ToJson()
+    {
+        throw new NotImplementedException();
+    }
+
     public void Update()
     {
         _timesUpdated++;
