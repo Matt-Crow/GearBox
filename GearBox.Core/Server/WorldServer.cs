@@ -1,6 +1,8 @@
 namespace GearBox.Core.Server;
 
 using GearBox.Core.Model;
+using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Static;
 
 public class WorldServer
 {
@@ -27,8 +29,9 @@ public class WorldServer
     {
         if (!_connections.Contains(connection))
         {
+            _world.AddDynamicObject(new Character()); //todo attach controls
             _connections.Add(connection);
-            var message = new Message(MessageType.WorldInit, _world.StaticContent);
+            var message = new Message<StaticWorldContentJson>(MessageType.WorldInit, _world.StaticContent.ToJson());
             await connection.Send(message);
         }
     }

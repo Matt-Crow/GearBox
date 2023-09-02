@@ -2,14 +2,17 @@ namespace GearBox.Core.Server;
 
 using GearBox.Core.Model;
 
-public class Message
+// must be generic to serialize Body as JSON: 
+// https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism?pivots=dotnet-7-0
+public readonly struct Message<T>
+where T : IJson
 {
-    public Message(MessageType type, ISerializable body)
+    public Message(MessageType type, T body)
     {
         Type = type;
         Body = body;
     }
 
     public MessageType Type { get; init; }
-    public ISerializable Body { get; init; }
+    public T Body { get; init; }
 }

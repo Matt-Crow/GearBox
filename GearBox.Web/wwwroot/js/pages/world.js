@@ -7,9 +7,9 @@ async function main() {
         .withUrl("/world-hub")
         .build();
     connection.on("receive", (message) => {
-        const li = $("<li></li>");
-        li.text(message);
-        li.appendTo("#output");
+        const obj = JSON.parse(message);
+        const pretty = JSON.stringify(obj, null, 4);
+        $("#output").text(pretty);
     });
     await connection.start();
 

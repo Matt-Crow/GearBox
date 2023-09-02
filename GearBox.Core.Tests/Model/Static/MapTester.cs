@@ -1,8 +1,8 @@
 namespace GearBox.Core.Tests.Model.Static;
 
+using GearBox.Core.Model;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
-using System.Drawing;
 using Xunit;
 
 public class MapTester
@@ -27,7 +27,7 @@ public class MapTester
     public void MustAddTileTypeBeforeSettingTiles()
     {
         var sut = new Map();
-        var aTileType = TileType.Tangible(Color.Green);
+        var aTileType = TileType.Tangible(Color.GREEN);
         Assert.Throws<ArgumentException>(() => sut.SetTileAt(Coordinates.ORIGIN, aTileType));
     }
 
@@ -35,8 +35,8 @@ public class MapTester
     public void CanSetKeyMultipleTimes()
     {
         var sut = new Map();
-        var type1 = TileType.Tangible(Color.Green);
-        var type2 = TileType.Tangible(Color.Red);
+        var type1 = TileType.Tangible(Color.GREEN);
+        var type2 = TileType.Tangible(Color.RED);
         
         sut.SetTileTypeForKey(1, type1);
         sut.SetTileTypeForKey(1, type2);
@@ -52,7 +52,7 @@ public class MapTester
     public void CannotSetTileOutOfBounds(int x, int y)
     {
         var sut = new Map(Dimensions.InTiles(20));
-        var aTileType = TileType.Tangible(Color.Green);
+        var aTileType = TileType.Tangible(Color.GREEN);
         sut.SetTileTypeForKey(1, aTileType);
 
         Assert.Throws<ArgumentException>(() => sut.SetTileAt(Coordinates.FromTiles(x, y), 1));

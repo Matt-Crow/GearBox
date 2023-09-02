@@ -1,3 +1,4 @@
+using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton(new WorldServer()); // todo WorldRepository
 
 var app = builder.Build();
 

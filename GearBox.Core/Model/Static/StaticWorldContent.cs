@@ -2,7 +2,7 @@ namespace GearBox.Core.Model.Static;
 
 using GearBox.Core.Model;
 
-public class StaticWorldContent : ISerializable
+public class StaticWorldContent : ISerializable<StaticWorldContentJson>
 {
     public static readonly StaticWorldContent EMPTY = new StaticWorldContent(
         new Map(), 
@@ -17,4 +17,14 @@ public class StaticWorldContent : ISerializable
 
     public Map Map { get; init; }
     public IEnumerable<IStaticGameObject> GameObjects { get; init; }
+
+
+    public StaticWorldContentJson ToJson()
+    {
+        return new StaticWorldContentJson()
+        {
+            Map = Map.ToJson(),
+            GameObjects = GameObjects.Select(x => x.ToJson())
+        };
+    }
 }

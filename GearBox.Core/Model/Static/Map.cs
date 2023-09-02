@@ -1,12 +1,11 @@
 namespace GearBox.Core.Model.Static;
 
 using GearBox.Core.Model.Units;
-using System.Drawing;
 
 /// <summary>
 /// a Map is a matrix of tiles the player can see and collide with
 /// </summary>
-public class Map
+public class Map : ISerializable<MapJson>
 {
     // maybe don't even need more than just tangible & intangible colors
     private readonly int[,] _tileMap;
@@ -31,7 +30,7 @@ public class Map
             throw new ArgumentException("height must be positive");
         }
         _tileMap = new int[height, width]; // initializes all to 0
-        _tileTypes[0] = TileType.Intangible(Color.Blue);
+        _tileTypes[0] = TileType.Intangible(Color.BLUE);
     }
 
 
@@ -88,5 +87,23 @@ public class Map
         {
             throw new ArgumentException($"require 0 <= y < {Height}");
         }
+    }
+
+    public MapJson ToJson()
+    {
+        // Convert 2d array to 2d list: https://stackoverflow.com/a/37458182/11110116
+        var tm = _tileMap.Cast<int>() 
+            .Select((x,i)=> new {x, index = i/_tileMap.GetLength(1)})
+            .GroupBy(x=>x.index)
+            .Select(x=>x.Select(s=>s.x).ToList())  
+            .ToList();
+
+        var tt = new List<KeyValueJson<int, TileTypeJson>>();
+        foreach (var kv in _tileTypes)
+        {
+            tt.Add(new KeyValueJson<int, TileTypeJson>(kv.Key, kv.Value.ToJson()));
+        }
+
+        return new MapJson(tm, tt);
     }
 }

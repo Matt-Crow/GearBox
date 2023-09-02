@@ -1,11 +1,9 @@
 namespace GearBox.Core.Model.Static;
 
-using System.Drawing;
-
 /// <summary>
 /// defines one type of tile which may exist on a map
 /// </summary>
-public class TileType
+public class TileType : ISerializable<TileTypeJson>
 {
     public TileType(Color color, bool isTangible)
     {
@@ -23,7 +21,11 @@ public class TileType
         return new TileType(color, false);
     }
 
-
     public Color Color { get; init; }
     public bool IsTangible { get; init; }
+
+    public TileTypeJson ToJson()
+    {
+        return new TileTypeJson(Color, IsTangible);
+    }
 }
