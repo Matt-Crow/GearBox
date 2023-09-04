@@ -21,8 +21,7 @@ export class MessageHandlers {
         if (this.#handlers.has(message.type)) {
             this.#handlers.get(message.type).handle(message.body);
         } else {
-            const pretty = JSON.stringify(message, null, 4);
-            $("#output").text(pretty);
+            throw new Error(`Unsupported message type: ${message.type}`);
         }
     }
 }

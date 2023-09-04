@@ -1,8 +1,16 @@
-export class Map {
+import { PIXELS_PER_TILE } from "./constants.js";
+import { TileType, deserializeTileTypeJson } from "./tileType.js";
+
+// avoids conflicts with build-in JS Map class
+export class WorldMap {
     #tileMap;
     #tileTypes;
     
-    constructor({tileMap, tileTypes}) {
+    /**
+     * @param {number[][]} tileMap `[y][x]` is a key in `tileTypes`
+     * @param {Map<number, TileType>} tileTypes maps values in `tileMap` to a type of tile
+     */
+    constructor(tileMap, tileTypes) {
         this.#tileMap = tileMap;
         this.#tileTypes = tileTypes;
     }
@@ -14,18 +22,22 @@ export class Map {
         this.#tileMap.forEach((row, yIdx) => {
             row.forEach((tileTypeIdx, xIdx) => {
                 const tileType = this.#tileTypes.get(tileTypeIdx);
-
-                // draw border
-                if (tileType.isTangible) {
-                    context.fillStyle = "rgb(100 100 100)";
-                } else {
-                    context.fillStyle = "rgb(200 200 200)";
-                }
-                context.fillRect(xIdx * 100, yIdx * 100, 100, 100);
-
-                context.fillStyle = tileType.color;
-                context.fillRect(xIdx * 100 + 10, yIdx * 100 + 10, 80, 80);
+                tileType.drawAt(context, xIdx * PIXELS_PER_TILE, yIdx * PIXELS_PER_TILE);
             })
         });
     }
+}
+
+/**
+ * 
+ * @param {{tileTypes: {key: number, value: {color: {red: number, green: number, blue: number}, isTangible: boolean}}[], tileMap: number[][]}} obj 
+ * @returns {WorldMap}
+ */
+export function deserializeMapJson(obj) {
+    const tileTypes = new Map();
+    obj.tileTypes.forEach(tileType => {
+        tileTypes.set(tileType.key, deserializeTileTypeJson(tileType.value));
+    });
+
+    return new WorldMap(obj.tileMap, tileTypes);
 }

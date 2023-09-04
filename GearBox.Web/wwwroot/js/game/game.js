@@ -1,29 +1,35 @@
-import { JsonDeserializers } from "./infrastructure/jsonDeserializers.js";
 import { MessageHandlers } from "./infrastructure/messageHandlers.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
 import { WorldDeserializer, WorldInitHandler, WorldProxy, WorldUpdateHandler } from "./model/world.js";
 
+
 export class Game {
+    /**
+     * The HTMLCanvasElement this draws on.
+     */
     #canvas;
-    #worldProxy;
-    #jsonDeserializers;
-    #messageHandlers;
+
+    /**
+     * A WorldProxy which can be used to access the current world - if any.
+     */
+    #worldProxy = new WorldProxy();
+
+    /**
+     * MessageHandlers which deserialize messages received from the server
+     */
+    #messageHandlers = new MessageHandlers();
 
     /**
      * @param {HTMLCanvasElement} canvas the HTML canvas to draw on.
      */
     constructor(canvas) {
         this.#canvas = canvas;
-        this.#worldProxy = new WorldProxy();
-        
-        this.#jsonDeserializers = new JsonDeserializers();
-        this.#jsonDeserializers.addDeserializer(new CharacterJsonDeserializer());
 
         const worldDeserializer = new WorldDeserializer();
+        worldDeserializer.addDynamicObjectDeserializer(new CharacterJsonDeserializer());
 
-        this.#messageHandlers = new MessageHandlers();
         this.#messageHandlers.addHandler(new WorldInitHandler(this.#worldProxy, worldDeserializer));
-        this.#messageHandlers.addHandler(new WorldUpdateHandler(this.#worldProxy, this.#jsonDeserializers));
+        this.#messageHandlers.addHandler(new WorldUpdateHandler(this.#worldProxy, worldDeserializer));
 
         setInterval(() => this.#update(), 1000); // todo better frame rate
     }

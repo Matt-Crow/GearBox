@@ -1,7 +1,7 @@
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
 import { MessageHandler } from "../infrastructure/messageHandler.js";
-import { Map as WorldMap } from "./map.js";
+import { deserializeMapJson } from "./map.js";
 
 export class WorldProxy {
     #world;
@@ -67,7 +67,7 @@ export class WorldDeserializer {
     }
 
     deserializeWorldInitBody(obj) {
-        const map = this.#deserializeMap(obj.map);
+        const map = deserializeMapJson(obj.map);
         const staticGameObjects = this.#deserializeStaticGameObjects(obj.gameObjects);
         return new World(map, staticGameObjects);
     }
@@ -75,27 +75,6 @@ export class WorldDeserializer {
     deserializeWorldUpdateBody(obj) {
         const dynamicGameObjects = obj.gameObjects.map(x => this.#dynamicObjectDeserializers.deserialize(x));
         return dynamicGameObjects;
-    }
-
-    #deserializeMap(obj) {
-        const tileTypes = new Map();
-        obj.tileTypes.forEach(tileType => {
-            const r = tileType.value.color.red;
-            const g = tileType.value.color.green;
-            const b = tileType.value.color.blue;
-            const color = `rgb(${r} ${g} ${b})`; // CSS color doesn't use commas
-            // https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
-
-            tileTypes.set(tileType.key, {
-                color: color,
-                isTangible: tileType.value.isTangible
-            });
-        });
-
-        return new WorldMap({
-            tileMap: obj.tileMap, 
-            tileTypes: tileTypes
-        });
     }
 
     #deserializeStaticGameObjects(gameObjectsJson) {
@@ -117,9 +96,9 @@ export class WorldInitHandler extends MessageHandler {
 
 export class WorldUpdateHandler extends MessageHandler {
     
-    constructor(worldProxy, jsonDeserializers) {
+    constructor(worldProxy, worldDeserializer) {
         super("WorldUpdate", (obj) => {
-            const deserialized = obj.gameObjects.map(json => jsonDeserializers.deserialize(json));
+            const deserialized = worldDeserializer.deserializeWorldUpdateBody(obj);
             worldProxy.value.dynamicGameObjects = deserialized;
         });
     }
