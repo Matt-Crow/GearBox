@@ -3,7 +3,12 @@ import { Game } from "../game/game.js";
 $(async () => await main());
 
 async function main() {
-    const game = new Game();
+    const canvas = document.getElementById("canvas"); // don't want some weird JQuery proxy
+    if (canvas === null) {
+        throw new Error("Canvas not found.");
+    }
+
+    const game = new Game(canvas);
 
     $("#submit").prop("disabled", true);
     const connection = new signalR.HubConnectionBuilder()
@@ -11,7 +16,12 @@ async function main() {
         .build();
     connection.on("receive", (message) => {
         const obj = JSON.parse(message);
-        game.handle(obj);
+        try {
+            game.handle(obj);
+        } catch (e) {
+            // set breakpoint here if SignalR keeps suppressing error messages
+            console.error(e);
+        }
     });
     await connection.start();
 
