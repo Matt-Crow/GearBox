@@ -11,8 +11,8 @@ public class WorldServerTester
         var spy = new SpyConnection();
         var sut = new WorldServer();
 
-        await sut.AddConnection(spy);
-        await sut.AddConnection(spy);
+        await sut.AddConnection("foo", spy);
+        await sut.AddConnection("foo", spy);
 
         Assert.Equal(1, sut.TotalConnections);
     }
@@ -24,10 +24,10 @@ public class WorldServerTester
         var sut = new WorldServer();
         Assert.Equal(0, sut.TotalConnections);
 
-        await sut.AddConnection(spy);
+        await sut.AddConnection("foo", spy);
         Assert.Equal(1, sut.TotalConnections);
 
-        await sut.RemoveConnection(spy);
+        await sut.RemoveConnection("foo");
         Assert.Equal(0, sut.TotalConnections);
     }
 
@@ -37,7 +37,7 @@ public class WorldServerTester
         var spy = new SpyConnection();
         var sut = new WorldServer();
 
-        await sut.AddConnection(spy);
+        await sut.AddConnection("foo", spy);
 
         Assert.Contains(spy.MessagesReceived, message => message.Type == MessageType.WorldInit);
     }
@@ -48,8 +48,8 @@ public class WorldServerTester
         var client1 = new SpyConnection();
         var client2 = new SpyConnection();
         var sut = new WorldServer();
-        await sut.AddConnection(client1);
-        await sut.AddConnection(client2);
+        await sut.AddConnection("foo", client1);
+        await sut.AddConnection("bar", client2);
 
         await sut.Update();
 

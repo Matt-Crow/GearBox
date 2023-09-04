@@ -26,9 +26,4 @@ public class WorldHubConnection : IConnection
         });
         await _player.SendAsync("receive", sendMe);
     }
-
-    public Task<Message<T>> Receive<T>() where T : IJson
-    {
-        throw new NotImplementedException();
-    }
 }

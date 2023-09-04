@@ -4,6 +4,8 @@ namespace GearBox.Core.Server;
 
 /// <summary>
 /// A connection to a client.
+/// See WorldServer for how implementors should handle receiving messages from
+/// the connection.
 /// </summary>
 public interface IConnection
 {
@@ -11,9 +13,4 @@ public interface IConnection
     /// Sends a message to the client.
     /// </summary>
     public Task Send<T>(Message<T> message) where T : IJson;
-
-    /// <summary>
-    /// Waits for a message to arrive from the client, then returns that message
-    /// </summary>
-    public Task<Message<T>> Receive<T>() where T : IJson;
 }

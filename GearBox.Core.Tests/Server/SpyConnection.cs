@@ -15,9 +15,4 @@ public class SpyConnection : IConnection
         _messagesReceived.Add(new Message<IJson>(message.Type, message.Body));
         return Task.CompletedTask;
     }
-
-    public Task<Message<T>> Receive<T>() where T : IJson
-    {
-        throw new Exception();
-    }
 }

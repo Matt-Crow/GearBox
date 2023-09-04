@@ -1,11 +1,10 @@
-using System.Text.Json;
-using GearBox.Core.Model;
-using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Controls;
 using GearBox.Core.Server;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GearBox.Web.Infrastructure;
 
+// Hubs are transient: don't try storing data on them
 public class WorldHub : Hub
 {
     private readonly WorldServer _server;
@@ -17,8 +16,15 @@ public class WorldHub : Hub
 
     public override async Task OnConnectedAsync()
     {
+        var id = Context.ConnectionId;
         // new player
-        await _server.AddConnection(new WorldHubConnection(Clients.Caller));
+        await _server.AddConnection(id, new WorldHubConnection(Clients.Caller));
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        await _server.RemoveConnection(Context.ConnectionId);
+        await base.OnDisconnectedAsync(exception);
     }
 
     /// <summary>
@@ -29,6 +35,31 @@ public class WorldHub : Hub
     public async Task Send(string message)
     {
         //var sender = Context.User;
-        await Clients.All.SendAsync("receive", $"{{\"message:\": \"{message}\"}}");
+        if (message == "r")
+        {
+            await StartMovingRight();
+        }
+        else
+        {
+            await StopMovingRight();
+        }
+    }
+
+    public Task StartMovingRight()
+    {
+        return Receive(StartMoving.RIGHT);
+    }
+
+    public Task StopMovingRight()
+    {
+        return Receive(StopMoving.RIGHT);
+    }
+
+    private Task Receive(IControlCommand command)
+    {
+        var id = Context.ConnectionId;
+        var controller = _server.GetControlsById(id) ?? throw new Exception($"Invalid id: \"{id}\"");
+        controller.Receive(command);
+        return Task.CompletedTask;
     }
 }

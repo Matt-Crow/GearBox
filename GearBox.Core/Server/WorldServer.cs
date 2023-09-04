@@ -1,6 +1,7 @@
 namespace GearBox.Core.Server;
 
 using System.Timers;
+using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Static;
@@ -8,7 +9,8 @@ using GearBox.Core.Model.Static;
 public class WorldServer
 {
     private readonly World _world;
-    private readonly HashSet<IConnection> _connections;
+    private readonly Dictionary<string, IConnection> _connections = new();
+    private readonly Dictionary<string, CharacterController> _controls = new();
     private readonly Timer _timer;
 
     public WorldServer() : this(new World())
@@ -19,7 +21,6 @@ public class WorldServer
     public WorldServer(World world)
     {
         _world = world;
-        _connections = new HashSet<IConnection>();
         
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
@@ -42,13 +43,15 @@ public class WorldServer
     /// <summary>
     /// Adds the given connection, then sends the world
     /// </summary>
-    public async Task AddConnection(IConnection connection)
+    public async Task AddConnection(string id, IConnection connection)
     {
         // might need to synchronize this
-        if (!_connections.Contains(connection))
+        if (!_connections.ContainsKey(id))
         {
-            _world.AddDynamicObject(new Character()); //todo attach controls
-            _connections.Add(connection);
+            var character = new Character(); // will eventually read from repo
+            _world.AddDynamicObject(character);
+            _connections.Add(id, connection);
+            _controls.Add(id, new CharacterController(character));
             var message = new Message<StaticWorldContentJson>(MessageType.WorldInit, _world.StaticContent.ToJson());
             await connection.Send(message);
 
@@ -59,13 +62,11 @@ public class WorldServer
         }
     }
 
-    public Task RemoveConnection(IConnection connection)
+    public Task RemoveConnection(string id)
     {
-        if (_connections.Contains(connection))
+        if (_connections.ContainsKey(id))
         {
-            _connections.Remove(connection);
-            //TODO maybe send message that they left
-
+            _connections.Remove(id);
             if (!_connections.Any())
             {
                 _timer.Stop();
@@ -74,13 +75,22 @@ public class WorldServer
         return Task.CompletedTask;
     }
 
+    public CharacterController? GetControlsById(string id)
+    {
+        if (_controls.ContainsKey(id))
+        {
+            return _controls[id];
+        }
+        return null;
+    }
+
     public async Task Update()
     {
         _world.Update();
 
         // notify everyone of the update
         var message = new Message<DynamicWorldContentJson>(MessageType.WorldUpdate, _world.DynamicContent.ToJson());
-        var tasks = _connections.Select(conn => conn.Send(message));
+        var tasks = _connections.Values.Select(conn => conn.Send(message));
         await Task.WhenAll(tasks);
     }
 }
