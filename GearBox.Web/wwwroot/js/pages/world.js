@@ -1,4 +1,5 @@
 import { Game } from "../game/game.js";
+import { Client } from "../game/infrastructure/client.js";
 
 $(async () => await main());
 
@@ -31,4 +32,21 @@ async function main() {
         e.preventDefault();
     });
     $("#submit").prop("disabled", false);
+
+    const client = new Client(connection);
+    const keyMappings = new Map(); // value is [onUp, onDown]
+    keyMappings.set("KeyW", [() => client.stopMovingUp(),    () => client.startMovingUp()]);
+    keyMappings.set("KeyA", [() => client.stopMovingLeft(),  () => client.startMovingLeft()]);
+    keyMappings.set("KeyS", [() => client.stopMovingDown(),  () => client.startMovingDown()]);
+    keyMappings.set("KeyD", [() => client.stopMovingRight(), () => client.startMovingRight()]);
+    document.addEventListener("keyup", e => {
+        if (keyMappings.has(e.code)) {
+            keyMappings.get(e.code)[0]();
+        }
+    });
+    document.addEventListener("keydown", e => {
+        if (keyMappings.has(e.code)) {
+            keyMappings.get(e.code)[1]();
+        }
+    });
 }

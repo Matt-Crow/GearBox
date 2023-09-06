@@ -45,15 +45,22 @@ public class WorldHub : Hub
         }
     }
 
-    public Task StartMovingRight()
-    {
-        return Receive(StartMoving.RIGHT);
-    }
+    /*
+        Not sure how much I like this idea, 
+        as while it is very few lines of code,
+        it is a lot of little methods.
 
-    public Task StopMovingRight()
-    {
-        return Receive(StopMoving.RIGHT);
-    }
+        Maybe I'll come back to this once I've settled on serialization methods.
+    */
+    public Task StartMovingUp() => Receive(StartMoving.UP);
+    public Task StartMovingDown() => Receive(StartMoving.DOWN);
+    public Task StartMovingLeft() => Receive(StartMoving.LEFT);
+    public Task StartMovingRight() => Receive(StartMoving.RIGHT);
+
+    public Task StopMovingUp() => Receive(StopMoving.UP);
+    public Task StopMovingDown() => Receive(StopMoving.DOWN);
+    public Task StopMovingLeft() => Receive(StopMoving.LEFT);
+    public Task StopMovingRight() => Receive(StopMoving.RIGHT);
 
     private Task Receive(IControlCommand command)
     {

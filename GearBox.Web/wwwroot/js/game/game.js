@@ -31,7 +31,7 @@ export class Game {
         this.#messageHandlers.addHandler(new WorldInitHandler(this.#worldProxy, worldDeserializer));
         this.#messageHandlers.addHandler(new WorldUpdateHandler(this.#worldProxy, worldDeserializer));
 
-        setInterval(() => this.#update(), 1000); // todo better frame rate
+        setInterval(() => this.#update(), 1000 / 24);
     }
 
     /**
