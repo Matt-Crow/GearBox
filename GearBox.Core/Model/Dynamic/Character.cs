@@ -9,7 +9,7 @@ public class Character : IDynamicGameObject
 {
     private readonly MobileBehavior _mobility;
 
-    public Character() : this(Velocity.FromPolar(Speed.InTilesPerSecond(5), Direction.DOWN))
+    public Character() : this(Velocity.FromPolar(Speed.InTilesPerSecond(3), Direction.DOWN))
     {
 
     }
@@ -19,6 +19,11 @@ public class Character : IDynamicGameObject
         _mobility = new MobileBehavior(velocity);
     }
 
+
+    /// <summary>
+    /// Used by clients to uniquely identify a character across updates.
+    /// </summary>
+    public Guid Id { get; init; } = Guid.NewGuid();
 
     public Coordinates Coordinates { get => _mobility.Coordinates; set => _mobility.Coordinates = value; }
 
@@ -36,6 +41,7 @@ public class Character : IDynamicGameObject
     public IDynamicGameObjectJson ToJson()
     {
         return new CharacterJson(
+            Id,
             _mobility.Coordinates.XInPixels, 
             _mobility.Coordinates.YInPixels
         );

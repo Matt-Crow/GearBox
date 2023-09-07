@@ -52,7 +52,8 @@ public class WorldServer
             _world.AddDynamicObject(character);
             _connections.Add(id, connection);
             _controls.Add(id, new CharacterController(character));
-            var message = new Message<StaticWorldContentJson>(MessageType.WorldInit, _world.StaticContent.ToJson());
+            var payload = new WorldInit(character.Id, _world.StaticContent.ToJson());
+            var message = new Message<WorldInit>(MessageType.WorldInit, payload);
             await connection.Send(message);
 
             if (!_timer.Enabled)

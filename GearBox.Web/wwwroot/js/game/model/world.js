@@ -1,6 +1,7 @@
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
 import { MessageHandler } from "../infrastructure/messageHandler.js";
+import { Character } from "./character.js";
 import { deserializeMapJson } from "./map.js";
 
 export class WorldProxy {
@@ -10,6 +11,9 @@ export class WorldProxy {
         this.#world = null;
     }
 
+    /**
+     * @returns {World}
+     */
     get value() {
         if (this.#world === null) {
             throw new Error("world has not been set yet");
@@ -17,17 +21,22 @@ export class WorldProxy {
         return this.#world;
     }
 
+    /**
+     * @param {World} world 
+     */
     set value(world) {
         this.#world = world;
     }
 }
 
 export class World {
+    #playerId; // need reference to changing player
     #map;
     #staticGameObjects;
     #dynamicGameObjects;
 
-    constructor(map, staticGameObjects) {
+    constructor(playerId, map, staticGameObjects) {
+        this.#playerId = playerId;
         this.#map = map;
         this.#staticGameObjects = staticGameObjects;
         this.#dynamicGameObjects = [];
@@ -38,6 +47,27 @@ export class World {
      */
     set dynamicGameObjects(value) {
         this.#dynamicGameObjects = value;
+    }
+
+    /**
+     * @returns {Character} the player the client controls
+     */
+    get player() {
+        return this.#dynamicGameObjects.find(obj => obj.id == this.#playerId);
+    }
+
+    /**
+     * @returns {number}
+     */
+    get widthInPixels() {
+        return this.#map.widthInPixels;
+    }
+
+    /**
+     * @returns {number}
+     */
+    get heightInPixels() {
+        return this.#map.heightInPixels;
     }
 
     /**
@@ -67,9 +97,9 @@ export class WorldDeserializer {
     }
 
     deserializeWorldInitBody(obj) {
-        const map = deserializeMapJson(obj.map);
-        const staticGameObjects = this.#deserializeStaticGameObjects(obj.gameObjects);
-        return new World(map, staticGameObjects);
+        const map = deserializeMapJson(obj.staticWorldContent.map);
+        const staticGameObjects = this.#deserializeStaticGameObjects(obj.staticWorldContent.gameObjects);
+        return new World(obj.playerId, map, staticGameObjects);
     }
 
     deserializeWorldUpdateBody(obj) {

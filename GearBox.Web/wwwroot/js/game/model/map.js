@@ -16,6 +16,20 @@ export class WorldMap {
     }
 
     /**
+     * @returns {number}
+     */
+    get widthInPixels() {
+        return this.#tileMap[0].length * PIXELS_PER_TILE;
+    }
+
+    /**
+     * @returns {number}
+     */
+    get heightInPixels() {
+        return this.#tileMap.length * PIXELS_PER_TILE;
+    }
+
+    /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
     draw(context) {

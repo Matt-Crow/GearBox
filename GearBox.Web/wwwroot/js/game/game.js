@@ -45,9 +45,31 @@ export class Game {
     #update() {
         try {
             const world = this.#worldProxy.value;
-            world.draw(this.#canvas.getContext("2d"));
+            const player = world.player;
+            const w = this.#canvas.width;
+            const h = this.#canvas.height;
+            const ctx = this.#canvas.getContext("2d");
+            ctx.clearRect(0, 0, w, h);
+            if (player) {
+                ctx.translate(
+                    clamp(w - world.widthInPixels, -player.x + w/2, 0), 
+                    clamp(h - world.heightInPixels, -player.y + h/2, 0)
+                );
+            }
+            world.draw(ctx);
+            ctx.resetTransform();
         } catch (e) {
             // world is not yet ready; don't bother reporting, as update handler does so
         }
     }
+}
+
+function clamp(min, x, max) {
+    if (x > max) {
+        return max;
+    }
+    if (x < min) {
+        return min;
+    }
+    return x;
 }
