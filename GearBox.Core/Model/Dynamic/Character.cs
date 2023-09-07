@@ -51,4 +51,18 @@ public class Character : IDynamicGameObject
     {
         _mobility.UpdateMovement();
     }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not Character other)
+        {
+            return false;
+        }
+        return other.Id == Id;
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 }

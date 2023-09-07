@@ -27,7 +27,7 @@ public class WorldServerTester
         await sut.AddConnection("foo", spy);
         Assert.Equal(1, sut.TotalConnections);
 
-        await sut.RemoveConnection("foo");
+        sut.RemoveConnection("foo");
         Assert.Equal(0, sut.TotalConnections);
     }
 

@@ -21,6 +21,11 @@ public class DynamicWorldContent : ISerializable<DynamicWorldContentJson>
         _dynamicObjects.Add(obj);
     }
 
+    public void RemoveDynamicObject(IDynamicGameObject obj)
+    {
+        _dynamicObjects.Remove(obj);
+    }
+
     private void EnsureNotYetAdded(IGameObject obj)
     {
         if (_dynamicObjects.Contains(obj))

@@ -23,7 +23,7 @@ public class WorldHub : Hub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await _server.RemoveConnection(Context.ConnectionId);
+        _server.RemoveConnection(Context.ConnectionId);
         await base.OnDisconnectedAsync(exception);
     }
 

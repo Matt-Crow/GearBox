@@ -39,6 +39,11 @@ public class World
         DynamicContent.AddDynamicObject(obj);
     }
 
+    public void RemoveDynamicObject(IDynamicGameObject obj)
+    {
+        DynamicContent.RemoveDynamicObject(obj);
+    }
+
     /// <summary>
     /// Called each game tick.
     /// Updates the world and everything in it

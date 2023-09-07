@@ -10,6 +10,7 @@ public class WorldServer
 {
     private readonly World _world;
     private readonly Dictionary<string, IConnection> _connections = new();
+    private readonly Dictionary<string, Character> _players = new();
     private readonly Dictionary<string, CharacterController> _controls = new();
     private readonly Timer _timer;
 
@@ -51,6 +52,7 @@ public class WorldServer
             var character = new Character(); // will eventually read from repo
             _world.AddDynamicObject(character);
             _connections.Add(id, connection);
+            _players.Add(id, character);
             _controls.Add(id, new CharacterController(character));
             var payload = new WorldInit(character.Id, _world.StaticContent.ToJson());
             var message = new Message<WorldInit>(MessageType.WorldInit, payload);
@@ -63,17 +65,26 @@ public class WorldServer
         }
     }
 
-    public Task RemoveConnection(string id)
+    public void RemoveConnection(string id)
     {
-        if (_connections.ContainsKey(id))
+        if (!_connections.ContainsKey(id))
         {
-            _connections.Remove(id);
-            if (!_connections.Any())
-            {
-                _timer.Stop();
-            }
+            return;
         }
-        return Task.CompletedTask;
+
+        var character = _players[id];
+        if (character is not null)
+        {
+            _world.RemoveDynamicObject(character);
+        }
+        _players.Remove(id);
+        _connections.Remove(id);
+        _controls.Remove(id);
+
+        if (!_connections.Any())
+        {
+            _timer.Stop();
+        }
     }
 
     public CharacterController? GetControlsById(string id)
