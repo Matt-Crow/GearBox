@@ -51,6 +51,14 @@ public class World
     public void Update()
     {
         DynamicContent.Update();
+        foreach (var obj in DynamicObjects)
+        {
+            var body = obj.Body;
+            if (body is not null)
+            {
+                StaticContent.CheckForCollisions(body);
+            }
+        }
     }
 
     public override bool Equals(object? other)

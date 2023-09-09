@@ -8,12 +8,20 @@ using GearBox.Core.Model.Units;
 /// </summary>
 public class MobileBehavior
 {
-    public MobileBehavior(Velocity velocity)
+    private readonly BodyBehavior _body;
+
+    public MobileBehavior(Velocity velocity) : this(new(), velocity)
     {
+
+    }
+
+    public MobileBehavior(BodyBehavior body, Velocity velocity)
+    {
+        _body = body;
         Velocity = velocity;
     }
 
-    public Coordinates Coordinates { get; set; } = Coordinates.ORIGIN;
+    public Coordinates Coordinates { get => _body.Location; set => _body.Location = value; }
     public Velocity Velocity { get; set; }
     public bool IsMoving { get; set; } = false;
 

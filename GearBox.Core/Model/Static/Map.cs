@@ -1,5 +1,6 @@
 namespace GearBox.Core.Model.Static;
 
+using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Units;
 
 /// <summary>
@@ -34,8 +35,8 @@ public class Map : ISerializable<MapJson>
     }
 
 
-    public int Width { get => _tileMap.GetLength(1); }
-    public int Height { get => _tileMap.Length; }
+    private Distance Width { get => Distance.FromTiles(_tileMap.GetLength(1)); }
+    private Distance Height { get => Distance.FromTiles(_tileMap.GetLength(0)); }
 
 
     public void SetTileTypeForKey(int key, TileType value)
@@ -79,13 +80,43 @@ public class Map : ISerializable<MapJson>
     {
         var x = coordinates.XInTiles;
         var y = coordinates.YInTiles;
-        if (0 > x || x >= Width)
+        if (0 > x || x >= Width.InTiles)
         {
-            throw new ArgumentException($"require 0 <= x < {Width}");
+            throw new ArgumentException($"require 0 <= x < {Width.InTiles}");
         }
-        if (0 > y || y >= Height)
+        if (0 > y || y >= Height.InTiles)
         {
-            throw new ArgumentException($"require 0 <= y < {Height}");
+            throw new ArgumentException($"require 0 <= y < {Height.InTiles}");
+        }
+    }
+
+    /// <summary>
+    /// Checks if the given object collides with any part of the map,
+    /// then moves it if needed.
+    /// </summary>
+    /// <param name="body">the object to check for collisions with</param>
+    public void CheckForCollisions(BodyBehavior body)
+    {
+        KeepInBounds(body);
+    }
+
+    private void KeepInBounds(BodyBehavior body)
+    {
+        if (body.LeftInPixels < 0)
+        {
+            body.LeftInPixels = 0;
+        }
+        if (body.RightInPixels > Width.InPixels)
+        {
+            body.RightInPixels = Width.InPixels;
+        }
+        if (body.TopInPixels < 0)
+        {
+            body.TopInPixels = 0;
+        }
+        if (body.BottomInPixels > Height.InPixels)
+        {
+            body.BottomInPixels = Height.InPixels;
         }
     }
 

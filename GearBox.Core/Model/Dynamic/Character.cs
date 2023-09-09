@@ -16,7 +16,7 @@ public class Character : IDynamicGameObject
 
     public Character(Velocity velocity)
     {
-        _mobility = new MobileBehavior(velocity);
+        _mobility = new MobileBehavior(Body, velocity);
     }
 
 
@@ -25,7 +25,9 @@ public class Character : IDynamicGameObject
     /// </summary>
     public Guid Id { get; init; } = Guid.NewGuid();
 
-    public Coordinates Coordinates { get => _mobility.Coordinates; set => _mobility.Coordinates = value; }
+    public BodyBehavior Body { get; init; } = new();
+
+    public Coordinates Coordinates { get => Body.Location; set => Body.Location = value; }
 
 
     public void StartMovingIn(Direction direction)

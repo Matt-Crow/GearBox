@@ -21,6 +21,11 @@ public readonly struct Distance
         return new Distance(tiles * PIXELS_PER_TILE);
     }
 
+    public static Distance FromTiles(double tiles)
+    {
+        return new Distance((int)(tiles * PIXELS_PER_TILE));
+    }
+
     public int InPixels { get => _inPixels; }
     public int InTiles { get => _inPixels / PIXELS_PER_TILE; }
 

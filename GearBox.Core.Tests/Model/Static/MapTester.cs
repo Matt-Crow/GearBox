@@ -1,6 +1,7 @@
 namespace GearBox.Core.Tests.Model.Static;
 
 using GearBox.Core.Model;
+using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 using Xunit;
@@ -56,5 +57,19 @@ public class MapTester
         sut.SetTileTypeForKey(1, aTileType);
 
         Assert.Throws<ArgumentException>(() => sut.SetTileAt(Coordinates.FromTiles(x, y), 1));
+    }
+
+    [Fact]
+    public void CheckForCollisions_GivenOutOfBounds_MovesInBounds()
+    {
+        var sut = new Map();
+        var outOfBounds = new BodyBehavior()
+        {
+            Location = Coordinates.FromPixels(-1, 1000)
+        };
+
+        sut.CheckForCollisions(outOfBounds);
+
+        Assert.Equal(Coordinates.FromPixels(outOfBounds.Radius.InPixels, 1000), outOfBounds.Location);
     }
 }
