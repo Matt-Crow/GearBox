@@ -72,4 +72,22 @@ public class MapTester
 
         Assert.Equal(Coordinates.FromPixels(outOfBounds.Radius.InPixels, 1000), outOfBounds.Location);
     }
+
+    [Fact]
+    public void CheckForCollisions_GivenInTile_ShovesOut()
+    {
+        var sut = new Map();
+        var tangible = TileType.Tangible(Color.RED);
+        sut.SetTileTypeForKey(1, tangible);
+        var coordinates = Coordinates.FromTiles(2, 2);
+        sut.SetTileAt(coordinates, tangible);
+        var inTile = new BodyBehavior()
+        {
+            Location = coordinates
+        };
+
+        sut.CheckForCollisions(inTile);
+
+        Assert.NotEqual(coordinates, inTile.Location);
+    }
 }

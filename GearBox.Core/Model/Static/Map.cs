@@ -35,8 +35,8 @@ public class Map : ISerializable<MapJson>
     }
 
 
-    private Distance Width { get => Distance.FromTiles(_tileMap.GetLength(1)); }
-    private Distance Height { get => Distance.FromTiles(_tileMap.GetLength(0)); }
+    public Distance Width { get => Distance.FromTiles(_tileMap.GetLength(1)); }
+    public Distance Height { get => Distance.FromTiles(_tileMap.GetLength(0)); }
 
 
     public void SetTileTypeForKey(int key, TileType value)
@@ -76,6 +76,22 @@ public class Map : ISerializable<MapJson>
         return result;
     }
 
+    public bool IsValid(Coordinates coordinates)
+    {
+        // do not use try/catch around Validate, significant performance issues
+        var x = coordinates.XInTiles;
+        var y = coordinates.YInTiles;
+        if (0 > x || x >= Width.InTiles)
+        {
+            return false;
+        }
+        if (0 > y || y >= Height.InTiles)
+        {
+            return false;
+        }
+        return true;
+    }
+
     private void Validate(Coordinates coordinates)
     {
         var x = coordinates.XInTiles;
@@ -98,6 +114,7 @@ public class Map : ISerializable<MapJson>
     public void CheckForCollisions(BodyBehavior body)
     {
         KeepInBounds(body);
+        ShoveOutOfTiles(body);
     }
 
     private void KeepInBounds(BodyBehavior body)
@@ -117,6 +134,42 @@ public class Map : ISerializable<MapJson>
         if (body.BottomInPixels > Height.InPixels)
         {
             body.BottomInPixels = Height.InPixels;
+        }
+    }
+
+    private void ShoveOutOfTiles(BodyBehavior body)
+    {
+        if (body.Radius.InPixels * 2 > Distance.FromTiles(1).InPixels)
+        {
+            throw new Exception("Objects with large radius are not supported yet");
+        }
+
+        // For now, we're only dealing with bodies with radius of 1/2 tile or less.
+        // That makes the math a lot easier.
+
+        /*
+            Since this body is 1x1 tiles at most, it can occupy at most 4 times,
+            like so
+                aabb
+                axxb
+                cxxd
+                ccdd
+            Where a, b, c, and d are tiles, and x is the body.
+            So let's start checking in their upper-left corner, then check their
+            other corners.
+        */
+        var upperLeft = Coordinates.FromPixels(body.LeftInPixels, body.TopInPixels);
+        // truncate to upper left tile
+        var upperLeftTile = Coordinates.FromTiles(upperLeft.XInTiles, upperLeft.YInTiles);
+
+        // check all the tiles they occupy
+        for (var iter = new TileIterator(this, upperLeftTile, Dimensions.InTiles(2)); !iter.Done; iter.Next())
+        {
+            var tile = iter.Current;
+            if (tile.TileType.IsTangible && tile.IsCollidingWith(body))
+            {
+                tile.ShoveOut(body);
+            }
         }
     }
 
