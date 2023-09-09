@@ -40,12 +40,14 @@ async function main() {
     keyMappings.set("KeyS", [() => client.stopMovingDown(),  () => client.startMovingDown()]);
     keyMappings.set("KeyD", [() => client.stopMovingRight(), () => client.startMovingRight()]);
     document.addEventListener("keyup", e => {
-        if (keyMappings.has(e.code)) {
+        // uses e.repeat to check if key is held down
+        if (keyMappings.has(e.code) && !e.repeat) {
             keyMappings.get(e.code)[0]();
         }
     });
     document.addEventListener("keydown", e => {
-        if (keyMappings.has(e.code)) {
+        // uses e.repeat to check if key is held down
+        if (keyMappings.has(e.code) && !e.repeat) {
             keyMappings.get(e.code)[1]();
         }
     });

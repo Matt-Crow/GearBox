@@ -53,4 +53,11 @@ public class DirectionTester
         
         Assert.Equal(angle1, actual);
     }
+
+    [Fact]
+    public void DegreesBetween_LeftAndUp_Is90()
+    {
+        var actual = Direction.DegreesBetween(Direction.LEFT, Direction.UP);
+        Assert.Equal(90, actual);
+    }
 }

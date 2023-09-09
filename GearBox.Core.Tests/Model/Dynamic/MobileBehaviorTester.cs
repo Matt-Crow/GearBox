@@ -70,6 +70,17 @@ public class MobileBehaviorTester
     }
 
     [Fact]
+    public void StartMovingIn_GivenOrthogonal_Combines2()
+    {
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT));
+
+        sut.StartMovingIn(Direction.UP);
+        sut.StartMovingIn(Direction.LEFT);
+
+        Assert.Equal(Direction.FromBearingDegrees(315), sut.Velocity.Angle);
+    }
+
+    [Fact]
     public void StartMovingIn_GivenOpposite_Cancels()
     {
         var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT));

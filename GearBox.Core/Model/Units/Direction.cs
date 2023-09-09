@@ -28,7 +28,24 @@ public readonly struct Direction
 
     public static int DegreesBetween(Direction a, Direction b)
     {
-        return Math.Abs(a._bearingInDegrees - b._bearingInDegrees);
+        // make life easier by ensuring a < b
+        if (a._bearingInDegrees > b._bearingInDegrees)
+        {
+            return DegreesBetween(b, a);
+        }
+        
+        var degrees = b._bearingInDegrees - a._bearingInDegrees;
+
+        /*
+            You can get from one angle to another by going either clockwise or
+            counterclockwise; make sure the previous calculation didn't go the
+            long way!
+        */
+        if (degrees > 180) {
+            degrees = 360 - degrees;
+        }
+
+        return degrees;
     }
 
     /// <summary>
@@ -39,9 +56,40 @@ public readonly struct Direction
     /// <returns></returns>
     public static Direction Between(Direction a, Direction b)
     {
-        var angleBetween = DegreesBetween(a, b);
-        var smaller = Math.Min(a._bearingInDegrees, b._bearingInDegrees);
-        var degrees = smaller + angleBetween/2;
+        /*
+            Suppose there exist 3 angles: a, b, and c.
+            Where c is located between a & b
+                a < c < b OR b < c < a
+            and c is an equidistant from both a & b
+                |a - c| = |b - c|
+            AND the angle between a & c <= 90 degrees
+            solve for c.
+
+            2 cases:
+            if a < c < b
+                then |a - c| = c - a
+                and |b - c| = b - c = c - a
+                thus c = (a+b)/2
+            if b < c < a
+                then |a - c| = a - c
+                and |b - c| = c - b = a - c
+                thus c = (a+b)/2
+        */
+
+        var degrees = (a._bearingInDegrees + b._bearingInDegrees)/2;
+
+        /*
+            There are always 2 angles between a & b and of equal distance from
+            each of them. For example, for a = 0 and b = 90, both 45 (c) and 225
+            (c') satisfy those requirements, so we need to check whether we've
+            found c or c'
+        */
+        if (Math.Abs(a._bearingInDegrees - degrees) > 90)
+        {
+            // we've found c', so convert to c
+            degrees -= 180;
+        }
+
         return FromBearingDegrees(degrees);
     }
 
