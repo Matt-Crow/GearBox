@@ -27,24 +27,6 @@ public class WorldHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    /// <summary>
-    /// Called by Javascript, calls Javascript on all clients.
-    /// </summary>
-    /// <param name="message">the message sent by Javascipt</param>
-    /// <returns>A task which resolves once Javascript is invoked on all clients</returns>
-    public async Task Send(string message)
-    {
-        //var sender = Context.User;
-        if (message == "r")
-        {
-            await StartMovingRight();
-        }
-        else
-        {
-            await StopMovingRight();
-        }
-    }
-
     /*
         Not sure how much I like this idea, 
         as while it is very few lines of code,

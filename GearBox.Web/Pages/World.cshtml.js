@@ -1,5 +1,5 @@
-import { Game } from "../game/game.js";
-import { Client } from "../game/infrastructure/client.js";
+import { Game } from "../js/game/game.js";
+import { Client } from "../js/game/infrastructure/client.js";
 
 $(async () => await main());
 
@@ -11,7 +11,6 @@ async function main() {
 
     const game = new Game(canvas);
 
-    $("#submit").prop("disabled", true);
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("/world-hub")
         .build();
@@ -25,13 +24,6 @@ async function main() {
         }
     });
     await connection.start();
-
-    $("#submit").on("click", (e) => {
-        const message = $("input").val();
-        connection.invoke("Send", message);
-        e.preventDefault();
-    });
-    $("#submit").prop("disabled", false);
 
     const client = new Client(connection);
     const keyMappings = new Map(); // value is [onUp, onDown]

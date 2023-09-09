@@ -1,9 +1,7 @@
 @page
+@{
+    ViewData["Title"] = "World";
+}
 <canvas id="canvas" width="800", height="600"></canvas>
-<form>
-    <label for="input">input</label>
-    <input type="text" id="input"/>
-    <button type="submit" id="submit">Submit</button>
-</form>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/pages/world.js" type="module"></script>
+<script src="~/Pages/World.cshtml.js" type="module"></script>
