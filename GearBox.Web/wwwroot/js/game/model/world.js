@@ -79,7 +79,7 @@ export class World {
         this.#dynamicGameObjects.forEach(obj => obj.draw(context));
     }
 }
-
+let first = true;
 // unrelated to JSON deserializers, as those require type
 export class WorldDeserializer {
     
@@ -103,7 +103,11 @@ export class WorldDeserializer {
     }
 
     deserializeWorldUpdateBody(obj) {
-        const dynamicGameObjects = obj.gameObjects.map(x => this.#dynamicObjectDeserializers.deserialize(x));
+        if (first) {
+            console.log(obj);
+            first = false;
+        }
+        const dynamicGameObjects = obj.dynamicWorldContent.gameObjects.map(x => this.#dynamicObjectDeserializers.deserialize(x));
         return dynamicGameObjects;
     }
 

@@ -1,6 +1,7 @@
 namespace GearBox.Core.Model;
 
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Static;
 using System;
 
@@ -25,12 +26,14 @@ public class World
         Id = id;
         StaticContent = staticContent;
         DynamicContent = new DynamicWorldContent();
+        StableContent = new StableWorldContent();
     }
 
 
     public Guid Id { get; init; }
     public StaticWorldContent StaticContent { get; init; }
     public DynamicWorldContent DynamicContent { get; init; }
+    public StableWorldContent StableContent { get; init; }
     public IEnumerable<IDynamicGameObject> DynamicObjects { get => DynamicContent.DynamicObjects; }
 
 
@@ -44,11 +47,17 @@ public class World
         DynamicContent.RemoveDynamicObject(obj);
     }
 
+    public void AddStableObject(IStableGameObject obj)
+    {
+        StableContent.Add(obj);
+    }
+
     /// <summary>
     /// Called each game tick.
     /// Updates the world and everything in it
     /// </summary>
-    public void Update()
+    /// <returns>Changes to stable content</returns>
+    public IEnumerable<Change> Update()
     {
         DynamicContent.Update();
         foreach (var obj in DynamicObjects)
@@ -59,6 +68,7 @@ public class World
                 StaticContent.CheckForCollisions(body);
             }
         }
+        return StableContent.Update();
     }
 
     public override bool Equals(object? other)

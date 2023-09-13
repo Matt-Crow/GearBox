@@ -4,7 +4,6 @@ using System.Timers;
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
-using GearBox.Core.Model.Static;
 
 public class WorldServer
 {
@@ -49,6 +48,7 @@ public class WorldServer
         // might need to synchronize this
         if (!_connections.ContainsKey(id))
         {
+            todo playercharacter instead of character
             var character = new Character(); // will eventually read from repo
             _world.AddDynamicObject(character);
             _connections.Add(id, connection);
@@ -98,10 +98,14 @@ public class WorldServer
 
     public async Task Update()
     {
-        _world.Update();
+        var stableChanges = _world.Update();
 
         // notify everyone of the update
-        var message = new Message<DynamicWorldContentJson>(MessageType.WorldUpdate, _world.DynamicContent.ToJson());
+        var body = new WorldUpdateJson(
+            _world.DynamicContent.ToJson(),
+            stableChanges.Select(c => c.ToJson()).ToList()
+        );
+        var message = new Message<WorldUpdateJson>(MessageType.WorldUpdate, body);
         var tasks = _connections.Values.Select(conn => conn.Send(message));
         await Task.WhenAll(tasks);
     }
