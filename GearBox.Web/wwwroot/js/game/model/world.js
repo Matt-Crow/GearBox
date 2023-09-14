@@ -1,3 +1,4 @@
+import { Change, ChangeHandlers } from "../infrastructure/change.js";
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
 import { MessageHandler } from "../infrastructure/messageHandler.js";
@@ -79,13 +80,18 @@ export class World {
         this.#dynamicGameObjects.forEach(obj => obj.draw(context));
     }
 }
-let first = true;
+
 // unrelated to JSON deserializers, as those require type
 export class WorldDeserializer {
     
+    #changeHandlers;
     #dynamicObjectDeserializers;
 
-    constructor() {
+    /**
+     * @param {ChangeHandlers} changeHandlers 
+     */
+    constructor(changeHandlers) {
+        this.#changeHandlers = changeHandlers;
         this.#dynamicObjectDeserializers = new JsonDeserializers();
     }
 
@@ -103,11 +109,9 @@ export class WorldDeserializer {
     }
 
     deserializeWorldUpdateBody(obj) {
-        if (first) {
-            console.log(obj);
-            first = false;
-        }
         const dynamicGameObjects = obj.dynamicWorldContent.gameObjects.map(x => this.#dynamicObjectDeserializers.deserialize(x));
+        const changes = obj.changes.map(json => Change.fromJson(json));
+        changes.forEach(change => this.#changeHandlers.handle(change));
         return dynamicGameObjects;
     }
 

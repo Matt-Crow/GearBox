@@ -4,6 +4,7 @@ using System.Timers;
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Stable;
 
 public class WorldServer
 {
@@ -48,8 +49,10 @@ public class WorldServer
         // might need to synchronize this
         if (!_connections.ContainsKey(id))
         {
-            todo playercharacter instead of character
             var character = new Character(); // will eventually read from repo
+            var player = new PlayerCharacter(character);
+
+            _world.AddStableObject(player);
             _world.AddDynamicObject(character);
             _connections.Add(id, connection);
             _players.Add(id, character);
