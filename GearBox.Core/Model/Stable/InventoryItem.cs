@@ -68,6 +68,21 @@ public class InventoryItem : IStableGameObject
 
     public string Serialize(JsonSerializerOptions options)
     {
-        return JsonSerializer.Serialize(this, options);
+        return JsonSerializer.Serialize(new InventoryItemJson(this, options), options);
+    }
+
+    // only need to serialize a few properties
+    public class InventoryItemJson
+    {
+        public InventoryItemJson(InventoryItem item, JsonSerializerOptions options)
+        {
+            Inner = item.Inner.Serialize(options);
+            InnerType = item.Inner.ItemType;
+            Quantity = item.Quantity;
+        }
+
+        public string Inner { get; init; }
+        public string InnerType { get; init; }
+        public int Quantity { get; init; }
     }
 }

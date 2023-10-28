@@ -13,9 +13,11 @@ export class ItemChangeHandler extends ChangeHandler {
     /**
      * @param {JsonDeserializer} jsonDeserializer a deserializer for a specific 
      *  item type
+     * @returns {ItemChangeHandler}
      */
-    addDeserializer(jsonDeserializer) {
+    withDeserializer(jsonDeserializer) {
         this.#deserializers.addDeserializer(jsonDeserializer);
+        return this;
     }
 
     handleCreate(body) {
@@ -28,5 +30,29 @@ export class ItemChangeHandler extends ChangeHandler {
 
     handleDelete(body) {
         console.log(`Delete item ${body}`);
+    }
+}
+
+export class ResourceType {
+    #name;
+    
+    /**
+     * @param {string} name
+     */
+    constructor(name) {
+        this.#name = name;
+    }
+
+    /**
+     * @returns {string}
+     */
+    get name() {
+        return this.#name;
+    }
+}
+
+export class ResourceJsonDeserializer extends JsonDeserializer {
+    constructor() {
+        super("resource", (json) => new Resource(json.name));
     }
 }
