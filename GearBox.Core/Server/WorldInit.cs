@@ -1,4 +1,5 @@
 using GearBox.Core.Model;
+using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Static;
 
 namespace GearBox.Core.Server;
@@ -10,10 +11,11 @@ namespace GearBox.Core.Server;
 /// </summary>
 public class WorldInit : IJson
 {
-    public WorldInit(Guid playerId, StaticWorldContentJson staticWorldContent)
+    public WorldInit(Guid playerId, StaticWorldContentJson staticWorldContent, List<InventoryItemTypeJson> itemTypes)
     {
         PlayerId = playerId;
         StaticWorldContent = staticWorldContent;
+        ItemTypes = itemTypes;
     }
 
     /// <summary>
@@ -25,4 +27,9 @@ public class WorldInit : IJson
     /// The contents of the world which never change.
     /// </summary>
     public StaticWorldContentJson StaticWorldContent { get; init; }
+
+    /// <summary>
+    /// All the possible item types which can exist in the world.
+    /// </summary>
+    public List<InventoryItemTypeJson> ItemTypes { get; init; }
 }

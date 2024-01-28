@@ -3,6 +3,7 @@
  */
 import { TestCase, TestSuite } from "./tests.js";
 import { playerTests } from "../model/player.js";
+import { itemTests } from "../model/item.js";
 
 /**
  * @returns TestSuite[]
@@ -23,6 +24,7 @@ export function getAllTestSuites() {
                 await new Promise(resolve => setTimeout(resolve, 1000));
             })
         ]),
+        itemTests,
         playerTests
     ];
     return allTestSuites;

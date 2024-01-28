@@ -1,18 +1,13 @@
 using GearBox.Core.Model;
-using GearBox.Core.Model.Static;
-using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 
-var map = new Map();
-map.SetTileTypeForKey(1, TileType.Tangible(Color.RED));
-map.SetTileAt(Coordinates.FromTiles(5, 5), 1);
-map.SetTileAt(Coordinates.FromTiles(5, 6), 1);
-map.SetTileAt(Coordinates.FromTiles(6, 5), 1);
-map.SetTileAt(Coordinates.FromTiles(8, 5), 1);
-var world = new World(Guid.NewGuid(), new StaticWorldContent(map, new List<IStaticGameObject>()));
-
 var builder = WebApplication.CreateBuilder(args);
+
+var world = new WorldBuilder()
+    .AddDummyItemTypes()
+    .WithDummyMap()
+    .Build();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

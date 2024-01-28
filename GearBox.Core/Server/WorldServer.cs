@@ -57,7 +57,11 @@ public class WorldServer
             _connections.Add(id, connection);
             _players.Add(id, character);
             _controls.Add(id, new CharacterController(character));
-            var payload = new WorldInit(character.Id, _world.StaticContent.ToJson());
+            var payload = new WorldInit(
+                character.Id, 
+                _world.StaticContent.ToJson(),
+                _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
+            );
             var message = new Message<WorldInit>(MessageType.WorldInit, payload);
             await connection.Send(message);
 

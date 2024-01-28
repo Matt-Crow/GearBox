@@ -21,19 +21,25 @@ public class World
         
     }
 
-    public World(Guid id, StaticWorldContent staticContent)
+    public World(Guid id, StaticWorldContent staticContent) : this(id, staticContent, InventoryItemTypeRepository.Of(new List<InventoryItemType>()))
+    {
+
+    }
+
+    public World(Guid id, StaticWorldContent staticContent, IInventoryItemTypeRepository itemTypes)
     {
         Id = id;
         StaticContent = staticContent;
         DynamicContent = new DynamicWorldContent();
         StableContent = new StableWorldContent();
+        ItemTypes = itemTypes;
     }
-
 
     public Guid Id { get; init; }
     public StaticWorldContent StaticContent { get; init; }
     public DynamicWorldContent DynamicContent { get; init; }
     public StableWorldContent StableContent { get; init; }
+    public IInventoryItemTypeRepository ItemTypes { get; init; }
     public IEnumerable<IDynamicGameObject> DynamicObjects { get => DynamicContent.DynamicObjects; }
 
 
