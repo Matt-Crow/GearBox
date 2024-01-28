@@ -5,7 +5,7 @@ namespace GearBox.Core.Model.Stable;
 /// <summary>
 /// Contains items a player has picked up.
 /// </summary>
-public class Inventory : IStableGameObject
+public class Inventory : IStableGameObject, ISerializable<InventoryJson>
 {
     private readonly Dictionary<string, List<InventoryItem>> _content = new();
 
@@ -18,7 +18,7 @@ public class Inventory : IStableGameObject
 
     public void Add(InventoryItem item)
     {
-        // do items need names?
+        // TODO do items need names?
     }
 
     public void Update()
@@ -29,5 +29,13 @@ public class Inventory : IStableGameObject
     public string Serialize(JsonSerializerOptions options)
     {
         throw new NotImplementedException();
+    }
+
+    public InventoryJson ToJson()
+    {
+        var items = Content
+            .Select(x => x.ToJson())
+            .ToList();
+        return new InventoryJson(items);
     }
 }

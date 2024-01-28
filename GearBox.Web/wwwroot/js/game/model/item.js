@@ -32,27 +32,3 @@ export class ItemChangeHandler extends ChangeHandler {
         console.log(`Delete item ${body}`);
     }
 }
-
-export class ResourceType {
-    #name;
-    
-    /**
-     * @param {string} name
-     */
-    constructor(name) {
-        this.#name = name;
-    }
-
-    /**
-     * @returns {string}
-     */
-    get name() {
-        return this.#name;
-    }
-}
-
-export class ResourceJsonDeserializer extends JsonDeserializer {
-    constructor() {
-        super("resource", (json) => new Resource(json.name));
-    }
-}

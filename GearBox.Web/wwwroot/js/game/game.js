@@ -1,7 +1,7 @@
 import { ChangeHandlers } from "./infrastructure/change.js";
 import { MessageHandlers } from "./infrastructure/messageHandlers.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
-import { ItemChangeHandler, ResourceJsonDeserializer } from "./model/item.js";
+import { ItemChangeHandler } from "./model/item.js";
 import { PlayerChangeHandler } from "./model/player.js";
 import { WorldDeserializer, WorldInitHandler, WorldProxy, WorldUpdateHandler } from "./model/world.js";
 
@@ -29,9 +29,7 @@ export class Game {
         this.#canvas = canvas;
 
         const changeHandlers = new ChangeHandlers();
-        changeHandlers.add(new ItemChangeHandler()
-            .withDeserializer(new ResourceJsonDeserializer())
-        );
+        changeHandlers.add(new ItemChangeHandler());
         changeHandlers.add(new PlayerChangeHandler());
 
         const worldDeserializer = new WorldDeserializer(changeHandlers);
