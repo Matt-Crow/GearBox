@@ -21,13 +21,23 @@ public class InventoryItem : IStableGameObject, ISerializable<InventoryItemJson>
         Quantity = quantity;
     }
 
-    public string Type { get => "inventoryItem"; }
-
+    public string Type => "inventoryItem";
+    
     public InventoryItemType ItemType {get; init; }
+
+    /// <summary>
+    /// Subclasses should override this method if they need to provide metadata to the front end
+    /// </summary>
+    protected virtual List<ItemMetadataJson> Metadata => new();
+    
+    /// <summary>
+    /// Subclasses should override this method if they need to provide tags to the front end
+    /// </summary>
+    protected virtual List<string> Tags => new();
 
     public int Quantity { get; private set; }
 
-    public IEnumerable<object?> DynamicValues { get => ImmutableArray.Create<object?>(Quantity); }
+    public IEnumerable<object?> DynamicValues => ImmutableArray.Create<object?>(Quantity);
 
     public void AddQuantity(int quantity)
     {
@@ -73,6 +83,6 @@ public class InventoryItem : IStableGameObject, ISerializable<InventoryItemJson>
 
     public InventoryItemJson ToJson()
     {
-        return new InventoryItemJson(ItemType.Name, Quantity);
+        return new InventoryItemJson(ItemType.Name, Metadata, Tags, Quantity);
     }
 }

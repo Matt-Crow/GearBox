@@ -3,6 +3,28 @@ import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
 import { TestCase, TestSuite } from "../testing/tests.js";
 
+export class InventoryItem {
+    #type;
+    #quantity;
+
+    /**
+     * @param {InventoryItemType} type 
+     * @param {number} quantity 
+     */
+    constructor(type, quantity) {
+        this.#type = type;
+        this.#quantity = quantity;
+    }
+
+    get type() {
+        return this.#type;
+    }
+
+    get quantity() {
+        return this.#quantity;
+    }
+}
+
 export class InventoryItemType {
     #name;
     #isStackable;
@@ -24,6 +46,26 @@ export class InventoryItemType {
 export function deserializeItemTypeJson(obj) {
     const result = new InventoryItemType(obj.name, obj.isStackable);
     return result;
+}
+
+export class InventoryItemDeserializer {
+    #itemTypes;
+
+    /**
+     * @param {InventoryItemTypeRepository} itemTypes 
+     */
+    constructor(itemTypes) {
+        this.#itemTypes = itemTypes;
+    }
+
+    deserilize(obj) {
+        const type = this.#itemTypes.getItemTypeByName(obj.name);
+        if (type === null) {
+            throw new Error(`Bad item type name: "${obj.name}"`);
+        }
+        const result = new InventoryItem(type, obj.quantity);
+        return result;
+    }
 }
 
 export class ItemChangeHandler extends ChangeHandler {

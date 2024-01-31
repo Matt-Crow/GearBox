@@ -7,19 +7,12 @@ namespace GearBox.Core.Model.Stable;
 /// </summary>
 public class Inventory : IStableGameObject, ISerializable<InventoryJson>
 {
-    private readonly Dictionary<string, List<InventoryItem>> _content = new();
-
-
-    public IEnumerable<InventoryItem> Content => _content.SelectMany(kv => kv.Value);
-
+    public InventoryTab Equipment { get; init; } = new();
+    public InventoryTab Materials { get; init; } = new();
+    public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
+        .Concat(Equipment.DynamicValues)
+        .Concat(Materials.DynamicValues);
     public string Type => "inventory";
-
-    public IEnumerable<object?> DynamicValues => Content;
-
-    public void Add(InventoryItem item)
-    {
-        // TODO do items need names?
-    }
 
     public void Update()
     {
@@ -33,9 +26,10 @@ public class Inventory : IStableGameObject, ISerializable<InventoryJson>
 
     public InventoryJson ToJson()
     {
-        var items = Content
-            .Select(x => x.ToJson())
-            .ToList();
-        return new InventoryJson(items);
+        var result = new InventoryJson(
+            Equipment.ToJson(),
+            Materials.ToJson()
+        );
+        return result;
     }
 }

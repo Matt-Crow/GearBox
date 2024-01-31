@@ -2,10 +2,12 @@ namespace GearBox.Core.Model.Stable;
 
 public readonly struct InventoryJson : IJson
 {
-    public InventoryJson(List<InventoryItemJson> items)
+    public InventoryJson(InventoryTabJson equipment, InventoryTabJson materials)
     {
-        Items = items;
+        Equipment = equipment;
+        Materials = materials;
     }
 
-    public List<InventoryItemJson> Items { get; init; }
+    public InventoryTabJson Equipment { get; init; }
+    public InventoryTabJson Materials { get; init; }
 }
