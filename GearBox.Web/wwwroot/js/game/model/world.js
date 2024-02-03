@@ -61,6 +61,13 @@ export class World {
     }
 
     /**
+     * @returns {string}
+     */
+    get playerId() {
+        return this.#playerId;
+    }
+
+    /**
      * @returns {number}
      */
     get widthInPixels() {
@@ -132,10 +139,11 @@ export class WorldDeserializer {
 }
 
 export class WorldInitHandler extends MessageHandler {
-    constructor(worldProxy, worldDeserializer) {
+    constructor(worldProxy, worldDeserializer, callback) {
         super("WorldInit", (obj) => {
             const deserialized = worldDeserializer.deserializeWorldInitBody(obj);
             worldProxy.value = deserialized;
+            callback();
         });
     }
 }

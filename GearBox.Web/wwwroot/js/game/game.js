@@ -1,8 +1,8 @@
 import { ChangeHandlers } from "./infrastructure/change.js";
 import { MessageHandlers } from "./infrastructure/messageHandlers.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
-import { InventoryDeserializer, ItemChangeHandler, ItemDeserializer } from "./model/item.js";
-import { PlayerChangeHandler, PlayerDeserializer, PlayerRepository } from "./model/player.js";
+import { Inventory, InventoryDeserializer, Item, ItemChangeHandler, ItemDeserializer } from "./model/item.js";
+import { PlayerChangeHandler, PlayerDeserializer, PlayerEventListener, PlayerRepository } from "./model/player.js";
 import { WorldDeserializer, WorldInitHandler, WorldProxy, WorldUpdateHandler } from "./model/world.js";
 
 
@@ -24,16 +24,19 @@ export class Game {
 
     /**
      * @param {HTMLCanvasElement} canvas the HTML canvas to draw on.
+     * @param {HTMLTableSectionElement} inventoryRows the <tbody> of the inventory model.
      */
-    constructor(canvas) {
+    constructor(canvas, inventoryRows) {
         this.#canvas = canvas;
 
         const changeHandlers = new ChangeHandlers();
         changeHandlers.add(new ItemChangeHandler());
         const players = new PlayerRepository();
+
         // item type repository is not yet loaded, as the world hasn't been received.
         // therefore, lazy load the repo until I split phases in #34
         const itemDeserializer = new ItemDeserializer(() => this.#worldProxy.value.itemTypes);
+        
         const inventoryDeserializer = new InventoryDeserializer(itemDeserializer);
         const playerDeserializer = new PlayerDeserializer(inventoryDeserializer);
         changeHandlers.add(new PlayerChangeHandler(players, playerDeserializer));
@@ -41,7 +44,15 @@ export class Game {
         const worldDeserializer = new WorldDeserializer(changeHandlers);
         worldDeserializer.addDynamicObjectDeserializer(new CharacterJsonDeserializer());
 
-        this.#messageHandlers.addHandler(new WorldInitHandler(this.#worldProxy, worldDeserializer));
+        // todo clean this up after #34
+        this.#messageHandlers.addHandler(new WorldInitHandler(this.#worldProxy, worldDeserializer, () => {
+            const inventoryModal = new InventoryModal(inventoryRows);
+            players.addPlayerListener(this.#worldProxy.value.playerId, new PlayerEventListener({
+                onPlayerAdded: (player) => inventoryModal.setInventory(player.inventory),
+                onPlayerUpdated: (player) => inventoryModal.setInventory(player.inventory),
+                onPlayerRemoved: () => inventoryModal.clear()
+            }));
+        }));
         this.#messageHandlers.addHandler(new WorldUpdateHandler(this.#worldProxy, worldDeserializer));
 
         setInterval(() => this.#update(), 1000 / 24);
@@ -74,6 +85,48 @@ export class Game {
         } catch (e) {
             // world is not yet ready; don't bother reporting, as update handler does so
         }
+    }
+}
+
+class InventoryModal {
+    #tbody;
+
+    /**
+     * @param {HTMLTableSectionElement} tbody 
+     */
+    constructor(tbody) {
+        this.#tbody = tbody;
+    }
+
+    clear() {
+        this.#tbody.replaceChildren();
+    }
+
+    /**
+     * @param {Inventory} inventory 
+     */
+    setInventory(inventory) {
+        this.clear();
+        inventory.equipment.forEach(item => this.#addItem(item));
+        inventory.materials.forEach(item => this.#addItem(item));
+    }
+
+    /**
+     * @param {Item} item 
+     */
+    #addItem(item) {
+        const tds = [
+            item.type.name,
+            item.type.description ?? "items don't have descriptions yet",
+            item.quantity
+        ].map(data => {
+            const e = document.createElement("td");
+            e.innerText = data;
+            return e;
+        });
+        const tr = document.createElement("tr");
+        tds.forEach(td => tr.appendChild(td));
+        this.#tbody.appendChild(tr);
     }
 }
 
