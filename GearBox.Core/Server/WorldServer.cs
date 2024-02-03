@@ -47,24 +47,41 @@ public class WorldServer
     public async Task AddConnection(string id, IConnection connection)
     {
         // might need to synchronize this
-        if (!_connections.ContainsKey(id))
+        if (_connections.ContainsKey(id))
         {
-            var character = new Character(); // will eventually read from repo
-            var player = new PlayerCharacter(character);
+            return;
+        }
 
-            _world.AddStableObject(player);
-            _world.AddDynamicObject(character);
-            _connections.Add(id, connection);
-            _players.Add(id, character);
-            _controls.Add(id, new CharacterController(character));
-            var payload = new WorldInit(character.Id, _world.StaticContent.ToJson());
-            var message = new Message<WorldInit>(MessageType.WorldInit, payload);
-            await connection.Send(message);
+        var character = new Character(); // will eventually read from repo
+        var player = new PlayerCharacter(character);
 
-            if (!_timer.Enabled)
+        // testing inventory
+        var allItemTypes = _world.ItemTypes.GetAll();
+        if (allItemTypes.Any())
+        {
+            player.Inventory.Materials.Add(new InventoryItem(allItemTypes.First()));
+            _world.AddTimer(new WorldTimer(() => 
             {
-                _timer.Start();
-            }
+                player.Inventory.Materials.Add(new InventoryItem(allItemTypes.Last()));
+            }, 500));
+        }
+
+        _world.AddStableObject(player);
+        _world.AddDynamicObject(character);
+        _connections.Add(id, connection);
+        _players.Add(id, character);
+        _controls.Add(id, new CharacterController(character));
+        var payload = new WorldInit(
+            character.Id,
+            _world.StaticContent.ToJson(),
+            _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
+        );
+        var message = new Message<WorldInit>(MessageType.WorldInit, payload);
+        await connection.Send(message);
+
+        if (!_timer.Enabled)
+        {
+            _timer.Start();
         }
     }
 

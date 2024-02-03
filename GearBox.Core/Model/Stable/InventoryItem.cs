@@ -6,33 +6,43 @@ namespace GearBox.Core.Model.Stable;
 /// <summary>
 /// an item which can go in a player's inventory
 /// </summary>
-public class InventoryItem : IStableGameObject
+public class InventoryItem : IStableGameObject, ISerializable<InventoryItemJson>
 {
-    public InventoryItem(IInventoryItemType inner) : this(inner, 1)
+    public InventoryItem(InventoryItemType type) : this(type, 1)
     {
 
     }
 
-    public InventoryItem(IInventoryItemType inner, int quantity)
+    public InventoryItem(InventoryItemType type, int quantity)
     {
         MustBeNonNegative(nameof(quantity), quantity);
-        MustBeValidQuantity(inner, quantity);
-        Inner = inner;
+        MustBeValidQuantity(type, quantity);
+        ItemType = type;
         Quantity = quantity;
     }
 
-    public string Type { get => "inventoryItem"; }
+    public string Type => "inventoryItem";
+    
+    public InventoryItemType ItemType {get; init; }
 
-    public IInventoryItemType Inner {get; init; }
+    /// <summary>
+    /// Subclasses should override this method if they need to provide metadata to the front end
+    /// </summary>
+    protected virtual List<ItemMetadataJson> Metadata => new();
+    
+    /// <summary>
+    /// Subclasses should override this method if they need to provide tags to the front end
+    /// </summary>
+    protected virtual List<string> Tags => new();
 
     public int Quantity { get; private set; }
 
-    public IEnumerable<object?> DynamicValues { get => ImmutableArray.Create<object?>(Quantity); }
+    public IEnumerable<object?> DynamicValues => ImmutableArray.Create<object?>(Quantity);
 
     public void AddQuantity(int quantity)
     {
         MustBeNonNegative(nameof(quantity), quantity);
-        MustBeValidQuantity(Inner, Quantity + quantity);
+        MustBeValidQuantity(ItemType, Quantity + quantity);
         Quantity += quantity;
     }
 
@@ -53,11 +63,11 @@ public class InventoryItem : IStableGameObject
             throw new ArgumentOutOfRangeException(name, $"Must be non-negative, so {value} is not allowed.");
         }
     }
-    private static void MustBeValidQuantity(IInventoryItemType type, int quantity)
+    private static void MustBeValidQuantity(InventoryItemType type, int quantity)
     {
         if (!type.IsStackable && quantity != 0 && quantity != 1)
         {
-            throw new ArgumentOutOfRangeException($"{type.ItemType} is not stackable, so quantity must be 0 or 1, not {quantity}");
+            throw new ArgumentOutOfRangeException($"{type.Name} is not stackable, so quantity must be 0 or 1, not {quantity}");
         }
     }
 
@@ -68,21 +78,11 @@ public class InventoryItem : IStableGameObject
 
     public string Serialize(JsonSerializerOptions options)
     {
-        return JsonSerializer.Serialize(new InventoryItemJson(this, options), options);
+        return JsonSerializer.Serialize(ToJson(), options);
     }
 
-    // only need to serialize a few properties
-    public class InventoryItemJson
+    public InventoryItemJson ToJson()
     {
-        public InventoryItemJson(InventoryItem item, JsonSerializerOptions options)
-        {
-            Inner = item.Inner.Serialize(options);
-            InnerType = item.Inner.ItemType;
-            Quantity = item.Quantity;
-        }
-
-        public string Inner { get; init; }
-        public string InnerType { get; init; }
-        public int Quantity { get; init; }
+        return new InventoryItemJson(ItemType.Name, Metadata, Tags, Quantity);
     }
 }

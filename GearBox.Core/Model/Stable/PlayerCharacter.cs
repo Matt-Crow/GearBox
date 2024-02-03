@@ -19,8 +19,9 @@ public class PlayerCharacter : IStableGameObject
         _inner = inner;
     }
 
-    public string Type { get => "playerCharacter"; }
-    public IEnumerable<object?> DynamicValues { get => new List<object?>(); }
+    public string Type => "playerCharacter";
+    public IEnumerable<object?> DynamicValues => Inventory.DynamicValues;
+    public Inventory Inventory { get; init; } = new();
 
     public void Update()
     {
@@ -29,6 +30,7 @@ public class PlayerCharacter : IStableGameObject
 
     public string Serialize(JsonSerializerOptions options)
     {
-        return JsonSerializer.Serialize(this, options);
+        var asJson = new PlayerJson(_inner.Id, Inventory.ToJson());
+        return JsonSerializer.Serialize(asJson, options);
     }
 }

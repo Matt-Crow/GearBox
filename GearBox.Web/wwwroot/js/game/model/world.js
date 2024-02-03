@@ -3,6 +3,7 @@ import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
 import { MessageHandler } from "../infrastructure/messageHandler.js";
 import { Character } from "./character.js";
+import { InventoryItemTypeRepository, deserializeItemTypeJson } from "./item.js";
 import { deserializeMapJson } from "./map.js";
 
 export class WorldProxy {
@@ -35,12 +36,14 @@ export class World {
     #map;
     #staticGameObjects;
     #dynamicGameObjects;
+    #itemTypes;
 
-    constructor(playerId, map, staticGameObjects) {
+    constructor(playerId, map, staticGameObjects, itemTypes) {
         this.#playerId = playerId;
         this.#map = map;
         this.#staticGameObjects = staticGameObjects;
         this.#dynamicGameObjects = [];
+        this.#itemTypes = new InventoryItemTypeRepository(itemTypes);
     }
 
     /**
@@ -58,6 +61,13 @@ export class World {
     }
 
     /**
+     * @returns {string}
+     */
+    get playerId() {
+        return this.#playerId;
+    }
+
+    /**
      * @returns {number}
      */
     get widthInPixels() {
@@ -69,6 +79,10 @@ export class World {
      */
     get heightInPixels() {
         return this.#map.heightInPixels;
+    }
+
+    get itemTypes() {
+        return this.#itemTypes;
     }
 
     /**
@@ -105,7 +119,8 @@ export class WorldDeserializer {
     deserializeWorldInitBody(obj) {
         const map = deserializeMapJson(obj.staticWorldContent.map);
         const staticGameObjects = this.#deserializeStaticGameObjects(obj.staticWorldContent.gameObjects);
-        return new World(obj.playerId, map, staticGameObjects);
+        const itemTypes = obj.itemTypes.map(deserializeItemTypeJson);
+        return new World(obj.playerId, map, staticGameObjects, itemTypes);
     }
 
     deserializeWorldUpdateBody(obj) {
@@ -124,10 +139,11 @@ export class WorldDeserializer {
 }
 
 export class WorldInitHandler extends MessageHandler {
-    constructor(worldProxy, worldDeserializer) {
+    constructor(worldProxy, worldDeserializer, callback) {
         super("WorldInit", (obj) => {
             const deserialized = worldDeserializer.deserializeWorldInitBody(obj);
             worldProxy.value = deserialized;
+            callback();
         });
     }
 }

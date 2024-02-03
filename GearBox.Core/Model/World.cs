@@ -11,6 +11,8 @@ using System;
 /// </summary>
 public class World
 {
+    private readonly List<WorldTimer> _timers = new();
+
     public World() : this(Guid.NewGuid(), StaticWorldContent.EMPTY)
     {
 
@@ -21,19 +23,25 @@ public class World
         
     }
 
-    public World(Guid id, StaticWorldContent staticContent)
+    public World(Guid id, StaticWorldContent staticContent) : this(id, staticContent, InventoryItemTypeRepository.Of(new List<InventoryItemType>()))
+    {
+
+    }
+
+    public World(Guid id, StaticWorldContent staticContent, IInventoryItemTypeRepository itemTypes)
     {
         Id = id;
         StaticContent = staticContent;
         DynamicContent = new DynamicWorldContent();
         StableContent = new StableWorldContent();
+        ItemTypes = itemTypes;
     }
-
 
     public Guid Id { get; init; }
     public StaticWorldContent StaticContent { get; init; }
     public DynamicWorldContent DynamicContent { get; init; }
     public StableWorldContent StableContent { get; init; }
+    public IInventoryItemTypeRepository ItemTypes { get; init; }
     public IEnumerable<IDynamicGameObject> DynamicObjects { get => DynamicContent.DynamicObjects; }
 
 
@@ -52,6 +60,11 @@ public class World
         StableContent.Add(obj);
     }
 
+    public void AddTimer(WorldTimer timer)
+    {
+        _timers.Add(timer);
+    }
+
     /// <summary>
     /// Called each game tick.
     /// Updates the world and everything in it
@@ -59,6 +72,7 @@ public class World
     /// <returns>Changes to stable content</returns>
     public IEnumerable<Change> Update()
     {
+        _timers.ForEach(t => t.Update());
         DynamicContent.Update();
         foreach (var obj in DynamicObjects)
         {

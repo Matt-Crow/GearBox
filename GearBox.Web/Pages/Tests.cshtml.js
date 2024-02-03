@@ -40,9 +40,5 @@ function _failed(testSuite, testCase, error) {
         </tr>
     `;
     $("#output").after(row);
-    console.error({
-        suite: testSuite.name,
-        case: testCase.name,
-        error
-    });
+    console.error(error);
 }
