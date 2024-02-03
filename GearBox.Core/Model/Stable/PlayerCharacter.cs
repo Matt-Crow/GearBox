@@ -13,16 +13,15 @@ namespace GearBox.Core.Model.Stable;
 public class PlayerCharacter : IStableGameObject
 {
     private readonly Character _inner;
-    private readonly Inventory _inventory;
 
     public PlayerCharacter(Character inner)
     {
         _inner = inner;
-        _inventory = new();
     }
 
     public string Type => "playerCharacter";
-    public IEnumerable<object?> DynamicValues => _inventory.DynamicValues;
+    public IEnumerable<object?> DynamicValues => Inventory.DynamicValues;
+    public Inventory Inventory { get; init; } = new();
 
     public void Update()
     {
@@ -31,7 +30,7 @@ public class PlayerCharacter : IStableGameObject
 
     public string Serialize(JsonSerializerOptions options)
     {
-        var asJson = new PlayerJson(_inner.Id, _inventory.ToJson());
+        var asJson = new PlayerJson(_inner.Id, Inventory.ToJson());
         return JsonSerializer.Serialize(asJson, options);
     }
 }

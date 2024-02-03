@@ -1,8 +1,8 @@
 import { ChangeHandlers } from "./infrastructure/change.js";
 import { MessageHandlers } from "./infrastructure/messageHandlers.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
-import { ItemChangeHandler } from "./model/item.js";
-import { PlayerChangeHandler } from "./model/player.js";
+import { InventoryDeserializer, ItemChangeHandler, ItemDeserializer } from "./model/item.js";
+import { PlayerChangeHandler, PlayerDeserializer, PlayerRepository } from "./model/player.js";
 import { WorldDeserializer, WorldInitHandler, WorldProxy, WorldUpdateHandler } from "./model/world.js";
 
 
@@ -30,7 +30,13 @@ export class Game {
 
         const changeHandlers = new ChangeHandlers();
         changeHandlers.add(new ItemChangeHandler());
-        changeHandlers.add(new PlayerChangeHandler());
+        const players = new PlayerRepository();
+        // item type repository is not yet loaded, as the world hasn't been received.
+        // therefore, lazy load the repo until I split phases in #34
+        const itemDeserializer = new ItemDeserializer(() => this.#worldProxy.value.itemTypes);
+        const inventoryDeserializer = new InventoryDeserializer(itemDeserializer);
+        const playerDeserializer = new PlayerDeserializer(inventoryDeserializer);
+        changeHandlers.add(new PlayerChangeHandler(players, playerDeserializer));
 
         const worldDeserializer = new WorldDeserializer(changeHandlers);
         worldDeserializer.addDynamicObjectDeserializer(new CharacterJsonDeserializer());

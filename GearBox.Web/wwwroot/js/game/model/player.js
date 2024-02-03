@@ -8,14 +8,19 @@
 
 import { ChangeHandler } from "../infrastructure/change.js";
 import { TestCase, TestSuite } from "../testing/tests.js";
+import { Inventory, InventoryDeserializer } from "./item.js";
 
 export class Player {
     #id;
     #inventory;
 
-    constructor(id, inventory=[]) {
+    /**
+     * @param {string} id 
+     * @param {Inventory} inventory 
+     */
+    constructor(id, inventory) {
         this.#id = id;
-        this.#inventory = inventory.slice();
+        this.#inventory = inventory ?? new Inventory();
     }
 
     get id() {
@@ -23,29 +28,58 @@ export class Player {
     }
 
     get inventory() {
-        return this.#inventory.slice();
+        return this.#inventory;
+    }
+}
+
+export class PlayerDeserializer {
+    #inventoryDeserializer;
+
+    /**
+     * @param {InventoryDeserializer} inventoryDeserializer 
+     */
+    constructor(inventoryDeserializer) {
+        this.#inventoryDeserializer = inventoryDeserializer;
+    }
+
+    deserialize(json) {
+        const id = json.id;
+        const inventory = this.#inventoryDeserializer.deserialize(json.inventory);
+        return new Player(id, inventory);
     }
 }
 
 export class PlayerChangeHandler extends ChangeHandler {
-    // TODO inject repository
-    constructor() {
+    #players;
+    #deserializer;
+
+    /*
+     * @param {PlayerRepository} players 
+     * @param {PlayerDeserializer} deserializer 
+     */    
+    constructor(players, deserializer) {
         super("playerCharacter");
+        this.#players = players;
+        this.#deserializer = deserializer;
     }
 
-    // TODO
     handleCreate(body) {
         console.log(`Create player ${body}`);
+        const json = JSON.parse(body);
+        const player = this.#deserializer.deserialize(json);
+        this.#players.addPlayer(player);
     }
 
-    // TODO
     handleUpdate(body) {
         console.log(`Update player ${body}`);
+        const json = JSON.parse(body);
+        const player = this.#deserializer.deserialize(json);
+        this.#players.updatePlayer(player);
     }
 
-    // TODO
     handleDelete(body) {
         console.log(`Delete player ${body}`);
+        this.#players.removePlayerById(JSON.parse(body).id);
     }
 }
 
