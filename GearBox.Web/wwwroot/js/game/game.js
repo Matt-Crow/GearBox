@@ -39,11 +39,7 @@ export class Game {
      * @param {object} message a JSON message received through SignalR
      */
     handle(message) {
-        if (!message.body) {
-            this.#handleMessage = (_message) => {}; // do nothing so it only reports the error once
-            throw new Error("Matt, you updated the messages on the server, but not on the client!");
-        }
-        this.#handleMessage(message.body); 
+        this.#handleMessage(message); 
     }
 
     #handleInit(initMessage) {

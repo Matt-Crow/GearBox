@@ -71,12 +71,11 @@ public class WorldServer
         _connections.Add(id, connection);
         _players.Add(id, character);
         _controls.Add(id, new CharacterController(character));
-        var payload = new WorldInit(
+        var message = new WorldInit(
             character.Id,
             _world.StaticContent.ToJson(),
             _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
         );
-        var message = new Message<WorldInit>(MessageType.WorldInit, payload);
         await connection.Send(message);
 
         if (!_timer.Enabled)
@@ -121,11 +120,10 @@ public class WorldServer
         var stableChanges = _world.Update();
 
         // notify everyone of the update
-        var body = new WorldUpdateJson(
+        var message = new WorldUpdateJson(
             _world.DynamicContent.ToJson(),
             stableChanges.Select(c => c.ToJson()).ToList()
         );
-        var message = new Message<WorldUpdateJson>(MessageType.WorldUpdate, body);
         var tasks = _connections.Values.Select(conn => conn.Send(message));
         await Task.WhenAll(tasks);
     }
