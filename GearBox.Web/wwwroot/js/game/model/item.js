@@ -112,18 +112,17 @@ export class Item {
 }
 
 export class ItemDeserializer {
-    #lazyItemTypes;
+    #itemTypes;
 
     /**
-     * TODO don't use lazy loading after #34
-     * @param {() => InventoryItemTypeRepository} lazyItemTypes 
+     * @param {InventoryItemTypeRepository} itemTypes 
      */
-    constructor(lazyItemTypes) {
-        this.#lazyItemTypes = lazyItemTypes;
+    constructor(itemTypes) {
+        this.#itemTypes = itemTypes;
     }
 
     deserilize(json) {
-        const type = this.#lazyItemTypes().getItemTypeByName(json.name);
+        const type = this.#itemTypes.getItemTypeByName(json.name);
         if (type === null) {
             throw new Error(`Bad item type name: "${json.name}"`);
         }
