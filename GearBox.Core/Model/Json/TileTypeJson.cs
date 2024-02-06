@@ -1,13 +1,13 @@
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Json;
 
 public readonly struct TileTypeJson : IJson
 {
-    public TileTypeJson(Color color, bool isTangible)
+    public TileTypeJson(ColorJson color, bool isTangible)
     {
         Color = color;
         IsTangible = isTangible;
     }
     
-    public Color Color { get; init; }
+    public ColorJson Color { get; init; }
     public bool IsTangible { get; init; }
 }

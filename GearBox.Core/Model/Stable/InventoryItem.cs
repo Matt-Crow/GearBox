@@ -1,3 +1,4 @@
+using GearBox.Core.Model.Json;
 using System.Collections.Immutable;
 using System.Text.Json;
 
@@ -28,7 +29,7 @@ public class InventoryItem : IStableGameObject, ISerializable<InventoryItemJson>
     /// <summary>
     /// Subclasses should override this method if they need to provide metadata to the front end
     /// </summary>
-    protected virtual List<ItemMetadataJson> Metadata => new();
+    protected virtual List<KeyValueJson<string, object?>> Metadata => new();
     
     /// <summary>
     /// Subclasses should override this method if they need to provide tags to the front end

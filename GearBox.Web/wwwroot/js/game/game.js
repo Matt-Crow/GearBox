@@ -18,7 +18,7 @@ export class Game {
 
     /**
      * The current function for handling messages from the server.
-     * Currently, this assumes the server will always start by sending WorldInit,
+     * Currently, this assumes the server will always start by sending WorldInitJson,
      * followed by an number of WorldUpdates,
      * and no other message types.
      */

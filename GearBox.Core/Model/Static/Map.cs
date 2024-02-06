@@ -1,7 +1,9 @@
-namespace GearBox.Core.Model.Static;
 
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
+
+namespace GearBox.Core.Model.Static;
 
 /// <summary>
 /// a Map is a matrix of tiles the player can see and collide with

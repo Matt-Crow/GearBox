@@ -1,10 +1,11 @@
 namespace GearBox.Core.Server;
 
-using System.Timers;
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Stable;
+using System.Timers;
 
 public class WorldServer
 {
@@ -71,7 +72,7 @@ public class WorldServer
         _connections.Add(id, connection);
         _players.Add(id, character);
         _controls.Add(id, new CharacterController(character));
-        var message = new WorldInit(
+        var message = new WorldInitJson(
             character.Id,
             _world.StaticContent.ToJson(),
             _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()

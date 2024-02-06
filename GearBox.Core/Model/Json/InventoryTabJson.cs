@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Json;
 
 public readonly struct InventoryTabJson : IJson
 {

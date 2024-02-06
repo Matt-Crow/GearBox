@@ -1,4 +1,6 @@
-namespace GearBox.Core.Model.Stable;
+using GearBox.Core.Model.Stable;
+
+namespace GearBox.Core.Model.Json;
 
 public readonly struct ChangeJson : IJson
 {

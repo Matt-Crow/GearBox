@@ -1,4 +1,4 @@
-using GearBox.Core.Model;
+using GearBox.Core.Model.Json;
 using GearBox.Core.Server;
 
 namespace GearBox.Core.Tests.Server;

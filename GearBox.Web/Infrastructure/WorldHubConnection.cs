@@ -1,8 +1,8 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using GearBox.Core.Model;
+using GearBox.Core.Model.Json;
 using GearBox.Core.Server;
 using Microsoft.AspNetCore.SignalR;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GearBox.Web.Infrastructure;
 

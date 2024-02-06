@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Dynamic;
+namespace GearBox.Core.Model.Json;
 
 public readonly struct CharacterJson : IDynamicGameObjectJson
 {

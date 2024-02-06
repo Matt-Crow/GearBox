@@ -1,17 +1,13 @@
-using GearBox.Core.Model;
-using GearBox.Core.Model.Stable;
-using GearBox.Core.Model.Static;
-
-namespace GearBox.Core.Server;
+namespace GearBox.Core.Model.Json;
 
 /// <summary>
 /// Sent as a message to users upon first connecting to a world.
 /// It contains all information which will never change, and thus only needs to
 /// be sent once.
 /// </summary>
-public class WorldInit : IJson
+public readonly struct WorldInitJson : IJson
 {
-    public WorldInit(Guid playerId, StaticWorldContentJson staticWorldContent, List<InventoryItemTypeJson> itemTypes)
+    public WorldInitJson(Guid playerId, StaticWorldContentJson staticWorldContent, List<InventoryItemTypeJson> itemTypes)
     {
         PlayerId = playerId;
         StaticWorldContent = staticWorldContent;

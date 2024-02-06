@@ -1,10 +1,10 @@
 using System.Text.Json;
 
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Json;
 
 public readonly struct InventoryItemJson : IJson
 {
-    public InventoryItemJson(string name, List<ItemMetadataJson> metadata, List<string> tags, int quantity)
+    public InventoryItemJson(string name, List<KeyValueJson<string, object?>> metadata, List<string> tags, int quantity)
     {
         Name = name;
         Metadata = metadata;
@@ -20,7 +20,7 @@ public readonly struct InventoryItemJson : IJson
     /// <summary>
     /// Subclasses of InventoryItem should use this property to pass additional information to the front end
     /// </summary>
-    public List<ItemMetadataJson> Metadata { get; init; }
+    public List<KeyValueJson<string, object?>> Metadata { get; init; }
 
     /// <summary>
     /// Subclasses of InventoryItem should use this property to pass additional information to the front end
