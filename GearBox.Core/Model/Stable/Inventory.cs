@@ -1,3 +1,4 @@
+using GearBox.Core.Model.Json;
 using System.Text.Json;
 
 namespace GearBox.Core.Model.Stable;

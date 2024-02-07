@@ -1,7 +1,7 @@
-namespace GearBox.Core.Tests.Server;
-
 using GearBox.Core.Server;
 using Xunit;
+
+namespace GearBox.Core.Tests.Server;
 
 public class WorldServerTester
 {
@@ -39,7 +39,7 @@ public class WorldServerTester
 
         await sut.AddConnection("foo", spy);
 
-        Assert.Contains(spy.MessagesReceived, message => message.Type == MessageType.WorldInit);
+        Assert.NotEmpty(spy.MessagesReceived);
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class WorldServerTester
 
         await sut.Update();
 
-        Assert.Contains(client1.MessagesReceived, message => message.Type == MessageType.WorldUpdate);
-        Assert.Contains(client2.MessagesReceived, message => message.Type == MessageType.WorldUpdate);
+        Assert.NotEmpty(client1.MessagesReceived);
+        Assert.NotEmpty(client2.MessagesReceived);
     }
 }

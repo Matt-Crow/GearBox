@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model;
+namespace GearBox.Core.Model.Json;
 
 /// <summary>
 /// Designates that a class can be serialized and sent as a message

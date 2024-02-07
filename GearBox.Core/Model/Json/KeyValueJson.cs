@@ -1,11 +1,11 @@
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Json;
 
 /// <summary>
 /// represents a simple key-to-value mapping in JSON
 /// </summary>
 /// <typeparam name="TKey">the type of key</typeparam>
 /// <typeparam name="TValue">the type of value</typeparam>
-public class KeyValueJson<TKey, TValue>
+public readonly struct KeyValueJson<TKey, TValue>
 {
     public KeyValueJson(TKey key, TValue value)
     {

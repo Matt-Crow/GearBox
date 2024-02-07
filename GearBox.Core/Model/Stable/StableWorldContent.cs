@@ -28,7 +28,7 @@ public class StableWorldContent
         _pendingChanges.Clear();
     }
 
-    // will be used during WorldInit
+    // will be used during WorldInitJson
     public IEnumerable<Change> GetPendingChanges()
     {
         return _pendingChanges.AsEnumerable();

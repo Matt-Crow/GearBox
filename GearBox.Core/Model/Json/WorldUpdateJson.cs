@@ -1,8 +1,4 @@
-using GearBox.Core.Model;
-using GearBox.Core.Model.Dynamic;
-using GearBox.Core.Model.Stable;
-
-namespace GearBox.Core.Server;
+namespace GearBox.Core.Model.Json;
 
 /// <summary>
 /// Notifies clients of changes to the world they're connected to

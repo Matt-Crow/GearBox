@@ -1,17 +1,17 @@
 namespace GearBox.Core.Server;
 
-using System.Timers;
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Stable;
+using System.Timers;
 
 public class WorldServer
 {
     private readonly World _world;
     private readonly Dictionary<string, IConnection> _connections = new();
     private readonly Dictionary<string, Character> _players = new();
-    private readonly Dictionary<string, CharacterController> _controls = new();
     private readonly Timer _timer;
 
     public WorldServer() : this(new World())
@@ -59,10 +59,10 @@ public class WorldServer
         var allItemTypes = _world.ItemTypes.GetAll();
         if (allItemTypes.Any())
         {
-            player.Inventory.Materials.Add(new InventoryItem(allItemTypes.First()));
+            player.Inventory.Materials.Add(new Item(allItemTypes.First()));
             _world.AddTimer(new WorldTimer(() => 
             {
-                player.Inventory.Materials.Add(new InventoryItem(allItemTypes.Last()));
+                player.Inventory.Materials.Add(new Item(allItemTypes.Last()));
             }, 500));
         }
 
@@ -70,13 +70,11 @@ public class WorldServer
         _world.AddDynamicObject(character);
         _connections.Add(id, connection);
         _players.Add(id, character);
-        _controls.Add(id, new CharacterController(character));
-        var payload = new WorldInit(
+        var message = new WorldInitJson(
             character.Id,
             _world.StaticContent.ToJson(),
             _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
         );
-        var message = new Message<WorldInit>(MessageType.WorldInit, payload);
         await connection.Send(message);
 
         if (!_timer.Enabled)
@@ -99,7 +97,6 @@ public class WorldServer
         }
         _players.Remove(id);
         _connections.Remove(id);
-        _controls.Remove(id);
 
         if (!_connections.Any())
         {
@@ -107,13 +104,16 @@ public class WorldServer
         }
     }
 
-    public CharacterController? GetControlsById(string id)
+    /// <summary>
+    /// Executes the given command on the player of the user with the given ID
+    /// </summary>
+    public void ExecuteCommand(string id, IControlCommand command)
     {
-        if (_controls.ContainsKey(id))
+        if (!_players.ContainsKey(id))
         {
-            return _controls[id];
+            throw new Exception($"Invalid id: \"{id}\"");
         }
-        return null;
+        command.ExecuteOn(_players[id]);
     }
 
     public async Task Update()
@@ -121,11 +121,10 @@ public class WorldServer
         var stableChanges = _world.Update();
 
         // notify everyone of the update
-        var body = new WorldUpdateJson(
+        var message = new WorldUpdateJson(
             _world.DynamicContent.ToJson(),
             stableChanges.Select(c => c.ToJson()).ToList()
         );
-        var message = new Message<WorldUpdateJson>(MessageType.WorldUpdate, body);
         var tasks = _connections.Values.Select(conn => conn.Send(message));
         await Task.WhenAll(tasks);
     }

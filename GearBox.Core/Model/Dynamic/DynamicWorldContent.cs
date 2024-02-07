@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Json;
+
 namespace GearBox.Core.Model.Dynamic;
 
 /// <summary>

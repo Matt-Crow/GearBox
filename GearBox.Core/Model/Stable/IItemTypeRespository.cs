@@ -1,17 +1,17 @@
 namespace GearBox.Core.Model.Stable;
 
 /// <summary>
-/// Stores all inventory item type definitions
+/// Stores all item type definitions
 /// </summary>
-public interface IInventoryItemTypeRepository
+public interface IItemTypeRepository
 {
     /// <summary>
     /// Retrieves the item type definition with the given name, if such an item type exists.
     /// </summary>
-    InventoryItemType? GetByName(string name);
+    ItemType? GetByName(string name);
 
     /// <summary>
     /// Retrieves all item type definitions
     /// </summary>
-    IEnumerable<InventoryItemType> GetAll();
+    IEnumerable<ItemType> GetAll();
 }

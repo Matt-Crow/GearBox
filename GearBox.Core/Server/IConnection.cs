@@ -1,4 +1,4 @@
-using GearBox.Core.Model;
+using GearBox.Core.Model.Json;
 
 namespace GearBox.Core.Server;
 
@@ -12,5 +12,5 @@ public interface IConnection
     /// <summary>
     /// Sends a message to the client.
     /// </summary>
-    public Task Send<T>(Message<T> message) where T : IJson;
+    public Task Send<T>(T message) where T : IJson;
 }

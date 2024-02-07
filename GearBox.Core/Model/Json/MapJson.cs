@@ -1,6 +1,6 @@
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Json;
 
-public class MapJson : IJson
+public readonly struct MapJson : IJson
 {
     public MapJson(List<List<int>> tileMap, List<KeyValueJson<int, TileTypeJson>> tileTypes)
     {
@@ -8,6 +8,6 @@ public class MapJson : IJson
         TileTypes = tileTypes;
     }
 
-    public List<List<int>> TileMap { get; set; }
+    public List<List<int>> TileMap { get; init; }
     public List<KeyValueJson<int, TileTypeJson>> TileTypes { get; init; }
 }

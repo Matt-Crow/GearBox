@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Json;
+
 namespace GearBox.Core.Model;
 
 public readonly struct Color : ISerializable<ColorJson>
@@ -19,6 +21,6 @@ public readonly struct Color : ISerializable<ColorJson>
 
     public ColorJson ToJson()
     {
-        throw new NotImplementedException();
+        return new ColorJson(Red, Green, Blue);
     }
 }

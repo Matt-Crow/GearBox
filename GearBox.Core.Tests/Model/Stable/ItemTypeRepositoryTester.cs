@@ -3,25 +3,25 @@ using Xunit;
 
 namespace GearBox.Core.Tests.Model.Stable;
 
-public class InventoryItemTypeRepositoryTester
+public class ItemTypeRepositoryTester
 {
     [Fact]
     public void Of_GivenDuplicate_Throws()
     {
-        var items = new List<InventoryItemType>()
+        var items = new List<ItemType>()
         {
-            InventoryItemType.Stackable("foo"),
-            InventoryItemType.NonStackable("foo")
+            ItemType.Stackable("foo"),
+            ItemType.NonStackable("foo")
         };
 
-        Assert.Throws<ArgumentException>(() => InventoryItemTypeRepository.Of(items));
+        Assert.Throws<ArgumentException>(() => ItemTypeRepository.Of(items));
     }
 
     [Fact]
     public void GetByName_GivenNotExists_ReturnsNull()
     {
-        var items = Enumerable.Empty<InventoryItemType>();
-        var sut = InventoryItemTypeRepository.Of(items);
+        var items = Enumerable.Empty<ItemType>();
+        var sut = ItemTypeRepository.Of(items);
 
         var actual = sut.GetByName("foo");
 
@@ -31,8 +31,8 @@ public class InventoryItemTypeRepositoryTester
     [Fact]
     public void GetByName_GivenExists_ReturnsIt()
     {
-        var expected = InventoryItemType.Stackable("foo");
-        var sut = InventoryItemTypeRepository.Of(new List<InventoryItemType>()
+        var expected = ItemType.Stackable("foo");
+        var sut = ItemTypeRepository.Of(new List<ItemType>()
         {
             expected
         });
@@ -45,9 +45,9 @@ public class InventoryItemTypeRepositoryTester
     [Fact]
     public void GetAll_Works()
     {
-        var type1 = InventoryItemType.Stackable("foo");
-        var type2 = InventoryItemType.NonStackable("bar");
-        var sut = InventoryItemTypeRepository.Of(new List<InventoryItemType>()
+        var type1 = ItemType.Stackable("foo");
+        var type2 = ItemType.NonStackable("bar");
+        var sut = ItemTypeRepository.Of(new List<ItemType>()
         {
             type1,
             type2

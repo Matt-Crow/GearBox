@@ -1,7 +1,7 @@
-namespace GearBox.Core.Model.Static;
-
-using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Json;
+
+namespace GearBox.Core.Model.Static;
 
 public class StaticWorldContent : ISerializable<StaticWorldContentJson>
 {
@@ -32,10 +32,10 @@ public class StaticWorldContent : ISerializable<StaticWorldContentJson>
 
     public StaticWorldContentJson ToJson()
     {
-        return new StaticWorldContentJson()
-        {
-            Map = Map.ToJson(),
-            GameObjects = GameObjects.Select(x => x.ToJson())
-        };
+        var map = Map.ToJson();
+        var gameObjects = GameObjects
+            .Select(x => x.ToJson())
+            .ToList();
+        return new StaticWorldContentJson(map, gameObjects);
     }
 }

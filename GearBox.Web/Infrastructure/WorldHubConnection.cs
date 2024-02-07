@@ -1,8 +1,8 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using GearBox.Core.Model;
+using GearBox.Core.Model.Json;
 using GearBox.Core.Server;
 using Microsoft.AspNetCore.SignalR;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GearBox.Web.Infrastructure;
 
@@ -15,7 +15,7 @@ public class WorldHubConnection : IConnection
         _player = player;
     }
 
-    public async Task Send<T>(Message<T> message) where T : IJson
+    public async Task Send<T>(T message) where T : IJson
     {
         var sendMe = JsonSerializer.Serialize(message, new JsonSerializerOptions()
         {
