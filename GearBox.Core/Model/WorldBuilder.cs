@@ -7,15 +7,15 @@ namespace GearBox.Core.Model;
 public class WorldBuilder
 {
     private Map? _map;
-    private readonly List<InventoryItemType> _itemTypes = new();
+    private readonly List<ItemType> _itemTypes = new();
 
-    public WorldBuilder AddItemType(InventoryItemType itemType)
+    public WorldBuilder AddItemType(ItemType itemType)
     {
         _itemTypes.Add(itemType);
         return this;
     }
 
-    public WorldBuilder AddItemTypes(IEnumerable<InventoryItemType> itemTypes)
+    public WorldBuilder AddItemTypes(IEnumerable<ItemType> itemTypes)
     {
         var result = this;
         foreach (var itemType in itemTypes)
@@ -27,12 +27,12 @@ public class WorldBuilder
 
     public WorldBuilder AddDummyItemTypes()
     {
-        var dummyItemTypes = new List<InventoryItemType>()
+        var dummyItemTypes = new List<ItemType>()
         {
-            InventoryItemType.Stackable("stackable 1"),
-            InventoryItemType.Stackable("stackable 2"),
-            InventoryItemType.NonStackable("non-stackable 1"),
-            InventoryItemType.NonStackable("non-stackable 2")
+            ItemType.Stackable("stackable 1"),
+            ItemType.Stackable("stackable 2"),
+            ItemType.NonStackable("non-stackable 1"),
+            ItemType.NonStackable("non-stackable 2")
         };
         return AddItemTypes(dummyItemTypes);
     }
@@ -57,7 +57,7 @@ public class WorldBuilder
         var result = new World(
             Guid.NewGuid(),
             new StaticWorldContent(_map, new List<IStaticGameObject>()),
-            InventoryItemTypeRepository.Of(_itemTypes)
+            ItemTypeRepository.Of(_itemTypes)
         );
         return result;
     }

@@ -7,14 +7,14 @@ namespace GearBox.Core.Model.Stable;
 /// <summary>
 /// an item which can go in a player's inventory
 /// </summary>
-public class InventoryItem : IStableGameObject, ISerializable<InventoryItemJson>
+public class Item : IStableGameObject, ISerializable<ItemJson>
 {
-    public InventoryItem(InventoryItemType type) : this(type, 1)
+    public Item(ItemType type) : this(type, 1)
     {
 
     }
 
-    public InventoryItem(InventoryItemType type, int quantity)
+    public Item(ItemType type, int quantity)
     {
         MustBeNonNegative(nameof(quantity), quantity);
         MustBeValidQuantity(type, quantity);
@@ -22,9 +22,9 @@ public class InventoryItem : IStableGameObject, ISerializable<InventoryItemJson>
         Quantity = quantity;
     }
 
-    public string Type => "inventoryItem";
+    public string Type => "item";
     
-    public InventoryItemType ItemType {get; init; }
+    public ItemType ItemType {get; init; }
 
     /// <summary>
     /// Subclasses should override this method if they need to provide metadata to the front end
@@ -64,7 +64,7 @@ public class InventoryItem : IStableGameObject, ISerializable<InventoryItemJson>
             throw new ArgumentOutOfRangeException(name, $"Must be non-negative, so {value} is not allowed.");
         }
     }
-    private static void MustBeValidQuantity(InventoryItemType type, int quantity)
+    private static void MustBeValidQuantity(ItemType type, int quantity)
     {
         if (!type.IsStackable && quantity != 0 && quantity != 1)
         {
@@ -82,8 +82,8 @@ public class InventoryItem : IStableGameObject, ISerializable<InventoryItemJson>
         return JsonSerializer.Serialize(ToJson(), options);
     }
 
-    public InventoryItemJson ToJson()
+    public ItemJson ToJson()
     {
-        return new InventoryItemJson(ItemType.Name, Metadata, Tags, Quantity);
+        return new ItemJson(ItemType.Name, Metadata, Tags, Quantity);
     }
 }

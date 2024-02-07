@@ -60,10 +60,10 @@ public class WorldServer
         var allItemTypes = _world.ItemTypes.GetAll();
         if (allItemTypes.Any())
         {
-            player.Inventory.Materials.Add(new InventoryItem(allItemTypes.First()));
+            player.Inventory.Materials.Add(new Item(allItemTypes.First()));
             _world.AddTimer(new WorldTimer(() => 
             {
-                player.Inventory.Materials.Add(new InventoryItem(allItemTypes.Last()));
+                player.Inventory.Materials.Add(new Item(allItemTypes.Last()));
             }, 500));
         }
 

@@ -9,7 +9,7 @@ export class ItemChangeHandler extends ChangeHandler {
     #deserializers;
     
     constructor() {
-        super("inventoryItem");
+        super("item");
         this.#deserializers = new JsonDeserializers();
     }
 
@@ -115,7 +115,7 @@ export class ItemDeserializer {
     #itemTypes;
 
     /**
-     * @param {InventoryItemTypeRepository} itemTypes 
+     * @param {ItemTypeRepository} itemTypes 
      */
     constructor(itemTypes) {
         this.#itemTypes = itemTypes;
@@ -165,7 +165,7 @@ export function deserializeItemTypeJson(obj) {
     return result;
 }
 
-export class InventoryItemTypeRepository {
+export class ItemTypeRepository {
     #itemTypes = new Map();
 
     /**
@@ -189,12 +189,12 @@ export class InventoryItemTypeRepository {
 
 export const itemTests = new TestSuite("item.js", [
     new TestCase("getItemTypeByName_givenNotFound_returnsNull", (assert) => {
-        var sut = new InventoryItemTypeRepository();
+        var sut = new ItemTypeRepository();
         assert.isNull(sut.getItemTypeByName("foo"));
     }),
     new TestCase("getItemTypeByName_givenFound_returnsIt", (assert) => {
         var expected = new ItemType("foo", true);
-        var sut = new InventoryItemTypeRepository([expected]);
+        var sut = new ItemTypeRepository([expected]);
 
         var actual = sut.getItemTypeByName(expected.name);
 

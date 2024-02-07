@@ -13,15 +13,15 @@ public class InventoryTab : IStableGameObject, ISerializable<InventoryTabJson>
         I want to maintain insertion order
     */
     // TODO change to ItemStack
-    private readonly List<InventoryItem> _content = new();
+    private readonly List<Item> _content = new();
 
-    public IEnumerable<InventoryItem> Content => _content.AsEnumerable();
+    public IEnumerable<Item> Content => _content.AsEnumerable();
 
     public string Type => "inventoryTab";
 
     public IEnumerable<object?> DynamicValues => Content;
 
-    public void Add(InventoryItem item)
+    public void Add(Item item)
     {
         if (item.ItemType.IsStackable)
         {

@@ -3,18 +3,18 @@ using GearBox.Core.Model.Json;
 namespace GearBox.Core.Model.Stable;
 
 /// <summary>
-/// Every inventory item has a specific type, which is used to group it with similar items.
+/// Every item has a specific type, which is used to group it with similar items.
 /// </summary>
-public readonly struct InventoryItemType : ISerializable<InventoryItemTypeJson>
+public readonly struct ItemType : ISerializable<ItemTypeJson>
 {
-    private InventoryItemType(string name, bool isStackable)
+    private ItemType(string name, bool isStackable)
     {
         Name = name;
         IsStackable = isStackable;
     }
 
-    public static InventoryItemType Stackable(string name) => new InventoryItemType(name, true);
-    public static InventoryItemType NonStackable(string name) => new InventoryItemType(name, false);
+    public static ItemType Stackable(string name) => new ItemType(name, true);
+    public static ItemType NonStackable(string name) => new ItemType(name, false);
 
     /// <summary>
     /// Used by the frontend to deserialize
@@ -29,10 +29,10 @@ public readonly struct InventoryItemType : ISerializable<InventoryItemTypeJson>
     /// <summary>
     /// Item types should only be serialized when sending the world init message,
     /// as the client can then use a repository to lookup the item type definition by name.
-    /// This reduces the payload size when serializing InventoryItem to JSON.
+    /// This reduces the payload size when serializing Item to JSON.
     /// </summary>
-    public InventoryItemTypeJson ToJson()
+    public ItemTypeJson ToJson()
     {
-        return new InventoryItemTypeJson(Name, IsStackable);
+        return new ItemTypeJson(Name, IsStackable);
     }
 }

@@ -1,8 +1,8 @@
 namespace GearBox.Core.Model.Json;
 
-public readonly struct InventoryItemTypeJson : IJson
+public readonly struct ItemTypeJson : IJson
 {
-    public InventoryItemTypeJson(string name, bool isStackable)
+    public ItemTypeJson(string name, bool isStackable)
     {
         Name = name;
         IsStackable = isStackable;

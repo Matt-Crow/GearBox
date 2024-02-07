@@ -2,7 +2,7 @@ import { Change, ChangeHandlers } from "../infrastructure/change.js";
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
 import { Character } from "./character.js";
-import { InventoryItemTypeRepository, deserializeItemTypeJson } from "./item.js";
+import { ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
 import { deserializeMapJson } from "./map.js";
 
 export class World {
@@ -17,7 +17,7 @@ export class World {
         this.#map = map;
         this.#staticGameObjects = staticGameObjects;
         this.#dynamicGameObjects = [];
-        this.#itemTypes = new InventoryItemTypeRepository(itemTypes);
+        this.#itemTypes = new ItemTypeRepository(itemTypes);
     }
 
     /**
