@@ -12,7 +12,6 @@ public class WorldServer
     private readonly World _world;
     private readonly Dictionary<string, IConnection> _connections = new();
     private readonly Dictionary<string, Character> _players = new();
-    private readonly Dictionary<string, CharacterController> _controls = new();
     private readonly Timer _timer;
 
     public WorldServer() : this(new World())
@@ -71,7 +70,6 @@ public class WorldServer
         _world.AddDynamicObject(character);
         _connections.Add(id, connection);
         _players.Add(id, character);
-        _controls.Add(id, new CharacterController(character));
         var message = new WorldInitJson(
             character.Id,
             _world.StaticContent.ToJson(),
@@ -99,7 +97,6 @@ public class WorldServer
         }
         _players.Remove(id);
         _connections.Remove(id);
-        _controls.Remove(id);
 
         if (!_connections.Any())
         {
@@ -107,13 +104,16 @@ public class WorldServer
         }
     }
 
-    public CharacterController? GetControlsById(string id)
+    /// <summary>
+    /// Executes the given command on the player of the user with the given ID
+    /// </summary>
+    public void ExecuteCommand(string id, IControlCommand command)
     {
-        if (_controls.ContainsKey(id))
+        if (!_players.ContainsKey(id))
         {
-            return _controls[id];
+            throw new Exception($"Invalid id: \"{id}\"");
         }
-        return null;
+        command.ExecuteOn(_players[id]);
     }
 
     public async Task Update()

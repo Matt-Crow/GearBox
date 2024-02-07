@@ -47,8 +47,7 @@ public class WorldHub : Hub
     private Task Receive(IControlCommand command)
     {
         var id = Context.ConnectionId;
-        var controller = _server.GetControlsById(id) ?? throw new Exception($"Invalid id: \"{id}\"");
-        controller.Receive(command);
+        _server.ExecuteCommand(id, command);
         return Task.CompletedTask;
     }
 }
