@@ -44,6 +44,14 @@ public class InventoryTab : IStableGameObject, ISerializable<InventoryTabJson>
         }
     }
 
+    public void AddRange(IEnumerable<Item> items)
+    {
+        foreach (var item in items)
+        {
+            Add(item);
+        }
+    }
+
     public void Update()
     {
         // does nothing

@@ -17,24 +17,11 @@ public class StableWorldContentTester
     }
 
     [Fact]
-    public void ClearPendingChanges_RemovesFromUpdateResult()
-    {
-        var sut = new StableWorldContent();
-        sut.Add(new StableGameObjectSpy());
-
-        sut.ClearPendingChanges();
-        var actual = sut.Update();
-
-        Assert.Empty(actual);
-    }
-
-    [Fact]
     public void Update_GivenAnObjectChanges_EmitsUpdateEvent()
     {
         var sut = new StableWorldContent();
         var spy = new StableGameObjectSpy();
         sut.Add(spy);
-        sut.ClearPendingChanges();
 
         spy.Foo++;
         var actual = sut.Update();

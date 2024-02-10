@@ -10,6 +10,7 @@ export class World {
     #map;
     #staticGameObjects;
     #dynamicGameObjects;
+    #stableGameObjects;
     #itemTypes;
 
     constructor(playerId, map, staticGameObjects, itemTypes) {
@@ -17,6 +18,7 @@ export class World {
         this.#map = map;
         this.#staticGameObjects = staticGameObjects;
         this.#dynamicGameObjects = [];
+        this.#stableGameObjects = new Map();
         this.#itemTypes = new ItemTypeRepository(itemTypes);
     }
 
@@ -59,6 +61,21 @@ export class World {
         return this.#itemTypes;
     }
 
+    addStableGameObject(obj) {
+        this.#stableGameObjects.set(obj.id, obj);
+    }
+
+    updateStableGameObject(obj) {
+        if (!this.#stableGameObjects.has(obj.id)) {
+            throw new Error(`Bad ID: ${obj.id}`);
+        }
+        this.#stableGameObjects.set(obj.id, obj);
+    }
+
+    removeStableGameObject(id) {
+        this.#stableGameObjects.delete(id);
+    }
+
     /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
@@ -66,6 +83,9 @@ export class World {
         this.#map.draw(context);
         this.#staticGameObjects.forEach(obj => obj.draw(context));
         this.#dynamicGameObjects.forEach(obj => obj.draw(context));
+        for (const obj of this.#stableGameObjects.values()) {
+            obj.draw(context);
+        }
     }
 }
 

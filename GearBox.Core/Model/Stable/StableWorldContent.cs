@@ -3,6 +3,8 @@ namespace GearBox.Core.Model.Stable;
 public class StableWorldContent
 {
     private readonly List<IStableGameObject> _objects = new();
+    private readonly List<PlayerCharacter> _players = new ();
+    private readonly List<LootChest> _lootChests = new ();
     private readonly Dictionary<IStableGameObject, int> _hashes = new();
     private readonly List<Change> _pendingChanges = new();
 
@@ -13,6 +15,26 @@ public class StableWorldContent
         _pendingChanges.Add(Change.Created(obj));
     }
 
+    // need this method, as there are special behaviors associated with players
+    public void AddPlayer(PlayerCharacter player)
+    {
+        Add(player);
+        _players.Add(player);
+    }
+
+    // player-interactables
+    public void AddLootChest(LootChest lootChest)
+    {
+        Add(lootChest);
+        _lootChests.Add(lootChest);
+    }
+
+    public IEnumerable<IStableGameObject> GetAll()
+    {
+        var result = _objects.AsEnumerable();
+        return result;
+    }
+
     private static int MakeHashFor(IStableGameObject obj)
     {
         var result = new HashCode();
@@ -21,17 +43,6 @@ public class StableWorldContent
             result.Add(field);
         }
         return result.ToHashCode();
-    }
-
-    public void ClearPendingChanges()
-    {
-        _pendingChanges.Clear();
-    }
-
-    // will be used during WorldInitJson
-    public IEnumerable<Change> GetPendingChanges()
-    {
-        return _pendingChanges.AsEnumerable();
     }
 
     /// <summary>
@@ -45,13 +56,20 @@ public class StableWorldContent
         {
             obj.Update();
         }
+        foreach (var lootChest in _lootChests)
+        {
+            foreach (var player in _players)
+            {
+                lootChest.CheckForCollisions(player);
+            }
+        }
         foreach (var obj in _objects.Where(HashHasChanged))
         {
             result.Add(Change.Updated(obj));
             _hashes[obj] = MakeHashFor(obj);
         }
         result.AddRange(_pendingChanges); // find any changes which occured during update
-        ClearPendingChanges();
+        _pendingChanges.Clear();
         return result;
     }
 

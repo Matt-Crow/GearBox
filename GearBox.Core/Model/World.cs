@@ -3,6 +3,7 @@ namespace GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Static;
+using GearBox.Core.Model.Units;
 using System;
 
 /// <summary>
@@ -55,14 +56,30 @@ public class World
         DynamicContent.RemoveDynamicObject(obj);
     }
 
-    public void AddStableObject(IStableGameObject obj)
-    {
-        StableContent.Add(obj);
-    }
-
     public void AddTimer(WorldTimer timer)
     {
         _timers.Add(timer);
+    }
+
+    public void SpawnLootChest()
+    {
+        var random = new Random();
+
+        var chestItems = new List<Item>();
+        var itemTypes = ItemTypes.GetAll().ToList();
+        var numItems = random.Next(1, 4);
+        for (var i = 0; i < numItems; i++)
+        {
+            var itemType = itemTypes[random.Next(itemTypes.Count)];
+            chestItems.Add(new Item(itemType));
+        }
+        // todo Map.GetOpenSpot
+        var location = Coordinates.FromTiles(
+            random.Next(StaticContent.Map.Width.InTiles), 
+            random.Next(StaticContent.Map.Height.InTiles)
+        );
+        var lootChest = new LootChest(location, chestItems.ToArray());
+        StableContent.AddLootChest(lootChest);
     }
 
     /// <summary>

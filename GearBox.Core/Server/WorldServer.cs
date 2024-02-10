@@ -55,27 +55,33 @@ public class WorldServer
         var character = new Character(); // will eventually read from repo
         var player = new PlayerCharacter(character);
 
-        // testing inventory
-        var allItemTypes = _world.ItemTypes.GetAll();
-        if (allItemTypes.Any())
+        // testing LootChests
+        _world.AddTimer(new WorldTimer(() => 
         {
-            player.Inventory.Materials.Add(new Item(allItemTypes.First()));
-            _world.AddTimer(new WorldTimer(() => 
-            {
-                player.Inventory.Materials.Add(new Item(allItemTypes.Last()));
-            }, 500));
-        }
+            _world.SpawnLootChest();
+        }, 500));
 
-        _world.AddStableObject(player);
+        _world.StableContent.AddPlayer(player);
         _world.AddDynamicObject(character);
         _connections.Add(id, connection);
         _players.Add(id, character);
-        var message = new WorldInitJson(
+        var worldInit = new WorldInitJson(
             character.Id,
             _world.StaticContent.ToJson(),
             _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
         );
-        await connection.Send(message);
+        await connection.Send(worldInit);
+
+        // need to send all StableGameObjects to client
+        var allStableObjects = _world.StableContent.GetAll()
+            .Select(obj => Change.Created(obj))
+            .Select(change => change.ToJson())
+            .ToList();
+        var worldUpdate = new WorldUpdateJson(
+            _world.DynamicContent.ToJson(),
+            allStableObjects
+        );
+        await connection.Send(worldUpdate);
 
         if (!_timer.Enabled)
         {
