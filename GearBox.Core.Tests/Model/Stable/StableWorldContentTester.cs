@@ -22,11 +22,11 @@ public class StableWorldContentTester
         var sut = new StableWorldContent();
         var spy = new StableGameObjectSpy();
         sut.Add(spy);
-        sut.ClearPendingChanges();
+        sut.Update(); // clears & applies changes
 
         spy.Foo++;
         var actual = sut.Update();
-
+        
         Assert.Contains(actual, change => change.IsContent);
     }
 }

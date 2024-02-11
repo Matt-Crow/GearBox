@@ -1,19 +1,14 @@
+using GearBox.Core.Utils;
+
 namespace GearBox.Core.Model.Stable;
 
 public class StableWorldContent
 {
-    private readonly List<IStableGameObject> _objects = new();
-    private readonly List<PlayerCharacter> _players = new ();
-    private readonly List<LootChest> _lootChests = new ();
+    private readonly SafeList<IStableGameObject> _objects = new();
+    private readonly SafeList<PlayerCharacter> _players = new ();
+    private readonly SafeList<LootChest> _lootChests = new ();
     private readonly Dictionary<IStableGameObject, int> _hashes = new();
-    private readonly List<Change> _pendingChanges = new();
-
-    public void Add(IStableGameObject obj)
-    {
-        _objects.Add(obj);
-        _hashes[obj] = MakeHashFor(obj);
-        _pendingChanges.Add(Change.Content(obj));
-    }
+    private readonly List<Change> _added = new();
 
     // need this method, as there are special behaviors associated with players
     public void AddPlayer(PlayerCharacter player)
@@ -29,18 +24,11 @@ public class StableWorldContent
         _lootChests.Add(lootChest);
     }
 
-    public IEnumerable<IStableGameObject> GetAll()
+    public void Add(IStableGameObject obj)
     {
-        var result = _objects.AsEnumerable();
-        return result;
-    }
-
-    /// <summary>
-    /// Removes all pending change events such that they will not be emitted by the next Update
-    /// </summary>
-    public void ClearPendingChanges()
-    {
-        _pendingChanges.Clear();
+        _objects.Add(obj);
+        _hashes[obj] = MakeHashFor(obj);
+        _added.Add(Change.Content(obj));
     }
 
     private static int MakeHashFor(IStableGameObject obj)
@@ -50,7 +38,14 @@ public class StableWorldContent
         {
             result.Add(field);
         }
-        return result.ToHashCode();
+        var hashCode = result.ToHashCode();
+        return hashCode;
+    }
+
+    public IEnumerable<IStableGameObject> GetAll()
+    {
+        var result = _objects.AsEnumerable();
+        return result;
     }
 
     /// <summary>
@@ -60,24 +55,32 @@ public class StableWorldContent
     public IEnumerable<Change> Update()
     {
         var result = new List<Change>();
-        foreach (var obj in _objects)
+        foreach (var obj in _objects.AsEnumerable())
         {
-            obj.Update();
+            obj.Update(); 
         }
-        foreach (var lootChest in _lootChests)
+        foreach (var lootChest in _lootChests.AsEnumerable())
         {
-            foreach (var player in _players)
+            foreach (var player in _players.AsEnumerable())
             {
                 lootChest.CheckForCollisions(player);
             }
         }
-        foreach (var obj in _objects.Where(HashHasChanged))
+
+        foreach (var obj in _objects.AsEnumerable().Where(HashHasChanged))
         {
             result.Add(Change.Content(obj));
             _hashes[obj] = MakeHashFor(obj);
         }
-        result.AddRange(_pendingChanges); // find any changes which occured during update
-        _pendingChanges.Clear();
+
+        // notify caller of objects added during iteration
+        result.AddRange(_added);
+        _added.Clear();
+
+        _objects.ApplyChanges();
+        _players.ApplyChanges();
+        _lootChests.ApplyChanges();
+
         return result;
     }
 

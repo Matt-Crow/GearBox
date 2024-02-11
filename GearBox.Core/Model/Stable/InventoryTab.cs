@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Json;
+using GearBox.Core.Utils;
 using System.Text.Json;
 
 namespace GearBox.Core.Model.Stable;
@@ -13,7 +14,7 @@ public class InventoryTab : IStableGameObject, ISerializable<InventoryTabJson>
         I want to maintain insertion order
     */
     // TODO change to ItemStack
-    private readonly List<Item> _content = new();
+    private readonly SafeList<Item> _content = new();
 
     public IEnumerable<Item> Content => _content.AsEnumerable();
 
@@ -25,7 +26,7 @@ public class InventoryTab : IStableGameObject, ISerializable<InventoryTabJson>
     {
         if (item.ItemType.IsStackable)
         {
-            var currentStack = _content
+            var currentStack = _content.AsEnumerable()
                 .Where(x => x.ItemType.Name == item.ItemType.Name)
                 .LastOrDefault();
             
@@ -42,6 +43,7 @@ public class InventoryTab : IStableGameObject, ISerializable<InventoryTabJson>
         {
             _content.Add(item);
         }
+        _content.ApplyChanges();
     }
 
     public void AddRange(IEnumerable<Item> items)
