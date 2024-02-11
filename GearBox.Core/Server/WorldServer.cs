@@ -74,7 +74,7 @@ public class WorldServer
 
         // need to send all StableGameObjects to client
         var allStableObjects = _world.StableContent.GetAll()
-            .Select(obj => Change.Created(obj))
+            .Select(obj => Change.Content(obj))
             .Select(change => change.ToJson())
             .ToList();
         var worldUpdate = new WorldUpdateJson(

@@ -6,33 +6,30 @@
 export class ChangeHandlers {
     #handlers = new Map();
 
-    add(handler) {
+    /**
+     * @param {ChangeHandler} handler 
+     * @returns {ChangeHandlers}
+     */
+    withChangeHandler(handler) {
         this.#handlers.set(handler.bodyType, handler);
+        return this;
     }
 
+    /**
+     * @param {Change} change 
+     */
     handle(change) {
         const bodyType = change.bodyType;
         if (!this.#handlers.has(bodyType)) {
             throw new Error(`Unsupported change body type: "${bodyType}"`);
         }
 
+        const obj = JSON.parse(change.body);
         const handler = this.#handlers.get(bodyType);
-        switch (change.changeType.toLowerCase()) {
-            case "create": {
-                handler.handleCreate(change.body);
-                break;
-            }
-            case "update": {
-                handler.handleUpdate(change.body);
-                break;
-            }
-            case "delete": {
-                handler.handleDelete(change.body);
-                break;
-            }
-            default: {
-                throw new Error(`Unsupported change type: "${change.changeType}"`);
-            }
+        if (change.isDelete) {
+            handler.handleDelete(obj);
+        } else {
+            handler.handleContent(obj);
         }
     }
 }
@@ -44,56 +41,61 @@ export class ChangeHandler {
         this.#bodyType = bodyType;
     }
 
+    /**
+     * @returns {string}
+     */
     get bodyType() {
         return this.#bodyType;
     }
 
     /**
-     * @param {string} body 
+     * @param {object} body 
      */
-    handleCreate(body) {
+    handleContent(_body) {
         throw new Error("abstract method");
     }
 
     /**
-     * @param {string} body 
+     * @param {object} body 
      */
-    handleUpdate(body) {
-        throw new Error("abstract method");
-    }
-
-    /**
-     * @param {string} body 
-     */
-    handleDelete(body) {
+    handleDelete(_body) {
         throw new Error("abstract method");
     }
 }
 
 export class Change {
-    #changeType;
     #bodyType;
     #body;
+    #isDelete;
 
-    constructor(changeType, bodyType, body) {
-        this.#changeType = changeType;
+    constructor(bodyType, body, isDelete) {
         this.#bodyType = bodyType;
         this.#body = body;
+        this.#isDelete = isDelete;
     }
 
     static fromJson(json) {
-        return new Change(json.changeType, json.bodyType, json.body);
+        return new Change(json.bodyType, json.body, json.isDelete);
     }
 
-    get changeType() {
-        return this.#changeType;
-    }
-
+    /**
+     * @returns {string}
+     */
     get bodyType() {
         return this.#bodyType;
     }
 
+    /**
+     * @returns {string}
+     */
     get body() {
         return this.#body;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    get isDelete() {
+        return this.#isDelete;
     }
 }

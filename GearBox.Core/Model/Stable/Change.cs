@@ -5,40 +5,33 @@ using System.Text.Json.Serialization;
 namespace GearBox.Core.Model.Stable;
 
 /// <summary>
-/// A change in a stable dynamic game object
+/// A change in a stable dynamic game object.
+/// A change can be one of two type: Content, or Delete.
+/// Content could be either adding or updating.
 /// </summary>
 public readonly struct Change : ISerializable<ChangeJson>
 {
-    private Change(ChangeType type, IStableGameObject changed)
+    private Change(IStableGameObject changed, bool isDelete)
     {
-        Type = type;
         Changed = changed;
+        IsDelete = isDelete;
     }
 
-    public static Change Created(IStableGameObject created)
+    public static Change Content(IStableGameObject created)
     {
-        return new Change(ChangeType.Create, created);
+        return new Change(created, false);
     }
 
-    public static Change Updated(IStableGameObject updated)
-    {
-        return new Change(ChangeType.Update, updated);
-    }
-
-    public ChangeType Type { get; init; }
     public IStableGameObject Changed { get; init; }
-    public bool IsCreate { get => Type == ChangeType.Create; }
-    public bool IsUpdate { get => Type == ChangeType.Update; }
+    public bool IsContent => !IsDelete;
+    public bool IsDelete { get; init; }
 
     public ChangeJson ToJson()
     {
         var options = new JsonSerializerOptions()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters = { 
-                new JsonStringEnumConverter() 
-            }
         };
-        return new ChangeJson(Type, Changed.Type, Changed.Serialize(options));
+        return new ChangeJson(Changed.Type, Changed.Serialize(options), IsDelete);
     }
 }

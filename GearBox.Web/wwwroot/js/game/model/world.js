@@ -61,14 +61,7 @@ export class World {
         return this.#itemTypes;
     }
 
-    addStableGameObject(obj) {
-        this.#stableGameObjects.set(obj.id, obj);
-    }
-
-    updateStableGameObject(obj) {
-        if (!this.#stableGameObjects.has(obj.id)) {
-            throw new Error(`Bad ID: ${obj.id}`);
-        }
+    saveStableGameObject(obj) {
         this.#stableGameObjects.set(obj.id, obj);
     }
 

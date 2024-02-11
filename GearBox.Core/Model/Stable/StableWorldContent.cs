@@ -12,7 +12,7 @@ public class StableWorldContent
     {
         _objects.Add(obj);
         _hashes[obj] = MakeHashFor(obj);
-        _pendingChanges.Add(Change.Created(obj));
+        _pendingChanges.Add(Change.Content(obj));
     }
 
     // need this method, as there are special behaviors associated with players
@@ -33,6 +33,14 @@ public class StableWorldContent
     {
         var result = _objects.AsEnumerable();
         return result;
+    }
+
+    /// <summary>
+    /// Removes all pending change events such that they will not be emitted by the next Update
+    /// </summary>
+    public void ClearPendingChanges()
+    {
+        _pendingChanges.Clear();
     }
 
     private static int MakeHashFor(IStableGameObject obj)
@@ -65,7 +73,7 @@ public class StableWorldContent
         }
         foreach (var obj in _objects.Where(HashHasChanged))
         {
-            result.Add(Change.Updated(obj));
+            result.Add(Change.Content(obj));
             _hashes[obj] = MakeHashFor(obj);
         }
         result.AddRange(_pendingChanges); // find any changes which occured during update

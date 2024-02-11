@@ -4,14 +4,14 @@ namespace GearBox.Core.Model.Json;
 
 public readonly struct ChangeJson : IJson
 {
-    public ChangeJson(ChangeType changeType, string bodyType, string body)
+    public ChangeJson(string bodyType, string body, bool isDelete)
     {
-        ChangeType = changeType;
         BodyType = bodyType;
         Body = body;
+        IsDelete = isDelete;
     }
 
-    public ChangeType ChangeType { get; init; }
     public string BodyType { get; init; }
     public string Body { get; init; }
+    public bool IsDelete { get; init; }
 }

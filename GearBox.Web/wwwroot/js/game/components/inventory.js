@@ -14,8 +14,7 @@ export class InventoryModal {
         this.#modal = modal;
         this.#tbody = tbody;
         this.#playerEventListener = new PlayerEventListener({
-            onPlayerAdded: (player) => this.#setInventory(player.inventory),
-            onPlayerUpdated: (player) => this.#setInventory(player.inventory),
+            onPlayerChanged: (player) => this.#setInventory(player.inventory),
             onPlayerRemoved: () => this.#clear()
         });
     }

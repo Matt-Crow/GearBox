@@ -6,26 +6,27 @@ namespace GearBox.Core.Tests.Model.Stable;
 public class StableWorldContentTester
 {
     [Fact]
-    public void Add_EmitsCreateEvent()
+    public void Add_EmitsContentEvent()
     {
         var sut = new StableWorldContent();
         sut.Add(new StableGameObjectSpy());
 
         var actual = sut.Update();
 
-        Assert.Contains(actual, change => change.IsCreate);
+        Assert.Contains(actual, change => change.IsContent);
     }
 
     [Fact]
-    public void Update_GivenAnObjectChanges_EmitsUpdateEvent()
+    public void Update_GivenAnObjectChanges_EmitsContentEvent()
     {
         var sut = new StableWorldContent();
         var spy = new StableGameObjectSpy();
         sut.Add(spy);
+        sut.ClearPendingChanges();
 
         spy.Foo++;
         var actual = sut.Update();
 
-        Assert.Contains(actual, change => change.IsUpdate);
+        Assert.Contains(actual, change => change.IsContent);
     }
 }

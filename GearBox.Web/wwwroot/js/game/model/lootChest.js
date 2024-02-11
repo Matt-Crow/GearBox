@@ -2,7 +2,6 @@ import { ChangeHandler } from "../infrastructure/change.js";
 import { PIXELS_PER_TILE } from "./constants.js";
 import { World } from "./world.js";
 
-
 export class LootChestChangeHandler extends ChangeHandler {
     #world;
 
@@ -14,24 +13,17 @@ export class LootChestChangeHandler extends ChangeHandler {
         this.#world = world;
     }
 
-    handleCreate(body) {
-        const json = JSON.parse(body);
-        const lootChest = this.#deserialize(json);
-        this.#world.addStableGameObject(lootChest);
-    } 
-
-    handleUpdate(body) {
-        const json = JSON.parse(body);
-        const lootChest = this.#deserialize(json);
-        if (lootChest.collectedBy.includes(this.#world.playerId)) {
+    handleContent(obj) {
+        const lootChest = this.#deserialize(obj);
+        if (lootChest.hasBeenCollectedBy(this.#world.playerId)) {
             this.#world.removeStableGameObject(lootChest.id);
         } else {
-            this.#world.updateStableGameObject(lootChest);
+            this.#world.saveStableGameObject(lootChest);
         }
     }
 
-    handleDelete(_body) {
-        throw new Error("LootChestChangeHandler::handleDelete not implemented yet");
+    handleDelete(obj) {
+        this.#world.removeStableGameObject(obj.id);
     }
 
     #deserialize(json) {
@@ -66,26 +58,11 @@ export class LootChest {
         return this.#id;
     }
 
-    get x() {
-        return this.#x;
-    }
-
-    get y() {
-        return this.#y;
-    }
-
-    /**
-     * @returns {string[]}
-     */
-    get collectedBy() {
-        return this.#collectedBy;
-    }
-
     /**
      * @param {string} playerId 
      * @returns {boolean}
      */
-    wasCollectedBy(playerId) {
+    hasBeenCollectedBy(playerId) {
         return this.#collectedBy.includes(playerId);
     }
 
@@ -93,7 +70,7 @@ export class LootChest {
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
     draw(context) {
-        const small = PIXELS_PER_TILE / 10;
+        const small = PIXELS_PER_TILE / 20;
         context.fillStyle = "brown";
         context.fillRect(
             this.#x + small, 
