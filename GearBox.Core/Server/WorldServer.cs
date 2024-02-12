@@ -65,7 +65,7 @@ public class WorldServer
         var player = new PlayerCharacter(character);
 
         _world.StableContent.AddPlayer(player);
-        _world.AddDynamicObject(character);
+        _world.DynamicContent.AddDynamicObject(character);
         _connections.Add(id, connection);
         _players.Add(id, character);
         var worldInit = new WorldInitJson(
@@ -102,7 +102,7 @@ public class WorldServer
         var character = _players[id];
         if (character is not null)
         {
-            _world.RemoveDynamicObject(character);
+            _world.DynamicContent.RemoveDynamicObject(character);
         }
         _players.Remove(id);
         _connections.Remove(id);

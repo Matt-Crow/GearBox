@@ -18,6 +18,8 @@ public class ItemTypeRepository : IItemTypeRepository
         return new ItemTypeRepository(asDictionary);
     }
 
+    public static ItemTypeRepository Empty() => new ItemTypeRepository(new Dictionary<string, ItemType>());
+
     public ItemType? GetByName(string name)
     {
         if (_inner.ContainsKey(name))
