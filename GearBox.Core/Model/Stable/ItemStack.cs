@@ -4,14 +4,14 @@ namespace GearBox.Core.Model.Stable;
 
 public class ItemStack : ISerializable<ItemJson>
 {
-    public ItemStack(Item item, int quantity=1)
+    public ItemStack(IItem item, int quantity=1)
     {
         MustBeNonNegative(nameof(quantity), quantity);
         Item = item;
         Quantity = quantity;
     }
 
-    public Item Item { get; init; }
+    public IItem Item { get; init; }
     public int Quantity { get; private set; }
     public IEnumerable<object?> DynamicValues => Item.DynamicValues.Append(Quantity);
 
@@ -42,7 +42,7 @@ public class ItemStack : ISerializable<ItemJson>
     public ItemJson ToJson()
     {
         var result = new ItemJson(
-            Item.ItemType.Name,
+            Item.Type.Name,
             Item.Metadata,
             Item.Tags,
             Quantity

@@ -12,15 +12,15 @@ public class LootChest : IStableGameObject
 {
     private readonly Guid _id = Guid.NewGuid();
     private readonly HashSet<Guid> _collectedBy = new();
-    private readonly List<Item> _contents;
+    private readonly List<IItem> _contents;
 
-    public LootChest(Coordinates location, params Item[] contents)
+    public LootChest(Coordinates location, params IItem[] contents)
     {
         Body = new BodyBehavior()
         {
             Location = location
         };
-        _contents = new List<Item>(contents);
+        _contents = new List<IItem>(contents);
     }
 
     public string Type => "lootChest";
@@ -39,7 +39,11 @@ public class LootChest : IStableGameObject
         if (Body.CollidesWith(player.Inner.Body))
         {
             _collectedBy.Add(player.Inner.Id);
-            player.Inventory.Materials.AddRange(_contents);
+            foreach (var item in _contents)
+            {
+                var tab = item.GetTab(player.Inventory);
+                tab.Add(item);
+            }
         }
     }
 

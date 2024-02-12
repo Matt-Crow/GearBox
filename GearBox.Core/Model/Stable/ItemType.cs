@@ -13,6 +13,7 @@ public readonly struct ItemType
     }
 
     public string Name { get; init; }
+    // todo description
 
     public ItemTypeJson ToJson()
     {

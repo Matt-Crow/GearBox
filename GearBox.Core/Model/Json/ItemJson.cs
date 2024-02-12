@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace GearBox.Core.Model.Json;
 
 /// <summary>
-/// Combines together data from ItemStack, Item, and ItemType
+/// Combines together data from ItemStack, IItem, and ItemType
 /// </summary>
 public readonly struct ItemJson : IJson
 {

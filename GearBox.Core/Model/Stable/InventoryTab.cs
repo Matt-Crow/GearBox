@@ -19,11 +19,11 @@ public class InventoryTab : ISerializable<InventoryTabJson>
 
     public IEnumerable<object?> DynamicValues => Content.Select(stack => stack.DynamicValues);
 
-    public void Add(Item item, int quantity=1)
+    public void Add(IItem item, int quantity=1)
     {
         // check for existing stack, add to it if it exists
         var currentStack = _content.AsEnumerable()
-            .Where(stack => stack.Item.Is(item))
+            .Where(stack => stack.Item.Equals(item))
             .LastOrDefault();
         if (currentStack == null)
         {
@@ -36,7 +36,7 @@ public class InventoryTab : ISerializable<InventoryTabJson>
         _content.ApplyChanges();
     }
 
-    public void AddRange(IEnumerable<Item> items)
+    public void AddRange(IEnumerable<IItem> items)
     {
         foreach (var item in items)
         {

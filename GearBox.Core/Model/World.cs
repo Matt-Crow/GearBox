@@ -65,13 +65,13 @@ public class World
     {
         var random = new Random();
 
-        var chestItems = new List<Item>();
+        var chestItems = new List<IItem>();
         var itemTypes = ItemTypes.GetAll().ToList();
         var numItems = random.Next(1, 4);
         for (var i = 0; i < numItems; i++)
         {
             var itemType = itemTypes[random.Next(itemTypes.Count)];
-            chestItems.Add(new Item(itemType));
+            chestItems.Add(new Material(itemType));
         }
         // todo Map.GetOpenSpot
         var location = Coordinates.FromTiles(

@@ -8,7 +8,7 @@ public class InventoryTabTester
     public void Add_GivenEmptyInventory_Works()
     {
         var sut = new InventoryTab();
-        var expected = new Item(new ItemType("foo"));
+        var expected = new Material(new ItemType("foo"));
         
         sut.Add(expected, 42);
         var actual = sut.Content.FirstOrDefault();
@@ -22,11 +22,11 @@ public class InventoryTabTester
         var sut = new InventoryTab();
         var type = new ItemType("foo");
         
-        sut.Add(new Item(type), 2);
-        sut.Add(new Item(type), 3);
+        sut.Add(new Material(type), 2);
+        sut.Add(new Material(type), 3);
         var result = sut.Content.FirstOrDefault();
 
-        Assert.Equal(type.Name, result?.Item.ItemType.Name);
+        Assert.Equal(type, result?.Item.Type);
         Assert.Equal(5, result?.Quantity);
     }
 
@@ -34,12 +34,27 @@ public class InventoryTabTester
     public void Add_GivenDifferent_DoesNotSum()
     {
         var sut = new InventoryTab();
-        var item1 = new Item(new ItemType("foo"));
-        var item2 = new Item(new ItemType("bar"));
+        var item1 = new Material(new ItemType("foo"));
+        var item2 = new Material(new ItemType("bar"));
         
         sut.Add(item1);
         sut.Add(item2);
         
+        var result = sut.Content.ToList();
+        Assert.Equal(item1, result.ElementAtOrDefault(0)?.Item);
+        Assert.Equal(item2, result.ElementAtOrDefault(1)?.Item);
+    }
+
+    [Fact]
+    public void Add_GivenEquipment_DoesNotSum()
+    {
+        var sut = new InventoryTab();
+        var item1 = new Equipment(new ItemType("foo"));
+        var item2 = new Equipment(new ItemType("foo"));
+    
+        sut.Add(item1);
+        sut.Add(item2);
+
         var result = sut.Content.ToList();
         Assert.Equal(item1, result.ElementAtOrDefault(0)?.Item);
         Assert.Equal(item2, result.ElementAtOrDefault(1)?.Item);

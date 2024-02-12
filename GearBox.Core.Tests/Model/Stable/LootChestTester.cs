@@ -10,7 +10,7 @@ public class LootChestTester
     [Fact]
     public void CheckForCollisions_GivenPlayerCollides_AddsToInventory()
     {
-        var item = new Item(new ItemType("foo"));
+        var item = new Material(new ItemType("foo"));
         var sut = new LootChest(Coordinates.ORIGIN, item);
         var player = new PlayerCharacter(new Character()
         {
