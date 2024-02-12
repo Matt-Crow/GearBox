@@ -13,6 +13,7 @@ public class WorldServer
     private readonly Dictionary<string, IConnection> _connections = new();
     private readonly Dictionary<string, Character> _players = new();
     private readonly Timer _timer;
+    private static readonly object updateLock = new();
 
     public WorldServer() : this(new World())
     {
@@ -127,14 +128,17 @@ public class WorldServer
 
     public async Task Update()
     {
-        var stableChanges = _world.Update();
-
-        // notify everyone of the update
-        var message = new WorldUpdateJson(
-            _world.DynamicContent.ToJson(),
-            stableChanges.Select(c => c.ToJson()).ToList()
-        );
-        var tasks = _connections.Values.Select(conn => conn.Send(message));
+        var tasks = new List<Task>();
+        lock (updateLock)
+        {
+            var stableChanges = _world.Update();
+            // notify everyone of the update
+            var message = new WorldUpdateJson(
+                _world.DynamicContent.ToJson(),
+                stableChanges.Select(c => c.ToJson()).ToList()
+            );
+            tasks.AddRange(_connections.Values.Select(conn => conn.Send(message)));
+        }
         await Task.WhenAll(tasks);
     }
 }
