@@ -10,7 +10,7 @@ public class LootChestTester
     [Fact]
     public void CheckForCollisions_GivenPlayerCollides_AddsToInventory()
     {
-        var item = new Item(ItemType.Stackable("foo"));
+        var item = new Item(new ItemType("foo"));
         var sut = new LootChest(Coordinates.ORIGIN, item);
         var player = new PlayerCharacter(new Character()
         {
@@ -19,6 +19,6 @@ public class LootChestTester
 
         sut.CheckForCollisions(player);
 
-        Assert.Contains(item, player.Inventory.Materials.Content);
+        Assert.Contains(item, player.Inventory.Materials.Content.Select(stack => stack.Item));
     }
 }

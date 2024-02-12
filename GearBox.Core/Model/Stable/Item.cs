@@ -1,89 +1,47 @@
 using GearBox.Core.Model.Json;
-using System.Collections.Immutable;
-using System.Text.Json;
 
 namespace GearBox.Core.Model.Stable;
 
 /// <summary>
 /// an item which can go in a player's inventory
 /// </summary>
-public class Item : IStableGameObject, ISerializable<ItemJson>
+public class Item 
 {
-    public Item(ItemType type) : this(type, 1)
+    public Item(ItemType type)
     {
-
-    }
-
-    public Item(ItemType type, int quantity)
-    {
-        MustBeNonNegative(nameof(quantity), quantity);
-        MustBeValidQuantity(type, quantity);
         ItemType = type;
-        Quantity = quantity;
     }
-
-    public string Type => "item";
     
     public ItemType ItemType {get; init; }
+
+    // todo description
 
     /// <summary>
     /// Subclasses should override this method if they need to provide metadata to the front end
     /// </summary>
-    protected virtual List<KeyValueJson<string, object?>> Metadata => new();
+    public virtual List<KeyValueJson<string, object?>> Metadata => new();
     
     /// <summary>
     /// Subclasses should override this method if they need to provide tags to the front end
     /// </summary>
-    protected virtual List<string> Tags => new();
+    public virtual List<string> Tags => new();
 
-    public int Quantity { get; private set; }
+    // todo figure out how to handle items with dynamic metadata & tags
+    // better to make this virtual, subclasses handle it
+    public IEnumerable<object?> DynamicValues => Metadata.AsEnumerable()
+        .OrderBy(kv => kv.Key)
+        .Select(kv => $"{kv.Key}: {kv.Value}")
+        .Concat(Tags);
 
-    public IEnumerable<object?> DynamicValues => ImmutableArray.Create<object?>(Quantity);
+    // todo method of getting which inventory tab to add to / remove from
 
-    public void AddQuantity(int quantity)
+    public bool Is(Item other)
     {
-        MustBeNonNegative(nameof(quantity), quantity);
-        MustBeValidQuantity(ItemType, Quantity + quantity);
-        Quantity += quantity;
-    }
-
-    public void RemoveQuantity(int quantity)
-    {
-        MustBeNonNegative(nameof(quantity), quantity);
-        if (Quantity < quantity)
-        {
-            throw new Exception($"Item only has {Quantity} quantity, so cannot remove {quantity}");
-        }
-        Quantity -= quantity;
-    }
-
-    private static void MustBeNonNegative(string name, int value)
-    {
-        if (value < 0)
-        {
-            throw new ArgumentOutOfRangeException(name, $"Must be non-negative, so {value} is not allowed.");
-        }
-    }
-    private static void MustBeValidQuantity(ItemType type, int quantity)
-    {
-        if (!type.IsStackable && quantity != 0 && quantity != 1)
-        {
-            throw new ArgumentOutOfRangeException($"{type.Name} is not stackable, so quantity must be 0 or 1, not {quantity}");
-        }
-    }
-
-    public void Update()
-    {
-        // does nothing
-    }
-
-    public string Serialize(JsonSerializerOptions options)
-    {
-        return JsonSerializer.Serialize(ToJson(), options);
-    }
-
-    public ItemJson ToJson()
-    {
-        return new ItemJson(ItemType.Name, Metadata, Tags, Quantity);
+        var sameItemType = other.ItemType.Equals(ItemType);
+        var sameMetadata = other.Metadata.Count == Metadata.Count
+            && !other.Metadata.Except(Metadata).Any();
+        var sameTags = other.Tags.Count == Tags.Count
+            && !other.Tags.Except(Tags).Any();
+        return sameItemType && sameMetadata && sameTags;
     }
 }

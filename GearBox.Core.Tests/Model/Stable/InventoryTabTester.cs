@@ -8,41 +8,40 @@ public class InventoryTabTester
     public void Add_GivenEmptyInventory_Works()
     {
         var sut = new InventoryTab();
-        var expected = new Item(ItemType.Stackable("foo"), 42);
+        var expected = new Item(new ItemType("foo"));
         
-        sut.Add(expected);
+        sut.Add(expected, 42);
         var actual = sut.Content.FirstOrDefault();
 
-        Assert.Equal(expected, actual);
+        Assert.Equal(expected, actual?.Item);
     }
 
     [Fact]
     public void Add_GivenStackableDuplicate_Sums()
     {
         var sut = new InventoryTab();
-        var type = ItemType.Stackable("foo");
+        var type = new ItemType("foo");
         
-        sut.Add(new Item(type, 2));
-        sut.Add(new Item(type, 3));
+        sut.Add(new Item(type), 2);
+        sut.Add(new Item(type), 3);
         var result = sut.Content.FirstOrDefault();
 
-        Assert.Equal(type.Name, result?.ItemType.Name);
+        Assert.Equal(type.Name, result?.Item.ItemType.Name);
         Assert.Equal(5, result?.Quantity);
     }
 
     [Fact]
-    public void Add_GivenNonStackableDuplicate_DoesNotSum()
+    public void Add_GivenDifferent_DoesNotSum()
     {
         var sut = new InventoryTab();
-        var type = ItemType.NonStackable("foo");
-        var item1 = new Item(type);
-        var item2 = new Item(type);
+        var item1 = new Item(new ItemType("foo"));
+        var item2 = new Item(new ItemType("bar"));
         
         sut.Add(item1);
         sut.Add(item2);
         
         var result = sut.Content.ToList();
-        Assert.Equal(item1, result.ElementAtOrDefault(0));
-        Assert.Equal(item2, result.ElementAtOrDefault(1));
+        Assert.Equal(item1, result.ElementAtOrDefault(0)?.Item);
+        Assert.Equal(item2, result.ElementAtOrDefault(1)?.Item);
     }
 }

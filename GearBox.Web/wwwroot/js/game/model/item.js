@@ -108,24 +108,18 @@ export class ItemDeserializer {
 
 export class ItemType {
     #name;
-    #isStackable;
 
-    constructor(name, isStackable) {
+    constructor(name) {
         this.#name = name;
-        this.#isStackable = isStackable;
     }
 
     get name() {
         return this.#name;
     }
-
-    get isStackable() {
-        return this.#isStackable;
-    }
 }
 
 export function deserializeItemTypeJson(obj) {
-    const result = new ItemType(obj.name, obj.isStackable);
+    const result = new ItemType(obj.name);
     return result;
 }
 

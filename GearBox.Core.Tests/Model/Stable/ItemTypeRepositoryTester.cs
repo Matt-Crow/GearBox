@@ -10,8 +10,8 @@ public class ItemTypeRepositoryTester
     {
         var items = new List<ItemType>()
         {
-            ItemType.Stackable("foo"),
-            ItemType.NonStackable("foo")
+            new ItemType("foo"),
+            new ItemType("foo")
         };
 
         Assert.Throws<ArgumentException>(() => ItemTypeRepository.Of(items));
@@ -31,7 +31,7 @@ public class ItemTypeRepositoryTester
     [Fact]
     public void GetByName_GivenExists_ReturnsIt()
     {
-        var expected = ItemType.Stackable("foo");
+        var expected = new ItemType("foo");
         var sut = ItemTypeRepository.Of(new List<ItemType>()
         {
             expected
@@ -45,8 +45,8 @@ public class ItemTypeRepositoryTester
     [Fact]
     public void GetAll_Works()
     {
-        var type1 = ItemType.Stackable("foo");
-        var type2 = ItemType.NonStackable("bar");
+        var type1 = new ItemType("foo");
+        var type2 = new ItemType("bar");
         var sut = ItemTypeRepository.Of(new List<ItemType>()
         {
             type1,

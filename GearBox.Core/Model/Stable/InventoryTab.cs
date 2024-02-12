@@ -7,41 +7,31 @@ namespace GearBox.Core.Model.Stable;
 /// <summary>
 /// Each Inventory is broken down into multiple tabs, which each hold a different category of item.
 /// </summary>
-public class InventoryTab : IStableGameObject, ISerializable<InventoryTabJson>
+public class InventoryTab : ISerializable<InventoryTabJson>
 {
     /*
         While a List is less performant than a Dictionary for lookups, 
         I want to maintain insertion order
     */
-    // TODO change to ItemStack
-    private readonly SafeList<Item> _content = new();
+    private readonly SafeList<ItemStack> _content = new();
 
-    public IEnumerable<Item> Content => _content.AsEnumerable();
+    public IEnumerable<ItemStack> Content => _content.AsEnumerable();
 
-    public string Type => "inventoryTab";
+    public IEnumerable<object?> DynamicValues => Content.Select(stack => stack.DynamicValues);
 
-    public IEnumerable<object?> DynamicValues => Content;
-
-    public void Add(Item item)
+    public void Add(Item item, int quantity=1)
     {
-        if (item.ItemType.IsStackable)
+        // check for existing stack, add to it if it exists
+        var currentStack = _content.AsEnumerable()
+            .Where(stack => stack.Item.Is(item))
+            .LastOrDefault();
+        if (currentStack == null)
         {
-            var currentStack = _content.AsEnumerable()
-                .Where(x => x.ItemType.Name == item.ItemType.Name)
-                .LastOrDefault();
-            
-            if (currentStack == null)
-            {
-                _content.Add(item);
-            }
-            else
-            {
-                currentStack.AddQuantity(item.Quantity);
-            }
+            _content.Add(new ItemStack(item, quantity));
         }
         else
         {
-            _content.Add(item);
+            currentStack.AddQuantity(quantity);
         }
         _content.ApplyChanges();
     }
@@ -54,19 +44,9 @@ public class InventoryTab : IStableGameObject, ISerializable<InventoryTabJson>
         }
     }
 
-    public void Update()
-    {
-        // does nothing
-    }
-
-    public string Serialize(JsonSerializerOptions options)
-    {
-        throw new NotImplementedException();
-    }
-
     public InventoryTabJson ToJson()
     {
-        var items = Content
+        var items = _content.AsEnumerable()
             .Select(x => x.ToJson())
             .ToList();
         return new InventoryTabJson(items);

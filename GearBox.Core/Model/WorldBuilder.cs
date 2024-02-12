@@ -29,10 +29,9 @@ public class WorldBuilder
     {
         var dummyItemTypes = new List<ItemType>()
         {
-            ItemType.Stackable("stackable 1"),
-            ItemType.Stackable("stackable 2"),
-            ItemType.NonStackable("non-stackable 1"),
-            ItemType.NonStackable("non-stackable 2")
+            new ItemType("Wood"),
+            new ItemType("Rock"),
+            new ItemType("Rusty Shovel")
         };
         return AddItemTypes(dummyItemTypes);
     }

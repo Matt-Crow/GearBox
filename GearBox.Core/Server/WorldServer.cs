@@ -59,7 +59,7 @@ public class WorldServer
         _world.AddTimer(new WorldTimer(() => 
         {
             _world.SpawnLootChest();
-        }, 500));
+        }, 50));
 
         _world.StableContent.AddPlayer(player);
         _world.AddDynamicObject(character);
