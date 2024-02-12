@@ -40,8 +40,8 @@ export class LootChest {
 
     /**
      * @param {string} id 
-     * @param {number} x 
-     * @param {number} y 
+     * @param {number} x center of the LootChest
+     * @param {number} y center of the LootChest
      * @param {string[]} collectedBy 
      */
     constructor(id, x, y, collectedBy) {
@@ -70,11 +70,12 @@ export class LootChest {
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
     draw(context) {
+        const radius = PIXELS_PER_TILE / 2;
         const small = PIXELS_PER_TILE / 20;
         context.fillStyle = "brown";
         context.fillRect(
-            this.#x + small, 
-            this.#y + small, 
+            this.#x - radius + small, 
+            this.#y - radius + small, 
             PIXELS_PER_TILE - small*2, 
             PIXELS_PER_TILE - small*2
         );

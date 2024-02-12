@@ -25,7 +25,7 @@ public class BodyBehavior
     /// <summary>
     /// Where this object is centered
     /// </summary>
-    public Coordinates Location { get; set; } = Coordinates.ORIGIN;
+    public Coordinates Location { get; set; } = Coordinates.ORIGIN.CenteredOnTile();
 
     public int LeftInPixels
     {

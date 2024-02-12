@@ -36,12 +36,22 @@ public readonly struct Coordinates
         );
     }
 
+    public Coordinates Plus(Distance dx, Distance dy)
+    {
+        return new Coordinates(_x.Plus(dx), _y.Plus(dy));
+    }
+
     public Coordinates PlusTiles(int dx, int dy)
     {
         return Coordinates.FromTiles(
             XInTiles + dx,
             YInTiles + dy
         );
+    }
+
+    public Coordinates CenteredOnTile()
+    {
+        return Plus(Distance.FromTiles(0.5), Distance.FromTiles(0.5));
     }
 
     public override string ToString()

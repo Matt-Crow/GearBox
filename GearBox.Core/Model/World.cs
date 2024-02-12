@@ -51,7 +51,7 @@ public class World
         var location = StaticContent.Map.GetRandomOpenTile();
         if (location != null)
         {
-            var lootChest = new LootChest(location.Value, chestItems.ToArray());
+            var lootChest = new LootChest(location.Value.CenteredOnTile(), chestItems.ToArray());
             StableContent.AddLootChest(lootChest);
         }
     }

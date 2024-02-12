@@ -29,6 +29,11 @@ public readonly struct Distance
     public int InPixels { get => _inPixels; }
     public int InTiles { get => _inPixels / PIXELS_PER_TILE; }
 
+    public Distance Plus(Distance other)
+    {
+        return Distance.FromPixels(InPixels + other.InPixels);
+    }
+
     public override string ToString()
     {
         return _inPixels.ToString();

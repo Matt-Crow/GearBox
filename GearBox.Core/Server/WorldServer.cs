@@ -60,7 +60,7 @@ public class WorldServer
         var spawnLocation = _world.StaticContent.Map.GetRandomOpenTile();
         if (spawnLocation != null)
         {
-            character.Coordinates = spawnLocation.Value;
+            character.Coordinates = spawnLocation.Value.CenteredOnTile();
         }
         var player = new PlayerCharacter(character);
 
