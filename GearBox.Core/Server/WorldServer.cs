@@ -22,6 +22,10 @@ public class WorldServer
     public WorldServer(World world)
     {
         _world = world;
+
+        // testing LootChests
+        _world.AddTimer(new WorldTimer(() => _world.SpawnLootChest(), 50));
+
         
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
@@ -53,13 +57,12 @@ public class WorldServer
         }
 
         var character = new Character(); // will eventually read from repo
-        var player = new PlayerCharacter(character);
-
-        // testing LootChests
-        _world.AddTimer(new WorldTimer(() => 
+        var spawnLocation = _world.StaticContent.Map.GetRandomOpenTile();
+        if (spawnLocation != null)
         {
-            _world.SpawnLootChest();
-        }, 50));
+            character.Coordinates = spawnLocation.Value;
+        }
+        var player = new PlayerCharacter(character);
 
         _world.StableContent.AddPlayer(player);
         _world.AddDynamicObject(character);

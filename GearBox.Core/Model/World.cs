@@ -73,13 +73,13 @@ public class World
             var itemType = itemTypes[random.Next(itemTypes.Count)];
             chestItems.Add(new Material(itemType));
         }
-        // todo Map.GetOpenSpot
-        var location = Coordinates.FromTiles(
-            random.Next(StaticContent.Map.Width.InTiles), 
-            random.Next(StaticContent.Map.Height.InTiles)
-        );
-        var lootChest = new LootChest(location, chestItems.ToArray());
-        StableContent.AddLootChest(lootChest);
+        
+        var location = StaticContent.Map.GetRandomOpenTile();
+        if (location != null)
+        {
+            var lootChest = new LootChest(location.Value, chestItems.ToArray());
+            StableContent.AddLootChest(lootChest);
+        }
     }
 
     /// <summary>

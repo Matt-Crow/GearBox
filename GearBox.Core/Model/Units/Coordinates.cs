@@ -36,6 +36,14 @@ public readonly struct Coordinates
         );
     }
 
+    public Coordinates PlusTiles(int dx, int dy)
+    {
+        return Coordinates.FromTiles(
+            XInTiles + dx,
+            YInTiles + dy
+        );
+    }
+
     public override string ToString()
     {
         return $"({_x}, {_y})";
