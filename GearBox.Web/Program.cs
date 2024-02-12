@@ -5,7 +5,7 @@ using GearBox.Web.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 var world = new WorldBuilder()
-    .AddDummyItemTypes()
+    .AddDummyItems()
     .WithDummyMap()
     .Build();
 

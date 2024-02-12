@@ -8,32 +8,21 @@ public class WorldBuilder
 {
     private Map? _map;
     private readonly List<ItemType> _itemTypes = new();
+    private readonly LootTable _loot = new();
 
-    public WorldBuilder AddItemType(ItemType itemType)
+    public WorldBuilder DefineItem(Func<IItem> definition)
     {
-        _itemTypes.Add(itemType);
+        _loot.Add(definition);
+        _itemTypes.Add(definition.Invoke().Type);
         return this;
     }
 
-    public WorldBuilder AddItemTypes(IEnumerable<ItemType> itemTypes)
+    public WorldBuilder AddDummyItems()
     {
-        var result = this;
-        foreach (var itemType in itemTypes)
-        {
-            result = result.AddItemType(itemType);
-        }
-        return result;
-    }
-
-    public WorldBuilder AddDummyItemTypes()
-    {
-        var dummyItemTypes = new List<ItemType>()
-        {
-            new ItemType("Wood"),
-            new ItemType("Rock"),
-            new ItemType("Rusty Shovel")
-        };
-        return AddItemTypes(dummyItemTypes);
+        DefineItem(() => new Material(new ItemType("Stone")));
+        DefineItem(() => new Material(new ItemType("Wood")));
+        DefineItem(() => new Equipment(new ItemType("Rusty Shovel")));
+        return this;
     }
 
     public WorldBuilder WithDummyMap()
@@ -56,7 +45,8 @@ public class WorldBuilder
         var result = new World(
             Guid.NewGuid(),
             new StaticWorldContent(_map, new List<IStaticGameObject>()),
-            ItemTypeRepository.Of(_itemTypes)
+            ItemTypeRepository.Of(_itemTypes),
+            _loot
         );
         return result;
     }

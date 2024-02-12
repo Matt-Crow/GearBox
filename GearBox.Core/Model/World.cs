@@ -13,6 +13,7 @@ using System;
 public class World
 {
     private readonly List<WorldTimer> _timers = new();
+    private readonly LootTable _loot;
 
     public World() : this(Guid.NewGuid(), StaticWorldContent.EMPTY)
     {
@@ -24,18 +25,19 @@ public class World
         
     }
 
-    public World(Guid id, StaticWorldContent staticContent) : this(id, staticContent, ItemTypeRepository.Of(new List<ItemType>()))
+    public World(Guid id, StaticWorldContent staticContent) : this(id, staticContent, ItemTypeRepository.Of(new List<ItemType>()), new LootTable())
     {
 
     }
 
-    public World(Guid id, StaticWorldContent staticContent, IItemTypeRepository itemTypes)
+    public World(Guid id, StaticWorldContent staticContent, IItemTypeRepository itemTypes, LootTable loot)
     {
         Id = id;
         StaticContent = staticContent;
         DynamicContent = new DynamicWorldContent();
         StableContent = new StableWorldContent();
         ItemTypes = itemTypes;
+        _loot = loot;
     }
 
     public Guid Id { get; init; }
@@ -66,12 +68,10 @@ public class World
         var random = new Random();
 
         var chestItems = new List<IItem>();
-        var itemTypes = ItemTypes.GetAll().ToList();
         var numItems = random.Next(1, 4);
         for (var i = 0; i < numItems; i++)
         {
-            var itemType = itemTypes[random.Next(itemTypes.Count)];
-            chestItems.Add(new Material(itemType));
+            chestItems.Add(_loot.GetRandomItem());
         }
         
         var location = StaticContent.Map.GetRandomOpenTile();
