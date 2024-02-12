@@ -50,7 +50,7 @@ export class InventoryModal {
     #addItem(item) {
         const tds = [
             item.type.name,
-            item.type.description ?? "items don't have descriptions yet",
+            item.description,
             item.quantity
         ].map(data => {
             const e = document.createElement("td");

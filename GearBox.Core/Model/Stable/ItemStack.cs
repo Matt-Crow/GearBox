@@ -43,6 +43,7 @@ public class ItemStack : ISerializable<ItemJson>
     {
         var result = new ItemJson(
             Item.Type.Name,
+            Item.Description,
             Item.Metadata,
             Item.Tags,
             Quantity

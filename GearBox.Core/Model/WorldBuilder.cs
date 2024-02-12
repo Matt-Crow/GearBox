@@ -19,9 +19,9 @@ public class WorldBuilder
 
     public WorldBuilder AddDummyItems()
     {
-        DefineItem(() => new Material(new ItemType("Stone")));
-        DefineItem(() => new Material(new ItemType("Wood")));
-        DefineItem(() => new Equipment(new ItemType("Rusty Shovel")));
+        DefineItem(() => new Material(new ItemType("Stone"), "A low-grade mining material"));
+        DefineItem(() => new Material(new ItemType("Wood"), "A low-grade foraging material"));
+        DefineItem(() => new Equipment(new ItemType("Rusty Shovel"), "An example tool"));
         return this;
     }
 

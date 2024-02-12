@@ -41,18 +41,21 @@ export class InventoryDeserializer {
 
 export class Item {
     #type;
+    #description;
     #metadata;
     #tags;
     #quantity;
 
     /**
      * @param {ItemType} type 
+     * @param {string} description 
      * @param {Map<string, object?>} metadata
      * @param {string[]} tags
      * @param {number} quantity 
      */
-    constructor(type, metadata, tags, quantity) {
+    constructor(type, description, metadata, tags, quantity) {
         this.#type = type;
+        this.#description = description;
         this.#metadata = metadata;
         this.#tags = tags;
         this.#quantity = quantity;
@@ -60,6 +63,10 @@ export class Item {
 
     get type() {
         return this.#type;
+    }
+
+    get description() {
+        return this.#description;
     }
 
     get metadata() {
@@ -98,6 +105,7 @@ export class ItemDeserializer {
 
         const result = new Item(
             type,
+            json.description,
             metadata,
             json.tags.slice(),
             json.quantity

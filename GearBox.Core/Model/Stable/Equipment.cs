@@ -9,13 +9,16 @@ public class Equipment : IItem
 {
     private readonly Guid _id;
 
-    public Equipment(ItemType type, Guid? id = null)
+    public Equipment(ItemType type, string? description = null, Guid? id = null)
     {
         Type = type;
+        Description = description ?? "no description provided";
         _id = id ?? Guid.NewGuid();
     }
     
     public ItemType Type { get; init; }
+
+    public string Description { get; init; }
 
     /// <summary>
     /// Subclasses should override this if they can change at runtime

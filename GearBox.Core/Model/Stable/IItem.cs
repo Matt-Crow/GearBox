@@ -9,6 +9,8 @@ public interface IItem
     /// </summary>
     ItemType Type { get; }
 
+    string Description { get; }
+
     /// <summary>
     /// Values which may change throughout the life of an IItem
     /// </summary>
