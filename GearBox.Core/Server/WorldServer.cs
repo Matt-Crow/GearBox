@@ -13,7 +13,7 @@ public class WorldServer
     private readonly Dictionary<string, IConnection> _connections = new();
     private readonly Dictionary<string, Character> _players = new();
     private readonly Timer _timer;
-    private static readonly object updateLock = new();
+    private static readonly object connectionLock = new();
 
     public WorldServer() : this(new World())
     {
@@ -51,7 +51,16 @@ public class WorldServer
     /// </summary>
     public async Task AddConnection(string id, IConnection connection)
     {
-        // might need to synchronize this
+        var task = Task.CompletedTask;
+        lock (connectionLock)
+        {
+            task = DoAddConnection(id, connection);
+        }
+        await task;
+    }
+
+    private async Task DoAddConnection(string id, IConnection connection)
+    {
         if (_connections.ContainsKey(id))
         {
             return;
@@ -95,6 +104,14 @@ public class WorldServer
 
     public void RemoveConnection(string id)
     {
+        lock (connectionLock)
+        {
+            DoRemoveConnection(id);
+        }
+    }
+
+    private void DoRemoveConnection(string id)
+    {
         if (!_connections.ContainsKey(id))
         {
             return;
@@ -128,17 +145,25 @@ public class WorldServer
 
     public async Task Update()
     {
-        var tasks = new List<Task>();
-        lock (updateLock)
+        var task = Task.CompletedTask;
+        lock (connectionLock)
         {
-            var stableChanges = _world.Update();
-            // notify everyone of the update
-            var message = new WorldUpdateJson(
-                _world.DynamicContent.ToJson(),
-                stableChanges.Select(c => c.ToJson()).ToList()
-            );
-            tasks.AddRange(_connections.Values.Select(conn => conn.Send(message)));
+            task = DoUpdate();
         }
+        await task;
+    }
+
+    private async Task DoUpdate()
+    {
+        var stableChanges = _world.Update();
+        // notify everyone of the update
+        var message = new WorldUpdateJson(
+            _world.DynamicContent.ToJson(),
+            stableChanges.Select(c => c.ToJson()).ToList()
+        );
+        var tasks = _connections.Values
+            .Select(conn => conn.Send(message))
+            .ToList();
         await Task.WhenAll(tasks);
     }
 }
