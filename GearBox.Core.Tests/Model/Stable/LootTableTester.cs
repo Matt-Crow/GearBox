@@ -16,10 +16,10 @@ public class LootTableTester
     public void GetRandomItem_GivenSingle_ReturnsCopyOfIt()
     {
         var sut = new LootTable();
-        var definition = () => new Material(new ItemType("foo"));
+        var definition = new ItemDefinition(new ItemType("foo"), t => new Material(t));
         sut.Add(definition);
 
-        var expected = definition.Invoke();
+        var expected = definition.Create();
         var actual = sut.GetRandomItem();
 
         Assert.Equal(expected, actual);

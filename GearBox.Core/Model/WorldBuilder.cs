@@ -10,19 +10,30 @@ public class WorldBuilder
     private readonly List<ItemType> _itemTypes = new();
     private readonly LootTable _loot = new();
 
-    public WorldBuilder DefineItem(Func<IItem> definition)
+    public WorldBuilder DefineItem(ItemDefinition itemDefinition)
     {
-        _loot.Add(definition);
-        _itemTypes.Add(definition.Invoke().Type);
+        _loot.Add(itemDefinition);
+        _itemTypes.Add(itemDefinition.Type);
         return this;
     }
 
-    public WorldBuilder AddDummyItems()
+    public WorldBuilder DefineMaterial(string name, string description, Grade grade)
     {
-        DefineItem(() => new Material(new ItemType("Stone"), "A low-grade mining material"));
-        DefineItem(() => new Material(new ItemType("Wood"), "A low-grade foraging material"));
-        DefineItem(() => new Equipment(new ItemType("Rusty Shovel"), "An example tool"));
-        return this;
+        var itemDefinition = new ItemDefinition(new ItemType(name, grade), t => new Material(t, description));
+        return DefineItem(itemDefinition);
+    }
+
+    // todo move to extension method once skills are added
+    public WorldBuilder AddMiningSkill()
+    {
+        var result = this
+            .DefineMaterial("Stone", "A low-grade mining material, but it's better than nothing.", Grade.COMMON)
+            .DefineMaterial("Bronze", "Used to craft low-level melee equipment.", Grade.UNCOMMON)
+            .DefineMaterial("Silver", "Used to craft enhancements for your equipment.", Grade.RARE)
+            .DefineMaterial("Gold", "Used to craft powerful magical artifacts.", Grade.EPIC)
+            .DefineMaterial("Titanium", "A high-grade mining material for crafting powerful melee equipment.", Grade.LEGENDARY);
+        
+        return result;
     }
 
     public WorldBuilder WithDummyMap()
