@@ -1,18 +1,17 @@
-namespace GearBox.Core.Tests.Server;
-
-using GearBox.Core.Model;
+using GearBox.Core.Model.Json;
 using GearBox.Core.Server;
+
+namespace GearBox.Core.Tests.Server;
 
 public class SpyConnection : IConnection
 {
-    private readonly List<Message<IJson>> _messagesReceived = new ();
+    private readonly List<IJson> _messagesReceived = new ();
 
-    public IEnumerable<Message<IJson>> MessagesReceived { get => _messagesReceived.AsEnumerable(); }
+    public IEnumerable<IJson> MessagesReceived => _messagesReceived.AsEnumerable();
 
-    public Task Send<T>(Message<T> message) where T : IJson
+    public Task Send<T>(T message) where T : IJson
     {
-        // _messagesReceived.Add(message) fails: https://stackoverflow.com/a/10606974/11110116
-        _messagesReceived.Add(new Message<IJson>(message.Type, message.Body));
+        _messagesReceived.Add(message);
         return Task.CompletedTask;
     }
 }

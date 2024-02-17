@@ -1,45 +1,25 @@
+import { Change, ChangeHandlers } from "../infrastructure/change.js";
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
-import { MessageHandler } from "../infrastructure/messageHandler.js";
 import { Character } from "./character.js";
+import { ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
 import { deserializeMapJson } from "./map.js";
-
-export class WorldProxy {
-    #world;
-
-    constructor() {
-        this.#world = null;
-    }
-
-    /**
-     * @returns {World}
-     */
-    get value() {
-        if (this.#world === null) {
-            throw new Error("world has not been set yet");
-        }
-        return this.#world;
-    }
-
-    /**
-     * @param {World} world 
-     */
-    set value(world) {
-        this.#world = world;
-    }
-}
 
 export class World {
     #playerId; // need reference to changing player
     #map;
     #staticGameObjects;
     #dynamicGameObjects;
+    #stableGameObjects;
+    #itemTypes;
 
-    constructor(playerId, map, staticGameObjects) {
+    constructor(playerId, map, staticGameObjects, itemTypes) {
         this.#playerId = playerId;
         this.#map = map;
         this.#staticGameObjects = staticGameObjects;
         this.#dynamicGameObjects = [];
+        this.#stableGameObjects = new Map();
+        this.#itemTypes = new ItemTypeRepository(itemTypes);
     }
 
     /**
@@ -57,6 +37,13 @@ export class World {
     }
 
     /**
+     * @returns {string}
+     */
+    get playerId() {
+        return this.#playerId;
+    }
+
+    /**
      * @returns {number}
      */
     get widthInPixels() {
@@ -70,6 +57,18 @@ export class World {
         return this.#map.heightInPixels;
     }
 
+    get itemTypes() {
+        return this.#itemTypes;
+    }
+
+    saveStableGameObject(obj) {
+        this.#stableGameObjects.set(obj.id, obj);
+    }
+
+    removeStableGameObject(id) {
+        this.#stableGameObjects.delete(id);
+    }
+
     /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
@@ -77,36 +76,27 @@ export class World {
         this.#map.draw(context);
         this.#staticGameObjects.forEach(obj => obj.draw(context));
         this.#dynamicGameObjects.forEach(obj => obj.draw(context));
+        for (const obj of this.#stableGameObjects.values()) {
+            obj.draw(context);
+        }
     }
 }
 
-// unrelated to JSON deserializers, as those require type
-export class WorldDeserializer {
-    
-    #dynamicObjectDeserializers;
-
-    constructor() {
-        this.#dynamicObjectDeserializers = new JsonDeserializers();
-    }
+export class WorldInitHandler {
 
     /**
-     * @param {JsonDeserializer} deserializer used to deserialize dynamic game objects
+     * Deserializes and returns the world init message sent by the server
+     * @param {object} obj 
+     * @returns {World}
      */
-    addDynamicObjectDeserializer(deserializer) {
-        this.#dynamicObjectDeserializers.addDeserializer(deserializer);
-    }
-
-    deserializeWorldInitBody(obj) {
+    handleWorldInit(obj) {
         const map = deserializeMapJson(obj.staticWorldContent.map);
         const staticGameObjects = this.#deserializeStaticGameObjects(obj.staticWorldContent.gameObjects);
-        return new World(obj.playerId, map, staticGameObjects);
+        const itemTypes = obj.itemTypes.map(deserializeItemTypeJson);
+        const deserialized = new World(obj.playerId, map, staticGameObjects, itemTypes);
+        return deserialized;
     }
-
-    deserializeWorldUpdateBody(obj) {
-        const dynamicGameObjects = obj.gameObjects.map(x => this.#dynamicObjectDeserializers.deserialize(x));
-        return dynamicGameObjects;
-    }
-
+    
     #deserializeStaticGameObjects(gameObjectsJson) {
         if (gameObjectsJson.length > 0) {
             throw new Error("not implemented yet");
@@ -115,21 +105,35 @@ export class WorldDeserializer {
     }
 }
 
-export class WorldInitHandler extends MessageHandler {
-    constructor(worldProxy, worldDeserializer) {
-        super("WorldInit", (obj) => {
-            const deserialized = worldDeserializer.deserializeWorldInitBody(obj);
-            worldProxy.value = deserialized;
-        });
-    }
-}
+export class WorldUpdateHandler {
+    #world;
+    #changeHandlers;
+    #deserializers;
 
-export class WorldUpdateHandler extends MessageHandler {
-    
-    constructor(worldProxy, worldDeserializer) {
-        super("WorldUpdate", (obj) => {
-            const deserialized = worldDeserializer.deserializeWorldUpdateBody(obj);
-            worldProxy.value.dynamicGameObjects = deserialized;
-        });
+    /**
+     * @param {World} world 
+     * @param {ChangeHandlers} changeHandlers 
+     */
+    constructor(world, changeHandlers) {
+        this.#world = world;
+        this.#changeHandlers = changeHandlers;
+        this.#deserializers = new JsonDeserializers();
+    }
+
+    /**
+     * @param {JsonDeserializer} deserializer used to deserialize dynamic game objects
+     * @returns {WorldUpdateHandler} this, for chaining
+     */
+    withDynamicObjectDeserializer(deserializer) {
+        this.#deserializers.addDeserializer(deserializer);
+        return this;
+    }
+
+    handleWorldUpdate(obj) {
+        const dynamicGameObjects = obj.dynamicWorldContent.gameObjects.map(x => this.#deserializers.deserialize(x));
+        this.#world.dynamicGameObjects = dynamicGameObjects;
+        
+        const changes = obj.changes.map(json => Change.fromJson(json));
+        changes.forEach(change => this.#changeHandlers.handle(change));
     }
 }

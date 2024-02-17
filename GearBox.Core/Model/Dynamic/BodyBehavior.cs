@@ -25,7 +25,7 @@ public class BodyBehavior
     /// <summary>
     /// Where this object is centered
     /// </summary>
-    public Coordinates Location { get; set; } = Coordinates.ORIGIN;
+    public Coordinates Location { get; set; } = Coordinates.ORIGIN.CenteredOnTile();
 
     public int LeftInPixels
     {
@@ -49,5 +49,12 @@ public class BodyBehavior
     {
         get => Location.YInPixels + Radius.InPixels;
         set => Location = Coordinates.FromPixels(Location.XInPixels, value - Radius.InPixels);
+    }
+
+    public bool CollidesWith(BodyBehavior other)
+    {
+        var withinX = RightInPixels >= other.LeftInPixels && LeftInPixels <= other.RightInPixels;
+        var withinY = BottomInPixels >= other.TopInPixels && TopInPixels <= other.BottomInPixels;
+        return withinX && withinY;
     }
 }

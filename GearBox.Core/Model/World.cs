@@ -1,8 +1,8 @@
 namespace GearBox.Core.Model;
 
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Static;
-using System;
 
 /// <summary>
 /// For now, a World is the topmost container for game objects.
@@ -10,48 +10,62 @@ using System;
 /// </summary>
 public class World
 {
-    public World() : this(Guid.NewGuid(), StaticWorldContent.EMPTY)
-    {
+    private readonly List<WorldTimer> _timers = new();
+    private readonly LootTable _loot;
 
-    }
-
-    public World(Guid id) : this(id, StaticWorldContent.EMPTY)
+    public World(
+        Guid? id = null, 
+        StaticWorldContent? staticContent = null, 
+        IItemTypeRepository? itemTypes = null, 
+        LootTable? loot = null
+    )
     {
-        
-    }
-
-    public World(Guid id, StaticWorldContent staticContent)
-    {
-        Id = id;
-        StaticContent = staticContent;
+        Id = id ?? Guid.NewGuid();
+        StaticContent = staticContent ?? StaticWorldContent.EMPTY;
         DynamicContent = new DynamicWorldContent();
+        StableContent = new StableWorldContent();
+        ItemTypes = itemTypes ?? ItemTypeRepository.Empty();
+        _loot = loot ?? new LootTable();
     }
-
 
     public Guid Id { get; init; }
     public StaticWorldContent StaticContent { get; init; }
     public DynamicWorldContent DynamicContent { get; init; }
-    public IEnumerable<IDynamicGameObject> DynamicObjects { get => DynamicContent.DynamicObjects; }
+    public StableWorldContent StableContent { get; init; }
+    public IItemTypeRepository ItemTypes { get; init; }
 
-
-    public void AddDynamicObject(IDynamicGameObject obj)
+    public void AddTimer(WorldTimer timer)
     {
-        DynamicContent.AddDynamicObject(obj);
+        _timers.Add(timer);
     }
 
-    public void RemoveDynamicObject(IDynamicGameObject obj)
+    public void SpawnLootChest()
     {
-        DynamicContent.RemoveDynamicObject(obj);
+        var chestItems = new List<IItem>();
+        var numItems = Random.Shared.Next(0, 3) + 1;
+        for (var i = 0; i < numItems; i++)
+        {
+            chestItems.Add(_loot.GetRandomItem());
+        }
+        
+        var location = StaticContent.Map.GetRandomOpenTile();
+        if (location != null)
+        {
+            var lootChest = new LootChest(location.Value.CenteredOnTile(), chestItems.ToArray());
+            StableContent.AddLootChest(lootChest);
+        }
     }
 
     /// <summary>
     /// Called each game tick.
     /// Updates the world and everything in it
     /// </summary>
-    public void Update()
+    /// <returns>Changes to stable content</returns>
+    public IEnumerable<Change> Update()
     {
+        _timers.ForEach(t => t.Update());
         DynamicContent.Update();
-        foreach (var obj in DynamicObjects)
+        foreach (var obj in DynamicContent.DynamicObjects)
         {
             var body = obj.Body;
             if (body is not null)
@@ -59,6 +73,7 @@ public class World
                 StaticContent.CheckForCollisions(body);
             }
         }
+        return StableContent.Update();
     }
 
     public override bool Equals(object? other)

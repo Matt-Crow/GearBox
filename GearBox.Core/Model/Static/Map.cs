@@ -1,7 +1,9 @@
-namespace GearBox.Core.Model.Static;
 
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
+
+namespace GearBox.Core.Model.Static;
 
 /// <summary>
 /// a Map is a matrix of tiles the player can see and collide with
@@ -173,6 +175,71 @@ public class Map : ISerializable<MapJson>
         }
     }
 
+    public Coordinates? GetRandomOpenTile()
+    {
+        var random = new Random();
+        var x = random.Next(Width.InTiles);
+        var y = random.Next(Height.InTiles);
+        var source = Coordinates.FromTiles(x, y);
+        return GetOpenTileAround(source);
+    }
+
+    private Coordinates? GetOpenTileAround(Coordinates source, int searchRadius=0)
+    {
+        /*
+            recursively search squares of tiles around a source
+
+            searchRadius = 0
+                S
+            
+            searchRadius = 1
+                XXX
+                X X
+                XXX
+
+            searchRadius = 2
+                XXXXX
+                X   X
+                X   X
+                X   X
+                XXXXX
+        */
+        var minX = source.XInTiles - searchRadius;
+        var maxX = source.XInTiles + searchRadius;
+        var minY = source.YInTiles - searchRadius;
+        var maxY = source.YInTiles + searchRadius;
+
+        var upperL = Coordinates.FromTiles(minX, minY);
+        var upperR = Coordinates.FromTiles(maxX, minY);
+        var lowerR = Coordinates.FromTiles(maxX, maxY);
+        var lowerL = Coordinates.FromTiles(minX, maxY);
+
+        // base case: search radius is too large to find anything
+        if (!IsValid(upperL) && !IsValid(upperR) && !IsValid(lowerR) && !IsValid(lowerL))
+        {
+            return null;
+        }
+        
+        Coordinates? found = null;
+        found ??= SearchForOpenTileAlongLine(upperL, upperR, 1, 0); // right across the top
+        found ??= SearchForOpenTileAlongLine(upperR, lowerR, 0, 1); // down the right
+        found ??= SearchForOpenTileAlongLine(lowerR, lowerL, -1, 0); // left across the bottom
+        found ??= SearchForOpenTileAlongLine(lowerL, upperL, 0, -1); // up the left
+
+        return found ?? GetOpenTileAround(source, searchRadius + 1);
+    }
+
+    private Coordinates? SearchForOpenTileAlongLine(Coordinates start, Coordinates end, int dx, int dy)
+    {
+        for (var curr = start; !curr.Equals(end); curr = curr.PlusTiles(dx, dy))
+        {
+            if (IsValid(curr) && !GetTileAt(curr).IsTangible)
+            {
+                return curr;
+            }
+        }
+        return null;
+    }
     public MapJson ToJson()
     {
         // Convert 2d array to 2d list: https://stackoverflow.com/a/37458182/11110116

@@ -1,15 +1,13 @@
 import { Game } from "../js/game/game.js";
+import { InventoryModal } from "../js/game/components/inventory.js";
 import { Client } from "../js/game/infrastructure/client.js";
 
 $(async () => await main());
 
 async function main() {
-    const canvas = document.getElementById("canvas"); // don't want some weird JQuery proxy
-    if (canvas === null) {
-        throw new Error("Canvas not found.");
-    }
-
-    const game = new Game(canvas);
+    const canvas = findElement("#canvas"); 
+    const inventoryModal = new InventoryModal(findElement("#inventoryModal"), findElement("#inventoryRows"));
+    const game = new Game(canvas, inventoryModal);
 
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("/world-hub")
@@ -42,5 +40,16 @@ async function main() {
         if (keyMappings.has(e.code) && !e.repeat) {
             keyMappings.get(e.code)[1]();
         }
+        if (e.code == "KeyI") {
+            inventoryModal.toggle();
+        }
     });
+}
+
+function findElement(selector) {
+    const e = document.querySelector(selector);
+    if (e === null) {
+        throw new Error(`Failed to locate element "${selector}"`);
+    }
+    return e;
 }

@@ -1,18 +1,19 @@
 namespace GearBox.Core.Server;
 
-using System.Timers;
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
-using GearBox.Core.Model.Static;
+using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Stable;
+using System.Timers;
 
 public class WorldServer
 {
     private readonly World _world;
     private readonly Dictionary<string, IConnection> _connections = new();
     private readonly Dictionary<string, Character> _players = new();
-    private readonly Dictionary<string, CharacterController> _controls = new();
     private readonly Timer _timer;
+    private static readonly object connectionLock = new();
 
     public WorldServer() : this(new World())
     {
@@ -22,6 +23,10 @@ public class WorldServer
     public WorldServer(World world)
     {
         _world = world;
+
+        // testing LootChests
+        _world.AddTimer(new WorldTimer(() => _world.SpawnLootChest(), 50));
+
         
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
@@ -46,26 +51,66 @@ public class WorldServer
     /// </summary>
     public async Task AddConnection(string id, IConnection connection)
     {
-        // might need to synchronize this
-        if (!_connections.ContainsKey(id))
+        var task = Task.CompletedTask;
+        lock (connectionLock)
         {
-            var character = new Character(); // will eventually read from repo
-            _world.AddDynamicObject(character);
-            _connections.Add(id, connection);
-            _players.Add(id, character);
-            _controls.Add(id, new CharacterController(character));
-            var payload = new WorldInit(character.Id, _world.StaticContent.ToJson());
-            var message = new Message<WorldInit>(MessageType.WorldInit, payload);
-            await connection.Send(message);
+            task = DoAddConnection(id, connection);
+        }
+        await task;
+    }
 
-            if (!_timer.Enabled)
-            {
-                _timer.Start();
-            }
+    private async Task DoAddConnection(string id, IConnection connection)
+    {
+        if (_connections.ContainsKey(id))
+        {
+            return;
+        }
+
+        var character = new Character(); // will eventually read from repo
+        var spawnLocation = _world.StaticContent.Map.GetRandomOpenTile();
+        if (spawnLocation != null)
+        {
+            character.Coordinates = spawnLocation.Value.CenteredOnTile();
+        }
+        var player = new PlayerCharacter(character);
+
+        _world.StableContent.AddPlayer(player);
+        _world.DynamicContent.AddDynamicObject(character);
+        _connections.Add(id, connection);
+        _players.Add(id, character);
+        var worldInit = new WorldInitJson(
+            character.Id,
+            _world.StaticContent.ToJson(),
+            _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
+        );
+        await connection.Send(worldInit);
+
+        // need to send all StableGameObjects to client
+        var allStableObjects = _world.StableContent.GetAll()
+            .Select(obj => Change.Content(obj))
+            .Select(change => change.ToJson())
+            .ToList();
+        var worldUpdate = new WorldUpdateJson(
+            _world.DynamicContent.ToJson(),
+            allStableObjects
+        );
+        await connection.Send(worldUpdate);
+
+        if (!_timer.Enabled)
+        {
+            _timer.Start();
         }
     }
 
     public void RemoveConnection(string id)
+    {
+        lock (connectionLock)
+        {
+            DoRemoveConnection(id);
+        }
+    }
+
+    private void DoRemoveConnection(string id)
     {
         if (!_connections.ContainsKey(id))
         {
@@ -75,11 +120,10 @@ public class WorldServer
         var character = _players[id];
         if (character is not null)
         {
-            _world.RemoveDynamicObject(character);
+            _world.DynamicContent.RemoveDynamicObject(character);
         }
         _players.Remove(id);
         _connections.Remove(id);
-        _controls.Remove(id);
 
         if (!_connections.Any())
         {
@@ -87,22 +131,39 @@ public class WorldServer
         }
     }
 
-    public CharacterController? GetControlsById(string id)
+    /// <summary>
+    /// Executes the given command on the player of the user with the given ID
+    /// </summary>
+    public void ExecuteCommand(string id, IControlCommand command)
     {
-        if (_controls.ContainsKey(id))
+        if (!_players.ContainsKey(id))
         {
-            return _controls[id];
+            throw new Exception($"Invalid id: \"{id}\"");
         }
-        return null;
+        command.ExecuteOn(_players[id]);
     }
 
     public async Task Update()
     {
-        _world.Update();
+        var task = Task.CompletedTask;
+        lock (connectionLock)
+        {
+            task = DoUpdate();
+        }
+        await task;
+    }
 
+    private async Task DoUpdate()
+    {
+        var stableChanges = _world.Update();
         // notify everyone of the update
-        var message = new Message<DynamicWorldContentJson>(MessageType.WorldUpdate, _world.DynamicContent.ToJson());
-        var tasks = _connections.Values.Select(conn => conn.Send(message));
+        var message = new WorldUpdateJson(
+            _world.DynamicContent.ToJson(),
+            stableChanges.Select(c => c.ToJson()).ToList()
+        );
+        var tasks = _connections.Values
+            .Select(conn => conn.Send(message))
+            .ToList();
         await Task.WhenAll(tasks);
     }
 }

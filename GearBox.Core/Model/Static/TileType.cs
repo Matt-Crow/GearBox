@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Json;
+
 namespace GearBox.Core.Model.Static;
 
 /// <summary>
@@ -26,6 +28,6 @@ public class TileType : ISerializable<TileTypeJson>
 
     public TileTypeJson ToJson()
     {
-        return new TileTypeJson(Color, IsTangible);
+        return new TileTypeJson(Color.ToJson(), IsTangible);
     }
 }

@@ -1,7 +1,10 @@
-import { MessageHandlers } from "./infrastructure/messageHandlers.js";
+import { InventoryModal } from "./components/inventory.js";
+import { ChangeHandlers } from "./infrastructure/change.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
-import { WorldDeserializer, WorldInitHandler, WorldProxy, WorldUpdateHandler } from "./model/world.js";
-
+import { InventoryDeserializer, ItemDeserializer } from "./model/item.js";
+import { LootChestChangeHandler } from "./model/lootChest.js";
+import { PlayerChangeHandler, PlayerDeserializer, PlayerRepository } from "./model/player.js";
+import { WorldInitHandler, WorldUpdateHandler } from "./model/world.js";
 
 export class Game {
     /**
@@ -10,57 +13,71 @@ export class Game {
     #canvas;
 
     /**
-     * A WorldProxy which can be used to access the current world - if any.
+     * The InventoryModal for the current player.
      */
-    #worldProxy = new WorldProxy();
+    #inventoryModal;
 
     /**
-     * MessageHandlers which deserialize messages received from the server
+     * The current function for handling messages from the server.
+     * Currently, this assumes the server will always start by sending WorldInitJson,
+     * followed by an number of WorldUpdates,
+     * and no other message types.
      */
-    #messageHandlers = new MessageHandlers();
+    #handleMessage;
 
     /**
      * @param {HTMLCanvasElement} canvas the HTML canvas to draw on.
+     * @param {InventoryModal} inventoryModal the modal for the current player's inventory.
      */
-    constructor(canvas) {
+    constructor(canvas, inventoryModal) {
         this.#canvas = canvas;
-
-        const worldDeserializer = new WorldDeserializer();
-        worldDeserializer.addDynamicObjectDeserializer(new CharacterJsonDeserializer());
-
-        this.#messageHandlers.addHandler(new WorldInitHandler(this.#worldProxy, worldDeserializer));
-        this.#messageHandlers.addHandler(new WorldUpdateHandler(this.#worldProxy, worldDeserializer));
-
-        setInterval(() => this.#update(), 1000 / 24);
+        this.#inventoryModal = inventoryModal;
+        this.#handleMessage = (message) => this.#handleInit(message);
     }
 
     /**
-     * Canned by SignalR to process messages
+     * Called by SignalR to process messages.
      * @param {object} message a JSON message received through SignalR
      */
     handle(message) {
-        this.#messageHandlers.handle(message);
+        this.#handleMessage(message); 
     }
 
-    #update() {
-        try {
-            const world = this.#worldProxy.value;
-            const player = world.player;
-            const w = this.#canvas.width;
-            const h = this.#canvas.height;
-            const ctx = this.#canvas.getContext("2d");
-            ctx.clearRect(0, 0, w, h);
-            if (player) {
-                ctx.translate(
-                    clamp(w - world.widthInPixels, -player.x + w/2, 0), 
-                    clamp(h - world.heightInPixels, -player.y + h/2, 0)
-                );
-            }
-            world.draw(ctx);
-            ctx.resetTransform();
-        } catch (e) {
-            // world is not yet ready; don't bother reporting, as update handler does so
+    #handleInit(initMessage) {
+        const world = new WorldInitHandler()
+            .handleWorldInit(initMessage);
+
+        // set up event listeners to update inventory modal when player changes
+        const players = new PlayerRepository();
+        players.addPlayerListener(world.playerId, this.#inventoryModal.playerEventListener);
+        
+        const itemDeserializer = new ItemDeserializer(world.itemTypes);
+        const changeHandlers = new ChangeHandlers()
+            .withChangeHandler(new LootChestChangeHandler(world))
+            .withChangeHandler(new PlayerChangeHandler(players, new PlayerDeserializer(new InventoryDeserializer(itemDeserializer))));
+        const updateHandler = new WorldUpdateHandler(world, changeHandlers)
+            .withDynamicObjectDeserializer(new CharacterJsonDeserializer());
+
+        // unregisters handleInit, switches to handling updates instead
+        this.#handleMessage = (updateMessage) => updateHandler.handleWorldUpdate(updateMessage);
+        
+        setInterval(() => this.#update(world), 1000 / 24);
+    }
+
+    #update(world) {
+        const player = world.player;
+        const w = this.#canvas.width;
+        const h = this.#canvas.height;
+        const ctx = this.#canvas.getContext("2d");
+        ctx.clearRect(0, 0, w, h);
+        if (player) {
+            ctx.translate(
+                clamp(w - world.widthInPixels, w/2 - player.x, 0), 
+                clamp(h - world.heightInPixels, h/2 - player.y, 0)
+            );
         }
+        world.draw(ctx);
+        ctx.resetTransform();
     }
 }
 

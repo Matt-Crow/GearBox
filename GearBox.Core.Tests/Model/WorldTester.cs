@@ -29,7 +29,7 @@ public class WorldTester
     {
         var spy = new DynamicGameObjectSpy();
         var sut = new World();
-        sut.AddDynamicObject(spy);
+        sut.DynamicContent.AddDynamicObject(spy);
         sut.Update();
         Assert.True(spy.HasBeenUpdated);
     }
@@ -40,7 +40,7 @@ public class WorldTester
         var sut = new World();
         var anObject = new DynamicGameObjectSpy();
 
-        sut.AddDynamicObject(anObject);
-        Assert.Throws<ArgumentException>(() => sut.AddDynamicObject(anObject));
+        sut.DynamicContent.AddDynamicObject(anObject);
+        Assert.Throws<ArgumentException>(() => sut.DynamicContent.AddDynamicObject(anObject));
     }
 }

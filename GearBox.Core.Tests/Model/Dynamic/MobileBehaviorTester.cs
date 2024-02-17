@@ -11,7 +11,7 @@ public class MobileBehaviorTester
     {
         var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.UP));
         Assert.False(sut.IsMoving);
-        Assert.Equal(Coordinates.ORIGIN, sut.Coordinates);
+        Assert.Equal(Coordinates.ORIGIN.CenteredOnTile(), sut.Coordinates);
     }
 
     [Fact]
