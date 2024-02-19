@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/GearBox.Web/bin/Debug/net7.0/GearBox.Web.dll",
+            "program": "${workspaceFolder}/GearBox.Web/bin/Debug/net8.0/GearBox.Web.dll",
             "args": [],
             "cwd": "${workspaceFolder}/GearBox.Web",
             "stopAtEntry": false,
