@@ -5,7 +5,7 @@ namespace GearBox.Core.Model.Stable;
 /// <summary>
 /// An Equipment is a type of item which a player can wield
 /// </summary>
-public class Equipment : IItem
+public abstract class Equipment : IItem
 {
     private readonly Guid _id;
 
@@ -39,6 +39,11 @@ public class Equipment : IItem
     {
         return inventory.Equipment;
     }
+
+    /// <summary>
+    /// Returns the equipment slot this should be equipped in
+    /// </summary>
+    public abstract EquipmentSlot GetSlot(PlayerCharacter player);
 
     public override bool Equals(object? obj)
     {

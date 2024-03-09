@@ -15,6 +15,24 @@ public class Inventory : IStableGameObject, ISerializable<InventoryJson>
         .Concat(Materials.DynamicValues);
     public string Type => "inventory";
 
+    public void Add(IItem item)
+    {
+        var tabToAddTo = item.GetTab(this);
+        tabToAddTo.Add(item);
+    }
+
+    public void Remove(IItem item)
+    {
+        var tabToRemoveFrom = item.GetTab(this);
+        tabToRemoveFrom.Remove(item);
+    }
+
+    public bool Contains(IItem item)
+    {
+        var tabToCheck = item.GetTab(this);
+        return tabToCheck.Contains(item);
+    }
+
     public void Update()
     {
         // does nothing

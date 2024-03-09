@@ -17,10 +17,37 @@ public class PlayerCharacter : IStableGameObject
         Inner = inner;
     }
 
+    public PlayerCharacter() : this(new())
+    {
+
+    }
+
     public string Type => "playerCharacter";
-    public IEnumerable<object?> DynamicValues => Inventory.DynamicValues;
+    public IEnumerable<object?> DynamicValues => Inventory.DynamicValues
+        .Append(Weapon.Value);
+    
     public Character Inner { get; init; }
     public Inventory Inventory { get; init; } = new();
+    public EquipmentSlot Weapon { get; init; } = new();
+    
+    public void Equip(Equipment equipment)
+    {
+        if (!Inventory.Equipment.Contains(equipment))
+        {
+            throw new ArgumentException(nameof(equipment));
+        }
+
+        var slot = equipment.GetSlot(this);
+        
+        // check if something is already in the slot
+        if (slot.Value != null)
+        {
+            Inventory.Add(slot.Value);
+        }
+
+        slot.Value = equipment;
+        Inventory.Remove(equipment);
+    }
 
     public void Update()
     {

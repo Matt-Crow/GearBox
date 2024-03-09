@@ -44,6 +44,21 @@ public class InventoryTab : ISerializable<InventoryTabJson>
         }
     }
 
+    public void Remove(IItem item)
+    {
+        var stackToRemoveFrom = _content.AsEnumerable()
+            .Where(stack => stack.Item.Equals(item))
+            .FirstOrDefault();
+        stackToRemoveFrom?.RemoveQuantity(1);
+    }
+
+    public bool Contains(IItem item)
+    {
+        var result = _content.AsEnumerable()
+            .Any(stack => stack.Item.Equals(item) && stack.Quantity > 0);
+        return result;
+    }
+
     public InventoryTabJson ToJson()
     {
         var items = _content.AsEnumerable()
