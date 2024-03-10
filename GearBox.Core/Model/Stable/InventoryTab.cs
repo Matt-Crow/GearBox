@@ -17,7 +17,7 @@ public class InventoryTab : ISerializable<InventoryTabJson>
 
     public IEnumerable<ItemStack> Content => _content.AsEnumerable();
 
-    public IEnumerable<object?> DynamicValues => Content.Select(stack => stack.DynamicValues);
+    public IEnumerable<object?> DynamicValues => Content.SelectMany(stack => stack.DynamicValues);
 
     public void Add(IItem item, int quantity=1)
     {
