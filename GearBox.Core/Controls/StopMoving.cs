@@ -1,4 +1,4 @@
-using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Controls;
@@ -16,8 +16,8 @@ public class StopMoving : IControlCommand
         _direction = direction;
     }
 
-    public void ExecuteOn(Character target)
+    public void ExecuteOn(PlayerCharacter target)
     {
-        target.StopMovingIn(_direction);
+        target.Inner.StopMovingIn(_direction);
     }
 }

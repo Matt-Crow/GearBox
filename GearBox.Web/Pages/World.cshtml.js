@@ -5,17 +5,18 @@ import { Client } from "../js/game/infrastructure/client.js";
 $(async () => await main());
 
 async function main() {
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/world-hub")
+        .build();
+    const client = new Client(connection);
     const canvas = findElement("#canvas"); 
     const inventoryModal = new InventoryModal(
         findElement("#inventoryModal"), 
         findElement("#materialRows"),
-        findElement("#equipmentRows")
+        findElement("#equipmentRows"),
+        client
     );
     const game = new Game(canvas, inventoryModal);
-
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/world-hub")
-        .build();
     connection.on("receive", (message) => {
         const obj = JSON.parse(message);
         try {
@@ -27,7 +28,6 @@ async function main() {
     });
     await connection.start();
 
-    const client = new Client(connection);
     const keyMappings = new Map(); // value is [onUp, onDown]
     keyMappings.set("KeyW", [() => client.stopMovingUp(),    () => client.startMovingUp()]);
     keyMappings.set("KeyA", [() => client.stopMovingLeft(),  () => client.startMovingLeft()]);

@@ -59,9 +59,19 @@ public class InventoryTab : ISerializable<InventoryTabJson>
         return result;
     }
 
+    public IItem? GetItemById(Guid id)
+    {
+        var result = _content.AsEnumerable()
+            .Where(stack => stack.Item.Id == id && stack.Quantity > 0)
+            .Select(stack => stack.Item)
+            .FirstOrDefault();
+        return result;
+    }
+
     public InventoryTabJson ToJson()
     {
         var items = _content.AsEnumerable()
+            .Where(x => x.Quantity > 0)
             .Select(x => x.ToJson())
             .ToList();
         return new InventoryTabJson(items);

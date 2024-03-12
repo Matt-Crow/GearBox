@@ -22,6 +22,11 @@ public readonly struct Change : ISerializable<ChangeJson>
         return new Change(created, false);
     }
 
+    public static Change Removed(IStableGameObject removed)
+    {
+        return new Change(removed, true);
+    }
+
     public IStableGameObject Changed { get; init; }
     public bool IsContent => !IsDelete;
     public bool IsDelete { get; init; }

@@ -5,6 +5,10 @@ export class Client {
         this.#signalr = signalr;    
     }
 
+    equip(id) {
+        this.#signalr.invoke("Equip", id)
+    }
+
     startMovingUp() {
         this.#signalr.invoke("StartMovingUp");
     }

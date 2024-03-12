@@ -49,6 +49,15 @@ public class PlayerCharacter : IStableGameObject
         Inventory.Remove(equipment);
     }
 
+    public void EquipById(Guid id)
+    {
+        var equipment = Inventory.Equipment.GetItemById(id) as Equipment;
+        if (equipment != null)
+        {
+            Equip(equipment);
+        }
+    }
+
     public void Update()
     {
         // do not update inner!

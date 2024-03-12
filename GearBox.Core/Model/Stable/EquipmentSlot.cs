@@ -14,6 +14,7 @@ public class EquipmentSlot
         }
         
         var result = new ItemJson(
+            Value.Id,
             Value.Type.Name,
             Value.Description,
             Value.Metadata,

@@ -11,7 +11,7 @@ public class WorldServer
 {
     private readonly World _world;
     private readonly Dictionary<string, IConnection> _connections = new();
-    private readonly Dictionary<string, Character> _players = new();
+    private readonly Dictionary<string, PlayerCharacter> _players = new();
     private readonly Timer _timer;
     private static readonly object connectionLock = new();
 
@@ -77,7 +77,7 @@ public class WorldServer
         _world.StableContent.AddPlayer(player);
         _world.DynamicContent.AddDynamicObject(character);
         _connections.Add(id, connection);
-        _players.Add(id, character);
+        _players.Add(id, player);
         var worldInit = new WorldInitJson(
             character.Id,
             _world.StaticContent.ToJson(),
@@ -117,10 +117,11 @@ public class WorldServer
             return;
         }
 
-        var character = _players[id];
-        if (character is not null)
+        var player = _players[id];
+        if (player is not null)
         {
-            _world.DynamicContent.RemoveDynamicObject(character);
+            _world.DynamicContent.RemoveDynamicObject(player.Inner);
+            _world.StableContent.RemovePlayer(player);
         }
         _players.Remove(id);
         _connections.Remove(id);

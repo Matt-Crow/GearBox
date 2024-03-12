@@ -1,3 +1,4 @@
+import { Client } from "../infrastructure/client.js";
 import { Inventory, Item } from "../model/item.js";
 import { PlayerEventListener } from "../model/player.js";
 
@@ -6,13 +7,15 @@ export class InventoryModal {
     #materialRows;
     #equipmentRows;
     #playerEventListener;
+    #client;
 
     /**
      * @param {HTMLDialogElement} modal
      * @param {HTMLTableSectionElement} materialRows
-     * @param {HTMLTableSectionElement} equipmentRows  
+     * @param {HTMLTableSectionElement} equipmentRows
+     * @param {Client} client 
      */
-    constructor(modal, materialRows, equipmentRows) {
+    constructor(modal, materialRows, equipmentRows, client) {
         this.#modal = modal;
         this.#materialRows = materialRows;
         this.#equipmentRows = equipmentRows;
@@ -20,6 +23,7 @@ export class InventoryModal {
             onPlayerChanged: (player) => this.#setInventory(player.inventory),
             onPlayerRemoved: () => this.#clear()
         });
+        this.#client = client;
     }
 
     get playerEventListener() {
@@ -66,6 +70,9 @@ export class InventoryModal {
         this.#materialRows.appendChild(tr);
     }
 
+    /**
+     * @param {Item} item 
+     */
     #addEquipment(item) {
         const tds = [
             item.type.name,
@@ -84,9 +91,7 @@ export class InventoryModal {
         equipButton.classList.add("btn");
         equipButton.classList.add("btn-primary");
 
-        // todo button should say "unequip" if the equipment is equipped
-        // todo equip on click - pass the ID to server
-        equipButton.addEventListener("click", (e) => console.log({item, e}));
+        equipButton.addEventListener("click", (e) => this.#client.equip(item.id));
         
         tr.appendChild(equipButton);
 

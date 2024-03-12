@@ -12,6 +12,7 @@ namespace GearBox.Core.Utils;
 public class SafeList<T>
 {
     private readonly List<T> _pendingAdd = new();
+    private readonly List<T> _pendingRemove = new();
     private readonly List<T> _items = new();
 
     public SafeList(params T[] items)
@@ -67,6 +68,11 @@ public class SafeList<T>
         }
     }
 
+    public void Remove(T item)
+    {
+        _pendingRemove.Add(item);
+    }
+
     /// <summary>
     /// Applies all pending changes to this list
     /// </summary>
@@ -74,5 +80,8 @@ public class SafeList<T>
     {
         _items.AddRange(_pendingAdd);
         _pendingAdd.Clear();
+
+        _items.RemoveAll(item => _pendingRemove.Contains(item));
+        _pendingRemove.Clear();
     }
 }

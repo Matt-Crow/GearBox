@@ -14,7 +14,7 @@ public abstract class Equipment : IItem
         Id = id ?? Guid.NewGuid();
     }
     
-    public Guid Id { get; init; }
+    public Guid? Id { get; init; }
     
     public ItemType Type { get; init; }
 

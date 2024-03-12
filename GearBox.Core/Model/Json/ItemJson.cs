@@ -7,14 +7,17 @@ namespace GearBox.Core.Model.Json;
 /// </summary>
 public readonly struct ItemJson : IJson
 {
-    public ItemJson(string name, string description, List<KeyValueJson<string, object?>> metadata, List<string> tags, int quantity)
+    public ItemJson(Guid? id, string name, string description, List<KeyValueJson<string, object?>> metadata, List<string> tags, int quantity)
     {
+        Id = id;
         Name = name;
         Description = description;
         Metadata = metadata;
         Tags = tags;
         Quantity = quantity;
     }
+
+    public Guid? Id { get; init; }
 
     /// <summary>
     /// The front end uses this to lookup the item type in a repository

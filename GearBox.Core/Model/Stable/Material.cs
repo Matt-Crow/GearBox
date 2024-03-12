@@ -13,6 +13,7 @@ public class Material : IItem
         Description = description ?? "no description provided";
     }
 
+    public Guid? Id => null;
     public ItemType Type { get; init; }
     public string Description { get; init; }
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>(); // resources never change

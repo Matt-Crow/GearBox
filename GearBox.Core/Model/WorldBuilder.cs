@@ -36,9 +36,12 @@ public class WorldBuilder
         return result;
     }
 
-    public WorldBuilder AddStarterWeapon()
+    public WorldBuilder AddStarterWeapons()
     {
-        return DefineItem(new ItemDefinition(new ItemType("Training Sword", Grade.COMMON), t => new Weapon(t, "No special ability.")));
+        var result = this 
+            .DefineItem(new ItemDefinition(new ItemType("Training Sword", Grade.COMMON), t => new Weapon(t, "No special ability.")))
+            .DefineItem(new ItemDefinition(new ItemType("Training Staff", Grade.COMMON), t => new Weapon(t, "Also no special ability.")));
+        return result;
     }
 
     public WorldBuilder WithDummyMap()

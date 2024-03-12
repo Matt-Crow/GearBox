@@ -1,8 +1,8 @@
-using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Stable;
 
 namespace GearBox.Core.Controls;
 
 public interface IControlCommand
 {
-    public void ExecuteOn(Character target);
+    void ExecuteOn(PlayerCharacter target);
 }

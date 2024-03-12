@@ -33,13 +33,14 @@ export class InventoryDeserializer {
     }
 
     deserialize(json) {
-        const equipment = json.equipment.items.map(x => this.#itemDeserializer.deserilize(x));
-        const materials = json.materials.items.map(x => this.#itemDeserializer.deserilize(x));
+        const equipment = json.equipment.items.map(x => this.#itemDeserializer.deserialize(x));
+        const materials = json.materials.items.map(x => this.#itemDeserializer.deserialize(x));
         return new Inventory(equipment, materials);
     }
 }
 
 export class Item {
+    #id;
     #type;
     #description;
     #metadata;
@@ -47,18 +48,24 @@ export class Item {
     #quantity;
 
     /**
+     * @param {string?} id 
      * @param {ItemType} type 
      * @param {string} description 
      * @param {Map<string, object?>} metadata
      * @param {string[]} tags
      * @param {number} quantity 
      */
-    constructor(type, description, metadata, tags, quantity) {
+    constructor(id, type, description, metadata, tags, quantity) {
+        this.#id = id;
         this.#type = type;
         this.#description = description;
         this.#metadata = metadata;
         this.#tags = tags;
         this.#quantity = quantity;
+    }
+
+    get id() {
+        return this.#id;
     }
 
     get type() {
@@ -92,7 +99,7 @@ export class ItemDeserializer {
         this.#itemTypes = itemTypes;
     }
 
-    deserilize(json) {
+    deserialize(json) {
         const type = this.#itemTypes.getItemTypeByName(json.name);
         if (type === null) {
             throw new Error(`Bad item type name: "${json.name}"`);
@@ -104,6 +111,7 @@ export class ItemDeserializer {
         }
 
         const result = new Item(
+            json.id,
             type,
             json.description,
             metadata,

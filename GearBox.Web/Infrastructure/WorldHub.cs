@@ -27,13 +27,7 @@ public class WorldHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    /*
-        Not sure how much I like this idea, 
-        as while it is very few lines of code,
-        it is a lot of little methods.
-
-        Maybe I'll come back to this once I've settled on serialization methods.
-    */
+    public Task Equip(Guid id) => Receive(new Equip(id));
     public Task StartMovingUp() => Receive(StartMoving.UP);
     public Task StartMovingDown() => Receive(StartMoving.DOWN);
     public Task StartMovingLeft() => Receive(StartMoving.LEFT);

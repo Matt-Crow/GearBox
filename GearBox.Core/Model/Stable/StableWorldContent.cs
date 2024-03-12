@@ -8,13 +8,19 @@ public class StableWorldContent
     private readonly SafeList<PlayerCharacter> _players = new ();
     private readonly SafeList<LootChest> _lootChests = new ();
     private readonly Dictionary<IStableGameObject, int> _hashes = new();
-    private readonly List<Change> _added = new();
+    private readonly List<Change> _changes = new();
 
     // need this method, as there are special behaviors associated with players
     public void AddPlayer(PlayerCharacter player)
     {
         Add(player);
         _players.Add(player);
+    }
+
+    public void RemovePlayer(PlayerCharacter player)
+    {
+        Remove(player);
+        _players.Remove(player);
     }
 
     // player-interactables
@@ -28,7 +34,14 @@ public class StableWorldContent
     {
         _objects.Add(obj);
         _hashes[obj] = MakeHashFor(obj);
-        _added.Add(Change.Content(obj));
+        _changes.Add(Change.Content(obj));
+    }
+
+    public void Remove(IStableGameObject obj)
+    {
+        _objects.Remove(obj);
+        _hashes.Remove(obj);
+        _changes.Add(Change.Removed(obj));
     }
 
     private static int MakeHashFor(IStableGameObject obj)
@@ -73,9 +86,9 @@ public class StableWorldContent
             _hashes[obj] = MakeHashFor(obj);
         }
 
-        // notify caller of objects added during iteration
-        result.AddRange(_added);
-        _added.Clear();
+        // notify caller of objects added or removed during iteration
+        result.AddRange(_changes);
+        _changes.Clear();
 
         _objects.ApplyChanges();
         _players.ApplyChanges();
@@ -86,6 +99,6 @@ public class StableWorldContent
 
     private bool HashHasChanged(IStableGameObject obj)
     {
-        return _hashes[obj] != MakeHashFor(obj);
+        return _hashes.ContainsKey(obj) && _hashes[obj] != MakeHashFor(obj);
     }
 }
