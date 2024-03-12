@@ -3,7 +3,7 @@ import { ChangeHandlers } from "./infrastructure/change.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
 import { InventoryDeserializer, ItemDeserializer } from "./model/item.js";
 import { LootChestChangeHandler } from "./model/lootChest.js";
-import { PlayerChangeHandler, PlayerDeserializer, PlayerRepository } from "./model/player.js";
+import { PlayerChangeHandler, PlayerDeserializer, PlayerEventListener, PlayerRepository } from "./model/player.js";
 import { WorldInitHandler, WorldUpdateHandler } from "./model/world.js";
 
 export class Game {
@@ -47,10 +47,19 @@ export class Game {
         const world = new WorldInitHandler()
             .handleWorldInit(initMessage);
 
-        // set up event listeners to update inventory modal when player changes
+        // set up event listeners to update UI when player changes
         const players = new PlayerRepository();
         players.addPlayerListener(world.playerId, this.#inventoryModal.playerEventListener);
-        
+        players.addPlayerListener(world.playerId, new PlayerEventListener({
+            onPlayerChanged: (player) => {
+                // this will be refactored on migrating to WebComponents
+                $("#currentHP").text(player.hitPoints.current);
+                $("#maxHP").text(player.hitPoints.max);
+                $("#currentEnergy").text(player.energy.current);
+                $("#maxEnergy").text(player.energy.max);
+            }
+        }));
+
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
         const changeHandlers = new ChangeHandlers()
             .withChangeHandler(new LootChestChangeHandler(world))

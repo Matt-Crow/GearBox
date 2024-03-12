@@ -12,16 +12,22 @@ import { Inventory, InventoryDeserializer } from "./item.js";
 
 export class Player {
     #id;
+    #hitPoints;
+    #energy;
     #inventory;
     #weapon;
 
     /**
      * @param {string} id 
+     * @param {Fraction} hitPoints 
+     * @param {Fraction} energy 
      * @param {Inventory} inventory 
      * @param {Item?} weapon 
      */
-    constructor(id, inventory, weapon) {
+    constructor(id, hitPoints, energy, inventory, weapon) {
         this.#id = id;
+        this.#hitPoints = hitPoints;
+        this.#energy = energy;
         this.#inventory = inventory ?? new Inventory();
         this.#weapon = weapon;
     }
@@ -30,12 +36,38 @@ export class Player {
         return this.#id;
     }
 
+    get hitPoints() {
+        return this.#hitPoints;
+    }
+
+    get energy() {
+        return this.#energy;
+    }
+
     get inventory() {
         return this.#inventory;
     }
 
     get weapon() {
         return this.#weapon;
+    }
+}
+
+export class Fraction {
+    #current;
+    #max;
+
+    constructor(current, max) {
+        this.#current = current;
+        this.#max = max;
+    }
+
+    get current() {
+        return this.#current;
+    }
+
+    get max() {
+        return this.#max;
     }
 }
 
@@ -55,7 +87,14 @@ export class PlayerDeserializer {
         const id = json.id;
         const inventory = this.#inventoryDeserializer.deserialize(json.inventory);
         const weapon = json.weapon ? this.#itemDeserializer.deserialize(json.weapon) : null;
-        return new Player(id, inventory, weapon);
+        var result = new Player(
+            id, 
+            new Fraction(json.hitPoints.current, json.hitPoints.max),
+            new Fraction(json.energy.current, json.energy.max),
+            inventory, 
+            weapon
+        );
+        return result;
     }
 }
 
