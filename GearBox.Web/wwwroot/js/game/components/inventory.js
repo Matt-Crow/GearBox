@@ -3,16 +3,19 @@ import { PlayerEventListener } from "../model/player.js";
 
 export class InventoryModal {
     #modal;
-    #tbody;
+    #materialRows;
+    #equipmentRows;
     #playerEventListener;
 
     /**
      * @param {HTMLDialogElement} modal
-     * @param {HTMLTableSectionElement} tbody 
+     * @param {HTMLTableSectionElement} materialRows
+     * @param {HTMLTableSectionElement} equipmentRows  
      */
-    constructor(modal, tbody) {
+    constructor(modal, materialRows, equipmentRows) {
         this.#modal = modal;
-        this.#tbody = tbody;
+        this.#materialRows = materialRows;
+        this.#equipmentRows = equipmentRows;
         this.#playerEventListener = new PlayerEventListener({
             onPlayerChanged: (player) => this.#setInventory(player.inventory),
             onPlayerRemoved: () => this.#clear()
@@ -32,7 +35,8 @@ export class InventoryModal {
     }
 
     #clear() {
-        this.#tbody.replaceChildren();
+        this.#materialRows.replaceChildren();
+        this.#equipmentRows.replaceChildren();
     }
 
     /**
@@ -40,14 +44,14 @@ export class InventoryModal {
      */
     #setInventory(inventory) {
         this.#clear();
-        inventory.equipment.forEach(item => this.#addItem(item));
-        inventory.materials.forEach(item => this.#addItem(item));
+        inventory.materials.forEach(item => this.#addMaterial(item));
+        inventory.equipment.forEach(item => this.#addEquipment(item));
     }
 
     /**
      * @param {Item} item 
      */
-    #addItem(item) {
+    #addMaterial(item) {
         const tds = [
             item.type.name,
             item.description,
@@ -59,6 +63,35 @@ export class InventoryModal {
         });
         const tr = document.createElement("tr");
         tds.forEach(td => tr.appendChild(td));
-        this.#tbody.appendChild(tr);
+        this.#materialRows.appendChild(tr);
+    }
+
+    #addEquipment(item) {
+        const tds = [
+            item.type.name,
+            item.description
+        ].map(data => {
+            const e = document.createElement("td");
+            e.innerText = data;
+            return e;
+        });
+        const tr = document.createElement("tr");
+        tds.forEach(td => tr.appendChild(td));
+
+        const equipButton = document.createElement("button");
+        equipButton.innerText = "Equip";
+        equipButton.type = "button";
+        equipButton.classList.add("btn");
+        equipButton.classList.add("btn-primary");
+
+        // todo button should say "unequip" if the equipment is equipped
+        // todo equip on click - pass the ID to server
+        equipButton.addEventListener("click", (e) => console.log({item, e}));
+        
+        tr.appendChild(equipButton);
+
+        // todo compare on hover
+
+        this.#equipmentRows.appendChild(tr);
     }
 }

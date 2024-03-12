@@ -54,7 +54,7 @@ export class Game {
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
         const changeHandlers = new ChangeHandlers()
             .withChangeHandler(new LootChestChangeHandler(world))
-            .withChangeHandler(new PlayerChangeHandler(players, new PlayerDeserializer(new InventoryDeserializer(itemDeserializer))));
+            .withChangeHandler(new PlayerChangeHandler(players, new PlayerDeserializer(new InventoryDeserializer(itemDeserializer), itemDeserializer)));
         const updateHandler = new WorldUpdateHandler(world, changeHandlers)
             .withDynamicObjectDeserializer(new CharacterJsonDeserializer());
 

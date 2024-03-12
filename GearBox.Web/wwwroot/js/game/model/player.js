@@ -13,14 +13,17 @@ import { Inventory, InventoryDeserializer } from "./item.js";
 export class Player {
     #id;
     #inventory;
+    #weapon;
 
     /**
      * @param {string} id 
      * @param {Inventory} inventory 
+     * @param {Item?} weapon 
      */
-    constructor(id, inventory) {
+    constructor(id, inventory, weapon) {
         this.#id = id;
         this.#inventory = inventory ?? new Inventory();
+        this.#weapon = weapon;
     }
 
     get id() {
@@ -30,22 +33,29 @@ export class Player {
     get inventory() {
         return this.#inventory;
     }
+
+    get weapon() {
+        return this.#weapon;
+    }
 }
 
 export class PlayerDeserializer {
     #inventoryDeserializer;
+    #itemDeserializer;
 
     /**
      * @param {InventoryDeserializer} inventoryDeserializer 
      */
-    constructor(inventoryDeserializer) {
+    constructor(inventoryDeserializer, itemDeserializer) {
         this.#inventoryDeserializer = inventoryDeserializer;
+        this.#itemDeserializer = itemDeserializer;
     }
 
     deserialize(json) {
         const id = json.id;
         const inventory = this.#inventoryDeserializer.deserialize(json.inventory);
-        return new Player(id, inventory);
+        const weapon = json.weapon ? this.#itemDeserializer.deserialize(json.weapon) : null;
+        return new Player(id, inventory, weapon);
     }
 }
 

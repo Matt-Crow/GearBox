@@ -7,14 +7,14 @@ namespace GearBox.Core.Model.Stable;
 /// </summary>
 public abstract class Equipment : IItem
 {
-    private readonly Guid _id;
-
     public Equipment(ItemType type, string? description = null, Guid? id = null)
     {
         Type = type;
         Description = description ?? "no description provided";
-        _id = id ?? Guid.NewGuid();
+        Id = id ?? Guid.NewGuid();
     }
+    
+    public Guid Id { get; init; }
     
     public ItemType Type { get; init; }
 
@@ -48,11 +48,11 @@ public abstract class Equipment : IItem
     public override bool Equals(object? obj)
     {
         var other = obj as Equipment;
-        return other?._id == _id;
+        return other?.Id == Id;
     }
     
     public override int GetHashCode()
     {
-        return _id.GetHashCode();
+        return Id.GetHashCode();
     }
 }

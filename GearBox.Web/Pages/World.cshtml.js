@@ -6,7 +6,11 @@ $(async () => await main());
 
 async function main() {
     const canvas = findElement("#canvas"); 
-    const inventoryModal = new InventoryModal(findElement("#inventoryModal"), findElement("#inventoryRows"));
+    const inventoryModal = new InventoryModal(
+        findElement("#inventoryModal"), 
+        findElement("#materialRows"),
+        findElement("#equipmentRows")
+    );
     const game = new Game(canvas, inventoryModal);
 
     const connection = new signalR.HubConnectionBuilder()

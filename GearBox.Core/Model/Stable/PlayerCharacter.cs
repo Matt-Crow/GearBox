@@ -24,7 +24,7 @@ public class PlayerCharacter : IStableGameObject
 
     public string Type => "playerCharacter";
     public IEnumerable<object?> DynamicValues => Inventory.DynamicValues
-        .Append(Weapon.Value);
+        .Concat(Weapon.DynamicValues);
     
     public Character Inner { get; init; }
     public Inventory Inventory { get; init; } = new();
@@ -56,7 +56,7 @@ public class PlayerCharacter : IStableGameObject
 
     public string Serialize(JsonSerializerOptions options)
     {
-        var asJson = new PlayerJson(Inner.Id, Inventory.ToJson());
+        var asJson = new PlayerJson(Inner.Id, Inventory.ToJson(), Weapon.ToJson());
         return JsonSerializer.Serialize(asJson, options);
     }
 }
