@@ -17,8 +17,6 @@ public class EquipmentSlot
             Value.Id,
             Value.Type.Name,
             Value.Description,
-            Value.Metadata,
-            Value.Tags,
             1 // quantity is always 1
         );
         return result;

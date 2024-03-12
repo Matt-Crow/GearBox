@@ -23,16 +23,6 @@ public interface IItem
     IEnumerable<object?> DynamicValues { get; }
 
     /// <summary>
-    /// Provides key-value pairs to the frontend
-    /// </summary>
-    List<KeyValueJson<string, object?>> Metadata { get; }
-
-    /// <summary>
-    /// Provides value data to the frontend
-    /// </summary>
-    List<string> Tags { get; }
-
-    /// <summary>
     /// Gets the inventory tab this belongs in
     /// </summary>
     InventoryTab GetTab(Inventory inventory);

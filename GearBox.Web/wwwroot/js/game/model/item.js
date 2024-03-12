@@ -43,24 +43,18 @@ export class Item {
     #id;
     #type;
     #description;
-    #metadata;
-    #tags;
     #quantity;
 
     /**
      * @param {string?} id 
      * @param {ItemType} type 
      * @param {string} description 
-     * @param {Map<string, object?>} metadata
-     * @param {string[]} tags
      * @param {number} quantity 
      */
-    constructor(id, type, description, metadata, tags, quantity) {
+    constructor(id, type, description, quantity) {
         this.#id = id;
         this.#type = type;
         this.#description = description;
-        this.#metadata = metadata;
-        this.#tags = tags;
         this.#quantity = quantity;
     }
 
@@ -74,14 +68,6 @@ export class Item {
 
     get description() {
         return this.#description;
-    }
-
-    get metadata() {
-        return this.#metadata;
-    }
-
-    get tags() {
-        return this.#tags;
     }
 
     get quantity() {
@@ -105,17 +91,10 @@ export class ItemDeserializer {
             throw new Error(`Bad item type name: "${json.name}"`);
         }
 
-        const metadata = new Map();
-        for (const datum of json.metadata) {
-            metadata.set(datum.key, datum.value);
-        }
-
         const result = new Item(
             json.id,
             type,
             json.description,
-            metadata,
-            json.tags.slice(),
             json.quantity
         );
         return result;

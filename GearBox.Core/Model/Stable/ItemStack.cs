@@ -45,8 +45,6 @@ public class ItemStack : ISerializable<ItemJson>
             Item.Id,
             Item.Type.Name,
             Item.Description,
-            Item.Metadata,
-            Item.Tags,
             Quantity
         );
         return result;

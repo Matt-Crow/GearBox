@@ -25,16 +25,6 @@ public abstract class Equipment : IItem
     /// </summary>
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>();
 
-    /// <summary>
-    /// Subclasses should override this
-    /// </summary>
-    public List<KeyValueJson<string, object?>> Metadata { get; init; } = new();
-
-    /// <summary>
-    /// Subclasses should override this
-    /// </summary>
-    public List<string> Tags { get; init; } = new();
-
     public InventoryTab GetTab(Inventory inventory)
     {
         return inventory.Equipment;

@@ -17,8 +17,6 @@ public class Material : IItem
     public ItemType Type { get; init; }
     public string Description { get; init; }
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>(); // resources never change
-    public List<KeyValueJson<string, object?>> Metadata { get; init; } = new(); // resources have no metadata
-    public List<string> Tags { get; init; } = new(); // materials have no tags
 
     public InventoryTab GetTab(Inventory inventory)
     {
