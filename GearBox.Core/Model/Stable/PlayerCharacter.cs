@@ -12,6 +12,7 @@ namespace GearBox.Core.Model.Stable;
 /// </summary>
 public class PlayerCharacter : IStableGameObject
 {
+    private int _damageTaken = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
     private int _frameCount = 0;
 
     public PlayerCharacter(Character inner)
@@ -26,13 +27,15 @@ public class PlayerCharacter : IStableGameObject
 
     public string Type => "playerCharacter";
     public IEnumerable<object?> DynamicValues => Inventory.DynamicValues
-        .Concat(HitPoints.DynamicValues)
+        .Append(_damageTaken)
         .Concat(Energy.DynamicValues)
+        .Concat(Stats.DynamicValues)
         .Concat(Weapon.DynamicValues);
     
     public Character Inner { get; init; }
-    public Fraction HitPoints { get; init; } = new(50, 100); // test value for now
     public Fraction Energy { get; init; } = new(100, 200); // test value for now
+    public PlayerStats Stats { get; init; } = new();
+    private int MaxHitPoints => Stats.MaxHitPoints.Value;
     public Inventory Inventory { get; init; } = new();
     public EquipmentSlot Weapon { get; init; } = new();
     
@@ -64,6 +67,15 @@ public class PlayerCharacter : IStableGameObject
         }
     }
 
+    public void HealPercent(double percent)
+    {
+        _damageTaken -= (int)(MaxHitPoints*percent);
+        if (_damageTaken < 0)
+        {
+            _damageTaken = 0;
+        }
+    }
+
     public void Update()
     {
         // do not update inner!
@@ -72,7 +84,7 @@ public class PlayerCharacter : IStableGameObject
         _frameCount++;
         if (_frameCount >= Time.FRAMES_PER_SECOND)
         {
-            HitPoints.RestorePercent(0.05);
+            HealPercent(0.05);
             Energy.RestorePercent(0.05);
             _frameCount = 0;
         }
@@ -82,7 +94,7 @@ public class PlayerCharacter : IStableGameObject
     {
         var asJson = new PlayerJson(
             Inner.Id, 
-            HitPoints.ToJson(),
+            new FractionJson(MaxHitPoints - _damageTaken, MaxHitPoints),
             Energy.ToJson(),
             Inventory.ToJson(), 
             Weapon.ToJson()
