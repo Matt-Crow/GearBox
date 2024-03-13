@@ -23,6 +23,13 @@ public class WorldBuilder
         return DefineItem(itemDefinition);
     }
 
+    public WorldBuilder DefineWeapon(string name, string description, Grade grade, Func<PlayerStatBoosts.Builder, PlayerStatBoosts.Builder> statBoostOptions)
+    {
+        var statBoosts = statBoostOptions(new PlayerStatBoosts.Builder()).Build();
+        var itemDefinition = new ItemDefinition(new ItemType(name, grade), t => new Weapon(t, description, statBoosts));
+        return DefineItem(itemDefinition);
+    }
+
     // todo move to extension method once skills are added
     public WorldBuilder AddMiningSkill()
     {
@@ -39,8 +46,8 @@ public class WorldBuilder
     public WorldBuilder AddStarterWeapons()
     {
         var result = this 
-            .DefineItem(new ItemDefinition(new ItemType("Training Sword", Grade.COMMON), t => new Weapon(t, "No special ability.")))
-            .DefineItem(new ItemDefinition(new ItemType("Training Staff", Grade.COMMON), t => new Weapon(t, "Also no special ability.")));
+            .DefineWeapon("Training Sword", "No special ability.", Grade.COMMON, stats => stats.WithMaxHitPoints(5))
+            .DefineWeapon("Training Staff", "Also no special ability.", Grade.COMMON, stats => stats.WithMaxEnergy(5));
         return result;
     }
 

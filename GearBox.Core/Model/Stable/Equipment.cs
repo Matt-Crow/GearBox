@@ -7,10 +7,11 @@ namespace GearBox.Core.Model.Stable;
 /// </summary>
 public abstract class Equipment : IItem
 {
-    public Equipment(ItemType type, string? description = null, Guid? id = null)
+    public Equipment(ItemType type, string? description = null, PlayerStatBoosts? statBoosts = null, Guid? id = null)
     {
         Type = type;
         Description = description ?? "no description provided";
+        StatBoosts = statBoosts ?? new PlayerStatBoosts.Builder().Build();
         Id = id ?? Guid.NewGuid();
     }
     
@@ -19,6 +20,11 @@ public abstract class Equipment : IItem
     public ItemType Type { get; init; }
 
     public string Description { get; init; }
+    
+    /// <summary>
+    /// The stat boosts this provides when equipped
+    /// </summary>
+    public PlayerStatBoosts StatBoosts { get; init; }
 
     /// <summary>
     /// Subclasses should override this if they can change at runtime
@@ -34,6 +40,7 @@ public abstract class Equipment : IItem
     /// Returns the equipment slot this should be equipped in
     /// </summary>
     public abstract EquipmentSlot GetSlot(PlayerCharacter player);
+
 
     public override bool Equals(object? obj)
     {

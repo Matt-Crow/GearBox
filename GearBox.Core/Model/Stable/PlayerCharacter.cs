@@ -13,6 +13,7 @@ namespace GearBox.Core.Model.Stable;
 public class PlayerCharacter : IStableGameObject
 {
     private int _damageTaken = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
+    private int _energyExpended = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     private int _frameCount = 0;
 
     public PlayerCharacter(Character inner)
@@ -28,14 +29,14 @@ public class PlayerCharacter : IStableGameObject
     public string Type => "playerCharacter";
     public IEnumerable<object?> DynamicValues => Inventory.DynamicValues
         .Append(_damageTaken)
-        .Concat(Energy.DynamicValues)
+        .Append(_energyExpended)
         .Concat(Stats.DynamicValues)
         .Concat(Weapon.DynamicValues);
     
     public Character Inner { get; init; }
-    public Fraction Energy { get; init; } = new(100, 200); // test value for now
     public PlayerStats Stats { get; init; } = new();
     private int MaxHitPoints => Stats.MaxHitPoints.Value;
+    private int MaxEnergy => Stats.MaxEnergy.Value;
     public Inventory Inventory { get; init; } = new();
     public EquipmentSlot Weapon { get; init; } = new();
     
@@ -56,6 +57,14 @@ public class PlayerCharacter : IStableGameObject
 
         slot.Value = equipment;
         Inventory.Remove(equipment);
+
+        // recalculate stat boosts
+        var allStatBoosts = new List<PlayerStatBoosts>();
+        if (Weapon.Value != null)
+        {
+            allStatBoosts.Add(Weapon.Value.StatBoosts);
+        }
+        Stats.SetStatBoosts(allStatBoosts);
     }
 
     public void EquipById(Guid id)
@@ -76,6 +85,15 @@ public class PlayerCharacter : IStableGameObject
         }
     }
 
+    public void RechargePercent(double percent)
+    {
+        _energyExpended -= (int)(MaxEnergy*percent);
+        if (_energyExpended < 0)
+        {
+            _energyExpended = 0;
+        }
+    }
+
     public void Update()
     {
         // do not update inner!
@@ -85,7 +103,7 @@ public class PlayerCharacter : IStableGameObject
         if (_frameCount >= Time.FRAMES_PER_SECOND)
         {
             HealPercent(0.05);
-            Energy.RestorePercent(0.05);
+            RechargePercent(0.05);
             _frameCount = 0;
         }
     }
@@ -95,7 +113,7 @@ public class PlayerCharacter : IStableGameObject
         var asJson = new PlayerJson(
             Inner.Id, 
             new FractionJson(MaxHitPoints - _damageTaken, MaxHitPoints),
-            Energy.ToJson(),
+            new FractionJson(MaxEnergy - _energyExpended, MaxEnergy),
             Inventory.ToJson(), 
             Weapon.ToJson()
         );
