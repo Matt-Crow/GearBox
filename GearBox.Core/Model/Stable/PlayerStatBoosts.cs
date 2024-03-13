@@ -1,52 +1,37 @@
 namespace GearBox.Core.Model.Stable;
 
-public readonly struct PlayerStatBoosts
+public class PlayerStatBoosts
 {
-    private PlayerStatBoosts(int maxHitPoints, int maxEnergy, int offense, int defense, int speed)
+    private readonly Dictionary<PlayerStatType, int> _values = new();
+
+    public PlayerStatBoosts()
     {
-        MaxHitPoints = maxHitPoints;
-        MaxEnergy = maxEnergy;
-        Offense = offense;
-        Defense = defense;
-        Speed = speed;
+        foreach (var statType in PlayerStatType.ALL)
+        {
+            _values[statType] = 0;
+        }
     }
 
-    public int MaxHitPoints { get; init; }
-    public int MaxEnergy { get; init; }
-    public int Offense { get; init; }
-    public int Defense { get; init; }
-    public int Speed { get; init; }
-
-    public class Builder
+    public PlayerStatBoosts Add(PlayerStatType type, int points)
     {
-        private readonly Dictionary<PlayerStatType, int> _stats;
-
-        public Builder(Dictionary<PlayerStatType, int>? stats = null)
-        {
-            _stats = stats ?? new();
-        }
-
-        public Builder WithMaxHitPoints(int maxHitPoints) => Add(PlayerStatType.MaxHitPoints, maxHitPoints);
-        public Builder WithMaxEnergy(int maxEnergy) => Add(PlayerStatType.MaxEnergy, maxEnergy);
-        public Builder WithOffense(int offense) => Add(PlayerStatType.Offense, offense);
-        public Builder WithDefense(int defense) => Add(PlayerStatType.Defense, defense);
-        public Builder WithSpeed(int speed) => Add(PlayerStatType.Speed, speed);
-
-        private Builder Add(PlayerStatType type, int points)
-        {
-            var copyOfStats =  new Dictionary<PlayerStatType, int>(_stats);
-            copyOfStats[type] = points;
-            return new Builder(copyOfStats);
-        }
-
-        private int Get(PlayerStatType type) => _stats.ContainsKey(type) ? _stats[type] : 0;
-
-        public PlayerStatBoosts Build() => new(
-            Get(PlayerStatType.MaxHitPoints), 
-            Get(PlayerStatType.MaxEnergy), 
-            Get(PlayerStatType.Offense), 
-            Get(PlayerStatType.Defense),
-            Get(PlayerStatType.Speed)
-        );
+        // while I don't like mutability, seems like a huge waste of memory to copy this class on modify
+        _values[type] += points;
+        return this;
     }
+
+    public PlayerStatBoosts Add(PlayerStatBoosts? other)
+    {
+        if (other == null)
+        {
+            return this;
+        }
+        
+        foreach (var statType in PlayerStatType.ALL)
+        {
+            Add(statType, other.Get(statType));
+        }
+        return this;
+    }
+
+    public int Get(PlayerStatType type) => _values[type];
 }

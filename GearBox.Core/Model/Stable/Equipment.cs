@@ -11,7 +11,7 @@ public abstract class Equipment : IItem
     {
         Type = type;
         Description = description ?? "no description provided";
-        StatBoosts = statBoosts ?? new PlayerStatBoosts.Builder().Build();
+        StatBoosts = statBoosts ?? new PlayerStatBoosts();
         Id = id ?? Guid.NewGuid();
     }
     

@@ -1,6 +1,6 @@
 namespace GearBox.Core.Model.Stable;
 
-public class PlayerStat<T>
+public class PlayerStat<T> : IPlayerStat
 {
     private readonly Func<int, T> _formula;
 

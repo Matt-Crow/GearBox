@@ -23,9 +23,10 @@ public class WorldBuilder
         return DefineItem(itemDefinition);
     }
 
-    public WorldBuilder DefineWeapon(string name, string description, Grade grade, Func<PlayerStatBoosts.Builder, PlayerStatBoosts.Builder> statBoostOptions)
+    public WorldBuilder DefineWeapon(string name, string description, Grade grade, Action<PlayerStatBoosts> modifyStatBoosts)
     {
-        var statBoosts = statBoostOptions(new PlayerStatBoosts.Builder()).Build();
+        var statBoosts = new PlayerStatBoosts();
+        modifyStatBoosts(statBoosts); // PlayerStatBoosts are mutable
         var itemDefinition = new ItemDefinition(new ItemType(name, grade), t => new Weapon(t, description, statBoosts));
         return DefineItem(itemDefinition);
     }
@@ -46,9 +47,16 @@ public class WorldBuilder
     public WorldBuilder AddStarterWeapons()
     {
         var result = this 
-            .DefineWeapon("Training Sword", "No special ability.", Grade.COMMON, stats => stats.WithOffense(20))
-            .DefineWeapon("Training Bow", "Hit stuff from far away.", Grade.COMMON, stats => stats.WithOffense(10).WithSpeed(10))
-            .DefineWeapon("Training Staff", "Also no special ability.", Grade.COMMON, stats => stats.WithMaxEnergy(5));
+            .DefineWeapon("Training Sword", "No special ability.", Grade.COMMON, stats => stats
+                .Add(PlayerStatType.OFFENSE, 20)
+            )
+            .DefineWeapon("Training Bow", "Hit stuff from far away.", Grade.COMMON, stats => stats
+                .Add(PlayerStatType.OFFENSE, 10)
+                .Add(PlayerStatType.SPEED, 10)
+            )
+            .DefineWeapon("Training Staff", "Also no special ability.", Grade.COMMON, stats => stats
+                .Add(PlayerStatType.MAX_ENERGY, 20)
+            );
         return result;
     }
 

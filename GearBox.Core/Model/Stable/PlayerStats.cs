@@ -15,12 +15,12 @@ public class PlayerStats
         .Concat(Defense.DynamicValues)
         .Concat(Speed.DynamicValues); 
     
-    public void SetStatBoosts(IEnumerable<PlayerStatBoosts> boosts)
+    public void SetStatBoosts(PlayerStatBoosts boosts)
     {
-        MaxHitPoints.Points = boosts.Sum(x => x.MaxHitPoints);
-        MaxEnergy.Points = boosts.Sum(x => x.MaxEnergy);
-        Offense.Points = boosts.Sum(x => x.Offense);
-        Defense.Points = boosts.Sum(x => x.Defense);
-        Speed.Points = boosts.Sum(x => x.Speed);
+        foreach (var statType in PlayerStatType.ALL)
+        {
+            var statToBoost = statType.GetStatFrom(this);
+            statToBoost.Points = boosts.Get(statType);
+        }
     }
 }
