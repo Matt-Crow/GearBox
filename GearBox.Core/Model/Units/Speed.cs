@@ -10,7 +10,7 @@ public readonly struct Speed
         _pixelsPerFrame = pixelsPerFrame;
     }
 
-    public static Speed InTilesPerSecond(int tilesPerSecond)
+    public static Speed FromTilesPerSecond(int tilesPerSecond)
     {
         /*
             tile     pixel   second
@@ -22,6 +22,8 @@ public readonly struct Speed
         return new Speed(result);
     }
 
+    public static Speed FromPixelsPerFrame(double pixelsPerFrame) => new(pixelsPerFrame);
 
-    public double InPixelsPerFrame { get => _pixelsPerFrame; }
+
+    public double InPixelsPerFrame => _pixelsPerFrame;
 }

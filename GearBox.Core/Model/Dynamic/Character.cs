@@ -10,7 +10,7 @@ public class Character : IDynamicGameObject
 {
     private readonly MobileBehavior _mobility;
 
-    public Character() : this(Velocity.FromPolar(Speed.InTilesPerSecond(3), Direction.DOWN))
+    public Character() : this(Velocity.FromPolar(Speed.FromTilesPerSecond(3), Direction.DOWN))
     {
 
     }
@@ -39,6 +39,11 @@ public class Character : IDynamicGameObject
     public void StopMovingIn(Direction direction)
     {
         _mobility.StopMovingIn(direction);
+    }
+
+    public void SetSpeed(Speed speed)
+    {
+        _mobility.Velocity = _mobility.Velocity.WithSpeed(speed);
     }
 
     public IDynamicGameObjectJson ToJson()

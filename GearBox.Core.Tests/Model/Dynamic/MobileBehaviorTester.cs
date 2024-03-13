@@ -9,7 +9,7 @@ public class MobileBehaviorTester
     [Fact]
     public void ConstructorSetsReasonableDefaults()
     {
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.UP));
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.UP));
         Assert.False(sut.IsMoving);
         Assert.Equal(Coordinates.ORIGIN.CenteredOnTile(), sut.Coordinates);
     }
@@ -18,7 +18,7 @@ public class MobileBehaviorTester
     public void UpdateMovementWhenNotMovingDoesNotChangeCoordinates()
     {
         var expected = Coordinates.FromPixels(42, 42);
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.LEFT))
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.LEFT))
         {
             Coordinates = expected,
             IsMoving = false
@@ -32,7 +32,7 @@ public class MobileBehaviorTester
     [Fact]
     public void UpdateMovementAddsVelocityToCoordinates()
     {
-        var speed = Speed.InTilesPerSecond(1);
+        var speed = Speed.FromTilesPerSecond(1);
         var sut = new MobileBehavior(Velocity.FromPolar(speed, Direction.RIGHT))
         {
             Coordinates = Coordinates.FromPixels(42, 42),
@@ -48,7 +48,7 @@ public class MobileBehaviorTester
     [Fact]
     public void StartMovingIn_GivenNotMoving_SetsVelocity()
     {
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT))
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.RIGHT))
         {
             IsMoving = false
         };
@@ -61,7 +61,7 @@ public class MobileBehaviorTester
     [Fact]
     public void StartMovingIn_GivenOrthogonal_Combines()
     {
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT));
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.RIGHT));
 
         sut.StartMovingIn(Direction.UP);
         sut.StartMovingIn(Direction.RIGHT);
@@ -72,7 +72,7 @@ public class MobileBehaviorTester
     [Fact]
     public void StartMovingIn_GivenOrthogonal_Combines2()
     {
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT));
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.RIGHT));
 
         sut.StartMovingIn(Direction.UP);
         sut.StartMovingIn(Direction.LEFT);
@@ -83,7 +83,7 @@ public class MobileBehaviorTester
     [Fact]
     public void StartMovingIn_GivenOpposite_Cancels()
     {
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT));
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.RIGHT));
 
         sut.StartMovingIn(Direction.UP);
         sut.StartMovingIn(Direction.DOWN);
@@ -94,7 +94,7 @@ public class MobileBehaviorTester
     [Fact]
     public void StartMovingIn_GivenNeitherOrthogonalNorOpposite_Sets()
     {
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT));
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.RIGHT));
         var expected = Direction.FromBearingDegrees(42);
         sut.StartMovingIn(Direction.UP);
         sut.StartMovingIn(expected);
@@ -105,7 +105,7 @@ public class MobileBehaviorTester
     [Fact]
     public void StopMovingIn_GivenNotMovingInThatDirection_DoesNotStop()
     {
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT));
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.RIGHT));
         sut.StartMovingIn(Direction.UP);
 
         sut.StopMovingIn(Direction.LEFT);
@@ -116,7 +116,7 @@ public class MobileBehaviorTester
     [Fact]
     public void StopMovingIn_GivenMovingInThatDirection_Stops()
     {
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT));
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.RIGHT));
         sut.StartMovingIn(Direction.UP);
 
         sut.StopMovingIn(Direction.UP);
@@ -127,7 +127,7 @@ public class MobileBehaviorTester
     [Fact]
     public void StopMovingIn_GivenMovingAtAngle_KeepsMovingInOther()
     {
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT));
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.RIGHT));
         sut.StartMovingIn(Direction.UP);
         sut.StartMovingIn(Direction.RIGHT);
 
@@ -140,7 +140,7 @@ public class MobileBehaviorTester
     [Fact]
     public void StopMovingIn_GivenMovingAtAngle_KeepsMovingInOther2()
     {
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), Direction.RIGHT));
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), Direction.RIGHT));
         sut.StartMovingIn(Direction.DOWN);
         sut.StartMovingIn(Direction.LEFT);
 
@@ -154,7 +154,7 @@ public class MobileBehaviorTester
     public void StopMovingIn_GivenUnrelatedDirection_DoesNothing()
     {
         var expected = Direction.Between(Direction.DOWN, Direction.LEFT);
-        var sut = new MobileBehavior(Velocity.FromPolar(Speed.InTilesPerSecond(1), expected))
+        var sut = new MobileBehavior(Velocity.FromPolar(Speed.FromTilesPerSecond(1), expected))
         {
             IsMoving = true
         };

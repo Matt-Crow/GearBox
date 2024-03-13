@@ -5,5 +5,6 @@ public enum PlayerStatType
     MaxHitPoints,
     MaxEnergy,
     Offense,
-    Defense
+    Defense,
+    Speed
 }

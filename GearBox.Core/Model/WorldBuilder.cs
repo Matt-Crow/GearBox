@@ -47,6 +47,7 @@ public class WorldBuilder
     {
         var result = this 
             .DefineWeapon("Training Sword", "No special ability.", Grade.COMMON, stats => stats.WithOffense(20))
+            .DefineWeapon("Training Bow", "Hit stuff from far away.", Grade.COMMON, stats => stats.WithOffense(10).WithSpeed(10))
             .DefineWeapon("Training Staff", "Also no special ability.", Grade.COMMON, stats => stats.WithMaxEnergy(5));
         return result;
     }

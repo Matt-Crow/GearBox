@@ -66,20 +66,19 @@ public class WorldServer
             return;
         }
 
-        var character = new Character(); // will eventually read from repo
+        var player = new PlayerCharacter(); // will eventually read from repo
         var spawnLocation = _world.StaticContent.Map.GetRandomOpenTile();
         if (spawnLocation != null)
         {
-            character.Coordinates = spawnLocation.Value.CenteredOnTile();
+            player.Inner.Coordinates = spawnLocation.Value.CenteredOnTile();
         }
-        var player = new PlayerCharacter(character);
 
         _world.StableContent.AddPlayer(player);
-        _world.DynamicContent.AddDynamicObject(character);
+        _world.DynamicContent.AddDynamicObject(player.Inner);
         _connections.Add(id, connection);
         _players.Add(id, player);
         var worldInit = new WorldInitJson(
-            character.Id,
+            player.Inner.Id,
             _world.StaticContent.ToJson(),
             _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
         );

@@ -1,5 +1,6 @@
 using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Units;
 using System.Text.Json;
 
 namespace GearBox.Core.Model.Stable;
@@ -12,18 +13,15 @@ namespace GearBox.Core.Model.Stable;
 /// </summary>
 public class PlayerCharacter : IStableGameObject
 {
+    private static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);
     private int _damageTaken = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
     private int _energyExpended = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     private int _frameCount = 0;
 
-    public PlayerCharacter(Character inner)
+    public PlayerCharacter() 
     {
-        Inner = inner;
-    }
-
-    public PlayerCharacter() : this(new())
-    {
-
+        Inner = new(Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
+        UpdateStats();
     }
 
     public string Type => "playerCharacter";
@@ -33,12 +31,26 @@ public class PlayerCharacter : IStableGameObject
         .Concat(Stats.DynamicValues)
         .Concat(Weapon.DynamicValues);
     
-    public Character Inner { get; init; }
+    public Character Inner { get; init; } = new();
     public PlayerStats Stats { get; init; } = new();
     private int MaxHitPoints => Stats.MaxHitPoints.Value;
     private int MaxEnergy => Stats.MaxEnergy.Value;
     public Inventory Inventory { get; init; } = new();
     public EquipmentSlot Weapon { get; init; } = new();
+
+    private void UpdateStats()
+    {
+        var allStatBoosts = new List<PlayerStatBoosts>();
+        if (Weapon.Value != null)
+        {
+            allStatBoosts.Add(Weapon.Value.StatBoosts);
+        }
+        Stats.SetStatBoosts(allStatBoosts);
+
+        // update movement speed
+        var multiplier = 1.0+Stats.Speed.Value;
+        Inner.SetSpeed(Speed.FromPixelsPerFrame(BASE_SPEED.InPixelsPerFrame * multiplier));
+    }
     
     public void Equip(Equipment equipment)
     {
@@ -58,13 +70,7 @@ public class PlayerCharacter : IStableGameObject
         slot.Value = equipment;
         Inventory.Remove(equipment);
 
-        // recalculate stat boosts
-        var allStatBoosts = new List<PlayerStatBoosts>();
-        if (Weapon.Value != null)
-        {
-            allStatBoosts.Add(Weapon.Value.StatBoosts);
-        }
-        Stats.SetStatBoosts(allStatBoosts);
+        UpdateStats();
     }
 
     public void EquipById(Guid id)
