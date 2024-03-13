@@ -1,6 +1,8 @@
+using GearBox.Core.Model.Stable;
+using GearBox.Core.Model.Stable.Items;
 using Xunit;
 
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Tests.Model.Stable.Items;
 
 public class InventoryTabTester
 {

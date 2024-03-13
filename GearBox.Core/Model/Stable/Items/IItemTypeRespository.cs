@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Stable.Items;
 
 /// <summary>
 /// Stores all item type definitions

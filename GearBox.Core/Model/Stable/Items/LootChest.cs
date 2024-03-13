@@ -3,7 +3,7 @@ using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 using System.Text.Json;
 
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Stable.Items;
 
 /// <summary>
 /// A LootChest provides players with loot

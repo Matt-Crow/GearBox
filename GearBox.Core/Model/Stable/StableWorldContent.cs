@@ -1,3 +1,4 @@
+using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Stable;

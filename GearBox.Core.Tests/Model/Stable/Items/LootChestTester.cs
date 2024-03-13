@@ -1,9 +1,9 @@
-using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Stable;
+using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Units;
 using Xunit;
 
-namespace GearBox.Core.Tests.Model.Stable;
+namespace GearBox.Core.Tests.Model.Stable.Items;
 
 public class LootChestTester
 {

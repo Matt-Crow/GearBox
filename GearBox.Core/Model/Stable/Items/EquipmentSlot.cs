@@ -1,6 +1,6 @@
 using GearBox.Core.Model.Json;
 
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Stable.Items;
 
 public class EquipmentSlot
 {

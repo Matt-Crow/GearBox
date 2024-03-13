@@ -2,6 +2,7 @@ namespace GearBox.Core.Model;
 
 using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Stable;
+using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Static;
 
 /// <summary>

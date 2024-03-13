@@ -1,6 +1,6 @@
 using GearBox.Core.Model.Json;
 
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Stable.Items;
 
 /// <summary>
 /// An Equipment is a type of item which a player can wield

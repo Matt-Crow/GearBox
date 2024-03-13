@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Stable.Items;
 
 public class Weapon : Equipment
 {

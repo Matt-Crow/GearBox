@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Stable.Items;
 
 /// <summary>
 /// Each item type has a Grade which determines how common or powerful it is

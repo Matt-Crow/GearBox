@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Stable.Items;
 
 public class ItemTypeRepository : IItemTypeRepository
 {

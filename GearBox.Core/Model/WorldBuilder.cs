@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Stable;
+using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 
