@@ -42,7 +42,7 @@ public class PlayerCharacter : IStableGameObject
     private void UpdateStats()
     {
         var boosts = new PlayerStatBoosts();
-        boosts.Add(Weapon.Value?.StatBoosts);
+        boosts = boosts.Combine(Weapon.Value?.StatBoosts);
         Stats.SetStatBoosts(boosts);
 
         // update movement speed

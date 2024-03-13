@@ -24,11 +24,12 @@ public class WorldBuilder
         return DefineItem(itemDefinition);
     }
 
-    public WorldBuilder DefineWeapon(string name, string description, Grade grade, Action<PlayerStatBoosts> modifyStatBoosts)
+    public WorldBuilder DefineWeapon(string name, Grade grade, Action<WeaponBuilder> modifyBuilder)
     {
-        var statBoosts = new PlayerStatBoosts();
-        modifyStatBoosts(statBoosts); // PlayerStatBoosts are mutable
-        var itemDefinition = new ItemDefinition(new ItemType(name, grade), t => new Weapon(t, description, statBoosts));
+        var itemType = new ItemType(name, grade);
+        var builder = new WeaponBuilder(itemType);
+        modifyBuilder(builder);
+        var itemDefinition = new ItemDefinition(itemType, _ => builder.Build());
         return DefineItem(itemDefinition);
     }
 
@@ -48,15 +49,28 @@ public class WorldBuilder
     public WorldBuilder AddStarterWeapons()
     {
         var result = this 
-            .DefineWeapon("Training Sword", "No special ability.", Grade.COMMON, stats => stats
-                .Add(PlayerStatType.OFFENSE, 20)
+            .DefineWeapon("Training Sword", Grade.COMMON, builder => builder
+                .WithDescription("No special ability")
+                .WithStatWeights(weights => weights
+                    .WeighDamagePerHit(2)
+                    .WeighPlayerStatBoost(PlayerStatType.OFFENSE, 1)
+                    .WeighPlayerStatBoost(PlayerStatType.DEFENSE, 1)
+                )
             )
-            .DefineWeapon("Training Bow", "Hit stuff from far away.", Grade.COMMON, stats => stats
-                .Add(PlayerStatType.OFFENSE, 10)
-                .Add(PlayerStatType.SPEED, 10)
+            .DefineWeapon("Training Bow", Grade.COMMON, builder => builder
+                .WithDescription("Hit stuff from far away.")
+                .WithStatWeights(weights => weights
+                    .WeighDamagePerHit(1)
+                    .WeighPlayerStatBoost(PlayerStatType.OFFENSE, 1)
+                    .WeighPlayerStatBoost(PlayerStatType.SPEED, 1)
+                )
             )
-            .DefineWeapon("Training Staff", "Also no special ability.", Grade.COMMON, stats => stats
-                .Add(PlayerStatType.MAX_ENERGY, 20)
+            .DefineWeapon("Training Staff", Grade.COMMON, builder => builder
+                .WithDescription("Also no special ability.")
+                .WithStatWeights(weights => weights
+                    .WeighDamagePerHit(1)
+                    .WeighPlayerStatBoost(PlayerStatType.MAX_ENERGY, 1)
+                )
             );
         return result;
     }

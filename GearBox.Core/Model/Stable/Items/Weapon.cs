@@ -2,9 +2,11 @@ namespace GearBox.Core.Model.Stable.Items;
 
 public class Weapon : Equipment
 {
-    public Weapon(ItemType type, string? description = null, PlayerStatBoosts? statBoosts = null, Guid? id = null) : base(type, description, statBoosts, id)
+    private readonly WeaponStats _stats;
+    
+    public Weapon(ItemType type, string? description = null, Guid? id = null, WeaponStats? stats = null) : base(type, description, stats?.PlayerStatBoosts, id)
     {
-        
+        _stats = stats ?? new WeaponStats(0, StatBoosts);
     }
 
     public override EquipmentSlot GetSlot(PlayerCharacter player)
