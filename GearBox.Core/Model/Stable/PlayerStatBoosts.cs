@@ -2,34 +2,47 @@ namespace GearBox.Core.Model.Stable;
 
 public readonly struct PlayerStatBoosts
 {
-    private PlayerStatBoosts(int maxHitPoints, int maxEnergy)
+    private PlayerStatBoosts(int maxHitPoints, int maxEnergy, int offense, int defense)
     {
         MaxHitPoints = maxHitPoints;
         MaxEnergy = maxEnergy;
+        Offense = offense;
+        Defense = defense;
     }
 
     public int MaxHitPoints { get; init; }
     public int MaxEnergy { get; init; }
+    public int Offense { get; init; }
+    public int Defense { get; init; }
 
     public class Builder
     {
-        private readonly int _maxHitPoints = 0;
-        private readonly int _maxEnergy = 0;
+        private readonly Dictionary<PlayerStatType, int> _stats;
 
-        private Builder(int maxHitPoints, int maxEnergy)
+        public Builder(Dictionary<PlayerStatType, int>? stats = null)
         {
-            _maxHitPoints = maxHitPoints;
-            _maxEnergy = maxEnergy;
+            _stats = stats ?? new();
         }
 
-        public Builder() : this(0, 0)
-        {
+        public Builder WithMaxHitPoints(int maxHitPoints) => Add(PlayerStatType.MaxHitPoints, maxHitPoints);
+        public Builder WithMaxEnergy(int maxEnergy) => Add(PlayerStatType.MaxEnergy, maxEnergy);
+        public Builder WithOffense(int offense) => Add(PlayerStatType.Offense, offense);
+        public Builder WithDefense(int defense) => Add(PlayerStatType.Defense, defense);
 
+        private Builder Add(PlayerStatType type, int points)
+        {
+            var copyOfStats =  new Dictionary<PlayerStatType, int>(_stats);
+            copyOfStats[type] = points;
+            return new Builder(copyOfStats);
         }
 
-        public Builder WithMaxHitPoints(int maxHitPoints) => new(maxHitPoints, _maxEnergy);
-        public Builder WithMaxEnergy(int maxEnergy) => new(_maxHitPoints, maxEnergy);
+        private int Get(PlayerStatType type) => _stats.ContainsKey(type) ? _stats[type] : 0;
 
-        public PlayerStatBoosts Build() => new(_maxHitPoints, _maxEnergy);
+        public PlayerStatBoosts Build() => new(
+            Get(PlayerStatType.MaxHitPoints), 
+            Get(PlayerStatType.MaxEnergy), 
+            Get(PlayerStatType.Offense), 
+            Get(PlayerStatType.Defense)
+        );
     }
 }

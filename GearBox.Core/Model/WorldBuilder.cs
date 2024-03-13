@@ -46,7 +46,7 @@ public class WorldBuilder
     public WorldBuilder AddStarterWeapons()
     {
         var result = this 
-            .DefineWeapon("Training Sword", "No special ability.", Grade.COMMON, stats => stats.WithMaxHitPoints(5))
+            .DefineWeapon("Training Sword", "No special ability.", Grade.COMMON, stats => stats.WithOffense(20))
             .DefineWeapon("Training Staff", "Also no special ability.", Grade.COMMON, stats => stats.WithMaxEnergy(5));
         return result;
     }
