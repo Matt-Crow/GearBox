@@ -1,6 +1,6 @@
 import { Client } from "../infrastructure/client.js";
 import { Inventory, Item } from "../model/item.js";
-import { PlayerEventListener } from "../model/player.js";
+import { Player, PlayerEventListener } from "../model/player.js";
 
 export class InventoryModal {
     #modal;
@@ -15,13 +15,14 @@ export class InventoryModal {
      */
     constructor(modal, client) {
         this.#modal = modal;
-        this.#materialRows  = getDescendantByClassName(modal, "materialRows");
-        this.#equipmentRows = getDescendantByClassName(modal, "equipmentRows");
+        this.#materialRows = document.querySelector("#materialRows");
+        this.#equipmentRows = document.querySelector("#equipmentRows");
         this.#playerEventListener = new PlayerEventListener({
-            onPlayerChanged: (player) => this.#setInventory(player.inventory),
+            onPlayerChanged: (player) => this.#bind(player),
             onPlayerRemoved: () => this.#clear()
         });
         this.#client = client;
+        this.#setWeapon(null);
     }
 
     get playerEventListener() {
@@ -39,6 +40,14 @@ export class InventoryModal {
     #clear() {
         this.#materialRows.replaceChildren();
         this.#equipmentRows.replaceChildren();
+    }
+
+    /**
+     * @param {Player} player 
+     */
+    #bind(player) {
+        this.#setInventory(player.inventory);
+        this.#setWeapon(player.weapon);
     }
 
     /**
@@ -96,6 +105,28 @@ export class InventoryModal {
         // todo compare on hover
 
         this.#equipmentRows.appendChild(tr);
+    }
+
+    #setWeapon(weapon) {
+        if (!weapon) {
+            $("#noWeapon").show();
+            $("#yesWeapon").hide();
+            return;
+        }
+
+        $("#noWeapon").hide();
+        $("#yesWeapon").show();
+
+        $("#weaponName").text(weapon.type.name);
+        $("#weaponDescription").text(weapon.description);
+        const details = weapon.details.map(str => {
+            const e = document.createElement("li");
+            e.innerText = str;
+            return e;
+        })
+        document
+            .querySelector("#weaponDetails")
+            .replaceChildren(...details); // need to destructure array for some reason
     }
 }
 

@@ -21,6 +21,8 @@ public abstract class Equipment : IItem
 
     public string Description { get; init; }
     
+    public abstract IEnumerable<string> Details { get; }
+    
     /// <summary>
     /// The stat boosts this provides when equipped
     /// </summary>
@@ -30,6 +32,7 @@ public abstract class Equipment : IItem
     /// Subclasses should override this if they can change at runtime
     /// </summary>
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>();
+
 
     public InventoryTab GetTab(Inventory inventory)
     {

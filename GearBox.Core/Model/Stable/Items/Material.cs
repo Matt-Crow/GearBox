@@ -16,6 +16,7 @@ public class Material : IItem
     public Guid? Id => null;
     public ItemType Type { get; init; }
     public string Description { get; init; }
+    public IEnumerable<string> Details => []; // materials have no details for now
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>(); // resources never change
 
     public InventoryTab GetTab(Inventory inventory)

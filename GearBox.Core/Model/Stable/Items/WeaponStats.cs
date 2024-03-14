@@ -1,3 +1,5 @@
+using GearBox.Core.Utils;
+
 namespace GearBox.Core.Model.Stable.Items;
 
 public class WeaponStats
@@ -12,4 +14,7 @@ public class WeaponStats
     }
     
     public PlayerStatBoosts PlayerStatBoosts { get; init; }
+
+    public IEnumerable<string> Details => ListExtensions.Of($"Damage per hit: {_damagePerHit}")
+        .Concat(PlayerStatBoosts.Details);
 }

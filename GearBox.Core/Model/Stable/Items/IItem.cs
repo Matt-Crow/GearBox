@@ -18,6 +18,11 @@ public interface IItem
     string Description { get; }
 
     /// <summary>
+    /// Details to display in the GUI
+    /// </summary>
+    IEnumerable<string> Details { get; }
+
+    /// <summary>
     /// Values which may change throughout the life of an IItem
     /// </summary>
     IEnumerable<object?> DynamicValues { get; }

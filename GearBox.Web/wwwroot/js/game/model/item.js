@@ -43,18 +43,21 @@ export class Item {
     #id;
     #type;
     #description;
+    #details;
     #quantity;
 
     /**
      * @param {string?} id 
      * @param {ItemType} type 
      * @param {string} description 
+     * @param {string[]} details 
      * @param {number} quantity 
      */
-    constructor(id, type, description, quantity) {
+    constructor(id, type, description, details, quantity) {
         this.#id = id;
         this.#type = type;
         this.#description = description;
+        this.#details = details;
         this.#quantity = quantity;
     }
 
@@ -68,6 +71,10 @@ export class Item {
 
     get description() {
         return this.#description;
+    }
+
+    get details() {
+        return this.#details;
     }
 
     get quantity() {
@@ -95,6 +102,7 @@ export class ItemDeserializer {
             json.id,
             type,
             json.description,
+            json.details.slice(),
             json.quantity
         );
         return result;

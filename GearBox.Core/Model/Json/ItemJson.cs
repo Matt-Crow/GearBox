@@ -5,11 +5,12 @@ namespace GearBox.Core.Model.Json;
 /// </summary>
 public readonly struct ItemJson : IJson
 {
-    public ItemJson(Guid? id, string name, string description, int quantity)
+    public ItemJson(Guid? id, string name, string description, IEnumerable<string> details, int quantity)
     {
         Id = id;
         Name = name;
         Description = description;
+        Details = details;
         Quantity = quantity;
     }
 
@@ -21,6 +22,7 @@ public readonly struct ItemJson : IJson
     public string Name { get; init; }
 
     public string Description { get; init; }
+    public IEnumerable<string> Details { get; init; }
 
     /// <summary>
     /// The number of items in this stack

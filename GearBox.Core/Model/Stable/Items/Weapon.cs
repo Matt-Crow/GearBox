@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Units;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Stable.Items;
 
@@ -12,6 +13,9 @@ public class Weapon : Equipment
         _attackRange = attackRange ?? AttackRange.MELEE;
         _stats = stats ?? new WeaponStats(0, StatBoosts);
     }
+
+    public override IEnumerable<string> Details => ListExtensions.Of($"Range: {_attackRange}")
+        .Concat(_stats.Details);
 
     public override EquipmentSlot GetSlot(PlayerCharacter player)
     {

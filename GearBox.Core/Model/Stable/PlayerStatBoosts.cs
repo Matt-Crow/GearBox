@@ -3,13 +3,23 @@ namespace GearBox.Core.Model.Stable;
 public class PlayerStatBoosts
 {
     private readonly Dictionary<PlayerStatType, int> _values = new();
+    private readonly List<string> _details = [];
 
     public PlayerStatBoosts(Dictionary<PlayerStatType, int>? values = null)
     {
-        values ??= new();
+        values ??= [];
         foreach (var statType in PlayerStatType.ALL)
         {
-            _values[statType] = (values.ContainsKey(statType)) ? values[statType] : 0;
+            var points = 0;
+            if (values.TryGetValue(statType, out int value))
+            {
+                points = value;
+            }
+            _values[statType] = points;
+            if (points != 0)
+            {
+                _details.Add($"+{values[statType]} {statType}");
+            }
         }
     }
 
@@ -33,4 +43,6 @@ public class PlayerStatBoosts
     }
 
     public int Get(PlayerStatType type) => _values[type];
+
+    public IEnumerable<string> Details => _details;
 }
