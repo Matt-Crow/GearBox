@@ -51,25 +51,28 @@ public class WorldBuilder
         var result = this 
             .DefineWeapon("Training Sword", Grade.COMMON, builder => builder
                 .WithDescription("No special ability")
+                .WithRange(AttackRange.MELEE)
                 .WithStatWeights(weights => weights
                     .WeighDamagePerHit(2)
-                    .WeighPlayerStatBoost(PlayerStatType.OFFENSE, 1)
-                    .WeighPlayerStatBoost(PlayerStatType.DEFENSE, 1)
+                    .Weigh(PlayerStatType.OFFENSE, 1)
+                    .Weigh(PlayerStatType.DEFENSE, 1)
                 )
             )
             .DefineWeapon("Training Bow", Grade.COMMON, builder => builder
                 .WithDescription("Hit stuff from far away.")
+                .WithRange(AttackRange.LONG)
                 .WithStatWeights(weights => weights
                     .WeighDamagePerHit(1)
-                    .WeighPlayerStatBoost(PlayerStatType.OFFENSE, 1)
-                    .WeighPlayerStatBoost(PlayerStatType.SPEED, 1)
+                    .Weigh(PlayerStatType.OFFENSE, 1)
+                    .Weigh(PlayerStatType.SPEED, 1)
                 )
             )
             .DefineWeapon("Training Staff", Grade.COMMON, builder => builder
                 .WithDescription("Also no special ability.")
+                .WithRange(AttackRange.MEDIUM)
                 .WithStatWeights(weights => weights
                     .WeighDamagePerHit(1)
-                    .WeighPlayerStatBoost(PlayerStatType.MAX_ENERGY, 1)
+                    .Weigh(PlayerStatType.MAX_ENERGY, 1)
                 )
             );
         return result;

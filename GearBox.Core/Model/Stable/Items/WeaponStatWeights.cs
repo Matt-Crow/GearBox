@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Units;
+
 namespace GearBox.Core.Model.Stable.Items;
 
 public class WeaponStatWeights
@@ -19,15 +21,17 @@ public class WeaponStatWeights
         return this;
     }
 
-    public WeaponStatWeights WeighPlayerStatBoost(PlayerStatType playerStatType, int weight)
+    public WeaponStatWeights Weigh(PlayerStatType playerStatType, int weight)
     {
         _playerStatWeights[playerStatType] = weight;
         return this;
     }
 
-    public WeaponStats Build()
+    public WeaponStats Build(AttackRange attackRange)
     {
-        var totalPoints = 1000; // TODO scale with level & grade
+        // TODO scale with level & grade
+        var totalPoints = (int)(1000 * (1-attackRange.WeaponStatPenalty));
+        
         var totalWeights = _damagePerHit + _playerStatWeights.Values.Sum();
         if (totalWeights == 0)
         {
