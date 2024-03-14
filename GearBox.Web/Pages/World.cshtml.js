@@ -1,5 +1,5 @@
 import { Game } from "../js/game/game.js";
-import { InventoryModal } from "../js/game/components/inventory.js";
+import { InventoryModal } from "../js/game/components/inventoryModal.js";
 import { PlayerHud } from "../js/game/components/playerHud.js";
 import { Client } from "../js/game/infrastructure/client.js";
 
@@ -10,15 +10,12 @@ async function main() {
         .withUrl("/world-hub")
         .build();
     const client = new Client(connection);
-    const canvas = findElement("#canvas"); 
-    const inventoryModal = new InventoryModal(
-        findElement("#inventoryModal"), 
-        findElement("#materialRows"),
-        findElement("#equipmentRows"),
-        client
+    const inventoryModal = new InventoryModal(findElement("#inventoryModal"), client);
+    const game = new Game(
+        findElement("#canvas"), 
+        inventoryModal, 
+        new PlayerHud(findElement("#playerHud"))
     );
-    const playerHud = new PlayerHud(findElement("#playerHud"));
-    const game = new Game(canvas, inventoryModal, playerHud);
     connection.on("receive", (message) => {
         const obj = JSON.parse(message);
         try {

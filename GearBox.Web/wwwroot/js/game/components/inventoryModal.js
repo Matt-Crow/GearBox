@@ -11,14 +11,12 @@ export class InventoryModal {
 
     /**
      * @param {HTMLDialogElement} modal
-     * @param {HTMLTableSectionElement} materialRows
-     * @param {HTMLTableSectionElement} equipmentRows
      * @param {Client} client 
      */
-    constructor(modal, materialRows, equipmentRows, client) {
+    constructor(modal, client) {
         this.#modal = modal;
-        this.#materialRows = materialRows;
-        this.#equipmentRows = equipmentRows;
+        this.#materialRows  = getDescendantByClassName(modal, "materialRows");
+        this.#equipmentRows = getDescendantByClassName(modal, "equipmentRows");
         this.#playerEventListener = new PlayerEventListener({
             onPlayerChanged: (player) => this.#setInventory(player.inventory),
             onPlayerRemoved: () => this.#clear()
@@ -99,4 +97,18 @@ export class InventoryModal {
 
         this.#equipmentRows.appendChild(tr);
     }
+}
+
+/**
+ * 
+ * @param {HTMLElement} element 
+ * @param {string} className
+ * @returns {HTMLElement} 
+ */
+function getDescendantByClassName(element, className) {
+    const descendants = Array.from(element.getElementsByClassName(className));
+    if (!descendants) {
+        throw new Error(`Failed to locate any elements with className ${className} under ${element}`);
+    }
+    return descendants[0];
 }

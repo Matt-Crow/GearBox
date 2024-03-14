@@ -1,10 +1,10 @@
-import { InventoryModal } from "./components/inventory.js";
+import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
 import { ChangeHandlers } from "./infrastructure/change.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
 import { InventoryDeserializer, ItemDeserializer } from "./model/item.js";
 import { LootChestChangeHandler } from "./model/lootChest.js";
-import { PlayerChangeHandler, PlayerDeserializer, PlayerEventListener, PlayerRepository } from "./model/player.js";
+import { PlayerChangeHandler, PlayerDeserializer, PlayerRepository } from "./model/player.js";
 import { WorldInitHandler, WorldUpdateHandler } from "./model/world.js";
 
 export class Game {

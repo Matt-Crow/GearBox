@@ -2,12 +2,16 @@
 @{
     ViewData["Title"] = "World";
 }
+<!-- drawing canvas -->
 <canvas id="canvas" width="800", height="600"></canvas>
+<!-- player HUD -->
 <div id="playerHud" class="d-flex justify-content-between">
     <div>HP: <span class="currentHP">x</span>/<span class="maxHP">100</span></div>
     <div>Energy: <span class="currentEnergy">x</span>/<span class="maxEnergy">100</span></div>
 </div>
+<!-- inventory model -->
 <dialog id="inventoryModal" style="width: 90%; height: 60%">
+    <!-- tab selector -->
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item">
             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#materialsTab" type="button" role="tab" aria-controls="materialsTab" aria-selected="true">Materials</button>
@@ -17,6 +21,7 @@
         </li>
     </ul>
     <div class="tab-content">
+        <!-- materials tab -->
         <div class="tab-pane fade active show table-responsive" id="materialsTab" role="tabpanel" aria-labelledby="materials-tab">
             <table class="table table-striped table-hover">
                 <thead class="thead-dark">
@@ -26,9 +31,10 @@
                         <th>Quantity</th>
                     </tr>
                 </thead>
-                <tbody id="materialRows"></tbody>
+                <tbody class="materialRows"></tbody>
             </table>
         </div>
+        <!-- equipment tab -->
         <div class="tab-pane fade" id="equipmentTab" role="tabpanel" aria-labelledby="equipment-tab">
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
@@ -39,7 +45,7 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="equipmentRows"></tbody>
+                    <tbody class="equipmentRows"></tbody>
                 </table>
             </div>
         </div>
