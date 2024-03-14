@@ -16,7 +16,8 @@ async function main() {
         findElement("#equipmentRows"),
         client
     );
-    const game = new Game(canvas, inventoryModal);
+    const playerHud = document.getElementById("playerHud");
+    const game = new Game(canvas, inventoryModal, playerHud);
     connection.on("receive", (message) => {
         const obj = JSON.parse(message);
         try {

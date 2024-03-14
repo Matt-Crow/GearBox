@@ -3,10 +3,7 @@
     ViewData["Title"] = "World";
 }
 <canvas id="canvas" width="800", height="600"></canvas>
-<div class="d-flex justify-content-between">
-    <div>HP: <span id="currentHP">x</span>/<span id="maxHP">100</span></div>
-    <div>Energy: <span id="currentEnergy">x</span>/<span id="maxEnergy">100</span></div>
-</div>
+<player-hud id="playerHud"></player-hud>
 <dialog id="inventoryModal" style="width: 90%; height: 60%">
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item">
@@ -47,3 +44,4 @@
 </dialog>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/Pages/World.cshtml.js" type="module"></script>
+<script src="~/js/game/components/playerHud.js" type="module" defer></script>
