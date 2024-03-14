@@ -1,5 +1,6 @@
 import { Game } from "../js/game/game.js";
 import { InventoryModal } from "../js/game/components/inventory.js";
+import { PlayerHud } from "../js/game/components/playerHud.js";
 import { Client } from "../js/game/infrastructure/client.js";
 
 $(async () => await main());
@@ -16,7 +17,8 @@ async function main() {
         findElement("#equipmentRows"),
         client
     );
-    const game = new Game(canvas, inventoryModal);
+    const playerHud = new PlayerHud(findElement("#playerHud"));
+    const game = new Game(canvas, inventoryModal, playerHud);
     connection.on("receive", (message) => {
         const obj = JSON.parse(message);
         try {

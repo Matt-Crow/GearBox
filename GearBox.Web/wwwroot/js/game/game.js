@@ -1,4 +1,5 @@
 import { InventoryModal } from "./components/inventory.js";
+import { PlayerHud } from "./components/playerHud.js";
 import { ChangeHandlers } from "./infrastructure/change.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
 import { InventoryDeserializer, ItemDeserializer } from "./model/item.js";
@@ -18,6 +19,11 @@ export class Game {
     #inventoryModal;
 
     /**
+     * The PlayerHud for the current player.
+     */
+    #playerHud;
+
+    /**
      * The current function for handling messages from the server.
      * Currently, this assumes the server will always start by sending WorldInitJson,
      * followed by an number of WorldUpdates,
@@ -28,10 +34,12 @@ export class Game {
     /**
      * @param {HTMLCanvasElement} canvas the HTML canvas to draw on.
      * @param {InventoryModal} inventoryModal the modal for the current player's inventory.
+     * @param {PlayerHud} playerHud the player HUD for the current player
      */
-    constructor(canvas, inventoryModal) {
+    constructor(canvas, inventoryModal, playerHud) {
         this.#canvas = canvas;
         this.#inventoryModal = inventoryModal;
+        this.#playerHud = playerHud;
         this.#handleMessage = (message) => this.#handleInit(message);
     }
 
@@ -50,15 +58,7 @@ export class Game {
         // set up event listeners to update UI when player changes
         const players = new PlayerRepository();
         players.addPlayerListener(world.playerId, this.#inventoryModal.playerEventListener);
-        players.addPlayerListener(world.playerId, new PlayerEventListener({
-            onPlayerChanged: (player) => {
-                // this will be refactored on migrating to WebComponents
-                $("#currentHP").text(player.hitPoints.current);
-                $("#maxHP").text(player.hitPoints.max);
-                $("#currentEnergy").text(player.energy.current);
-                $("#maxEnergy").text(player.energy.max);
-            }
-        }));
+        players.addPlayerListener(world.playerId, this.#playerHud.playerEventListener);
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
         const changeHandlers = new ChangeHandlers()
