@@ -20,11 +20,8 @@ public class WeaponStatWeights
         return this;
     }
 
-    public PlayerStatBoosts Build(AttackRange attackRange)
+    public PlayerStatBoosts Build(int totalPoints)
     {
-        // TODO scale with level & grade
-        var totalPoints = (int)(1000 * (1-attackRange.WeaponStatPenalty));
-        
         var totalWeights = _playerStatWeights.Values.Sum();
         if (totalWeights == 0)
         {
