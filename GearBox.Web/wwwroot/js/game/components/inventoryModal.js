@@ -83,6 +83,7 @@ export class InventoryModal {
     #addEquipment(item) {
         const tds = [
             item.type.name,
+            item.level,
             item.description
         ].map(data => {
             const e = document.createElement("td");
@@ -117,7 +118,7 @@ export class InventoryModal {
         $("#noWeapon").hide();
         $("#yesWeapon").show();
 
-        $("#weaponName").text(weapon.type.name);
+        $("#weaponName").text(`${weapon.type.name} LV ${weapon.level}`);
         $("#weaponDescription").text(weapon.description);
         const details = weapon.details.map(str => {
             const e = document.createElement("li");
@@ -128,18 +129,4 @@ export class InventoryModal {
             .querySelector("#weaponDetails")
             .replaceChildren(...details); // need to destructure array for some reason
     }
-}
-
-/**
- * 
- * @param {HTMLElement} element 
- * @param {string} className
- * @returns {HTMLElement} 
- */
-function getDescendantByClassName(element, className) {
-    const descendants = Array.from(element.getElementsByClassName(className));
-    if (!descendants) {
-        throw new Error(`Failed to locate any elements with className ${className} under ${element}`);
-    }
-    return descendants[0];
 }

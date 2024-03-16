@@ -17,6 +17,7 @@ public class EquipmentSlot : IDynamic
             Value.Id,
             Value.Type.Name,
             Value.Description,
+            Value.Level,
             Value.Details,
             1 // quantity is always 1
         );

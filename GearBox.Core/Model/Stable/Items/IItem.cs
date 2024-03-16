@@ -1,5 +1,3 @@
-using GearBox.Core.Model.Json;
-
 namespace GearBox.Core.Model.Stable.Items;
 
 public interface IItem
@@ -16,6 +14,11 @@ public interface IItem
     ItemType Type { get; }
 
     string Description { get; }
+
+    /// <summary>
+    /// The minimum level players must have to use this item
+    /// </summary>
+    int Level { get; }
 
     /// <summary>
     /// Details to display in the GUI

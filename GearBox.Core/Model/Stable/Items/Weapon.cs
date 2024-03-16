@@ -10,10 +10,11 @@ public class Weapon : Equipment
     public Weapon(
         ItemType type, 
         string? description = null, 
+        int? level = null,
         Guid? id = null, 
         AttackRange? attackRange = null, 
         PlayerStatBoosts? boosts = null
-    ) : base(type, description, boosts, id)
+    ) : base(type, description, level, boosts, id)
     {
         _attackRange = attackRange ?? AttackRange.MELEE;
     }

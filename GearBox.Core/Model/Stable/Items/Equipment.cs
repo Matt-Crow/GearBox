@@ -1,5 +1,3 @@
-using GearBox.Core.Model.Json;
-
 namespace GearBox.Core.Model.Stable.Items;
 
 /// <summary>
@@ -7,10 +5,17 @@ namespace GearBox.Core.Model.Stable.Items;
 /// </summary>
 public abstract class Equipment : IItem
 {
-    public Equipment(ItemType type, string? description = null, PlayerStatBoosts? statBoosts = null, Guid? id = null)
+    public Equipment(
+        ItemType type, 
+        string? description = null, 
+        int? level = null,
+        PlayerStatBoosts? statBoosts = null, 
+        Guid? id = null
+    )
     {
         Type = type;
         Description = description ?? "no description provided";
+        Level = level ?? 0;
         StatBoosts = statBoosts ?? new PlayerStatBoosts();
         Id = id ?? Guid.NewGuid();
     }
@@ -20,6 +25,7 @@ public abstract class Equipment : IItem
     public ItemType Type { get; init; }
 
     public string Description { get; init; }
+    public int Level { get; init; }
     
     public abstract IEnumerable<string> Details { get; }
     

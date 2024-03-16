@@ -32,11 +32,15 @@ public class WeaponBuilder
         return this;
     }
 
-    public Weapon Build()
+    /// <summary>
+    /// Builds the weapon at the given level
+    /// </summary>
+    public Weapon Build(int level)
     {
         var result = new Weapon(
             _type, 
             _description,
+            level,
             null, // id is null
             _attackRange,
             _statWeights.Build(_attackRange)

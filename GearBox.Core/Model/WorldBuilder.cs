@@ -29,7 +29,7 @@ public class WorldBuilder
         var itemType = new ItemType(name, grade);
         var builder = new WeaponBuilder(itemType);
         modifyBuilder(builder);
-        var itemDefinition = new ItemDefinition(itemType, _ => builder.Build());
+        var itemDefinition = new ItemDefinition(itemType, _ => builder.Build(1)); // in the future, this will be based on the area level
         return DefineItem(itemDefinition);
     }
 
