@@ -53,7 +53,6 @@ public class WorldBuilder
                 .WithDescription("No special ability")
                 .WithRange(AttackRange.MELEE)
                 .WithStatWeights(weights => weights
-                    .WeighDamagePerHit(2)
                     .Weigh(PlayerStatType.OFFENSE, 1)
                     .Weigh(PlayerStatType.DEFENSE, 1)
                 )
@@ -62,7 +61,6 @@ public class WorldBuilder
                 .WithDescription("Hit stuff from far away.")
                 .WithRange(AttackRange.LONG)
                 .WithStatWeights(weights => weights
-                    .WeighDamagePerHit(1)
                     .Weigh(PlayerStatType.OFFENSE, 1)
                     .Weigh(PlayerStatType.SPEED, 1)
                 )
@@ -71,7 +69,7 @@ public class WorldBuilder
                 .WithDescription("Also no special ability.")
                 .WithRange(AttackRange.MEDIUM)
                 .WithStatWeights(weights => weights
-                    .WeighDamagePerHit(1)
+                    .Weigh(PlayerStatType.DEFENSE, 1)
                     .Weigh(PlayerStatType.MAX_ENERGY, 1)
                 )
             );

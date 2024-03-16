@@ -14,15 +14,36 @@ namespace GearBox.Core.Model.Stable;
 /// </summary>
 public class PlayerCharacter : IStableGameObject
 {
+    /// <summary>
+    /// The maximum level a player can attain
+    /// </summary>
+    public static readonly int MAX_LEVEL = 20;
+
     private static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);
+    private readonly int _level = MAX_LEVEL; // in the future, this will read from a repository
+    
+    /// <summary>
+    /// While it seems a bit strange to keep damage per hit on the player instead of their weapon,
+    /// this prevents situations where all weapons would require damage 
+    /// and allows players to attack without weapons
+    /// </summary>
+    private int _damagePerHit;
     private int _damageTaken = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
     private int _energyExpended = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
-    private int _frameCount = 0;
+    private int _frameCount = 0; // used for regeneration
 
     public PlayerCharacter() 
     {
         Inner = new(Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
         UpdateStats();
+    }
+
+    private static int GetDamagePerHitByLevel(int level)
+    {
+        var maxDamage = 1000;
+        var percentToMaxLevel = ((double)level) / MAX_LEVEL;
+        var result = (int)(maxDamage * percentToMaxLevel);
+        return result;
     }
 
     public string Type => "playerCharacter";
@@ -41,6 +62,9 @@ public class PlayerCharacter : IStableGameObject
 
     private void UpdateStats()
     {
+        // move to leveling method later
+        _damagePerHit = GetDamagePerHitByLevel(_level);
+
         var boosts = new PlayerStatBoosts();
         boosts = boosts.Combine(Weapon.Value?.StatBoosts);
         Stats.SetStatBoosts(boosts);
