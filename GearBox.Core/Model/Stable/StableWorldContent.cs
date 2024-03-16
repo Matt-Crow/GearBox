@@ -5,6 +5,7 @@ namespace GearBox.Core.Model.Stable;
 
 public class StableWorldContent
 {
+    private readonly DynamicHasher _hasher = new();
     private readonly SafeList<IStableGameObject> _objects = new();
     private readonly SafeList<PlayerCharacter> _players = new ();
     private readonly SafeList<LootChest> _lootChests = new ();
@@ -34,7 +35,7 @@ public class StableWorldContent
     public void Add(IStableGameObject obj)
     {
         _objects.Add(obj);
-        _hashes[obj] = MakeHashFor(obj);
+        _hashes[obj] = _hasher.Hash(obj);
         _changes.Add(Change.Content(obj));
     }
 
@@ -43,17 +44,6 @@ public class StableWorldContent
         _objects.Remove(obj);
         _hashes.Remove(obj);
         _changes.Add(Change.Removed(obj));
-    }
-
-    private static int MakeHashFor(IStableGameObject obj)
-    {
-        var result = new HashCode();
-        foreach (var field in obj.DynamicValues)
-        {
-            result.Add(field);
-        }
-        var hashCode = result.ToHashCode();
-        return hashCode;
     }
 
     public IEnumerable<IStableGameObject> GetAll()
@@ -84,7 +74,7 @@ public class StableWorldContent
         foreach (var obj in _objects.AsEnumerable().Where(HashHasChanged))
         {
             result.Add(Change.Content(obj));
-            _hashes[obj] = MakeHashFor(obj);
+            _hashes[obj] = _hasher.Hash(obj);
         }
 
         // notify caller of objects added or removed during iteration
@@ -100,6 +90,6 @@ public class StableWorldContent
 
     private bool HashHasChanged(IStableGameObject obj)
     {
-        return _hashes.ContainsKey(obj) && _hashes[obj] != MakeHashFor(obj);
+        return _hashes.ContainsKey(obj) && _hashes[obj] != _hasher.Hash(obj);
     }
 }
