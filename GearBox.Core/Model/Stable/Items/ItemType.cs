@@ -14,8 +14,5 @@ public readonly struct ItemType
     public Grade Grade { get; init; }
     // todo add sprite once those are implemented
 
-    public ItemTypeJson ToJson()
-    {
-        return new ItemTypeJson(Name);
-    }
+    public ItemTypeJson ToJson() => new(Name, Grade.Order, Grade.Name);
 }

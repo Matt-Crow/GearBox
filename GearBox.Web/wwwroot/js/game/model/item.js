@@ -119,18 +119,30 @@ export class ItemDeserializer {
 
 export class ItemType {
     #name;
+    #gradeOrder;
+    #gradeName;
 
-    constructor(name) {
+    constructor(name, gradeOrder, gradeName) {
         this.#name = name;
+        this.#gradeOrder = gradeOrder;
+        this.#gradeName = gradeName;
     }
 
     get name() {
         return this.#name;
     }
+
+    get gradeOrder() {
+        return this.#gradeOrder;
+    }
+
+    get gradeName() {
+        return this.#gradeName;
+    }
 }
 
 export function deserializeItemTypeJson(obj) {
-    const result = new ItemType(obj.name);
+    const result = new ItemType(obj.name, obj.gradeOrder, obj.gradeName);
     return result;
 }
 

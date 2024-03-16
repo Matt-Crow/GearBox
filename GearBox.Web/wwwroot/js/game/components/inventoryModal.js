@@ -83,6 +83,7 @@ export class InventoryModal {
     #addEquipment(item) {
         const tds = [
             item.type.name,
+            item.type.gradeName,
             item.level,
             item.description
         ].map(data => {
@@ -108,6 +109,9 @@ export class InventoryModal {
         this.#equipmentRows.appendChild(tr);
     }
 
+    /**
+     * @param {Item} weapon 
+     */
     #setWeapon(weapon) {
         if (!weapon) {
             $("#noWeapon").show();
@@ -118,7 +122,7 @@ export class InventoryModal {
         $("#noWeapon").hide();
         $("#yesWeapon").show();
 
-        $("#weaponName").text(`${weapon.type.name} LV ${weapon.level}`);
+        $("#weaponName").text(`${weapon.type.name} LV ${weapon.level} ${stars(weapon.type.gradeOrder)}`);
         $("#weaponDescription").text(weapon.description);
         const details = weapon.details.map(str => {
             const e = document.createElement("li");
@@ -129,4 +133,12 @@ export class InventoryModal {
             .querySelector("#weaponDetails")
             .replaceChildren(...details); // need to destructure array for some reason
     }
+}
+
+function stars(num) {
+    let result = "";
+    for (let i = 0; i < num; i++) {
+        result += "*";
+    }
+    return result;
 }
