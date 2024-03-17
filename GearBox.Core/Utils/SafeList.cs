@@ -57,6 +57,16 @@ public class SafeList<T>
     }
 
     /// <summary>
+    /// Checks whether the given item would exist after the next call to ApplyChanges
+    /// </summary>
+    public bool Contains(T obj)
+    {
+        var willBeInItems = _pendingAdd.Contains(obj) || _items.Contains(obj);
+        var result = willBeInItems && !_pendingRemove.Contains(obj);
+        return result;
+    }
+
+    /// <summary>
     /// Gets the current values in the list, excluding any pending changes
     /// </summary>
     public IEnumerable<T> AsEnumerable()
@@ -68,6 +78,9 @@ public class SafeList<T>
         }
     }
 
+    /// <summary>
+    /// Schedules the given item to be removed after the next call to ApplyChanges
+    /// </summary>
     public void Remove(T item)
     {
         _pendingRemove.Add(item);
