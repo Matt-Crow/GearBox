@@ -122,6 +122,16 @@ public class PlayerCharacter : IStableGameObject
         }
     }
 
+    public void UseBasicAttack(World inWorld, Direction inDirection)
+    {
+        // todo calc speed, make sure attack isn't on cooldown
+        var attack = new Projectile(
+            Inner.Coordinates, 
+            Velocity.FromPolar(Speed.FromTilesPerSecond(3), inDirection)
+        );
+        inWorld.DynamicContent.AddDynamicObject(attack);
+    }
+
     public void Update()
     {
         // do not update inner!

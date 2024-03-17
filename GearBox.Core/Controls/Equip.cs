@@ -1,3 +1,4 @@
+using GearBox.Core.Model;
 using GearBox.Core.Model.Stable;
 
 namespace GearBox.Core.Controls;
@@ -11,7 +12,7 @@ public class Equip : IControlCommand
         _equipmentId = equipmentId;
     }
 
-    public void ExecuteOn(PlayerCharacter target)
+    public void ExecuteOn(PlayerCharacter target, World inWorld)
     {
         target.EquipById(_equipmentId);
     }

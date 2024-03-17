@@ -11,8 +11,11 @@ async function main() {
         .build();
     const client = new Client(connection);
     const inventoryModal = new InventoryModal(findElement("#inventoryModal"), client);
+    const canvas = findElement("#canvas");
+    const mouseCoords = [0, 0];
+    canvas.addEventListener("mousemove", (e) => updateMousePosition(e, canvas, mouseCoords));
     const game = new Game(
-        findElement("#canvas"), 
+        canvas,
         inventoryModal, 
         new PlayerHud(findElement("#playerHud"))
     );
@@ -38,15 +41,39 @@ async function main() {
             keyMappings.get(e.code)[0]();
         }
     });
+
     document.addEventListener("keydown", e => {
         // uses e.repeat to check if key is held down
         if (keyMappings.has(e.code) && !e.repeat) {
             keyMappings.get(e.code)[1]();
         }
+        if (e.code == "KeyQ") {
+            const [px, py] = game.getPlayerCoords();
+            const [tx, ty] = game.getCanvasTranslate();
+            const [mx, my] = mouseCoords;
+            const dx = mx - px - tx;
+            const dy = my - py - ty;
+            const angleInRadians = Math.atan2(-dy, dx); // y first, then x. -dy flips
+            const angleInDegrees = Math.trunc(180 * angleInRadians / Math.PI); // convert to int so it doesn't crash server
+            const bearing = 90 - angleInDegrees;
+            client.useBasicAttack(bearing);
+        }
         if (e.code == "KeyI") {
             inventoryModal.toggle();
         }
     });
+}
+
+/**
+ * https://stackoverflow.com/a/17130415
+ * @param {MouseEvent} event 
+ * @param {HTMLCanvasElement} canvas 
+ * @param {number[]} mouseCoords 
+ */
+function updateMousePosition(event, canvas, mouseCoords) {
+    const box = canvas.getBoundingClientRect();
+    mouseCoords[0] = event.clientX - box.left;
+    mouseCoords[1] = event.clientY - box.top;
 }
 
 function findElement(selector) {

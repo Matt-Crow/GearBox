@@ -140,7 +140,7 @@ public class WorldServer
         {
             throw new Exception($"Invalid id: \"{id}\"");
         }
-        command.ExecuteOn(_players[id]);
+        command.ExecuteOn(_players[id], _world);
     }
 
     public async Task Update()

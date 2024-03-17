@@ -5,6 +5,7 @@ import { CharacterJsonDeserializer } from "./model/character.js";
 import { InventoryDeserializer, ItemDeserializer } from "./model/item.js";
 import { LootChestChangeHandler } from "./model/lootChest.js";
 import { PlayerChangeHandler, PlayerDeserializer, PlayerRepository } from "./model/player.js";
+import { ProjectileJsonDeserializer } from "./model/projectile.js";
 import { WorldInitHandler, WorldUpdateHandler } from "./model/world.js";
 
 export class Game {
@@ -31,6 +32,8 @@ export class Game {
      */
     #handleMessage;
 
+    #world;
+
     /**
      * @param {HTMLCanvasElement} canvas the HTML canvas to draw on.
      * @param {InventoryModal} inventoryModal the modal for the current player's inventory.
@@ -41,6 +44,7 @@ export class Game {
         this.#inventoryModal = inventoryModal;
         this.#playerHud = playerHud;
         this.#handleMessage = (message) => this.#handleInit(message);
+        this.#world = null;
     }
 
     /**
@@ -49,6 +53,25 @@ export class Game {
      */
     handle(message) {
         this.#handleMessage(message); 
+    }
+
+    getPlayerCoords() {
+        const player = this.#world?.player;
+        return [player?.x, player?.y];
+    }
+
+    getCanvasTranslate() {
+        const world = this.#world;
+        const player = world?.player;
+        if (!player) {
+            return [0, 0];
+        }
+        const w = this.#canvas.width;
+        const h = this.#canvas.height;
+        return [
+            clamp(w - world.widthInPixels, w/2 - player.x, 0), 
+            clamp(h - world.heightInPixels, h/2 - player.y, 0)
+        ];
     }
 
     #handleInit(initMessage) {
@@ -65,12 +88,15 @@ export class Game {
             .withChangeHandler(new LootChestChangeHandler(world))
             .withChangeHandler(new PlayerChangeHandler(players, new PlayerDeserializer(new InventoryDeserializer(itemDeserializer), itemDeserializer)));
         const updateHandler = new WorldUpdateHandler(world, changeHandlers)
-            .withDynamicObjectDeserializer(new CharacterJsonDeserializer());
+            .withDynamicObjectDeserializer(new CharacterJsonDeserializer())
+            .withDynamicObjectDeserializer(new ProjectileJsonDeserializer());
 
         // unregisters handleInit, switches to handling updates instead
         this.#handleMessage = (updateMessage) => updateHandler.handleWorldUpdate(updateMessage);
         
         setInterval(() => this.#update(world), 1000 / 24);
+
+        this.#world = world;
     }
 
     #update(world) {
