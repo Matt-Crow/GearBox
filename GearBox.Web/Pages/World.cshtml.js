@@ -2,6 +2,7 @@ import { Game } from "../js/game/game.js";
 import { InventoryModal } from "../js/game/components/inventoryModal.js";
 import { PlayerHud } from "../js/game/components/playerHud.js";
 import { Client } from "../js/game/infrastructure/client.js";
+import { Canvas } from "../js/game/components/canvas.js";
 
 $(async () => await main());
 
@@ -10,15 +11,12 @@ async function main() {
         .withUrl("/world-hub")
         .build();
     const client = new Client(connection);
+    
+    const canvas = new Canvas(findElement("#canvas"));
     const inventoryModal = new InventoryModal(findElement("#inventoryModal"), client);
-    const canvas = findElement("#canvas");
-    const mouseCoords = [0, 0];
-    canvas.addEventListener("mousemove", (e) => updateMousePosition(e, canvas, mouseCoords));
-    const game = new Game(
-        canvas,
-        inventoryModal, 
-        new PlayerHud(findElement("#playerHud"))
-    );
+    const hud = new PlayerHud(findElement("#playerHud"));
+    const game = new Game(canvas, inventoryModal, hud);
+    
     connection.on("receive", (message) => {
         const obj = JSON.parse(message);
         try {
@@ -49,10 +47,8 @@ async function main() {
         }
         if (e.code == "KeyQ") {
             const [px, py] = game.getPlayerCoords();
-            const [tx, ty] = game.getCanvasTranslate();
-            const [mx, my] = mouseCoords;
-            const dx = mx - px - tx;
-            const dy = my - py - ty;
+            const dx = canvas.translatedMouseX - px;
+            const dy = canvas.translatedMouseY - py;
             const angleInRadians = Math.atan2(-dy, dx); // y first, then x. -dy flips
             const angleInDegrees = Math.trunc(180 * angleInRadians / Math.PI); // convert to int so it doesn't crash server
             const bearing = 90 - angleInDegrees;
@@ -62,18 +58,6 @@ async function main() {
             inventoryModal.toggle();
         }
     });
-}
-
-/**
- * https://stackoverflow.com/a/17130415
- * @param {MouseEvent} event 
- * @param {HTMLCanvasElement} canvas 
- * @param {number[]} mouseCoords 
- */
-function updateMousePosition(event, canvas, mouseCoords) {
-    const box = canvas.getBoundingClientRect();
-    mouseCoords[0] = event.clientX - box.left;
-    mouseCoords[1] = event.clientY - box.top;
 }
 
 function findElement(selector) {
