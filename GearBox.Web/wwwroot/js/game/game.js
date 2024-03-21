@@ -70,6 +70,7 @@ export class Game {
         const players = new PlayerRepository();
         players.addPlayerListener(world.playerId, this.#inventoryModal.playerEventListener);
         players.addPlayerListener(world.playerId, this.#playerHud.playerEventListener);
+        this.#playerHud.characterSupplier = () => world.player;
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
         const changeHandlers = new ChangeHandlers()

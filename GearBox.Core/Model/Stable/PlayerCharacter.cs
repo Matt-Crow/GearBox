@@ -28,7 +28,6 @@ public class PlayerCharacter : IStableGameObject
     /// and allows players to attack without weapons
     /// </summary>
     private int _damagePerHit;
-    private int _damageTaken = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
     private int _energyExpended = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     private int _frameCount = 0; // used for regeneration
 
@@ -48,14 +47,13 @@ public class PlayerCharacter : IStableGameObject
 
     public string Type => "playerCharacter";
     public IEnumerable<object?> DynamicValues => Inventory.DynamicValues
-        .Append(_damageTaken)
+        .Append(Inner.DamageTaken) // hacky: need this so playerHud refreshes when Inner heals
         .Append(_energyExpended)
         .Concat(Stats.DynamicValues)
         .Concat(Weapon.DynamicValues);
     
     public Character Inner { get; init; } = new();
     public PlayerStats Stats { get; init; } = new();
-    private int MaxHitPoints => Stats.MaxHitPoints.Value;
     private int MaxEnergy => Stats.MaxEnergy.Value;
     public Inventory Inventory { get; init; } = new();
     public EquipmentSlot Weapon { get; init; } = new();
@@ -68,6 +66,7 @@ public class PlayerCharacter : IStableGameObject
         var boosts = new PlayerStatBoosts();
         boosts = boosts.Combine(Weapon.Value?.StatBoosts);
         Stats.SetStatBoosts(boosts);
+        Inner.MaxHitPoints = Stats.MaxHitPoints.Value;
 
         // update movement speed
         var multiplier = 1.0+Stats.Speed.Value;
@@ -104,15 +103,6 @@ public class PlayerCharacter : IStableGameObject
         }
     }
 
-    public void HealPercent(double percent)
-    {
-        _damageTaken -= (int)(MaxHitPoints*percent);
-        if (_damageTaken < 0)
-        {
-            _damageTaken = 0;
-        }
-    }
-
     public void RechargePercent(double percent)
     {
         _energyExpended -= (int)(MaxEnergy*percent);
@@ -134,13 +124,13 @@ public class PlayerCharacter : IStableGameObject
 
     public void Update()
     {
-        // do not update inner!
+        // do not call Inner.Update!
 
         // restore 5% HP & energy per second
         _frameCount++;
         if (_frameCount >= Time.FRAMES_PER_SECOND)
         {
-            HealPercent(0.05);
+            Inner.HealPercent(0.05);
             RechargePercent(0.05);
             _frameCount = 0;
         }
@@ -150,7 +140,6 @@ public class PlayerCharacter : IStableGameObject
     {
         var asJson = new PlayerJson(
             Inner.Id, 
-            new FractionJson(MaxHitPoints - _damageTaken, MaxHitPoints),
             new FractionJson(MaxEnergy - _energyExpended, MaxEnergy),
             Inventory.ToJson(), 
             Weapon.ToJson()

@@ -1,8 +1,10 @@
+import { Character } from "../model/character.js";
 import { Player, PlayerEventListener } from "../model/player.js";
 
 export class PlayerHud {
     #element;
     #playerEventListener;
+    #characterSupplier;
 
     /**
      * @param {HTMLDivElement} element 
@@ -11,7 +13,8 @@ export class PlayerHud {
         this.#element = element;
         this.#playerEventListener = new PlayerEventListener({
             onPlayerChanged: p => this.#bind(p)
-        });        
+        });
+        this.#characterSupplier = () => null;
     }
 
     /**
@@ -22,11 +25,19 @@ export class PlayerHud {
     }
 
     /**
+     * @param {() => Character} value 
+     */
+    set characterSupplier(value) {
+        this.#characterSupplier = value;
+    }
+
+    /**
      * @param {Player} player 
      */
     #bind(player) {
-        bind(this.#element, "currentHP", player.hitPoints.current);
-        bind(this.#element, "maxHP", player.hitPoints.max);
+        const character = this.#characterSupplier();
+        bind(this.#element, "currentHP", character?.hitPoints.current);
+        bind(this.#element, "maxHP", character?.hitPoints.max);
         bind(this.#element, "currentEnergy", player.energy.current);
         bind(this.#element, "maxEnergy", player.energy.max);
     }
