@@ -8,15 +8,13 @@ import { deserializeMapJson } from "./map.js";
 export class World {
     #playerId; // need reference to changing player
     #map;
-    #staticGameObjects;
     #dynamicGameObjects;
     #stableGameObjects;
     #itemTypes;
 
-    constructor(playerId, map, staticGameObjects, itemTypes) {
+    constructor(playerId, map, itemTypes) {
         this.#playerId = playerId;
         this.#map = map;
-        this.#staticGameObjects = staticGameObjects;
         this.#dynamicGameObjects = [];
         this.#stableGameObjects = new Map();
         this.#itemTypes = new ItemTypeRepository(itemTypes);
@@ -74,7 +72,6 @@ export class World {
      */
     draw(context) {
         this.#map.draw(context);
-        this.#staticGameObjects.forEach(obj => obj.draw(context));
         this.#dynamicGameObjects.forEach(obj => obj.draw(context));
         for (const obj of this.#stableGameObjects.values()) {
             obj.draw(context);
@@ -91,17 +88,9 @@ export class WorldInitHandler {
      */
     handleWorldInit(obj) {
         const map = deserializeMapJson(obj.staticWorldContent.map);
-        const staticGameObjects = this.#deserializeStaticGameObjects(obj.staticWorldContent.gameObjects);
         const itemTypes = obj.itemTypes.map(deserializeItemTypeJson);
-        const deserialized = new World(obj.playerId, map, staticGameObjects, itemTypes);
+        const deserialized = new World(obj.playerId, map, itemTypes);
         return deserialized;
-    }
-    
-    #deserializeStaticGameObjects(gameObjectsJson) {
-        if (gameObjectsJson.length > 0) {
-            throw new Error("not implemented yet");
-        }
-        return [];
     }
 }
 
