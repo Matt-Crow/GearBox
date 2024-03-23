@@ -122,12 +122,14 @@ public class PlayerCharacter : IStableGameObject
         
         var weapon = Weapon.Value as Weapon;
         var range = weapon?.AttackRange.Range ?? AttackRange.MELEE.Range;
-        var attack = new Projectile(
+        var attack = new Attack(Inner);
+        var projectile = new Projectile(
             Inner.Coordinates, 
             Velocity.FromPolar(Speed.FromTilesPerSecond(range.InTiles), inDirection),
-            range
+            range,
+            attack
         );
-        inWorld.DynamicContent.AddDynamicObject(attack);
+        inWorld.DynamicContent.AddDynamicObject(projectile);
 
         _basicAttackCooldownInFrames = Time.FRAMES_PER_SECOND / 2; // .5 second cooldown
     }
