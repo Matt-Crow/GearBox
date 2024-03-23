@@ -95,7 +95,7 @@ public class WorldBuilder
         }
         var result = new World(
             Guid.NewGuid(),
-            new StaticWorldContent(_map),
+            _map,
             ItemTypeRepository.Of(_itemTypes),
             _loot
         );

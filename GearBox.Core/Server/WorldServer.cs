@@ -67,7 +67,7 @@ public class WorldServer
         }
 
         var player = new PlayerCharacter(); // will eventually read from repo
-        var spawnLocation = _world.StaticContent.Map.GetRandomOpenTile();
+        var spawnLocation = _world.Map.GetRandomOpenTile();
         if (spawnLocation != null)
         {
             player.Inner.Coordinates = spawnLocation.Value.CenteredOnTile();
@@ -79,7 +79,7 @@ public class WorldServer
         _players.Add(id, player);
         var worldInit = new WorldInitJson(
             player.Inner.Id,
-            _world.StaticContent.ToJson(),
+            _world.Map.ToJson(),
             _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
         );
         await connection.Send(worldInit);

@@ -87,7 +87,7 @@ export class WorldInitHandler {
      * @returns {World}
      */
     handleWorldInit(obj) {
-        const map = deserializeMapJson(obj.staticWorldContent.map);
+        const map = deserializeMapJson(obj.map);
         const itemTypes = obj.itemTypes.map(deserializeItemTypeJson);
         const deserialized = new World(obj.playerId, map, itemTypes);
         return deserialized;

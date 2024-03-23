@@ -16,13 +16,13 @@ public class World
 
     public World(
         Guid? id = null, 
-        StaticWorldContent? staticContent = null, 
+        Map? map = null, 
         IItemTypeRepository? itemTypes = null, 
         LootTable? loot = null
     )
     {
         Id = id ?? Guid.NewGuid();
-        StaticContent = staticContent ?? StaticWorldContent.EMPTY;
+        Map = map ?? new();
         DynamicContent = new DynamicWorldContent();
         StableContent = new StableWorldContent();
         ItemTypes = itemTypes ?? ItemTypeRepository.Empty();
@@ -30,7 +30,7 @@ public class World
     }
 
     public Guid Id { get; init; }
-    public StaticWorldContent StaticContent { get; init; }
+    public Map Map { get; init; }
     public DynamicWorldContent DynamicContent { get; init; }
     public StableWorldContent StableContent { get; init; }
     public IItemTypeRepository ItemTypes { get; init; }
@@ -49,7 +49,7 @@ public class World
             chestItems.Add(_loot.GetRandomItem());
         }
         
-        var location = StaticContent.Map.GetRandomOpenTile();
+        var location = Map.GetRandomOpenTile();
         if (location != null)
         {
             var lootChest = new LootChest(location.Value.CenteredOnTile(), chestItems.ToArray());
@@ -71,7 +71,7 @@ public class World
             var body = obj.Body;
             if (body is not null)
             {
-                StaticContent.CheckForCollisions(body);
+                Map.CheckForCollisions(body);
                 DynamicContent.CheckForCollisions(body);
             }
         }
