@@ -9,8 +9,11 @@ namespace GearBox.Core.Model.Dynamic;
 public class Projectile : IDynamicGameObject
 {
     private readonly MobileBehavior _mobility;
+    private readonly Distance _range;
+    private double _distanceTraveledInPixels = 0;
+    private bool _hasCollided;
 
-    public Projectile(Coordinates coordinates, Velocity velocity)
+    public Projectile(Coordinates coordinates, Velocity velocity, Distance range)
     {
         Body = new()
         {
@@ -18,14 +21,13 @@ public class Projectile : IDynamicGameObject
         };
         _mobility = new(Body, velocity);
         _mobility.StartMovingIn(velocity.Angle); // MobileBehavior defaults to not moving
+        _range = range;
     }
 
     public BodyBehavior Body { get; init; }
+    public bool IsTerminated => _hasCollided || _range.InPixels <= _distanceTraveledInPixels;
 
-    // do some of these in next commit
     // todo add a player collider thing
-    // todo add a terminating thing
-    // todo add max range
 
     public IDynamicGameObjectJson ToJson()
     {
@@ -39,5 +41,6 @@ public class Projectile : IDynamicGameObject
     public void Update()
     {
         _mobility.UpdateMovement();
+        _distanceTraveledInPixels += _mobility.Velocity.Magnitude.InPixelsPerFrame;
     }
 }

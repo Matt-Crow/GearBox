@@ -10,6 +10,7 @@ public class DuplicatingDynamicGameObject : IDynamicGameObject
     public DuplicatingDynamicGameObject(DynamicWorldContent content) => _content = content;
 
     public BodyBehavior? Body => null;
+    public bool IsTerminated => false;
 
     public IDynamicGameObjectJson ToJson() => throw new NotImplementedException();
 

@@ -36,6 +36,10 @@ public class DynamicWorldContent : ISerializable<DynamicWorldContentJson>
         {
             item.Update();
         }
+        foreach (var item in _gameObjects.AsEnumerable().Where(obj => obj.IsTerminated))
+        {
+            _gameObjects.Remove(item);
+        }
         _gameObjects.ApplyChanges();
     }
 

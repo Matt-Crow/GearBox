@@ -11,6 +11,7 @@ public class DynamicGameObjectSpy : IDynamicGameObject
     public bool HasBeenUpdated { get => _timesUpdated > 0; }
 
     public BodyBehavior? Body { get; init; } = null;
+    public bool IsTerminated => false;
 
     public IDynamicGameObjectJson ToJson()
     {

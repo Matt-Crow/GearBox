@@ -5,8 +5,6 @@ namespace GearBox.Core.Model.Stable.Items;
 
 public class Weapon : Equipment
 {
-    private readonly AttackRange _attackRange;
-    
     public Weapon(
         ItemType type, 
         string? description = null, 
@@ -16,10 +14,11 @@ public class Weapon : Equipment
         PlayerStatBoosts? boosts = null
     ) : base(type, description, level, boosts, id)
     {
-        _attackRange = attackRange ?? AttackRange.MELEE;
+        AttackRange = attackRange ?? AttackRange.MELEE;
     }
 
-    public override IEnumerable<string> Details => ListExtensions.Of($"Range: {_attackRange}")
+    public AttackRange AttackRange { get; init; }
+    public override IEnumerable<string> Details => ListExtensions.Of($"Range: {AttackRange}")
         .Concat(StatBoosts.Details);
 
     public override EquipmentSlot GetSlot(PlayerCharacter player) => player.Weapon;

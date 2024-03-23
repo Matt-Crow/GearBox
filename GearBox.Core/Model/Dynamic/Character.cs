@@ -29,6 +29,8 @@ public class Character : IDynamicGameObject
 
     public BodyBehavior Body { get; init; } = new();
 
+    public bool IsTerminated => DamageTaken >= MaxHitPoints;
+
     public Coordinates Coordinates { get => Body.Location; set => Body.Location = value; }
     
     public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor

@@ -28,4 +28,17 @@ public class DynamicWorldContentTester
 
         Assert.Single(sut.DynamicObjects);
     }
+
+    [Fact]
+    public void Object_AfterTerminating_IsRemoved()
+    {
+        var sut = new DynamicWorldContent();
+        var anObject = new TerminatingDynamicGameObject();
+
+        sut.AddDynamicObject(anObject);
+        anObject.IsTerminated = true;
+        sut.Update();
+
+        Assert.Empty(sut.DynamicObjects);
+    }
 }

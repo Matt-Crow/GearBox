@@ -30,6 +30,7 @@ public class PlayerCharacter : IStableGameObject
     private int _damagePerHit;
     private int _energyExpended = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     private int _frameCount = 0; // used for regeneration
+    private int _basicAttackCooldownInFrames = 0;
 
     public PlayerCharacter() 
     {
@@ -114,12 +115,21 @@ public class PlayerCharacter : IStableGameObject
 
     public void UseBasicAttack(World inWorld, Direction inDirection)
     {
-        // todo calc speed, make sure attack isn't on cooldown
+        if (_basicAttackCooldownInFrames != 0)
+        {
+            return;
+        }
+        
+        var weapon = Weapon.Value as Weapon;
+        var range = weapon?.AttackRange.Range ?? AttackRange.MELEE.Range;
         var attack = new Projectile(
             Inner.Coordinates, 
-            Velocity.FromPolar(Speed.FromTilesPerSecond(3), inDirection)
+            Velocity.FromPolar(Speed.FromTilesPerSecond(range.InTiles), inDirection),
+            range
         );
         inWorld.DynamicContent.AddDynamicObject(attack);
+
+        _basicAttackCooldownInFrames = Time.FRAMES_PER_SECOND / 2; // .5 second cooldown
     }
 
     public void Update()
@@ -133,6 +143,12 @@ public class PlayerCharacter : IStableGameObject
             Inner.HealPercent(0.05);
             RechargePercent(0.05);
             _frameCount = 0;
+        }
+
+        _basicAttackCooldownInFrames--;
+        if (_basicAttackCooldownInFrames < 0)
+        {
+            _basicAttackCooldownInFrames = 0;
         }
     }
 
