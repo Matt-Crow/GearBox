@@ -1,4 +1,5 @@
 using GearBox.Core.Controls;
+using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using Microsoft.AspNetCore.SignalR;
 
@@ -37,6 +38,11 @@ public class WorldHub : Hub
     public Task StopMovingDown() => Receive(StopMoving.DOWN);
     public Task StopMovingLeft() => Receive(StopMoving.LEFT);
     public Task StopMovingRight() => Receive(StopMoving.RIGHT);
+
+    /// <summary>
+    /// Note the parameter is the bearing in degrees, so 0 means up, 90 means to the right, etc.
+    /// </summary>
+    public Task UseBasicAttack(int bearingInDegrees) => Receive(new UseBasicAttackCommand(Direction.FromBearingDegrees(bearingInDegrees)));
 
     private Task Receive(IControlCommand command)
     {

@@ -72,6 +72,7 @@ public class World
             if (body is not null)
             {
                 StaticContent.CheckForCollisions(body);
+                DynamicContent.CheckForCollisions(body);
             }
         }
         return StableContent.Update();

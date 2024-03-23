@@ -6,38 +6,37 @@ export class Character {
     #color = "rgb(0 255 0)"; // todo read from server
     #x;
     #y;
+    #hitPoints;
 
     /**
      * @param {string} id a unique identifier for this character (GUID)
      * @param {number} x the x-coordinate of this character's center, in pixels
      * @param {number} y the y-coordinate of this character's center, in pixels 
+     * @param {Fraction} hitPoints 
      */
-    constructor(id, x, y) {
+    constructor(id, x, y, hitPoints) {
         this.#id = id;
         this.#x = x;
         this.#y = y;
+        this.#hitPoints = hitPoints;
     }
 
     /**
      * @returns {string} a unique identifier for this character (GUID)
      */
-    get id() {
-        return this.#id;
-    }
+    get id() { return this.#id; }
 
     /**
      * @returns {number} the x-coordinate of this character's center, in pixels
      */
-    get x() {
-        return this.#x;
-    }
+    get x() { return this.#x; }
 
     /**
      * @returns {number} the y-coordinate of this character's center, in pixels
      */
-    get y() {
-        return this.#y;
-    }
+    get y() { return this.#y; }
+
+    get hitPoints() { return this.#hitPoints; }
 
     /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
@@ -53,8 +52,26 @@ export class Character {
     }
 }
 
+export class Fraction {
+    #current;
+    #max;
+
+    constructor(current, max) {
+        this.#current = current;
+        this.#max = max;
+    }
+
+    get current() {
+        return this.#current;
+    }
+
+    get max() {
+        return this.#max;
+    }
+}
+
 export class CharacterJsonDeserializer extends JsonDeserializer {
     constructor() {
-        super("character", (obj) => new Character(obj.id, obj.x, obj.y));
+        super("character", (obj) => new Character(obj.id, obj.x, obj.y, new Fraction(obj.hitPoints.current, obj.hitPoints.max)));
     }
 }

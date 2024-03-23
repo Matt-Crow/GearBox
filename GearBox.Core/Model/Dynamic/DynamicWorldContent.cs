@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Json;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Dynamic;
 
@@ -7,32 +8,34 @@ namespace GearBox.Core.Model.Dynamic;
 /// </summary>
 public class DynamicWorldContent : ISerializable<DynamicWorldContentJson>
 {
-    /*
-        List is probably more efficient for iteration,
-        whereas Dictionary is more efficient for searching.
-        I can change this implementation based on which of those two operations
-        are needed more frequently... or I can do a more complex data structure.
-    */
-    private readonly List<IDynamicGameObject> _dynamicObjects = new();
+    private readonly SafeList<IDynamicGameObject> _gameObjects = new();
 
-    public IEnumerable<IDynamicGameObject> DynamicObjects { get => _dynamicObjects.AsEnumerable(); }
+    public IEnumerable<IDynamicGameObject> DynamicObjects => _gameObjects.AsEnumerable();
 
     public void AddDynamicObject(IDynamicGameObject obj)
     {
-        EnsureNotYetAdded(obj);
-        _dynamicObjects.Add(obj);
+        if (!_gameObjects.Contains(obj))
+        {
+            _gameObjects.Add(obj);
+        }
     }
 
     public void RemoveDynamicObject(IDynamicGameObject obj)
     {
-        _dynamicObjects.Remove(obj);
+        _gameObjects.Remove(obj);
     }
 
-    private void EnsureNotYetAdded(IGameObject obj)
+    public void CheckForCollisions(BodyBehavior body)
     {
-        if (_dynamicObjects.Contains(obj))
+        // only check for collisions with Characters for now
+        var collidingCharacters = _gameObjects.AsEnumerable()
+            .Select(obj => obj as Character)
+            .Where(obj => obj != null)
+            .Select(obj => obj!)
+            .Where(obj => obj?.Body != null && obj.Body.CollidesWith(body) && obj.Body != body);
+        foreach (var character in collidingCharacters)
         {
-            throw new ArgumentException();
+            body.OnCollided(new CollideEventArgs(character));
         }
     }
 
@@ -42,12 +45,21 @@ public class DynamicWorldContent : ISerializable<DynamicWorldContentJson>
     /// </summary>
     public void Update()
     {
-        _dynamicObjects.ForEach(x => x.Update());
+        _gameObjects.ApplyChanges();
+        foreach (var item in _gameObjects.AsEnumerable())
+        {
+            item.Update();
+        }
+        foreach (var item in _gameObjects.AsEnumerable().Where(obj => obj.IsTerminated))
+        {
+            _gameObjects.Remove(item);
+        }
+        _gameObjects.ApplyChanges();
     }
 
     public DynamicWorldContentJson ToJson()
     {
-        var objs = _dynamicObjects
+        var objs = _gameObjects.AsEnumerable()
             .Select(obj => obj.ToJson())
             .ToList();
         return new DynamicWorldContentJson(objs);

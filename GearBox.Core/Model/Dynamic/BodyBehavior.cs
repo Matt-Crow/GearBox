@@ -51,10 +51,17 @@ public class BodyBehavior
         set => Location = Coordinates.FromPixels(Location.XInPixels, value - Radius.InPixels);
     }
 
+    public event EventHandler<CollideEventArgs>? Collided;
+
     public bool CollidesWith(BodyBehavior other)
     {
         var withinX = RightInPixels >= other.LeftInPixels && LeftInPixels <= other.RightInPixels;
         var withinY = BottomInPixels >= other.TopInPixels && TopInPixels <= other.BottomInPixels;
         return withinX && withinY;
+    }
+
+    public void OnCollided(CollideEventArgs args)
+    {
+        Collided?.Invoke(this, args);
     }
 }

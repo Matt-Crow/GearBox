@@ -40,4 +40,8 @@ export class Client {
     stopMovingRight() {
         this.#signalr.invoke("StopMovingRight");
     }
+
+    useBasicAttack(bearingInDegrees) {
+        this.#signalr.invoke("UseBasicAttack", bearingInDegrees);
+    }
 }

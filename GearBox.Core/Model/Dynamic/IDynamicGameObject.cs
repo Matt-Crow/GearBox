@@ -11,11 +11,17 @@ public interface IDynamicGameObject : IGameObject, ISerializable<IDynamicGameObj
     /// The physical body of this game object.
     /// This object may not have a body.
     /// </summary>
-    public BodyBehavior? Body { get; }
+    BodyBehavior? Body { get; }
+
+    /// <summary>
+    /// Whether this object has terminated,
+    /// and thus should no longer be used.
+    /// </summary>
+    bool IsTerminated { get; }
 
     /// <summary>
     /// Called each game tick.
     /// Subclasses should not call this method.
     /// </summary>
-    public void Update();
+    void Update();
 }

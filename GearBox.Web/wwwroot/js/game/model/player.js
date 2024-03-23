@@ -12,21 +12,18 @@ import { Inventory, InventoryDeserializer } from "./item.js";
 
 export class Player {
     #id;
-    #hitPoints;
     #energy;
     #inventory;
     #weapon;
 
     /**
      * @param {string} id 
-     * @param {Fraction} hitPoints 
      * @param {Fraction} energy 
      * @param {Inventory} inventory 
      * @param {Item?} weapon 
      */
-    constructor(id, hitPoints, energy, inventory, weapon) {
+    constructor(id, energy, inventory, weapon) {
         this.#id = id;
-        this.#hitPoints = hitPoints;
         this.#energy = energy;
         this.#inventory = inventory ?? new Inventory();
         this.#weapon = weapon;
@@ -34,10 +31,6 @@ export class Player {
 
     get id() {
         return this.#id;
-    }
-
-    get hitPoints() {
-        return this.#hitPoints;
     }
 
     get energy() {
@@ -89,7 +82,6 @@ export class PlayerDeserializer {
         const weapon = json.weapon ? this.#itemDeserializer.deserialize(json.weapon) : null;
         var result = new Player(
             id, 
-            new Fraction(json.hitPoints.current, json.hitPoints.max),
             new Fraction(json.energy.current, json.energy.max),
             inventory, 
             weapon
