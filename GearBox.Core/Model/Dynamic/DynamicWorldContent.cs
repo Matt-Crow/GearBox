@@ -7,7 +7,7 @@ namespace GearBox.Core.Model.Dynamic;
 /// <summary>
 /// Dynamic content can change with each update.
 /// </summary>
-public class DynamicWorldContent : ISerializable<DynamicWorldContentJson>
+public class DynamicWorldContent
 {
     private readonly SafeList<IDynamicGameObject> _gameObjects = new();
 
@@ -58,7 +58,7 @@ public class DynamicWorldContent : ISerializable<DynamicWorldContentJson>
         _gameObjects.ApplyChanges();
     }
 
-    public DynamicWorldContentJson ToJson()
+    public List<GameObjectJson> ToJson()
     {
         var options = new JsonSerializerOptions()
         {
@@ -67,6 +67,6 @@ public class DynamicWorldContent : ISerializable<DynamicWorldContentJson>
         var objs = _gameObjects.AsEnumerable()
             .Select(obj => new GameObjectJson(obj.Type, obj.Serialize(options)))
             .ToList();
-        return new DynamicWorldContentJson(objs);
+        return objs;
     }
 }

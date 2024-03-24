@@ -6,14 +6,14 @@ namespace GearBox.Core.Model.Json;
 public readonly struct WorldUpdateJson : IJson
 {
     public WorldUpdateJson(
-        DynamicWorldContentJson dynamicWorldContent,
+        List<GameObjectJson> gameObjects,
         List<ChangeJson> changes
     )
     {
-        DynamicWorldContent = dynamicWorldContent;
+        GameObjects = gameObjects;
         Changes = changes;
     }
     
-    public DynamicWorldContentJson DynamicWorldContent { get; init; }
+    public List<GameObjectJson> GameObjects { get; init; }
     public List<ChangeJson> Changes { get; init; }
 }

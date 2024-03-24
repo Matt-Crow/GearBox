@@ -119,12 +119,10 @@ export class WorldUpdateHandler {
     }
 
     handleWorldUpdate(obj) {
-        const dynamicGameObjects = obj.dynamicWorldContent.gameObjects
-            .map(gameObjectJson => this.#deserialize(gameObjectJson));
+        const dynamicGameObjects = obj.gameObjects.map(gameObjectJson => this.#deserialize(gameObjectJson));
         this.#world.dynamicGameObjects = dynamicGameObjects;
         
-        const changes = obj.changes
-            .map(json => Change.fromJson(json));
+        const changes = obj.changes.map(json => Change.fromJson(json));
         changes.forEach(change => this.#changeHandlers.handle(change));
     }
 
