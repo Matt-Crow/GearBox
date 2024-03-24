@@ -15,12 +15,14 @@ public class StableWorldContent
     public void AddPlayer(PlayerCharacter player)
     {
         Add(player);
+        Add(player.Inventory);
         _players.Add(player);
     }
 
     public void RemovePlayer(PlayerCharacter player)
     {
         Remove(player);
+        Remove(player.Inventory);
         _players.Remove(player);
     }
 

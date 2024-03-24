@@ -3,7 +3,7 @@ import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
 import { ChangeHandlers } from "./infrastructure/change.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
-import { InventoryDeserializer, ItemDeserializer } from "./model/item.js";
+import { InventoryChangeHandler, InventoryDeserializer, ItemDeserializer } from "./model/item.js";
 import { LootChestChangeHandler } from "./model/lootChest.js";
 import { PlayerChangeHandler, PlayerDeserializer, PlayerRepository } from "./model/player.js";
 import { ProjectileJsonDeserializer } from "./model/projectile.js";
@@ -75,7 +75,12 @@ export class Game {
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
         const changeHandlers = new ChangeHandlers()
             .withChangeHandler(new LootChestChangeHandler(world))
-            .withChangeHandler(new PlayerChangeHandler(players, new PlayerDeserializer(new InventoryDeserializer(itemDeserializer), itemDeserializer)));
+            .withChangeHandler(new PlayerChangeHandler(players, new PlayerDeserializer(itemDeserializer)))
+            .withChangeHandler(new InventoryChangeHandler(
+                world.playerId, 
+                new InventoryDeserializer(itemDeserializer), 
+                this.#inventoryModal.inventoryChangeListener
+            ));
         const updateHandler = new WorldUpdateHandler(world, changeHandlers)
             .withDynamicObjectDeserializer(new CharacterJsonDeserializer())
             .withDynamicObjectDeserializer(new ProjectileJsonDeserializer());

@@ -35,6 +35,7 @@ public class PlayerCharacter : IStableGameObject
     public PlayerCharacter() 
     {
         Inner = new(Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
+        Inventory = new(Inner.Id);
         UpdateStats();
     }
 
@@ -47,16 +48,15 @@ public class PlayerCharacter : IStableGameObject
     }
 
     public string Type => "playerCharacter";
-    public IEnumerable<object?> DynamicValues => Inventory.DynamicValues
+    public IEnumerable<object?> DynamicValues => Stats.DynamicValues
         .Append(Inner.DamageTaken) // hacky: need this so playerHud refreshes when Inner heals
         .Append(_energyExpended)
-        .Concat(Stats.DynamicValues)
         .Concat(Weapon.DynamicValues);
     
     public Character Inner { get; init; } = new();
     public PlayerStats Stats { get; init; } = new();
     private int MaxEnergy => Stats.MaxEnergy.Value;
-    public Inventory Inventory { get; init; } = new();
+    public Inventory Inventory { get; init; }
     public EquipmentSlot Weapon { get; init; } = new();
 
     private void UpdateStats()
@@ -156,10 +156,10 @@ public class PlayerCharacter : IStableGameObject
 
     public string Serialize(JsonSerializerOptions options)
     {
+        // do not serialize and send inventory - that is handled elsewhere
         var asJson = new PlayerJson(
             Inner.Id, 
             new FractionJson(MaxEnergy - _energyExpended, MaxEnergy),
-            Inventory.ToJson(), 
             Weapon.ToJson()
         );
         return JsonSerializer.Serialize(asJson, options);

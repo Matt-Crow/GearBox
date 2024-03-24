@@ -1,25 +1,25 @@
+import { ChangeHandler, ChangeListener } from "../infrastructure/change.js";
 import { TestCase, TestSuite } from "../testing/tests.js";
 
 export class Inventory {
+    #ownerId;
     #equipment;
     #materials;
 
     /**
+     * @param {string} ownerId 
      * @param {Item[]} equipment 
      * @param {Item[]} materials 
      */
-    constructor(equipment=[], materials=[]) {
+    constructor(ownerId, equipment=[], materials=[]) {
+        this.#ownerId = ownerId;
         this.#equipment = equipment;
         this.#materials = materials;
     }
 
-    get equipment() {
-        return this.#equipment;
-    }
-
-    get materials() {
-        return this.#materials;
-    }
+    get ownerId() { return this.#ownerId; }
+    get equipment() { return this.#equipment; }
+    get materials() { return this.#materials; }
 }
 
 export class InventoryDeserializer {
@@ -35,7 +35,41 @@ export class InventoryDeserializer {
     deserialize(json) {
         const equipment = json.equipment.items.map(x => this.#itemDeserializer.deserialize(x));
         const materials = json.materials.items.map(x => this.#itemDeserializer.deserialize(x));
-        return new Inventory(equipment, materials);
+        return new Inventory(json.ownerId, equipment, materials);
+    }
+}
+
+export class InventoryChangeHandler extends ChangeHandler {
+    #playerId;
+    #changeListeners;
+    #deserializer;
+
+    /**
+     * @param {string} playerId 
+     * @param {InventoryDeserializer} deserializer 
+     * @param  {...ChangeListener} changeListeners 
+     */
+    constructor(playerId, deserializer, ...changeListeners) {
+        super("inventory");
+        this.#playerId = playerId;
+        this.#deserializer = deserializer;
+        this.#changeListeners = changeListeners;
+    }
+
+    handleContent(obj) {
+        if (obj.ownerId != this.#playerId) {
+            return; // don't bother handling changes to other players' inventories
+        }
+        const inventory = this.#deserializer.deserialize(obj);
+        this.#changeListeners.forEach(listener => listener.changed(inventory));
+    }
+
+    handleDelete(obj) {
+        if (obj.ownerId != this.#playerId) {
+            return; // don't bother handling changes to other players' inventories
+        }
+        const inventory = this.#deserializer.deserialize(obj);
+        this.#changeListeners.forEach(listener => listener.removed(inventory));
     }
 }
 

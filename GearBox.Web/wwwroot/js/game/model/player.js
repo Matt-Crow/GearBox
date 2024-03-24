@@ -8,12 +8,11 @@
 
 import { ChangeHandler } from "../infrastructure/change.js";
 import { TestCase, TestSuite } from "../testing/tests.js";
-import { Inventory, InventoryDeserializer } from "./item.js";
+import { Inventory, ItemDeserializer } from "./item.js";
 
 export class Player {
     #id;
     #energy;
-    #inventory;
     #weapon;
 
     /**
@@ -22,10 +21,9 @@ export class Player {
      * @param {Inventory} inventory 
      * @param {Item?} weapon 
      */
-    constructor(id, energy, inventory, weapon) {
+    constructor(id, energy, weapon) {
         this.#id = id;
         this.#energy = energy;
-        this.#inventory = inventory ?? new Inventory();
         this.#weapon = weapon;
     }
 
@@ -35,10 +33,6 @@ export class Player {
 
     get energy() {
         return this.#energy;
-    }
-
-    get inventory() {
-        return this.#inventory;
     }
 
     get weapon() {
@@ -65,25 +59,21 @@ export class Fraction {
 }
 
 export class PlayerDeserializer {
-    #inventoryDeserializer;
     #itemDeserializer;
 
     /**
-     * @param {InventoryDeserializer} inventoryDeserializer 
+     * @param {ItemDeserializer} itemDeserializer 
      */
-    constructor(inventoryDeserializer, itemDeserializer) {
-        this.#inventoryDeserializer = inventoryDeserializer;
+    constructor(itemDeserializer) {
         this.#itemDeserializer = itemDeserializer;
     }
 
     deserialize(json) {
         const id = json.id;
-        const inventory = this.#inventoryDeserializer.deserialize(json.inventory);
         const weapon = json.weapon ? this.#itemDeserializer.deserialize(json.weapon) : null;
         var result = new Player(
             id, 
             new Fraction(json.energy.current, json.energy.max),
-            inventory, 
             weapon
         );
         return result;
