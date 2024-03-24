@@ -1,6 +1,6 @@
 namespace GearBox.Core.Model.Json;
 
-public readonly struct CharacterJson : IDynamicGameObjectJson
+public readonly struct CharacterJson : IJson
 {
     public CharacterJson(Guid id, int xInPixels, int yInPixels, FractionJson hitPoints)
     {

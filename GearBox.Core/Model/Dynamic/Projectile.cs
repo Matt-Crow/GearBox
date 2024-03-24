@@ -1,3 +1,4 @@
+using System.Text.Json;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 
@@ -25,21 +26,22 @@ public class Projectile : IDynamicGameObject
         _range = range;
     }
 
+    public string Type => "projectile";
     public BodyBehavior Body { get; init; }
     public bool IsTerminated => _hasCollided || _range.InPixels <= _distanceTraveledInPixels;
-
-    public IDynamicGameObjectJson ToJson()
-    {
-        var result = new ProjectileJson(
-            Body.Location.XInPixels, 
-            Body.Location.YInPixels
-        );
-        return result;
-    }
 
     public void Update()
     {
         _mobility.UpdateMovement();
         _distanceTraveledInPixels += _mobility.Velocity.Magnitude.InPixelsPerFrame;
+    }
+
+    public string Serialize(JsonSerializerOptions options)
+    {
+        var json = new ProjectileJson(
+            Body.Location.XInPixels, 
+            Body.Location.YInPixels
+        );
+        return JsonSerializer.Serialize(json, options);
     }
 }

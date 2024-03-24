@@ -1,3 +1,4 @@
+using System.Text.Json;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 
@@ -21,7 +22,8 @@ public class Character : IDynamicGameObject
         _mobility = new MobileBehavior(Body, velocity);
     }
 
-
+    public string Type => "character";
+    
     /// <summary>
     /// Used by clients to uniquely identify a character across updates.
     /// </summary>
@@ -62,19 +64,20 @@ public class Character : IDynamicGameObject
         }
     }
 
-    public IDynamicGameObjectJson ToJson()
+    public void Update()
     {
-        return new CharacterJson(
+        _mobility.UpdateMovement();
+    }
+
+    public string Serialize(JsonSerializerOptions options)
+    {
+        var json = new CharacterJson(
             Id,
             _mobility.Coordinates.XInPixels, 
             _mobility.Coordinates.YInPixels,
             new FractionJson(MaxHitPoints - DamageTaken, MaxHitPoints)
         );
-    }
-
-    public void Update()
-    {
-        _mobility.UpdateMovement();
+        return JsonSerializer.Serialize(json, options);
     }
 
     public override bool Equals(object? obj)

@@ -1,6 +1,6 @@
 namespace GearBox.Core.Model.Json;
 
-public readonly struct ProjectileJson : IDynamicGameObjectJson
+public readonly struct ProjectileJson : IJson
 {
     public ProjectileJson(int x, int y)
     {
