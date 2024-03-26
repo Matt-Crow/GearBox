@@ -1,14 +1,13 @@
 import { ChangeListener } from "../infrastructure/change.js";
 import { Client } from "../infrastructure/client.js";
 import { Inventory, Item } from "../model/item.js";
-import { PlayerEventListener } from "../model/player.js";
 
 export class InventoryModal {
     #modal;
     #materialRows;
     #equipmentRows;
-    #playerEventListener;
     #inventoryChangeListener;
+    #weaponChangeListener;
     #client;
 
     /**
@@ -19,23 +18,20 @@ export class InventoryModal {
         this.#modal = modal;
         this.#materialRows = document.querySelector("#materialRows");
         this.#equipmentRows = document.querySelector("#equipmentRows");
-
-        // this will be refactored to use ChangeListener instead
-        this.#playerEventListener = new PlayerEventListener({
-            onPlayerChanged: (player) => this.#setWeapon(player.weapon),
-            onPlayerRemoved: () => this.#clear()
-        });
-        
         this.#inventoryChangeListener = new ChangeListener({
             onChanged: (inventory) => this.#setInventory(inventory),
             onRemoved: () => this.#clear() 
+        });
+        this.#weaponChangeListener = new ChangeListener({
+            onChanged: (weapon) => this.#setWeapon(weapon),
+            onRemoved: () => this.#setWeapon(null)
         });
         this.#client = client;
         this.#setWeapon(null);
     }
 
-    get playerEventListener() { return this.#playerEventListener; }
     get inventoryChangeListener() { return this.#inventoryChangeListener; }
+    get weaponChangeListener() { return this.#weaponChangeListener; }
 
     toggle() {
         if (this.#modal.open) {

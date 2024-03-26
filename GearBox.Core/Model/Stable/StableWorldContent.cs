@@ -16,6 +16,7 @@ public class StableWorldContent
     {
         Add(player);
         Add(player.Inventory);
+        Add(player.Weapon);
         _players.Add(player);
     }
 
@@ -23,6 +24,7 @@ public class StableWorldContent
     {
         Remove(player);
         Remove(player.Inventory);
+        Remove(player.Weapon);
         _players.Remove(player);
     }
 

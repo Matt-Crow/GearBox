@@ -36,6 +36,7 @@ public class PlayerCharacter : IStableGameObject
     {
         Inner = new(Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
         Inventory = new(Inner.Id);
+        Weapon = new(Inner.Id);
         UpdateStats();
     }
 
@@ -57,7 +58,7 @@ public class PlayerCharacter : IStableGameObject
     public PlayerStats Stats { get; init; } = new();
     private int MaxEnergy => Stats.MaxEnergy.Value;
     public Inventory Inventory { get; init; }
-    public EquipmentSlot Weapon { get; init; } = new();
+    public EquipmentSlot Weapon { get; init; }
 
     private void UpdateStats()
     {
@@ -156,11 +157,10 @@ public class PlayerCharacter : IStableGameObject
 
     public string Serialize(JsonSerializerOptions options)
     {
-        // do not serialize and send inventory - that is handled elsewhere
+        // serialize neither inventory nor weapon - those are handled elsewhere
         var asJson = new PlayerJson(
             Inner.Id, 
-            new FractionJson(MaxEnergy - _energyExpended, MaxEnergy),
-            Weapon.ToJson()
+            new FractionJson(MaxEnergy - _energyExpended, MaxEnergy)
         );
         return JsonSerializer.Serialize(asJson, options);
     }

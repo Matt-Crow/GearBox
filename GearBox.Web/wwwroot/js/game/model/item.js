@@ -41,8 +41,8 @@ export class InventoryDeserializer {
 
 export class InventoryChangeHandler extends ChangeHandler {
     #playerId;
-    #changeListeners;
     #deserializer;
+    #changeListeners;
 
     /**
      * @param {string} playerId 
@@ -70,6 +70,44 @@ export class InventoryChangeHandler extends ChangeHandler {
         }
         const inventory = this.#deserializer.deserialize(obj);
         this.#changeListeners.forEach(listener => listener.removed(inventory));
+    }
+}
+
+export class EquippedWeaponChangeHandler extends ChangeHandler {
+    #playerId;
+    #deserializer;
+    #changeListeners;
+
+    /**
+     * @param {string} playerId 
+     * @param {ItemDeserializer} deserializer 
+     * @param  {...ChangeListener} changeListeners 
+     */
+    constructor(playerId, deserializer, ...changeListeners) {
+        super("equippedWeapon");
+        this.#playerId = playerId;
+        this.#deserializer = deserializer;
+        this.#changeListeners = changeListeners;
+    }
+
+    handleContent(obj) {
+        if (obj.ownerId != this.#playerId) {
+            return;
+        }
+        const weapon = obj.value
+            ? this.#deserializer.deserialize(obj.value) // obj.value - see EquipmentSlotJson
+            : null;
+        this.#changeListeners.forEach(listener => listener.changed(weapon));
+    }
+
+    handleDelete(obj) {
+        if (obj.ownerId != this.#playerId) {
+            return;
+        }
+        const weapon = obj.value
+            ? this.#deserializer.deserialize(obj.value)
+            : null;
+        this.#changeListeners.forEach(listener => listener.removed(weapon));
     }
 }
 

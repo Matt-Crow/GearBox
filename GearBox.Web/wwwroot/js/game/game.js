@@ -3,7 +3,7 @@ import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
 import { ChangeHandlers } from "./infrastructure/change.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
-import { InventoryChangeHandler, InventoryDeserializer, ItemDeserializer } from "./model/item.js";
+import { EquippedWeaponChangeHandler, InventoryChangeHandler, InventoryDeserializer, ItemDeserializer } from "./model/item.js";
 import { LootChestChangeHandler } from "./model/lootChest.js";
 import { PlayerChangeHandler, PlayerDeserializer, PlayerRepository } from "./model/player.js";
 import { ProjectileJsonDeserializer } from "./model/projectile.js";
@@ -68,18 +68,22 @@ export class Game {
 
         // set up event listeners to update UI when player changes
         const players = new PlayerRepository();
-        players.addPlayerListener(world.playerId, this.#inventoryModal.playerEventListener);
         players.addPlayerListener(world.playerId, this.#playerHud.playerEventListener);
         this.#playerHud.characterSupplier = () => world.player;
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
         const changeHandlers = new ChangeHandlers()
             .withChangeHandler(new LootChestChangeHandler(world))
-            .withChangeHandler(new PlayerChangeHandler(players, new PlayerDeserializer(itemDeserializer)))
+            .withChangeHandler(new PlayerChangeHandler(players, new PlayerDeserializer()))
             .withChangeHandler(new InventoryChangeHandler(
                 world.playerId, 
                 new InventoryDeserializer(itemDeserializer), 
                 this.#inventoryModal.inventoryChangeListener
+            ))
+            .withChangeHandler(new EquippedWeaponChangeHandler(
+                world.playerId,
+                itemDeserializer,
+                this.#inventoryModal.weaponChangeListener
             ));
         const updateHandler = new WorldUpdateHandler(world, changeHandlers)
             .withDynamicObjectDeserializer(new CharacterJsonDeserializer())
