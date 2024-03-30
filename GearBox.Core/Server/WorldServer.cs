@@ -2,6 +2,7 @@ using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Stable;
+using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Server;
 
@@ -29,12 +30,8 @@ public class WorldServer
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
         
-        /*
-        1000 ms   second
-        ------- * -------
-        second    frame
-        */
-        _timer = new System.Timers.Timer(1000.0 / Time.FRAMES_PER_SECOND)
+        // get the seconds in 1 frame, x1000 to get ms
+        _timer = new System.Timers.Timer(Duration.FromFrames(1).InSeconds * 1000)
         {
             AutoReset = true,
             Enabled = false

@@ -18,6 +18,7 @@ public class PlayerCharacter : Character
     /// The maximum level a player can attain
     /// </summary>
     public static readonly int MAX_LEVEL = 20;
+    private static readonly Duration REGEN_COOLDOWN = Duration.FromSeconds(5);
     private static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);
     private readonly int _level = MAX_LEVEL; // in the future, this will read from a repository
     
@@ -130,7 +131,7 @@ public class PlayerCharacter : Character
         );
         inWorld.DynamicContent.AddDynamicObject(projectile);
 
-        _basicAttackCooldownInFrames = Time.FRAMES_PER_SECOND / 2; // .5 second cooldown
+        _basicAttackCooldownInFrames = Duration.FromSeconds(0.5).InFrames;
     }
 
     public override void TakeDamage(int damage)
@@ -145,7 +146,7 @@ public class PlayerCharacter : Character
 
         // restore 5% HP & energy per second
         _frameCount++;
-        if (_frameCount >= Time.FRAMES_PER_SECOND)
+        if (_frameCount >= REGEN_COOLDOWN.InFrames)
         {
             HealPercent(0.05);
             RechargePercent(0.05);
