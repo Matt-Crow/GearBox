@@ -49,7 +49,12 @@ public class PlayerCharacter : Character
         // move to leveling method later
         _damagePerHit = GetDamagePerHitByLevel(_level);
 
-        var boosts = new PlayerStatBoosts();
+        // scale HP & energy with level
+        var boosts = new PlayerStatBoosts(new()
+        {
+            {PlayerStatType.MAX_HIT_POINTS, _level * 20},
+            {PlayerStatType.MAX_ENERGY, _level * 20}
+        });
         boosts = boosts.Combine(Weapon.Value?.StatBoosts);
         Stats.SetStatBoosts(boosts);
         MaxHitPoints = Stats.MaxHitPoints.Value;
@@ -61,7 +66,7 @@ public class PlayerCharacter : Character
 
     private static int GetDamagePerHitByLevel(int level)
     {
-        var maxDamage = 1000;
+        var maxDamage = 500;
         var percentToMaxLevel = ((double)level) / MAX_LEVEL;
         var result = (int)(maxDamage * percentToMaxLevel);
         return result;
@@ -115,7 +120,8 @@ public class PlayerCharacter : Character
         
         var weapon = Weapon.Value as Weapon;
         var range = weapon?.AttackRange.Range ?? AttackRange.MELEE.Range;
-        var attack = new Attack(this);
+        var damage = _damagePerHit * (1.0 + Stats.Offense.Value);
+        var attack = new Attack(this, (int)damage);
         var projectile = new Projectile(
             Coordinates, 
             Velocity.FromPolar(Speed.FromTilesPerSecond(range.InTiles), inDirection),
@@ -125,6 +131,12 @@ public class PlayerCharacter : Character
         inWorld.DynamicContent.AddDynamicObject(projectile);
 
         _basicAttackCooldownInFrames = Time.FRAMES_PER_SECOND / 2; // .5 second cooldown
+    }
+
+    public override void TakeDamage(int damage)
+    {
+        var reducedDamage = damage * (1.0 - Stats.Defense.Value);
+        base.TakeDamage((int)reducedDamage);
     }
 
     public override void Update()

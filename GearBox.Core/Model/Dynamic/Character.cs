@@ -37,7 +37,7 @@ public class Character : IDynamicGameObject
     
     public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
     
-    public int MaxHitPoints { get; set; }
+    public int MaxHitPoints { get; set; } = 100; // arbitrary default value
 
 
     public void StartMovingIn(Direction direction)
@@ -53,6 +53,15 @@ public class Character : IDynamicGameObject
     public void SetSpeed(Speed speed)
     {
         _mobility.Velocity = _mobility.Velocity.WithSpeed(speed);
+    }
+
+    public virtual void TakeDamage(int damage)
+    {
+        DamageTaken += damage;
+        if (DamageTaken > MaxHitPoints)
+        {
+            DamageTaken = MaxHitPoints;
+        }
     }
 
     public void HealPercent(double percent)

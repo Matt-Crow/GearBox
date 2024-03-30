@@ -11,8 +11,9 @@ public class Projectile : IDynamicGameObject
 {
     private readonly MobileBehavior _mobility;
     private readonly Distance _range;
+    private readonly Attack _attack;
     private double _distanceTraveledInPixels = 0;
-    private bool _hasCollided; // this will have to wait until after Teams
+    private bool _hasCollided; 
 
     public Projectile(Coordinates coordinates, Velocity velocity, Distance range, Attack attack)
     {
@@ -20,10 +21,20 @@ public class Projectile : IDynamicGameObject
         {
             Location = coordinates
         };
-        Body.Collided += attack.HandleCollision;
+        _attack = attack;
+        Body.Collided += HandleCollision;
         _mobility = new(Body, velocity);
         _mobility.StartMovingIn(velocity.Angle); // MobileBehavior defaults to not moving
         _range = range;
+    }
+
+    private void HandleCollision(object? sender, CollideEventArgs e)
+    {
+        if (!_hasCollided && _attack.CanResolveAgainst(e.CollidedWith))
+        {
+            _attack.HandleCollision(sender, e);
+            _hasCollided = true;
+        }
     }
 
     public string Type => "projectile";
