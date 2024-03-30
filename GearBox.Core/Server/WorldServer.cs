@@ -1,5 +1,6 @@
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
+using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Units;
@@ -26,6 +27,8 @@ public class WorldServer
         // testing LootChests
         _world.AddTimer(new WorldTimer(() => _world.SpawnLootChest(), 50));
 
+        // testing EnemySpawner
+        _world.DynamicContent.AddDynamicObject(new EnemySpawner(_world, 3, 10));
         
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages

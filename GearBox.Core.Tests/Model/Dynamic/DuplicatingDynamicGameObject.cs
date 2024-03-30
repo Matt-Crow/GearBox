@@ -11,7 +11,7 @@ public class DuplicatingDynamicGameObject : IDynamicGameObject
 
     public Serializer? Serializer => null;
     public BodyBehavior? Body => null;
-    public bool IsTerminated => false;
+    public TerminateBehavior? Termination => null;
 
     public void Update() => _content.AddDynamicObject(new DuplicatingDynamicGameObject(_content));
 }

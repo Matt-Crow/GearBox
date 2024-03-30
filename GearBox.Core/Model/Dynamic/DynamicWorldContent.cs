@@ -50,11 +50,17 @@ public class DynamicWorldContent
         {
             item.Update();
         }
-        foreach (var item in _gameObjects.AsEnumerable().Where(obj => obj.IsTerminated))
+        foreach (var item in _gameObjects.AsEnumerable().Where(IsTerminated))
         {
+            item.Termination?.OnTerminated();
             _gameObjects.Remove(item);
         }
         _gameObjects.ApplyChanges();
+    }
+
+    private static bool IsTerminated(IDynamicGameObject obj)
+    {
+        return obj.Termination != null && obj.Termination.IsTerminated;
     }
 
     public List<GameObjectJson> ToJson()

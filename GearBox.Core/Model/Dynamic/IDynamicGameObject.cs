@@ -11,10 +11,9 @@ public interface IDynamicGameObject : IGameObject
     /// </summary>
     BodyBehavior? Body { get; }
 
-
     /// <summary>
-    /// Whether this object has terminated,
+    /// If set, this determines when the object is terminated,
     /// and thus should no longer be used.
     /// </summary>
-    bool IsTerminated { get; }
+    TerminateBehavior? Termination { get; }
 }

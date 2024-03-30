@@ -21,26 +21,22 @@ public class Character : IDynamicGameObject
     {
         _mobility = new MobileBehavior(Body, velocity);
         Serializer = new(Type, Serialize);
+        Termination = new(this, () => DamageTaken >= MaxHitPoints);
     }
 
-    protected virtual string Type => "character";
 
-    public Serializer Serializer { get; init; }
-    
     /// <summary>
     /// Used by clients to uniquely identify a character across updates.
     /// </summary>
     public Guid Id { get; init; } = Guid.NewGuid();
 
+    public Serializer Serializer { get; init; }
     public BodyBehavior Body { get; init; } = new();
-
-    public bool IsTerminated => DamageTaken >= MaxHitPoints;
-
+    public TerminateBehavior Termination { get; init; }
     public Coordinates Coordinates { get => Body.Location; set => Body.Location = value; }
-    
     public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
-    
     public int MaxHitPoints { get; set; } = 100; // arbitrary default value
+    protected virtual string Type => "character";
 
 
     public void StartMovingIn(Direction direction)

@@ -7,12 +7,11 @@ namespace GearBox.Core.Tests.Model.Dynamic;
 public class DynamicGameObjectSpy : IDynamicGameObject
 {
     private int _timesUpdated = 0;
-    public Serializer? Serializer => null;
     public int TimesUpdated => _timesUpdated;
     public bool HasBeenUpdated => _timesUpdated > 0;
-
+    public Serializer? Serializer => null;
     public BodyBehavior? Body { get; init; } = null;
-    public bool IsTerminated => false;
+    public TerminateBehavior? Termination => null;
 
     public void Update()
     {
