@@ -1,5 +1,6 @@
 using System.Text.Json;
 using GearBox.Core.Model.Json;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Stable.Items;
 
@@ -10,27 +11,20 @@ public class EquipmentSlot : IStableGameObject
     public EquipmentSlot(Guid ownerId)
     {
         _ownerId = ownerId;
+        Serializer = new Serializer(
+            "equippedWeapon", // todo change when generics are used
+            options => JsonSerializer.Serialize(new EquipmentSlotJson(_ownerId, ValueJson()), options)
+        );
     }
 
     public Equipment? Value { get; set; }
 
-    public string Type => "equippedWeapon"; // todo change when generics are used
+    public Serializer Serializer { get; init; }
 
     // start by outputting a boolean to distinguish between no Value and Value with no dynamic values
     public IEnumerable<object?> DynamicValues => Value == null
-        ? SequenceOf(false)
-        : SequenceOf(true).Append(Value.Id).Concat(Value.DynamicValues);
-
-    public void Update()
-    {
-        // do nothing
-    }
-
-    public string Serialize(JsonSerializerOptions options)
-    {
-        var asJson = new EquipmentSlotJson(_ownerId, ValueJson());
-        return JsonSerializer.Serialize(asJson, options);
-    }
+        ? ListExtensions.Of<object?>(false)
+        : ListExtensions.Of<object?>(true).Append(Value.Id).Concat(Value.DynamicValues);
 
     private ItemJson? ValueJson()
     {
@@ -50,5 +44,8 @@ public class EquipmentSlot : IStableGameObject
         return result;
     }
 
-    private static IEnumerable<object?> SequenceOf(object? value) => [value];
+    public void Update()
+    {
+        // do nothing
+    }
 }

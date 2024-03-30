@@ -21,9 +21,10 @@ public class LootChest : IStableGameObject
             Location = location
         };
         _contents = new List<IItem>(contents);
+        Serializer = new("lootChest", Serialize);
     }
 
-    public string Type => "lootChest";
+    public Serializer Serializer { get; init; }
     public IEnumerable<object?> DynamicValues => _collectedBy
         .Select(x => (object?)x) // not sure why it requires this explicit cast
         .AsEnumerable();
@@ -52,7 +53,7 @@ public class LootChest : IStableGameObject
         // do nothing
     }
 
-    public string Serialize(JsonSerializerOptions options)
+    private string Serialize(JsonSerializerOptions options)
     {
         var asJson = new LootChestJson(
             _id, 

@@ -1,11 +1,11 @@
-using System.Text.Json;
+using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
 
 namespace GearBox.Core.Tests.Model.Dynamic;
 
 public class TerminatingDynamicGameObject : IDynamicGameObject
 {
-    public string Type => "";
+    public Serializer? Serializer => null;
     public BodyBehavior? Body => null;
 
     public bool IsTerminated { get; set; }
@@ -13,10 +13,5 @@ public class TerminatingDynamicGameObject : IDynamicGameObject
     public void Update()
     {
         
-    }
-
-    public string Serialize(JsonSerializerOptions options)
-    {
-        throw new NotImplementedException();
     }
 }

@@ -11,17 +11,17 @@ public class Inventory : IStableGameObject
     public Inventory(Guid ownerId)
     {
         OwnerId = ownerId;
+        Serializer = new("inventory", Serialize);
     }
 
     public Guid OwnerId { get; init; }
+    public Serializer Serializer { get; init; }
     public InventoryTab Equipment { get; init; } = new();
     public InventoryTab Materials { get; init; } = new();
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
         .Concat(Equipment.DynamicValues)
         .Concat(Materials.DynamicValues);
 
-
-    public string Type => "inventory";
 
     public void Add(IItem item)
     {
@@ -41,16 +41,6 @@ public class Inventory : IStableGameObject
         return tabToCheck.Contains(item);
     }
 
-    public InventoryJson ToJson()
-    {
-        var result = new InventoryJson(
-            OwnerId,
-            Equipment.ToJson(),
-            Materials.ToJson()
-        );
-        return result;
-    }
-
     public void Update()
     {
         // do nothing
@@ -58,7 +48,11 @@ public class Inventory : IStableGameObject
 
     public string Serialize(JsonSerializerOptions options)
     {
-        var json = ToJson();
+        var json = new InventoryJson(
+            OwnerId,
+            Equipment.ToJson(),
+            Materials.ToJson()
+        );
         return JsonSerializer.Serialize(json, options);
     }
 }

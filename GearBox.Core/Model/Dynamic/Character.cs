@@ -20,9 +20,12 @@ public class Character : IDynamicGameObject
     public Character(Velocity velocity)
     {
         _mobility = new MobileBehavior(Body, velocity);
+        Serializer = new(Type, Serialize);
     }
 
-    public virtual string Type => "character";
+    protected virtual string Type => "character";
+
+    public Serializer Serializer { get; init; }
     
     /// <summary>
     /// Used by clients to uniquely identify a character across updates.
@@ -78,7 +81,7 @@ public class Character : IDynamicGameObject
         _mobility.UpdateMovement();
     }
 
-    public virtual string Serialize(JsonSerializerOptions options)
+    protected virtual string Serialize(JsonSerializerOptions options)
     {
         var json = new CharacterJson(
             Id,

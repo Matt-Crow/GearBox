@@ -1,4 +1,3 @@
-using System.Text.Json;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Utils;
 
@@ -60,12 +59,9 @@ public class DynamicWorldContent
 
     public List<GameObjectJson> ToJson()
     {
-        var options = new JsonSerializerOptions()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        };
         var objs = _gameObjects.AsEnumerable()
-            .Select(obj => new GameObjectJson(obj.Type, obj.Serialize(options)))
+            .Where(obj => obj.Serializer is not null)
+            .Select(obj => obj.Serializer!.Serialize())
             .ToList();
         return objs;
     }

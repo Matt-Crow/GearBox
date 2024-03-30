@@ -26,6 +26,7 @@ public class Projectile : IDynamicGameObject
         _mobility = new(Body, velocity);
         _mobility.StartMovingIn(velocity.Angle); // MobileBehavior defaults to not moving
         _range = range;
+        Serializer = new("projectile", Serialize);
     }
 
     private void HandleCollision(object? sender, CollideEventArgs e)
@@ -37,7 +38,7 @@ public class Projectile : IDynamicGameObject
         }
     }
 
-    public string Type => "projectile";
+    public Serializer Serializer { get; init; }
     public BodyBehavior Body { get; init; }
     public bool IsTerminated => _hasCollided || _range.InPixels <= _distanceTraveledInPixels;
 
@@ -47,7 +48,7 @@ public class Projectile : IDynamicGameObject
         _distanceTraveledInPixels += _mobility.Velocity.Magnitude.InPixelsPerFrame;
     }
 
-    public string Serialize(JsonSerializerOptions options)
+    private string Serialize(JsonSerializerOptions options)
     {
         var json = new ProjectileJson(
             Body.Location.XInPixels, 

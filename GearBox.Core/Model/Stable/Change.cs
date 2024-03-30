@@ -1,6 +1,4 @@
 using GearBox.Core.Model.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace GearBox.Core.Model.Stable;
 
@@ -33,10 +31,8 @@ public readonly struct Change : ISerializable<ChangeJson>
 
     public ChangeJson ToJson()
     {
-        var options = new JsonSerializerOptions()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        };
-        return new ChangeJson(Changed.Type, Changed.Serialize(options), IsDelete);
+        var asJson = Changed.Serializer?.Serialize() 
+            ?? throw new NotSupportedException("support for non-serializable stable game objects is not yet supported");
+        return new ChangeJson(asJson.Type, asJson.Content, IsDelete);
     }
 }

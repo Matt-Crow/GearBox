@@ -38,7 +38,7 @@ public class PlayerCharacter : Character
         UpdateStats();
     }
 
-    public override string Type => "playerCharacter";
+    protected override string Type => "playerCharacter";
     public PlayerStats Stats { get; init; } = new();
     private int MaxEnergy => Stats.MaxEnergy.Value;
     public Inventory Inventory { get; init; }
@@ -159,7 +159,7 @@ public class PlayerCharacter : Character
         }
     }
 
-    public override string Serialize(JsonSerializerOptions options)
+    protected override string Serialize(JsonSerializerOptions options)
     {
         // serialize neither inventory nor weapon - those are handled elsewhere
         var asJson = new PlayerJson(

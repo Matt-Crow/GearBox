@@ -1,23 +1,16 @@
-using System.Text.Json;
-
 namespace GearBox.Core.Model;
 
 public interface IGameObject
 {
     /// <summary>
-    /// What type this will be listed as when serialized
+    /// If specified, this serializer will be used to serialize this object and send it to the front end.
+    /// If not specified, this object will never be sent to the front end.
     /// </summary>
-    string Type { get; }
+    Serializer? Serializer { get; }
 
     /// <summary>
     /// Called each game tick.
     /// Subclasses should not call this method.
     /// </summary>
     void Update();
-
-    /// <summary>
-    /// Serializes this object so it can be sent to the front-end.
-    /// Note that Type is automatically provided to the front-end.
-    /// </summary>
-    string Serialize(JsonSerializerOptions options);
 }

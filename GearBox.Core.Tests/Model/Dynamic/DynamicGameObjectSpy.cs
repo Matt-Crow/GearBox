@@ -1,4 +1,5 @@
 using System.Text.Json;
+using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
 
 namespace GearBox.Core.Tests.Model.Dynamic;
@@ -6,8 +7,7 @@ namespace GearBox.Core.Tests.Model.Dynamic;
 public class DynamicGameObjectSpy : IDynamicGameObject
 {
     private int _timesUpdated = 0;
-
-    public string Type => "";
+    public Serializer? Serializer => null;
     public int TimesUpdated => _timesUpdated;
     public bool HasBeenUpdated => _timesUpdated > 0;
 
@@ -17,10 +17,5 @@ public class DynamicGameObjectSpy : IDynamicGameObject
     public void Update()
     {
         _timesUpdated++;
-    }
-
-    public string Serialize(JsonSerializerOptions options)
-    {
-        throw new NotImplementedException();
     }
 }
