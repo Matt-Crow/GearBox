@@ -1,17 +1,16 @@
-namespace GearBox.Core.Server;
-
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Stable;
-using System.Timers;
+
+namespace GearBox.Core.Server;
 
 public class WorldServer
 {
     private readonly World _world;
-    private readonly Dictionary<string, IConnection> _connections = new();
-    private readonly Dictionary<string, PlayerCharacter> _players = new();
-    private readonly Timer _timer;
+    private readonly Dictionary<string, IConnection> _connections = [];
+    private readonly Dictionary<string, PlayerCharacter> _players = [];
+    private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
 
     public WorldServer() : this(new World())
@@ -35,7 +34,7 @@ public class WorldServer
         ------- * -------
         second    frame
         */
-        _timer = new Timer(1000.0 / Time.FRAMES_PER_SECOND)
+        _timer = new System.Timers.Timer(1000.0 / Time.FRAMES_PER_SECOND)
         {
             AutoReset = true,
             Enabled = false
@@ -74,6 +73,7 @@ public class WorldServer
 
         _world.StableContent.AddPlayer(player);
         _world.DynamicContent.AddDynamicObject(player.Inner);
+        _world.DynamicContent.AddDynamicObject(player); // player must come after inner, lest it mess with front end... for now!
         _connections.Add(id, connection);
         _players.Add(id, player);
         var worldInit = new WorldInitJson(
@@ -118,6 +118,7 @@ public class WorldServer
         var player = _players[id];
         if (player is not null)
         {
+            _world.DynamicContent.RemoveDynamicObject(player);
             _world.DynamicContent.RemoveDynamicObject(player.Inner);
             _world.StableContent.RemovePlayer(player);
         }

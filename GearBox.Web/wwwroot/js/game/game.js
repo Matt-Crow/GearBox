@@ -5,7 +5,7 @@ import { ChangeHandlers } from "./infrastructure/change.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
 import { EquippedWeaponChangeHandler, InventoryChangeHandler, InventoryDeserializer, ItemDeserializer } from "./model/item.js";
 import { LootChestChangeHandler } from "./model/lootChest.js";
-import { PlayerChangeHandler, PlayerDeserializer, PlayerRepository } from "./model/player.js";
+import { PlayerChangeHandler } from "./model/player.js";
 import { ProjectileJsonDeserializer } from "./model/projectile.js";
 import { WorldInitHandler, WorldUpdateHandler } from "./model/world.js";
 
@@ -66,15 +66,11 @@ export class Game {
         const world = new WorldInitHandler()
             .handleWorldInit(initMessage);
 
-        // set up event listeners to update UI when player changes
-        const players = new PlayerRepository();
-        players.addPlayerListener(world.playerId, this.#playerHud.playerEventListener);
         this.#playerHud.characterSupplier = () => world.player;
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
         const changeHandlers = new ChangeHandlers()
             .withChangeHandler(new LootChestChangeHandler(world))
-            .withChangeHandler(new PlayerChangeHandler(players, new PlayerDeserializer()))
             .withChangeHandler(new InventoryChangeHandler(
                 world.playerId, 
                 new InventoryDeserializer(itemDeserializer), 
@@ -87,6 +83,7 @@ export class Game {
             ));
         const updateHandler = new WorldUpdateHandler(world, changeHandlers)
             .withDynamicObjectDeserializer(new CharacterJsonDeserializer())
+            .withDynamicObjectDeserializer(new PlayerChangeHandler(world.playerId, this.#playerHud.playerUpdateListener))
             .withDynamicObjectDeserializer(new ProjectileJsonDeserializer());
 
         // unregisters handleInit, switches to handling updates instead

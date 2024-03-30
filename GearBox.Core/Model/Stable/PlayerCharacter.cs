@@ -12,13 +12,12 @@ namespace GearBox.Core.Model.Stable;
 /// have different update types (characters are dynamic, players are stable),
 /// I'll keep it in this format for now.
 /// </summary>
-public class PlayerCharacter : IStableGameObject
+public class PlayerCharacter : IDynamicGameObject
 {
     /// <summary>
     /// The maximum level a player can attain
     /// </summary>
     public static readonly int MAX_LEVEL = 20;
-
     private static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);
     private readonly int _level = MAX_LEVEL; // in the future, this will read from a repository
     
@@ -40,21 +39,10 @@ public class PlayerCharacter : IStableGameObject
         UpdateStats();
     }
 
-    private static int GetDamagePerHitByLevel(int level)
-    {
-        var maxDamage = 1000;
-        var percentToMaxLevel = ((double)level) / MAX_LEVEL;
-        var result = (int)(maxDamage * percentToMaxLevel);
-        return result;
-    }
-
     public string Type => "playerCharacter";
-    public IEnumerable<object?> DynamicValues => Stats.DynamicValues
-        .Append(Inner.DamageTaken) // hacky: need this so playerHud refreshes when Inner heals
-        .Append(_energyExpended)
-        .Concat(Weapon.DynamicValues);
-    
     public Character Inner { get; init; } = new();
+    public BodyBehavior Body => Inner.Body;
+    public bool IsTerminated => Inner.IsTerminated;
     public PlayerStats Stats { get; init; } = new();
     private int MaxEnergy => Stats.MaxEnergy.Value;
     public Inventory Inventory { get; init; }
@@ -74,7 +62,15 @@ public class PlayerCharacter : IStableGameObject
         var multiplier = 1.0+Stats.Speed.Value;
         Inner.SetSpeed(Speed.FromPixelsPerFrame(BASE_SPEED.InPixelsPerFrame * multiplier));
     }
-    
+
+    private static int GetDamagePerHitByLevel(int level)
+    {
+        var maxDamage = 1000;
+        var percentToMaxLevel = ((double)level) / MAX_LEVEL;
+        var result = (int)(maxDamage * percentToMaxLevel);
+        return result;
+    }
+
     public void Equip(Equipment equipment)
     {
         if (!Inventory.Equipment.Contains(equipment))

@@ -1,9 +1,9 @@
 import { Character } from "../model/character.js";
-import { Player, PlayerEventListener } from "../model/player.js";
+import { Player } from "../model/player.js";
 
 export class PlayerHud {
     #element;
-    #playerEventListener;
+    #playerUpdateListener;
     #characterSupplier;
 
     /**
@@ -11,25 +11,19 @@ export class PlayerHud {
      */
     constructor(element) {
         this.#element = element;
-        this.#playerEventListener = new PlayerEventListener({
-            onPlayerChanged: p => this.#bind(p)
-        });
+        this.#playerUpdateListener = p => this.#bind(p);
         this.#characterSupplier = () => null;
     }
 
     /**
-     * @returns {PlayerEventListener}
+     * @returns {(p: Player) => any}
      */
-    get playerEventListener() {
-        return this.#playerEventListener;
-    }
+    get playerUpdateListener() { return this.#playerUpdateListener; }
 
     /**
      * @param {() => Character} value 
      */
-    set characterSupplier(value) {
-        this.#characterSupplier = value;
-    }
+    set characterSupplier(value) { this.#characterSupplier = value; }
 
     /**
      * @param {Player} player 

@@ -14,7 +14,6 @@ public class StableWorldContent
     // need this method, as there are special behaviors associated with players
     public void AddPlayer(PlayerCharacter player)
     {
-        Add(player);
         Add(player.Inventory);
         Add(player.Weapon);
         _players.Add(player);
@@ -22,7 +21,6 @@ public class StableWorldContent
 
     public void RemovePlayer(PlayerCharacter player)
     {
-        Remove(player);
         Remove(player.Inventory);
         Remove(player.Weapon);
         _players.Remove(player);

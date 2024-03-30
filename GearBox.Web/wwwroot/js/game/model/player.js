@@ -1,14 +1,11 @@
 /*
     Exports:
     - Player: model class
-    - PlayerChangeHandler: responds to player updates
-    - PlayerRepository: stores players
-    - PlayerEventListener: listens for events emitted by PlayerRepository
+    - Fraction: used by Player
+    - PlayerChangeHandler: deserializes and responds to player updates
  */
 
-import { ChangeHandler } from "../infrastructure/change.js";
-import { TestCase, TestSuite } from "../testing/tests.js";
-import { Inventory, ItemDeserializer } from "./item.js";
+import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 
 export class Player {
     #id;
@@ -23,13 +20,9 @@ export class Player {
         this.#energy = energy;
     }
 
-    get id() {
-        return this.#id;
-    }
-
-    get energy() {
-        return this.#energy;
-    }
+    get id() { return this.#id; }
+    get energy() { return this.#energy; }
+    get dynamicValues() { return this.#energy.dynamicValues }
 }
 
 export class Fraction {
@@ -41,196 +34,64 @@ export class Fraction {
         this.#max = max;
     }
 
-    get current() {
-        return this.#current;
-    }
-
-    get max() {
-        return this.#max;
-    }
+    get current() { return this.#current; }
+    get max() { return this.#max; }
+    get dynamicValues() { return [this.#current, this.#max]; }
 }
 
-export class PlayerDeserializer {
-    deserialize(json) {
+export class PlayerChangeHandler extends JsonDeserializer {
+    #playerId;
+    #previous = null;
+    #changeListener;
+
+    constructor(playerId, changeListener) {
+        super("playerCharacter", obj => this.#handle(obj));
+        this.#playerId = playerId;
+        this.#changeListener = changeListener;
+    }
+
+    #handle(obj) {
+        const player = this.#deserialize(obj);
+        if (player.id === this.#playerId && this.#hasPlayerChanged(player)) {
+            // stops flickering in the UI
+            this.#previous = player;
+            this.#changeListener(player);
+        }
+        return {draw: () => null}; // hacky for now: don't want player to be returned by World::player
+        // uncomment this next line once Player extends Character
+        // return player;
+    }
+
+    #deserialize(json) {
         var result = new Player(
             json.id, 
             new Fraction(json.energy.current, json.energy.max)
         );
         return result;
     }
-}
-
-export class PlayerChangeHandler extends ChangeHandler {
-    #players;
-    #deserializer;
-
-    /** 
-     * @param {PlayerRepository} players 
-     * @param {PlayerDeserializer} deserializer 
-     */    
-    constructor(players, deserializer) {
-        super("playerCharacter");
-        this.#players = players;
-        this.#deserializer = deserializer;
-    }
-
-    handleContent(obj) {
-        const player = this.#deserializer.deserialize(obj);
-        this.#players.savePlayer(player);
-    }
-
-    handleDelete(obj) {
-        this.#players.removePlayerById(obj.id);
-    }
-}
-
-export class PlayerRepository {
-    #players = new Map();
-    #playerListeners = new Map();
 
     /**
      * @param {Player} player 
      */
-    savePlayer(player) {
-        this.#players.set(player.id, player);
-        this.#notifyListeners(player.id, (listener) => listener.playerChanged(player));
-    }
-
-    /**
-     * @param {number} playerId
-     * @param {PlayerEventListener} listener
-     */
-    addPlayerListener(playerId, listener) {
-        if (!this.#playerListeners.has(playerId)) {
-            this.#playerListeners.set(playerId, []);
-        }
-        this.#playerListeners.get(playerId).push(listener);
-    }
-
-    /**
-     * @param {number} id
-     * @returns {Player?}
-     */
-    getPlayerById(id) {
-        const result = this.#players.has(id)
-            ? this.#players.get(id)
-            : null;
+    #hasPlayerChanged(player) {
+        const result = this.#previous === null || this.#arraysDiffer(player.dynamicValues, this.#previous.dynamicValues);
         return result;
     }
 
     /**
-     * @param {number} id 
+     * @param {any[]} array1 
+     * @param {any[]} array2 
+     * @returns 
      */
-    removePlayerById(id) {
-        const player = this.getPlayerById(id);
-        if (player === null) {
-            throw new Error(`Player not found: ${id}`);
+    #arraysDiffer(array1, array2) {
+        if (array1.length !== array2.length) {
+            return true;
         }
-        this.#players.delete(id);
-        this.#notifyListeners(id, (listener) => listener.playerRemoved(player));
-    }
-
-    /**
-     * @param {number} playerId
-     * @param {(listener: PlayerEventListener) => any} doThis
-     */
-    #notifyListeners(playerId, doThis) {
-        const listeners = this.#playerListeners.get(playerId);
-        if (listeners) {
-            listeners.forEach((listener) => doThis(listener));
+        for (let i = 0; i < array1.length; i++) {
+            if (array1[i] !== array2[i]) {
+                return true;
+            }
         }
+        return false;
     }
 }
-
-export class PlayerEventListener {
-    #onPlayerChanged;
-    #onPlayerRemoved;
-
-    constructor({onPlayerChanged, onPlayerRemoved}) {
-        const doNothing = () => {};
-        this.#onPlayerChanged = onPlayerChanged ?? doNothing;
-        this.#onPlayerRemoved = onPlayerRemoved ?? doNothing;
-    }
-
-    playerChanged(player) {
-        this.#onPlayerChanged(player);
-    }
-
-    playerRemoved(player) {
-        this.#onPlayerRemoved(player);
-    }
-}
-
-export const playerTests = new TestSuite("PlayerRepository", [
-    new TestCase("savePlayer_givenDuplicate_isOk", (assert) => {
-        const sut = new PlayerRepository();
-        const player = new Player(42);
-
-        sut.savePlayer(player);
-        sut.savePlayer(player);
-    }),
-    new TestCase("savePlayer_givenPlayer_works", (assert) => {
-        const sut = new PlayerRepository();
-        const expected = new Player(42);
-
-        sut.savePlayer(expected);
-        const actual = sut.getPlayerById(expected.id);
-
-        assert.equal(expected, actual);
-    }),
-    new TestCase("savePlayer_notifiesChangeListeners", (assert) => {
-        const sut = new PlayerRepository();
-        let called = false;
-        const listener = new PlayerEventListener({
-            onPlayerChanged: () => called = true
-        });
-        sut.addPlayerListener(42, listener);
-
-        sut.savePlayer(new Player(42));
-
-        assert.assert(called, "playerAdded should have been called");
-    }),
-    new TestCase("savePlayer_alsoUpdates", (assert) => {
-        const old = new Player(42);
-        const expected = new Player(42);
-        const sut = new PlayerRepository();
-        sut.savePlayer(old);
-
-        sut.savePlayer(expected);
-        const actual = sut.getPlayerById(42);
-
-        assert.notEqual(old, actual);
-        assert.equal(expected, actual);
-    }),
-    new TestCase("getPlayerById_givenNotFound_returnsNull", (assert) => {
-        const sut = new PlayerRepository();
-        const actual = sut.getPlayerById(42);
-        assert.isNull(actual);
-    }),
-    new TestCase("remove_givenBadId_throws", (assert) => {
-        const sut = new PlayerRepository();
-
-        assert.throws(() => sut.removePlayerById(42));
-    }),
-    new TestCase("remove_works", (assert) => {
-        const sut = new PlayerRepository();
-        sut.savePlayer(new Player(42));
-
-        sut.removePlayerById(42);
-        assert.isNull(sut.getPlayerById(42));
-    }),
-    new TestCase("remove_notifiesChangeListeners", (assert) => {
-        const sut = new PlayerRepository();
-        const player = new Player(42);
-        sut.savePlayer(player);
-        let called = false;
-        const listener = new PlayerEventListener({
-            onPlayerRemoved: () => called = true
-        });
-        sut.addPlayerListener(player.id, listener);
-
-        sut.removePlayerById(player.id);
-
-        assert.assert(called, "playerRemoved should have been called");
-    })
-]);
