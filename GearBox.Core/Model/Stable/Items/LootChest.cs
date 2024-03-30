@@ -31,14 +31,14 @@ public class LootChest : IStableGameObject
 
     public void CheckForCollisions(PlayerCharacter player)
     {
-        if (_collectedBy.Contains(player.Inner.Id))
+        if (_collectedBy.Contains(player.Id))
         {
             return;
         }
 
-        if (Body.CollidesWith(player.Inner.Body))
+        if (Body.CollidesWith(player.Body))
         {
-            _collectedBy.Add(player.Inner.Id);
+            _collectedBy.Add(player.Id);
             foreach (var item in _contents)
             {
                 var tab = item.GetTab(player.Inventory);

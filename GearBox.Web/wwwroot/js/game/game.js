@@ -66,8 +66,6 @@ export class Game {
         const world = new WorldInitHandler()
             .handleWorldInit(initMessage);
 
-        this.#playerHud.characterSupplier = () => world.player;
-
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
         const changeHandlers = new ChangeHandlers()
             .withChangeHandler(new LootChestChangeHandler(world))

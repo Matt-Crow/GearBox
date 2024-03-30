@@ -42,7 +42,7 @@ public class WorldServer
         _timer.Elapsed += async (sender, e) => await Update();
     }
 
-    public int TotalConnections { get => _connections.Count; }
+    public int TotalConnections => _connections.Count;
 
     /// <summary>
     /// Adds the given connection, then sends the world
@@ -68,16 +68,15 @@ public class WorldServer
         var spawnLocation = _world.Map.GetRandomOpenTile();
         if (spawnLocation != null)
         {
-            player.Inner.Coordinates = spawnLocation.Value.CenteredOnTile();
+            player.Coordinates = spawnLocation.Value.CenteredOnTile();
         }
 
         _world.StableContent.AddPlayer(player);
-        _world.DynamicContent.AddDynamicObject(player.Inner);
-        _world.DynamicContent.AddDynamicObject(player); // player must come after inner, lest it mess with front end... for now!
+        _world.DynamicContent.AddDynamicObject(player);
         _connections.Add(id, connection);
         _players.Add(id, player);
         var worldInit = new WorldInitJson(
-            player.Inner.Id,
+            player.Id,
             _world.Map.ToJson(),
             _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
         );
@@ -119,7 +118,6 @@ public class WorldServer
         if (player is not null)
         {
             _world.DynamicContent.RemoveDynamicObject(player);
-            _world.DynamicContent.RemoveDynamicObject(player.Inner);
             _world.StableContent.RemovePlayer(player);
         }
         _players.Remove(id);

@@ -1,18 +1,16 @@
-import { Character } from "../model/character.js";
 import { Player } from "../model/player.js";
 
 export class PlayerHud {
     #element;
+    #previous = null;
     #playerUpdateListener;
-    #characterSupplier;
 
     /**
      * @param {HTMLDivElement} element 
      */
     constructor(element) {
         this.#element = element;
-        this.#playerUpdateListener = p => this.#bind(p);
-        this.#characterSupplier = () => null;
+        this.#playerUpdateListener = p => this.#bindIfChanged(p);
     }
 
     /**
@@ -21,17 +19,36 @@ export class PlayerHud {
     get playerUpdateListener() { return this.#playerUpdateListener; }
 
     /**
-     * @param {() => Character} value 
+     * @param {Player} player 
      */
-    set characterSupplier(value) { this.#characterSupplier = value; }
+    #bindIfChanged(player) {
+        // stops flickering in the UI
+        if (this.#previous === null || this.#hasPlayerChanged(player)) {
+            this.#bind(player);
+            this.#previous = player;
+        }
+    }
+
+    /**
+     * @param {Player} player 
+    */
+    #hasPlayerChanged(player) {
+        const props = [
+            p => p.hitPoints.current,
+            p => p.hitPoints.max,
+            p => p.energy.current,
+            p => p.energy.max
+         ];
+         const result = this.#previous === null || props.some(prop => prop(player) !== prop(this.#previous));
+         return result;
+    }
 
     /**
      * @param {Player} player 
      */
     #bind(player) {
-        const character = this.#characterSupplier();
-        bind(this.#element, "currentHP", character?.hitPoints.current);
-        bind(this.#element, "maxHP", character?.hitPoints.max);
+        bind(this.#element, "currentHP", player.hitPoints.current);
+        bind(this.#element, "maxHP", player.hitPoints.max);
         bind(this.#element, "currentEnergy", player.energy.current);
         bind(this.#element, "maxEnergy", player.energy.max);
     }

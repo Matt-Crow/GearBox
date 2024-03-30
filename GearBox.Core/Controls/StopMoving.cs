@@ -19,6 +19,6 @@ public class StopMoving : IControlCommand
 
     public void ExecuteOn(PlayerCharacter target, World inWorld)
     {
-        target.Inner.StopMovingIn(_direction);
+        target.StopMovingIn(_direction);
     }
 }

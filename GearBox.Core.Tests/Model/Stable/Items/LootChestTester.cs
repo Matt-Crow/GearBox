@@ -12,8 +12,10 @@ public class LootChestTester
     {
         var item = new Material(new ItemType("foo"));
         var sut = new LootChest(Coordinates.ORIGIN, item);
-        var player = new PlayerCharacter();
-        player.Inner.Coordinates = sut.Body.Location;
+        var player = new PlayerCharacter
+        {
+            Coordinates = sut.Body.Location
+        };
 
         sut.CheckForCollisions(player);
 

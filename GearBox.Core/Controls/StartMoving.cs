@@ -19,6 +19,6 @@ public class StartMoving : IControlCommand
 
     public void ExecuteOn(PlayerCharacter target, World inWorld)
     {
-        target.Inner.StartMovingIn(_direction);
+        target.StartMovingIn(_direction);
     }
 }
