@@ -2,8 +2,8 @@ namespace GearBox.Core.Model.Dynamic.Player;
 
 public class PlayerStats
 {
-    public PlayerStat<int> MaxHitPoints { get; init; } = PlayerStat<int>.Linear(1000, 5.0);
-    public PlayerStat<int> MaxEnergy { get; init; } = PlayerStat<int>.Linear(100, 3.0);
+    public PlayerStat<double> MaxHitPoints { get; init; } = PlayerStat<double>.DiminishingReturn();
+    public PlayerStat<double> MaxEnergy { get; init; } = PlayerStat<double>.DiminishingReturn();
     public PlayerStat<double> Offense { get; init; } = PlayerStat<double>.DiminishingReturn();
     public PlayerStat<double> Defense { get; init; } = PlayerStat<double>.DiminishingReturn();
     public PlayerStat<double> Speed { get; init; } = PlayerStat<double>.DiminishingReturn();

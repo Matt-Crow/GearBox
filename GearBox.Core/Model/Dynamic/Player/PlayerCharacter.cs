@@ -19,26 +19,24 @@ public class PlayerCharacter : Character
     }
 
     protected override string Type => "playerCharacter";
+    private int MaxEnergy { get; set; }
     public PlayerStats Stats { get; init; } = new();
-    private int MaxEnergy => Stats.MaxEnergy.Value;
     public Inventory Inventory { get; init; }
     public EquipmentSlot Weapon { get; init; }
 
-    private void UpdateStats()
+    public override void UpdateStats()
     {
-        // scale HP & energy with level
-        var boosts = new PlayerStatBoosts(new()
-        {
-            {PlayerStatType.MAX_HIT_POINTS, Level * 20},
-            {PlayerStatType.MAX_ENERGY, Level * 20}
-        });
+        var boosts = new PlayerStatBoosts();
         boosts = boosts.Combine(Weapon.Value?.StatBoosts);
         Stats.SetStatBoosts(boosts);
-        MaxHitPoints = Stats.MaxHitPoints.Value;
+
+        MaxEnergy = GetMaxEnergyByLevel(Level);
 
         // update movement speed
         var multiplier = 1.0+Stats.Speed.Value;
         SetSpeed(Speed.FromPixelsPerFrame(BASE_SPEED.InPixelsPerFrame * multiplier));
+        
+        base.UpdateStats();
     }
 
     public void Equip(Equipment equipment)
@@ -139,5 +137,19 @@ public class PlayerCharacter : Character
             new FractionJson(MaxEnergy - _energyExpended, MaxEnergy)
         );
         return JsonSerializer.Serialize(asJson, options);
+    }
+
+    protected override int GetMaxHitPointsByLevel(int level)
+    {
+        var multiplier = 1.0 + Stats.MaxHitPoints.Value;
+        var result = base.GetMaxHitPointsByLevel(level) * multiplier;
+        return (int)result; 
+    }
+
+    private int GetMaxEnergyByLevel(int level)
+    {
+        var multiplier = 1.0 + Stats.MaxEnergy.Value;
+        var result = (50 + 5*level) * multiplier;
+        return (int)result;
     }
 }

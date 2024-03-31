@@ -20,8 +20,9 @@ public class Character : IDynamicGameObject
         _mobility = new MobileBehavior(Body, Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
         Serializer = new(Type, Serialize);
         Termination = new(this, () => DamageTaken >= MaxHitPoints);
-        Level = 1; // todo add parameter
-        DamagePerHit = GetDamagePerHitByLevel(Level);
+        
+        // todo add parameter
+        SetLevel(1);
     }
 
 
@@ -31,11 +32,30 @@ public class Character : IDynamicGameObject
     public TerminateBehavior Termination { get; init; }
     public Coordinates Coordinates { get => Body.Location; set => Body.Location = value; }
     public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
-    public int MaxHitPoints { get; set; } = 100; // arbitrary default value
+    public int MaxHitPoints { get; set; }
     protected virtual string Type => "character";
     protected int Level { get; private set; }
     protected int DamagePerHit { get; private set; } // tie DPH to character instead of weapon so unarmed works
 
+
+    public void SetLevel(int level)
+    {
+        Level = level;
+
+        // avoid virtual call in ctor: https://stackoverflow.com/q/119506
+        UpdateStatsBase();
+    }
+
+    public virtual void UpdateStats()
+    {
+        UpdateStatsBase();
+    }
+
+    private void UpdateStatsBase()
+    {
+        MaxHitPoints = GetMaxHitPointsByLevel(Level);
+        DamagePerHit = GetDamagePerHitByLevel(Level);
+    }
 
     public void StartMovingIn(Direction direction)
     {
@@ -100,11 +120,17 @@ public class Character : IDynamicGameObject
         return Id.GetHashCode();
     }
 
-    private static int GetDamagePerHitByLevel(int level)
+    protected virtual int GetMaxHitPointsByLevel(int level)
     {
-        var maxDamage = 500;
-        var percentToMaxLevel = ((double)level) / MAX_LEVEL;
-        var result = (int)(maxDamage * percentToMaxLevel);
+        // ranges from 120 to 500
+        var result = 100 + 20*level;
+        return result;
+    }
+
+    private int GetDamagePerHitByLevel(int level)
+    {
+        // ranges from 50 to 183
+        var result = 43 + 7*level;
         return result;
     }
 }
