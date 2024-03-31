@@ -9,27 +9,23 @@ namespace GearBox.Core.Model.Dynamic;
 /// </summary>
 public class Character : IDynamicGameObject
 {
+    public static readonly int MAX_LEVEL = 20;
+    protected static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);
+
     private readonly MobileBehavior _mobility;
-    
 
-    public Character() : this(Velocity.FromPolar(Speed.FromTilesPerSecond(3), Direction.DOWN))
+
+    public Character()
     {
-
-    }
-
-    public Character(Velocity velocity)
-    {
-        _mobility = new MobileBehavior(Body, velocity);
+        _mobility = new MobileBehavior(Body, Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
         Serializer = new(Type, Serialize);
         Termination = new(this, () => DamageTaken >= MaxHitPoints);
+        Level = 1; // todo add parameter
+        DamagePerHit = GetDamagePerHitByLevel(Level);
     }
 
 
-    /// <summary>
-    /// Used by clients to uniquely identify a character across updates.
-    /// </summary>
     public Guid Id { get; init; } = Guid.NewGuid();
-
     public Serializer Serializer { get; init; }
     public BodyBehavior Body { get; init; } = new();
     public TerminateBehavior Termination { get; init; }
@@ -37,6 +33,8 @@ public class Character : IDynamicGameObject
     public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
     public int MaxHitPoints { get; set; } = 100; // arbitrary default value
     protected virtual string Type => "character";
+    protected int Level { get; private set; }
+    protected int DamagePerHit { get; private set; } // tie DPH to character instead of weapon so unarmed works
 
 
     public void StartMovingIn(Direction direction)
@@ -100,5 +98,13 @@ public class Character : IDynamicGameObject
     public override int GetHashCode()
     {
         return Id.GetHashCode();
+    }
+
+    private static int GetDamagePerHitByLevel(int level)
+    {
+        var maxDamage = 500;
+        var percentToMaxLevel = ((double)level) / MAX_LEVEL;
+        var result = (int)(maxDamage * percentToMaxLevel);
+        return result;
     }
 }

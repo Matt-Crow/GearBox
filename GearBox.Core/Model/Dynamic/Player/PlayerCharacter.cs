@@ -7,25 +7,11 @@ namespace GearBox.Core.Model.Dynamic.Player;
 
 public class PlayerCharacter : Character
 {
-    /// <summary>
-    /// The maximum level a player can attain
-    /// </summary>
-    public static readonly int MAX_LEVEL = 20;
-    private static readonly Duration REGEN_COOLDOWN = Duration.FromSeconds(5);
-    private static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);
-    private readonly int _level = MAX_LEVEL; // in the future, this will read from a repository
-    
-    /// <summary>
-    /// While it seems a bit strange to keep damage per hit on the player instead of their weapon,
-    /// this prevents situations where all weapons would require damage 
-    /// and allows players to attack without weapons
-    /// </summary>
-    private int _damagePerHit;
     private int _energyExpended = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     private int _frameCount = 0; // used for regeneration
     private int _basicAttackCooldownInFrames = 0;
 
-    public PlayerCharacter() : base(Velocity.FromPolar(BASE_SPEED, Direction.DOWN))
+    public PlayerCharacter() : base()
     {
         Inventory = new(Id);
         Weapon = new(Id);
@@ -40,14 +26,11 @@ public class PlayerCharacter : Character
 
     private void UpdateStats()
     {
-        // move to leveling method later
-        _damagePerHit = GetDamagePerHitByLevel(_level);
-
         // scale HP & energy with level
         var boosts = new PlayerStatBoosts(new()
         {
-            {PlayerStatType.MAX_HIT_POINTS, _level * 20},
-            {PlayerStatType.MAX_ENERGY, _level * 20}
+            {PlayerStatType.MAX_HIT_POINTS, Level * 20},
+            {PlayerStatType.MAX_ENERGY, Level * 20}
         });
         boosts = boosts.Combine(Weapon.Value?.StatBoosts);
         Stats.SetStatBoosts(boosts);
@@ -56,14 +39,6 @@ public class PlayerCharacter : Character
         // update movement speed
         var multiplier = 1.0+Stats.Speed.Value;
         SetSpeed(Speed.FromPixelsPerFrame(BASE_SPEED.InPixelsPerFrame * multiplier));
-    }
-
-    private static int GetDamagePerHitByLevel(int level)
-    {
-        var maxDamage = 500;
-        var percentToMaxLevel = ((double)level) / MAX_LEVEL;
-        var result = (int)(maxDamage * percentToMaxLevel);
-        return result;
     }
 
     public void Equip(Equipment equipment)
@@ -114,7 +89,7 @@ public class PlayerCharacter : Character
         
         var weapon = Weapon.Value as Weapon;
         var range = weapon?.AttackRange.Range ?? AttackRange.MELEE.Range;
-        var damage = _damagePerHit * (1.0 + Stats.Offense.Value);
+        var damage = DamagePerHit * (1.0 + Stats.Offense.Value);
         var attack = new Attack(this, (int)damage);
         var projectile = new Projectile(
             Coordinates, 
@@ -139,7 +114,7 @@ public class PlayerCharacter : Character
 
         // restore 5% HP & energy per second
         _frameCount++;
-        if (_frameCount >= REGEN_COOLDOWN.InFrames)
+        if (_frameCount >= Duration.FromSeconds(5).InFrames)
         {
             HealPercent(0.05);
             RechargePercent(0.05);
