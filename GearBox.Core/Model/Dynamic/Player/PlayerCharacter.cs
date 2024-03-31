@@ -1,17 +1,10 @@
-using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Units;
 using System.Text.Json;
 
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Dynamic.Player;
 
-/// <summary>
-/// Decorator around a Character.
-/// While this would make a lot of sense as a subclass of Character, since they
-/// have different update types (characters are dynamic, players are stable),
-/// I'll keep it in this format for now.
-/// </summary>
 public class PlayerCharacter : Character
 {
     /// <summary>

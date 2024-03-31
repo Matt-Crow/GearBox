@@ -1,8 +1,8 @@
-using GearBox.Core.Model.Stable;
+using GearBox.Core.Model.Dynamic.Player;
 using GearBox.Core.Model.Stable.Items;
 using Xunit;
 
-namespace GearBox.Core.Tests.Model.Stable;
+namespace GearBox.Core.Tests.Model.Dynamic.Player;
 
 public class PlayerCharacterTester
 {

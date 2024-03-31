@@ -1,6 +1,7 @@
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Dynamic.Player;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Units;

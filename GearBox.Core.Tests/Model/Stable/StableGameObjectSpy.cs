@@ -1,6 +1,3 @@
-
-using System.Text.Json;
-
 namespace GearBox.Core.Model.Stable;
 
 public class StableGameObjectSpy : IStableGameObject

@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Stable;
+namespace GearBox.Core.Model.Dynamic.Player;
 
 public class PlayerStatBoosts
 {

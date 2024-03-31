@@ -1,4 +1,3 @@
-using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Stable.Items;
 using Xunit;
 

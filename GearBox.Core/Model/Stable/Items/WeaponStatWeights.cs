@@ -1,4 +1,4 @@
-using GearBox.Core.Model.Units;
+using GearBox.Core.Model.Dynamic.Player;
 
 namespace GearBox.Core.Model.Stable.Items;
 
