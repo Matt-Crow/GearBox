@@ -13,13 +13,15 @@ export class Player extends Character {
 
     /**
      * @param {string} id 
+     * @param {string} name 
+     * @param {number} level 
      * @param {number} x the x-coordinate of this character's center, in pixels
      * @param {number} y the y-coordinate of this character's center, in pixels 
      * @param {Fraction} hitPoints
      * @param {Fraction} energy 
      */
-    constructor(id, x, y, hitPoints, energy) {
-        super(id, x, y, hitPoints);
+    constructor(id, name, level, x, y, hitPoints, energy) {
+        super(id, name, level, x, y, hitPoints);
         this.#energy = energy;
     }
 
@@ -51,6 +53,8 @@ export class PlayerChangeHandler extends JsonDeserializer {
     #deserialize(json) {
         var result = new Player(
             json.id, 
+            json.name,
+            json.level,
             json.x,
             json.y,
             new Fraction(json.hitPoints.current, json.hitPoints.max),

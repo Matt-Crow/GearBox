@@ -12,7 +12,7 @@ public class LootChestTester
     {
         var item = new Material(new ItemType("foo"));
         var sut = new LootChest(Coordinates.ORIGIN, item);
-        var player = new PlayerCharacter
+        var player = new PlayerCharacter("bar", 1)
         {
             Coordinates = sut.Body.Location
         };

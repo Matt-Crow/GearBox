@@ -9,14 +9,14 @@ public class PlayerCharacterTester
     [Fact]
     public void Equip_GivenNotInInventory_Throws()
     {
-        var sut = new PlayerCharacter();
-        Assert.Throws<ArgumentException>(() => sut.Equip(new Weapon(new ItemType("foo"))));
+        var sut = new PlayerCharacter("foo", 1);
+        Assert.Throws<ArgumentException>(() => sut.Equip(new Weapon(new ItemType("bar"))));
     }
 
     [Fact]
     public void Equip_GivenWeapon_SetsWeaponSlot()
     {
-        var sut = new PlayerCharacter();
+        var sut = new PlayerCharacter("foo", 1);
         var weapon = new Weapon(new ItemType("weapon"));
         sut.Inventory.Add(weapon);
 
@@ -28,7 +28,7 @@ public class PlayerCharacterTester
     [Fact]
     public void Equip_GivenWeapon_RemovesFromInventory()
     {
-        var sut = new PlayerCharacter();
+        var sut = new PlayerCharacter("foo", 1);
         var weapon = new Weapon(new ItemType("weapon"));
         sut.Inventory.Add(weapon);
 
@@ -40,7 +40,7 @@ public class PlayerCharacterTester
     [Fact]
     public void Equip_GivenWeaponAlreadyEquipped_AddsToInventory()
     {
-        var sut = new PlayerCharacter();
+        var sut = new PlayerCharacter("foo", 1);
         var alreadyEquipped = new Weapon(new ItemType("weapon 1"));
         var notYetEquipped = new Weapon(new ItemType("weapon 2"));
         sut.Inventory.Add(alreadyEquipped);

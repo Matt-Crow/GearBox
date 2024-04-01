@@ -9,14 +9,18 @@ public class EnemySpawner : IDynamicGameObject
     private readonly int _waveSize;
     private readonly int _maxChildren;
     private int _childCount = 0;
+    private readonly string _name;
+    private readonly int _level;
     private int _framesUntilNextUse = 0;
 
-
-    public EnemySpawner(World world, int waveSize=1, int maxChildren=5)
+    // todo options
+    public EnemySpawner(World world, int waveSize=1, int maxChildren=5, string name="test name", int level=5)
     {
         _world = world;
         _waveSize = waveSize;
         _maxChildren = maxChildren;
+        _name = name;
+        _level = level;
     }
 
 
@@ -51,7 +55,7 @@ public class EnemySpawner : IDynamicGameObject
             return;
         }
 
-        var enemy = new Character
+        var enemy = new Character(_name, _level)
         {
             Coordinates = tile.Value.CenteredOnTile()
         };

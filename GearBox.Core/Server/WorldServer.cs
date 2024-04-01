@@ -65,7 +65,7 @@ public class WorldServer
             return;
         }
 
-        var player = new PlayerCharacter(); // will eventually read from repo
+        var player = new PlayerCharacter("The Player", 1); // will eventually read from repo
         var spawnLocation = _world.Map.GetRandomOpenTile();
         if (spawnLocation != null)
         {

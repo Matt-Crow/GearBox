@@ -11,7 +11,7 @@ public class PlayerCharacter : Character
     private int _frameCount = 0; // used for regeneration
     private int _basicAttackCooldownInFrames = 0;
 
-    public PlayerCharacter() : base()
+    public PlayerCharacter(string name, int level) : base(name, level)
     {
         Inventory = new(Id);
         Weapon = new(Id);
@@ -131,6 +131,8 @@ public class PlayerCharacter : Character
         // serialize neither inventory nor weapon - those are handled elsewhere
         var asJson = new PlayerJson(
             Id, 
+            Name,
+            Level,
             Coordinates.XInPixels,
             Coordinates.YInPixels,
             new FractionJson(MaxHitPoints - DamageTaken, MaxHitPoints),

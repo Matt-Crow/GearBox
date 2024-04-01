@@ -15,18 +15,18 @@ public class Character : IDynamicGameObject
     private readonly MobileBehavior _mobility;
 
 
-    public Character()
+    public Character(string name, int level)
     {
+        Name = name;
         _mobility = new MobileBehavior(Body, Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
         Serializer = new(Type, Serialize);
         Termination = new(this, () => DamageTaken >= MaxHitPoints);
-        
-        // todo add parameter
-        SetLevel(1);
+        SetLevel(level);
     }
 
 
     public Guid Id { get; init; } = Guid.NewGuid();
+    public string Name { get; init; }
     public Serializer Serializer { get; init; }
     public BodyBehavior Body { get; init; } = new();
     public TerminateBehavior Termination { get; init; }
@@ -99,6 +99,8 @@ public class Character : IDynamicGameObject
     {
         var json = new CharacterJson(
             Id,
+            Name,
+            Level,
             _mobility.Coordinates.XInPixels, 
             _mobility.Coordinates.YInPixels,
             new FractionJson(MaxHitPoints - DamageTaken, MaxHitPoints)
