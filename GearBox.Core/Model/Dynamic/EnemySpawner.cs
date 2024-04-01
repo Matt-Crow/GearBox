@@ -6,21 +6,16 @@ public class EnemySpawner : IDynamicGameObject
 {
     private static readonly Duration COOLDOWN = Duration.FromSeconds(10);
     private readonly World _world;
-    private readonly int _waveSize;
-    private readonly int _maxChildren;
+    private readonly Func<Coordinates, IDynamicGameObject> _factory;
+    private readonly EnemySpawnerOptions _options;
     private int _childCount = 0;
-    private readonly string _name;
-    private readonly int _level;
     private int _framesUntilNextUse = 0;
 
-    // todo options
-    public EnemySpawner(World world, int waveSize=1, int maxChildren=5, string name="test name", int level=5)
+    public EnemySpawner(World world, Func<Coordinates, IDynamicGameObject> factory, EnemySpawnerOptions? options=null)
     {
         _world = world;
-        _waveSize = waveSize;
-        _maxChildren = maxChildren;
-        _name = name;
-        _level = level;
+        _factory = factory;
+        _options = options ?? new();
     }
 
 
@@ -34,7 +29,7 @@ public class EnemySpawner : IDynamicGameObject
         _framesUntilNextUse--;
         if (_framesUntilNextUse <= 0)
         {
-            for (var i = 0; i < _waveSize; i++)
+            for (var i = 0; i < _options.WaveSize; i++)
             {
                 Spawn();
             }
@@ -44,7 +39,7 @@ public class EnemySpawner : IDynamicGameObject
 
     private void Spawn()
     {
-        if (_childCount >= _maxChildren)
+        if (_childCount >= _options.MaxChildren)
         {
             return;
         }
@@ -55,11 +50,11 @@ public class EnemySpawner : IDynamicGameObject
             return;
         }
 
-        var enemy = new Character(_name, _level)
+        var enemy = _factory.Invoke(tile.Value.CenteredOnTile());
+        if (enemy.Termination != null)
         {
-            Coordinates = tile.Value.CenteredOnTile()
-        };
-        enemy.Termination.Terminated += ChildTerminated;
+            enemy.Termination.Terminated += ChildTerminated;
+        }
         _world.DynamicContent.AddDynamicObject(enemy);
         _childCount++;
     }

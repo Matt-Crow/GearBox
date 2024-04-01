@@ -29,7 +29,20 @@ public class WorldServer
         _world.AddTimer(new WorldTimer(() => _world.SpawnLootChest(), 50));
 
         // testing EnemySpawner
-        _world.DynamicContent.AddDynamicObject(new EnemySpawner(_world, 3, 10));
+        _world.DynamicContent.AddDynamicObject(
+            new EnemySpawner(
+                _world, 
+                coords => new Character("test enemy", 1)
+                {
+                    Coordinates = coords
+                }, 
+                new EnemySpawnerOptions()
+                {
+                    WaveSize = 3,
+                    MaxChildren = 10
+                }
+            )
+        );
         
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
