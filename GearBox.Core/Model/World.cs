@@ -13,12 +13,14 @@ public class World
 {
     private readonly List<WorldTimer> _timers = new();
     private readonly LootTable _loot;
+    private readonly List<Func<Character>> _enemies = [];
 
     public World(
         Guid? id = null, 
         Map? map = null, 
         IItemTypeRepository? itemTypes = null, 
-        LootTable? loot = null
+        LootTable? loot = null,
+        List<Func<Character>>? enemies = null
     )
     {
         Id = id ?? Guid.NewGuid();
@@ -27,6 +29,12 @@ public class World
         StableContent = new StableWorldContent();
         ItemTypes = itemTypes ?? ItemTypeRepository.Empty();
         _loot = loot ?? new LootTable();
+        _enemies = enemies ?? [];
+
+        if (_enemies.Count == 0)
+        {
+            _enemies.Add(() => new Character("Default enemy", 1));
+        }
     }
 
     public Guid Id { get; init; }
@@ -55,6 +63,18 @@ public class World
             var lootChest = new LootChest(location.Value.CenteredOnTile(), chestItems.ToArray());
             StableContent.AddLootChest(lootChest);
         }
+    }
+
+    public Character SpawnEnemy()
+    {
+        var enemyFactory = _enemies[Random.Shared.Next(_enemies.Count)];
+        var enemy = enemyFactory.Invoke();
+        
+        var tile = Map.GetRandomOpenTile() ?? throw new Exception("Map has no open tiles");
+        enemy.Coordinates = tile.CenteredOnTile();
+
+        DynamicContent.AddDynamicObject(enemy);
+        return enemy;
     }
 
     /// <summary>

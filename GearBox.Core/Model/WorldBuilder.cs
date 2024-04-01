@@ -1,3 +1,4 @@
+using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Dynamic.Player;
 using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Static;
@@ -8,8 +9,9 @@ namespace GearBox.Core.Model;
 public class WorldBuilder
 {
     private Map? _map;
-    private readonly List<ItemType> _itemTypes = new();
+    private readonly List<ItemType> _itemTypes = [];
     private readonly LootTable _loot = new();
+    private readonly List<Func<Character>> _enemies = [];
 
     public WorldBuilder DefineItem(ItemDefinition itemDefinition)
     {
@@ -76,6 +78,21 @@ public class WorldBuilder
         return result;
     }
 
+    public WorldBuilder DefineEnemy(Func<Character> definition)
+    {
+        _enemies.Add(definition);
+        return this;
+    }
+
+    public WorldBuilder AddDefaultEnemies()
+    {
+        var result = this
+            .DefineEnemy(() => new Character("Snake", 1))
+            .DefineEnemy(() => new Character("Scorpion", 1))
+            .DefineEnemy(() => new Character("Jackal", 2));
+        return result;
+    }
+
     public WorldBuilder WithDummyMap()
     {
         _map = new Map();
@@ -97,7 +114,8 @@ public class WorldBuilder
             Guid.NewGuid(),
             _map,
             ItemTypeRepository.Of(_itemTypes),
-            _loot
+            _loot,
+            _enemies
         );
         return result;
     }

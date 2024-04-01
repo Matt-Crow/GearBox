@@ -6,15 +6,13 @@ public class EnemySpawner : IDynamicGameObject
 {
     private static readonly Duration COOLDOWN = Duration.FromSeconds(10);
     private readonly World _world;
-    private readonly Func<Coordinates, IDynamicGameObject> _factory;
     private readonly EnemySpawnerOptions _options;
     private int _childCount = 0;
     private int _framesUntilNextUse = 0;
 
-    public EnemySpawner(World world, Func<Coordinates, IDynamicGameObject> factory, EnemySpawnerOptions? options=null)
+    public EnemySpawner(World world, EnemySpawnerOptions? options=null)
     {
         _world = world;
-        _factory = factory;
         _options = options ?? new();
     }
 
@@ -44,18 +42,11 @@ public class EnemySpawner : IDynamicGameObject
             return;
         }
 
-        var tile = _world.Map.GetRandomOpenTile();
-        if (tile == null)
-        {
-            return;
-        }
-
-        var enemy = _factory.Invoke(tile.Value.CenteredOnTile());
+        var enemy = _world.SpawnEnemy();
         if (enemy.Termination != null)
         {
             enemy.Termination.Terminated += ChildTerminated;
         }
-        _world.DynamicContent.AddDynamicObject(enemy);
         _childCount++;
     }
 

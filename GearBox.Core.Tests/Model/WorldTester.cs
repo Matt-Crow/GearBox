@@ -31,4 +31,20 @@ public class WorldTester
         sut.Update();
         Assert.True(spy.HasBeenUpdated);
     }
+
+    [Fact]
+    public void SpawnLootChest_GivenDefaultLootTable_Throws()
+    {
+        var sut = new World();
+
+        Assert.Throws<InvalidOperationException>(sut.SpawnLootChest);
+    }
+
+    [Fact]
+    public void SpawnEnemy_GivenDefaultEnemies_DoesNotThrow()
+    {
+        var sut = new World();
+        var actual = sut.SpawnEnemy();
+        Assert.NotNull(actual);
+    }
 }
