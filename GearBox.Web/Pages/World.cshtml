@@ -51,16 +51,28 @@
                     <tbody id="equipmentRows"></tbody>
                 </table>
             </div>
-            <!-- current weapon -->
-            <div class="h-50">
-                <div id="noWeapon">
-                    No weapon equipped
-                </div>
-                <div id="yesWeapon">
-                    <h2>Current Weapon</h2>
-                    <p><b id="weaponName"></b></p>
-                    <p><i id="weaponDescription"></i></p>
-                    <ul id="weaponDetails"></ul>
+            <!-- weapon info -->
+            <div class="h-50 container">
+                <div class="row">
+                    <!-- current weapon -->
+                    <div class="col-6">
+                        <div id="noWeapon">
+                            No weapon equipped
+                        </div>
+                        <div id="yesWeapon">
+                            <h2>Current Weapon</h2>
+                            <p><b class="weaponName"></b></p>
+                            <p><i class="weaponDescription"></i></p>
+                            <ul class="weaponDetails"></ul>
+                        </div>
+                    </div>
+                    <!-- compare weapon -->
+                    <div class="col-6" id="compareWeapon">
+                        <h2>Other Weapon</h2>
+                        <p><b class="weaponName"></b></p>
+                        <p><i class="weaponDescription"></i></p>
+                        <ul class="weaponDetails"></ul>
+                    </div>
                 </div>
             </div>
         </div>

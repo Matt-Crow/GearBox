@@ -28,6 +28,7 @@ export class InventoryModal {
         });
         this.#client = client;
         this.#setWeapon(null);
+        this.#setCompareWeapon(null);
     }
 
     get inventoryChangeListener() { return this.#inventoryChangeListener; }
@@ -88,6 +89,10 @@ export class InventoryModal {
             return e;
         });
         const tr = document.createElement("tr");
+        $(tr).hover(
+            () => this.#setCompareWeapon(item),
+            () => this.#setCompareWeapon(null)
+        );
         tds.forEach(td => tr.appendChild(td));
 
         const equipButton = document.createElement("button");
@@ -100,13 +105,11 @@ export class InventoryModal {
         
         tr.appendChild(equipButton);
 
-        // todo compare on hover
-
         this.#equipmentRows.appendChild(tr);
     }
 
     /**
-     * @param {Item} weapon 
+     * @param {Item?} weapon 
      */
     #setWeapon(weapon) {
         if (!weapon) {
@@ -118,16 +121,40 @@ export class InventoryModal {
         $("#noWeapon").hide();
         $("#yesWeapon").show();
 
-        $("#weaponName").text(`${weapon.type.name} LV ${weapon.level} ${stars(weapon.type.gradeOrder)}`);
-        $("#weaponDescription").text(weapon.description);
+        this.#bindWeaponCard("#yesWeapon", weapon);
+    }
+
+    /**
+     * @param {Item?} weapon 
+     */
+    #setCompareWeapon(weapon) {
+        if (!weapon) {
+            $("#compareWeapon").hide();
+            return;
+        }
+        $("#compareWeapon").show();
+
+        this.#bindWeaponCard("#compareWeapon", weapon);
+    }
+
+    #bindWeaponCard(selector, weapon) {
+        $(selector)
+            .find(".weaponName")
+            .text(`${weapon.type.name} LV ${weapon.level} ${stars(weapon.type.gradeOrder)}`);
+        
+        $(selector)
+            .find(".weaponDescription")
+            .text(weapon.description);
+
         const details = weapon.details.map(str => {
             const e = document.createElement("li");
             e.innerText = str;
             return e;
-        })
-        document
-            .querySelector("#weaponDetails")
-            .replaceChildren(...details); // need to destructure array for some reason
+        });
+        $(selector)
+            .find(".weaponDetails")
+            .empty()
+            .append(details);
     }
 }
 
