@@ -6,7 +6,10 @@ public readonly struct Color : ISerializable<ColorJson>
 {
     public static readonly Color RED = new(255, 0, 0);
     public static readonly Color GREEN = new(0, 255, 0);
+    public static readonly Color LIGHT_GREEN = new(0, 100, 0);
     public static readonly Color BLUE = new(0, 0, 255);
+    public static readonly Color GRAY = new(128, 128, 128);
+    public static readonly Color TAN = new(200, 180, 140);
 
     public Color(int r, int g, int b)
     {

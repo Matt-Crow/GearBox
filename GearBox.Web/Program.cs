@@ -8,7 +8,7 @@ var world = new WorldBuilder()
     .AddMiningSkill()
     .AddStarterWeapons()
     .AddDefaultEnemies()
-    .WithDummyMap()
+    .WithDesertMap()
     .Build();
 
 // Add services to the container.

@@ -35,13 +35,13 @@ public class MapTester
     [Fact]
     public void CanSetKeyMultipleTimes()
     {
-        var sut = new Map();
         var type1 = TileType.Tangible(Color.GREEN);
         var type2 = TileType.Tangible(Color.RED);
+        var sut = new Map()
+            .SetTileTypeForKey(1, type1)
+            .SetTileTypeForKey(1, type2)
+            .SetTileAt(Coordinates.ORIGIN, 1);
         
-        sut.SetTileTypeForKey(1, type1);
-        sut.SetTileTypeForKey(1, type2);
-        sut.SetTileAt(Coordinates.ORIGIN, 1);
         var actual = sut.GetTileAt(Coordinates.ORIGIN);
 
         Assert.Equal(type2, actual);
@@ -52,9 +52,9 @@ public class MapTester
     [InlineData(100, 0)]
     public void CannotSetTileOutOfBounds(int x, int y)
     {
-        var sut = new Map(Dimensions.InTiles(20));
         var aTileType = TileType.Tangible(Color.GREEN);
-        sut.SetTileTypeForKey(1, aTileType);
+        var sut = new Map(Dimensions.InTiles(20))
+            .SetTileTypeForKey(1, aTileType);
 
         Assert.Throws<ArgumentException>(() => sut.SetTileAt(Coordinates.FromTiles(x, y), 1));
     }
@@ -76,11 +76,11 @@ public class MapTester
     [Fact]
     public void CheckForCollisions_GivenInTile_ShovesOut()
     {
-        var sut = new Map();
         var tangible = TileType.Tangible(Color.RED);
-        sut.SetTileTypeForKey(1, tangible);
         var coordinates = Coordinates.FromTiles(2, 2);
-        sut.SetTileAt(coordinates, tangible);
+        var sut = new Map()
+            .SetTileTypeForKey(1, tangible)
+            .SetTileAt(coordinates, tangible);
         var inTile = new BodyBehavior()
         {
             Location = coordinates
