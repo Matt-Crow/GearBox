@@ -71,6 +71,18 @@ public class Map : ISerializable<MapJson>
         return this;
     }
 
+    public Map SetTilesFrom(int[,] csv)
+    {
+        for (var y = 0; y < csv.GetLength(0); y++)
+        {
+            for (var x = 0; x < csv.GetLength(1); x++)
+            {
+                SetTileAt(Coordinates.FromTiles(x, y), csv[y,x]);
+            }
+        }
+        return this;
+    }
+
     public TileType GetTileAt(Coordinates coordinates)
     {
         Validate(coordinates);

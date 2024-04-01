@@ -95,40 +95,37 @@ public class WorldBuilder
 
     public WorldBuilder WithDesertMap()
     {
+        // for now, I won't read from a CSV file, as it is difficult to ensure subprojects can find the right file
+        int[,] csv = {
+        //   0              5              10             15
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3}, // 0
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 3},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2, 2, 2, 2, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2, 2, 2, 2, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0},
+            {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0}, // 5
+            {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0}, // 10
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 3, 3, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 2}, // 15
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 2, 2},
+            {0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 2, 0, 0, 2, 2, 2},
+            {3, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+            {3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+        };
         _map = new Map(Dimensions.InTiles(20))
             .SetTileTypeForKey(0, TileType.Intangible(Color.TAN))
             .SetTileTypeForKey(1, TileType.Tangible(Color.GRAY))
             .SetTileTypeForKey(2, TileType.Tangible(Color.BLUE)) // water
             .SetTileTypeForKey(3, TileType.Intangible(Color.LIGHT_GREEN)) // plants
-            .SetTileAt(Coordinates.FromTiles(16, 15), 2) // pool of water
-            .SetTileAt(Coordinates.FromTiles(17, 15), 2)
-            .SetTileAt(Coordinates.FromTiles(15, 16), 2)
-            .SetTileAt(Coordinates.FromTiles(16, 16), 2)
-            .SetTileAt(Coordinates.FromTiles(17, 16), 2)
-            .SetTileAt(Coordinates.FromTiles(18, 16), 2)
-            .SetTileAt(Coordinates.FromTiles(15, 17), 2)
-            .SetTileAt(Coordinates.FromTiles(16, 17), 2)
-            .SetTileAt(Coordinates.FromTiles(17, 17), 2)
-            .SetTileAt(Coordinates.FromTiles(18, 17), 2)
-            .SetTileAt(Coordinates.FromTiles(16, 18), 2)
-            .SetTileAt(Coordinates.FromTiles(17, 18), 2)
-            .SetTileAt(Coordinates.FromTiles(0, 18), 3) // some plants
-            .SetTileAt(Coordinates.FromTiles(0, 19), 3)
-            .SetTileAt(Coordinates.FromTiles(1, 19), 3);
-        AddPillarToMap(Coordinates.FromTiles(5, 5), 1);
-        AddPillarToMap(Coordinates.FromTiles(5, 13), 1);
-        AddPillarToMap(Coordinates.FromTiles(13, 5), 1);
-        AddPillarToMap(Coordinates.FromTiles(13, 13), 1);
-        AddPillarToMap(Coordinates.FromTiles(9, 9), 1);
+            .SetTilesFrom(csv);
         return this;
-    }
-
-    private void AddPillarToMap(Coordinates upperLeft, int tileType)
-    {
-        _map?.SetTileAt(upperLeft.PlusTiles(0, 0), tileType);
-        _map?.SetTileAt(upperLeft.PlusTiles(1, 0), tileType);
-        _map?.SetTileAt(upperLeft.PlusTiles(0, 1), tileType);
-        _map?.SetTileAt(upperLeft.PlusTiles(1, 1), tileType);
     }
 
     public World Build()
