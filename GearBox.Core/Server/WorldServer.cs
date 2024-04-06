@@ -1,18 +1,19 @@
-namespace GearBox.Core.Server;
-
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Dynamic.Player;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Stable;
-using System.Timers;
+using GearBox.Core.Model.Units;
+
+namespace GearBox.Core.Server;
 
 public class WorldServer
 {
     private readonly World _world;
-    private readonly Dictionary<string, IConnection> _connections = new();
-    private readonly Dictionary<string, Character> _players = new();
-    private readonly Timer _timer;
+    private readonly Dictionary<string, IConnection> _connections = [];
+    private readonly Dictionary<string, PlayerCharacter> _players = [];
+    private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
 
     public WorldServer() : this(new World())
@@ -27,16 +28,21 @@ public class WorldServer
         // testing LootChests
         _world.AddTimer(new WorldTimer(() => _world.SpawnLootChest(), 50));
 
+        // testing EnemySpawner
+        _world.DynamicContent.AddDynamicObject(new EnemySpawner(
+            _world, 
+            new EnemySpawnerOptions()
+            {
+                WaveSize = 3,
+                MaxChildren = 10
+            }
+        ));
         
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
         
-        /*
-        1000 ms   second
-        ------- * -------
-        second    frame
-        */
-        _timer = new Timer(1000.0 / Time.FRAMES_PER_SECOND)
+        // get the seconds in 1 frame, x1000 to get ms
+        _timer = new System.Timers.Timer(Duration.FromFrames(1).InSeconds * 1000)
         {
             AutoReset = true,
             Enabled = false
@@ -44,7 +50,7 @@ public class WorldServer
         _timer.Elapsed += async (sender, e) => await Update();
     }
 
-    public int TotalConnections { get => _connections.Count; }
+    public int TotalConnections => _connections.Count;
 
     /// <summary>
     /// Adds the given connection, then sends the world
@@ -66,21 +72,20 @@ public class WorldServer
             return;
         }
 
-        var character = new Character(); // will eventually read from repo
-        var spawnLocation = _world.StaticContent.Map.GetRandomOpenTile();
+        var player = new PlayerCharacter("The Player", 1); // will eventually read from repo
+        var spawnLocation = _world.Map.GetRandomOpenTile();
         if (spawnLocation != null)
         {
-            character.Coordinates = spawnLocation.Value.CenteredOnTile();
+            player.Coordinates = spawnLocation.Value.CenteredOnTile();
         }
-        var player = new PlayerCharacter(character);
 
         _world.StableContent.AddPlayer(player);
-        _world.DynamicContent.AddDynamicObject(character);
+        _world.DynamicContent.AddDynamicObject(player);
         _connections.Add(id, connection);
-        _players.Add(id, character);
+        _players.Add(id, player);
         var worldInit = new WorldInitJson(
-            character.Id,
-            _world.StaticContent.ToJson(),
+            player.Id,
+            _world.Map.ToJson(),
             _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
         );
         await connection.Send(worldInit);
@@ -117,10 +122,11 @@ public class WorldServer
             return;
         }
 
-        var character = _players[id];
-        if (character is not null)
+        var player = _players[id];
+        if (player is not null)
         {
-            _world.DynamicContent.RemoveDynamicObject(character);
+            _world.DynamicContent.RemoveDynamicObject(player);
+            _world.StableContent.RemovePlayer(player);
         }
         _players.Remove(id);
         _connections.Remove(id);
@@ -140,7 +146,7 @@ public class WorldServer
         {
             throw new Exception($"Invalid id: \"{id}\"");
         }
-        command.ExecuteOn(_players[id]);
+        command.ExecuteOn(_players[id], _world);
     }
 
     public async Task Update()

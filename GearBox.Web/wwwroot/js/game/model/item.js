@@ -1,25 +1,25 @@
+import { ChangeHandler, ChangeListener } from "../infrastructure/change.js";
 import { TestCase, TestSuite } from "../testing/tests.js";
 
 export class Inventory {
+    #ownerId;
     #equipment;
     #materials;
 
     /**
+     * @param {string} ownerId 
      * @param {Item[]} equipment 
      * @param {Item[]} materials 
      */
-    constructor(equipment=[], materials=[]) {
+    constructor(ownerId, equipment=[], materials=[]) {
+        this.#ownerId = ownerId;
         this.#equipment = equipment;
         this.#materials = materials;
     }
 
-    get equipment() {
-        return this.#equipment;
-    }
-
-    get materials() {
-        return this.#materials;
-    }
+    get ownerId() { return this.#ownerId; }
+    get equipment() { return this.#equipment; }
+    get materials() { return this.#materials; }
 }
 
 export class InventoryDeserializer {
@@ -33,32 +33,111 @@ export class InventoryDeserializer {
     }
 
     deserialize(json) {
-        const equipment = json.equipment.items.map(x => this.#itemDeserializer.deserilize(x));
-        const materials = json.materials.items.map(x => this.#itemDeserializer.deserilize(x));
-        return new Inventory(equipment, materials);
+        const equipment = json.equipment.items.map(x => this.#itemDeserializer.deserialize(x));
+        const materials = json.materials.items.map(x => this.#itemDeserializer.deserialize(x));
+        return new Inventory(json.ownerId, equipment, materials);
+    }
+}
+
+export class InventoryChangeHandler extends ChangeHandler {
+    #playerId;
+    #deserializer;
+    #changeListeners;
+
+    /**
+     * @param {string} playerId 
+     * @param {InventoryDeserializer} deserializer 
+     * @param  {...ChangeListener} changeListeners 
+     */
+    constructor(playerId, deserializer, ...changeListeners) {
+        super("inventory");
+        this.#playerId = playerId;
+        this.#deserializer = deserializer;
+        this.#changeListeners = changeListeners;
+    }
+
+    handleContent(obj) {
+        if (obj.ownerId != this.#playerId) {
+            return; // don't bother handling changes to other players' inventories
+        }
+        const inventory = this.#deserializer.deserialize(obj);
+        this.#changeListeners.forEach(listener => listener.changed(inventory));
+    }
+
+    handleDelete(obj) {
+        if (obj.ownerId != this.#playerId) {
+            return; // don't bother handling changes to other players' inventories
+        }
+        const inventory = this.#deserializer.deserialize(obj);
+        this.#changeListeners.forEach(listener => listener.removed(inventory));
+    }
+}
+
+export class EquippedWeaponChangeHandler extends ChangeHandler {
+    #playerId;
+    #deserializer;
+    #changeListeners;
+
+    /**
+     * @param {string} playerId 
+     * @param {ItemDeserializer} deserializer 
+     * @param  {...ChangeListener} changeListeners 
+     */
+    constructor(playerId, deserializer, ...changeListeners) {
+        super("equippedWeapon");
+        this.#playerId = playerId;
+        this.#deserializer = deserializer;
+        this.#changeListeners = changeListeners;
+    }
+
+    handleContent(obj) {
+        if (obj.ownerId != this.#playerId) {
+            return;
+        }
+        const weapon = obj.value
+            ? this.#deserializer.deserialize(obj.value) // obj.value - see EquipmentSlotJson
+            : null;
+        this.#changeListeners.forEach(listener => listener.changed(weapon));
+    }
+
+    handleDelete(obj) {
+        if (obj.ownerId != this.#playerId) {
+            return;
+        }
+        const weapon = obj.value
+            ? this.#deserializer.deserialize(obj.value)
+            : null;
+        this.#changeListeners.forEach(listener => listener.removed(weapon));
     }
 }
 
 export class Item {
+    #id;
     #type;
     #description;
-    #metadata;
-    #tags;
+    #level;
+    #details;
     #quantity;
 
     /**
+     * @param {string?} id 
      * @param {ItemType} type 
      * @param {string} description 
-     * @param {Map<string, object?>} metadata
-     * @param {string[]} tags
+     * @param {number} level
+     * @param {string[]} details 
      * @param {number} quantity 
      */
-    constructor(type, description, metadata, tags, quantity) {
+    constructor(id, type, description, level, details, quantity) {
+        this.#id = id;
         this.#type = type;
         this.#description = description;
-        this.#metadata = metadata;
-        this.#tags = tags;
+        this.#level = level;
+        this.#details = details;
         this.#quantity = quantity;
+    }
+
+    get id() {
+        return this.#id;
     }
 
     get type() {
@@ -69,12 +148,12 @@ export class Item {
         return this.#description;
     }
 
-    get metadata() {
-        return this.#metadata;
+    get level() {
+        return this.#level;
     }
 
-    get tags() {
-        return this.#tags;
+    get details() {
+        return this.#details;
     }
 
     get quantity() {
@@ -92,22 +171,18 @@ export class ItemDeserializer {
         this.#itemTypes = itemTypes;
     }
 
-    deserilize(json) {
+    deserialize(json) {
         const type = this.#itemTypes.getItemTypeByName(json.name);
         if (type === null) {
             throw new Error(`Bad item type name: "${json.name}"`);
         }
 
-        const metadata = new Map();
-        for (const datum of json.metadata) {
-            metadata.set(datum.key, datum.value);
-        }
-
         const result = new Item(
+            json.id,
             type,
             json.description,
-            metadata,
-            json.tags.slice(),
+            json.level,
+            json.details.slice(),
             json.quantity
         );
         return result;
@@ -116,18 +191,30 @@ export class ItemDeserializer {
 
 export class ItemType {
     #name;
+    #gradeOrder;
+    #gradeName;
 
-    constructor(name) {
+    constructor(name, gradeOrder, gradeName) {
         this.#name = name;
+        this.#gradeOrder = gradeOrder;
+        this.#gradeName = gradeName;
     }
 
     get name() {
         return this.#name;
     }
+
+    get gradeOrder() {
+        return this.#gradeOrder;
+    }
+
+    get gradeName() {
+        return this.#gradeName;
+    }
 }
 
 export function deserializeItemTypeJson(obj) {
-    const result = new ItemType(obj.name);
+    const result = new ItemType(obj.name, obj.gradeOrder, obj.gradeName);
     return result;
 }
 

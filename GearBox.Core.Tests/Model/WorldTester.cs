@@ -1,10 +1,8 @@
-namespace GearBox.Core.Tests.Model;
-
 using GearBox.Core.Model;
-using GearBox.Core.Model.Dynamic;
-using GearBox.Core.Model.Static;
 using GearBox.Core.Tests.Model.Dynamic;
 using Xunit;
+
+namespace GearBox.Core.Tests.Model;
 
 public class WorldTester
 {
@@ -35,12 +33,18 @@ public class WorldTester
     }
 
     [Fact]
-    public void ObjectCannotBeAddedToSameCollectionTwice()
+    public void SpawnLootChest_GivenDefaultLootTable_Throws()
     {
         var sut = new World();
-        var anObject = new DynamicGameObjectSpy();
 
-        sut.DynamicContent.AddDynamicObject(anObject);
-        Assert.Throws<ArgumentException>(() => sut.DynamicContent.AddDynamicObject(anObject));
+        Assert.Throws<InvalidOperationException>(sut.SpawnLootChest);
+    }
+
+    [Fact]
+    public void SpawnEnemy_GivenDefaultEnemies_DoesNotThrow()
+    {
+        var sut = new World();
+        var actual = sut.SpawnEnemy();
+        Assert.NotNull(actual);
     }
 }

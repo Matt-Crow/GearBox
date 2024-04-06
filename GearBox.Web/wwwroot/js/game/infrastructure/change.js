@@ -99,3 +99,22 @@ export class Change {
         return this.#isDelete;
     }
 }
+
+export class ChangeListener {
+    #onChanged;
+    #onRemoved;
+
+    constructor({onChanged, onRemoved}) {
+        const doNothing = () => {};
+        this.#onChanged = onChanged ?? doNothing;
+        this.#onRemoved = onRemoved ?? doNothing;
+    }
+
+    changed(obj) {
+        this.#onChanged(obj);
+    }
+
+    removed(obj) {
+        this.#onRemoved(obj);
+    }
+}

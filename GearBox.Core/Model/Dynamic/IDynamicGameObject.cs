@@ -1,21 +1,19 @@
-using GearBox.Core.Model.Json;
-
 namespace GearBox.Core.Model.Dynamic;
 
 /// <summary>
 /// An object in a world which updates every game tick
 /// </summary>
-public interface IDynamicGameObject : IGameObject, ISerializable<IDynamicGameObjectJson>
+public interface IDynamicGameObject : IGameObject
 {
     /// <summary>
     /// The physical body of this game object.
     /// This object may not have a body.
     /// </summary>
-    public BodyBehavior? Body { get; }
+    BodyBehavior? Body { get; }
 
     /// <summary>
-    /// Called each game tick.
-    /// Subclasses should not call this method.
+    /// If set, this determines when the object is terminated,
+    /// and thus should no longer be used.
     /// </summary>
-    public void Update();
+    TerminateBehavior? Termination { get; }
 }

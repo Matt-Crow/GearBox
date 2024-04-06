@@ -6,7 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 var world = new WorldBuilder()
     .AddMiningSkill()
-    .WithDummyMap()
+    .AddStarterWeapons()
+    .AddDefaultEnemies()
+    .WithDesertMap()
     .Build();
 
 // Add services to the container.
@@ -25,7 +27,19 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+
+// need to keep the middleware pipeline in order: don't merge into the other if statement!
+if (app.Environment.IsDevelopment())
+{
+    app.UseStaticFiles(new StaticFileOptions()
+    {
+        OnPrepareResponse = (ctx) => ctx.Context.Response.Headers.Append("Cache-Control", "no-store")
+    });
+}
+else
+{
+    app.UseStaticFiles();
+}
 
 app.UseRouting();
 

@@ -3,41 +3,50 @@ import { PIXELS_PER_TILE } from "./constants.js";
 
 export class Character {
     #id;
+    #name;
+    #level;
     #color = "rgb(0 255 0)"; // todo read from server
     #x;
     #y;
+    #hitPoints;
 
     /**
      * @param {string} id a unique identifier for this character (GUID)
+     * @param {string} name 
+     * @param {number} level 
      * @param {number} x the x-coordinate of this character's center, in pixels
      * @param {number} y the y-coordinate of this character's center, in pixels 
+     * @param {Fraction} hitPoints 
      */
-    constructor(id, x, y) {
+    constructor(id, name, level, x, y, hitPoints) {
         this.#id = id;
+        this.#name = name;
+        this.#level = level;
         this.#x = x;
         this.#y = y;
+        this.#hitPoints = hitPoints;
     }
 
     /**
      * @returns {string} a unique identifier for this character (GUID)
      */
-    get id() {
-        return this.#id;
-    }
+    get id() { return this.#id; }
+
+    get name() { return this.#name; }
+
+    get level() { return this.#level; }
 
     /**
      * @returns {number} the x-coordinate of this character's center, in pixels
      */
-    get x() {
-        return this.#x;
-    }
+    get x() { return this.#x; }
 
     /**
      * @returns {number} the y-coordinate of this character's center, in pixels
      */
-    get y() {
-        return this.#y;
-    }
+    get y() { return this.#y; }
+
+    get hitPoints() { return this.#hitPoints; }
 
     /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
@@ -50,11 +59,39 @@ export class Character {
         context.beginPath();
         context.arc(this.#x, this.#y, r, 0, 2*Math.PI);
         context.fill();
+
+        context.fillStyle = "black";
+        context.fillText(`${this.#name} LV ${this.#level} (${this.#hitPoints.current} HP)`, this.#x-r, this.#y-r);
+    }
+}
+
+export class Fraction {
+    #current;
+    #max;
+
+    constructor(current, max) {
+        this.#current = current;
+        this.#max = max;
+    }
+
+    get current() {
+        return this.#current;
+    }
+
+    get max() {
+        return this.#max;
     }
 }
 
 export class CharacterJsonDeserializer extends JsonDeserializer {
     constructor() {
-        super("character", (obj) => new Character(obj.id, obj.x, obj.y));
+        super("character", (obj) => new Character(
+            obj.id, 
+            obj.name,
+            obj.level,
+            obj.x, 
+            obj.y, 
+            new Fraction(obj.hitPoints.current, obj.hitPoints.max)
+        ));
     }
 }

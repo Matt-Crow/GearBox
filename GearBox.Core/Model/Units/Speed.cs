@@ -10,18 +10,21 @@ public readonly struct Speed
         _pixelsPerFrame = pixelsPerFrame;
     }
 
-    public static Speed InTilesPerSecond(int tilesPerSecond)
+    public static Speed FromTilesPerSecond(int tilesPerSecond)
     {
         /*
             tile     pixel   second
             ------ x ----- x ------
             second   tile    frame
         */
-        var pixelsPerSecond = Distance.FromTiles(tilesPerSecond).InPixels;
-        var result = pixelsPerSecond / Time.FRAMES_PER_SECOND;
+        var pixels = Distance.FromTiles(tilesPerSecond).InPixels;
+        var second = Duration.FromSeconds(1).InFrames;
+        var result = pixels / second;
         return new Speed(result);
     }
 
+    public static Speed FromPixelsPerFrame(double pixelsPerFrame) => new(pixelsPerFrame);
 
-    public double InPixelsPerFrame { get => _pixelsPerFrame; }
+
+    public double InPixelsPerFrame => _pixelsPerFrame;
 }

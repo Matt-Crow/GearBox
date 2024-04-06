@@ -12,6 +12,7 @@ namespace GearBox.Core.Utils;
 public class SafeList<T>
 {
     private readonly List<T> _pendingAdd = new();
+    private readonly List<T> _pendingRemove = new();
     private readonly List<T> _items = new();
 
     public SafeList(params T[] items)
@@ -56,6 +57,16 @@ public class SafeList<T>
     }
 
     /// <summary>
+    /// Checks whether the given item would exist after the next call to ApplyChanges
+    /// </summary>
+    public bool Contains(T obj)
+    {
+        var willBeInItems = _pendingAdd.Contains(obj) || _items.Contains(obj);
+        var result = willBeInItems && !_pendingRemove.Contains(obj);
+        return result;
+    }
+
+    /// <summary>
     /// Gets the current values in the list, excluding any pending changes
     /// </summary>
     public IEnumerable<T> AsEnumerable()
@@ -68,11 +79,22 @@ public class SafeList<T>
     }
 
     /// <summary>
+    /// Schedules the given item to be removed after the next call to ApplyChanges
+    /// </summary>
+    public void Remove(T item)
+    {
+        _pendingRemove.Add(item);
+    }
+
+    /// <summary>
     /// Applies all pending changes to this list
     /// </summary>
     public void ApplyChanges()
     {
         _items.AddRange(_pendingAdd);
         _pendingAdd.Clear();
+
+        _items.RemoveAll(item => _pendingRemove.Contains(item));
+        _pendingRemove.Clear();
     }
 }

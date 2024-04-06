@@ -2,6 +2,7 @@ namespace GearBox.Core.Model;
 
 using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Stable;
+using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Static;
 
 /// <summary>
@@ -12,24 +13,32 @@ public class World
 {
     private readonly List<WorldTimer> _timers = new();
     private readonly LootTable _loot;
+    private readonly List<Func<Character>> _enemies = [];
 
     public World(
         Guid? id = null, 
-        StaticWorldContent? staticContent = null, 
+        Map? map = null, 
         IItemTypeRepository? itemTypes = null, 
-        LootTable? loot = null
+        LootTable? loot = null,
+        List<Func<Character>>? enemies = null
     )
     {
         Id = id ?? Guid.NewGuid();
-        StaticContent = staticContent ?? StaticWorldContent.EMPTY;
+        Map = map ?? new();
         DynamicContent = new DynamicWorldContent();
         StableContent = new StableWorldContent();
         ItemTypes = itemTypes ?? ItemTypeRepository.Empty();
         _loot = loot ?? new LootTable();
+        _enemies = enemies ?? [];
+
+        if (_enemies.Count == 0)
+        {
+            _enemies.Add(() => new Character("Default enemy", 1));
+        }
     }
 
     public Guid Id { get; init; }
-    public StaticWorldContent StaticContent { get; init; }
+    public Map Map { get; init; }
     public DynamicWorldContent DynamicContent { get; init; }
     public StableWorldContent StableContent { get; init; }
     public IItemTypeRepository ItemTypes { get; init; }
@@ -48,12 +57,24 @@ public class World
             chestItems.Add(_loot.GetRandomItem());
         }
         
-        var location = StaticContent.Map.GetRandomOpenTile();
+        var location = Map.GetRandomOpenTile();
         if (location != null)
         {
             var lootChest = new LootChest(location.Value.CenteredOnTile(), chestItems.ToArray());
             StableContent.AddLootChest(lootChest);
         }
+    }
+
+    public Character SpawnEnemy()
+    {
+        var enemyFactory = _enemies[Random.Shared.Next(_enemies.Count)];
+        var enemy = enemyFactory.Invoke();
+        
+        var tile = Map.GetRandomOpenTile() ?? throw new Exception("Map has no open tiles");
+        enemy.Coordinates = tile.CenteredOnTile();
+
+        DynamicContent.AddDynamicObject(enemy);
+        return enemy;
     }
 
     /// <summary>
@@ -70,7 +91,8 @@ public class World
             var body = obj.Body;
             if (body is not null)
             {
-                StaticContent.CheckForCollisions(body);
+                Map.CheckForCollisions(body);
+                DynamicContent.CheckForCollisions(body);
             }
         }
         return StableContent.Update();

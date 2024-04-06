@@ -1,4 +1,5 @@
 using GearBox.Core.Controls;
+using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using Microsoft.AspNetCore.SignalR;
 
@@ -27,13 +28,7 @@ public class WorldHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    /*
-        Not sure how much I like this idea, 
-        as while it is very few lines of code,
-        it is a lot of little methods.
-
-        Maybe I'll come back to this once I've settled on serialization methods.
-    */
+    public Task Equip(Guid id) => Receive(new Equip(id));
     public Task StartMovingUp() => Receive(StartMoving.UP);
     public Task StartMovingDown() => Receive(StartMoving.DOWN);
     public Task StartMovingLeft() => Receive(StartMoving.LEFT);
@@ -43,6 +38,11 @@ public class WorldHub : Hub
     public Task StopMovingDown() => Receive(StopMoving.DOWN);
     public Task StopMovingLeft() => Receive(StopMoving.LEFT);
     public Task StopMovingRight() => Receive(StopMoving.RIGHT);
+
+    /// <summary>
+    /// Note the parameter is the bearing in degrees, so 0 means up, 90 means to the right, etc.
+    /// </summary>
+    public Task UseBasicAttack(int bearingInDegrees) => Receive(new UseBasicAttackCommand(Direction.FromBearingDegrees(bearingInDegrees)));
 
     private Task Receive(IControlCommand command)
     {

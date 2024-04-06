@@ -5,6 +5,10 @@ export class Client {
         this.#signalr = signalr;    
     }
 
+    equip(id) {
+        this.#signalr.invoke("Equip", id)
+    }
+
     startMovingUp() {
         this.#signalr.invoke("StartMovingUp");
     }
@@ -35,5 +39,9 @@ export class Client {
 
     stopMovingRight() {
         this.#signalr.invoke("StopMovingRight");
+    }
+
+    useBasicAttack(bearingInDegrees) {
+        this.#signalr.invoke("UseBasicAttack", bearingInDegrees);
     }
 }

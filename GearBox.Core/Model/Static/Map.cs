@@ -37,16 +37,17 @@ public class Map : ISerializable<MapJson>
     }
 
 
-    public Distance Width { get => Distance.FromTiles(_tileMap.GetLength(1)); }
-    public Distance Height { get => Distance.FromTiles(_tileMap.GetLength(0)); }
+    public Distance Width => Distance.FromTiles(_tileMap.GetLength(1));
+    public Distance Height => Distance.FromTiles(_tileMap.GetLength(0));
 
 
-    public void SetTileTypeForKey(int key, TileType value)
+    public Map SetTileTypeForKey(int key, TileType value)
     {
         _tileTypes[key] = value;
+        return this;
     }
 
-    public void SetTileAt(Coordinates coordinates, TileType tileType)
+    public Map SetTileAt(Coordinates coordinates, TileType tileType)
     {
         if (!_tileTypes.ContainsValue(tileType))
         {
@@ -54,9 +55,10 @@ public class Map : ISerializable<MapJson>
         }
         var i = _tileTypes.FirstOrDefault(x => x.Value == tileType).Key;
         SetTileAt(coordinates, i);
+        return this;
     }
 
-    public void SetTileAt(Coordinates coordinates, int tileType)
+    public Map SetTileAt(Coordinates coordinates, int tileType)
     {
         Validate(coordinates);
         var x = coordinates.XInTiles;
@@ -66,6 +68,19 @@ public class Map : ISerializable<MapJson>
             throw new ArgumentException($"invalid tileType {tileType}");
         }
         _tileMap[y,x] = tileType;
+        return this;
+    }
+
+    public Map SetTilesFrom(int[,] csv)
+    {
+        for (var y = 0; y < csv.GetLength(0); y++)
+        {
+            for (var x = 0; x < csv.GetLength(1); x++)
+            {
+                SetTileAt(Coordinates.FromTiles(x, y), csv[y,x]);
+            }
+        }
+        return this;
     }
 
     public TileType GetTileAt(Coordinates coordinates)

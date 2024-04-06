@@ -8,15 +8,13 @@ import { deserializeMapJson } from "./map.js";
 export class World {
     #playerId; // need reference to changing player
     #map;
-    #staticGameObjects;
     #dynamicGameObjects;
     #stableGameObjects;
     #itemTypes;
 
-    constructor(playerId, map, staticGameObjects, itemTypes) {
+    constructor(playerId, map, itemTypes) {
         this.#playerId = playerId;
         this.#map = map;
-        this.#staticGameObjects = staticGameObjects;
         this.#dynamicGameObjects = [];
         this.#stableGameObjects = new Map();
         this.#itemTypes = new ItemTypeRepository(itemTypes);
@@ -74,7 +72,6 @@ export class World {
      */
     draw(context) {
         this.#map.draw(context);
-        this.#staticGameObjects.forEach(obj => obj.draw(context));
         this.#dynamicGameObjects.forEach(obj => obj.draw(context));
         for (const obj of this.#stableGameObjects.values()) {
             obj.draw(context);
@@ -90,18 +87,10 @@ export class WorldInitHandler {
      * @returns {World}
      */
     handleWorldInit(obj) {
-        const map = deserializeMapJson(obj.staticWorldContent.map);
-        const staticGameObjects = this.#deserializeStaticGameObjects(obj.staticWorldContent.gameObjects);
+        const map = deserializeMapJson(obj.map);
         const itemTypes = obj.itemTypes.map(deserializeItemTypeJson);
-        const deserialized = new World(obj.playerId, map, staticGameObjects, itemTypes);
+        const deserialized = new World(obj.playerId, map, itemTypes);
         return deserialized;
-    }
-    
-    #deserializeStaticGameObjects(gameObjectsJson) {
-        if (gameObjectsJson.length > 0) {
-            throw new Error("not implemented yet");
-        }
-        return [];
     }
 }
 
@@ -130,10 +119,23 @@ export class WorldUpdateHandler {
     }
 
     handleWorldUpdate(obj) {
-        const dynamicGameObjects = obj.dynamicWorldContent.gameObjects.map(x => this.#deserializers.deserialize(x));
+        const dynamicGameObjects = obj.gameObjects.map(gameObjectJson => this.#deserialize(gameObjectJson));
         this.#world.dynamicGameObjects = dynamicGameObjects;
         
         const changes = obj.changes.map(json => Change.fromJson(json));
         changes.forEach(change => this.#changeHandlers.handle(change));
+    }
+
+    #deserialize(gameObjectJson) {
+        /*
+            gameObjectJson is formatted as
+            {
+                "type": string
+                "content": string (stringified JSON)
+            }
+        */
+        const contentJson = JSON.parse(gameObjectJson.content);
+        contentJson["$type"] = gameObjectJson.type;
+        return this.#deserializers.deserialize(contentJson);
     }
 }

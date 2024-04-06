@@ -1,3 +1,4 @@
+using System.Text.Json;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 
@@ -8,28 +9,53 @@ namespace GearBox.Core.Model.Dynamic;
 /// </summary>
 public class Character : IDynamicGameObject
 {
+    public static readonly int MAX_LEVEL = 20;
+    protected static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);
+
     private readonly MobileBehavior _mobility;
 
-    public Character() : this(Velocity.FromPolar(Speed.InTilesPerSecond(3), Direction.DOWN))
-    {
 
+    public Character(string name, int level)
+    {
+        Name = name;
+        _mobility = new MobileBehavior(Body, Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
+        Serializer = new(Type, Serialize);
+        Termination = new(this, () => DamageTaken >= MaxHitPoints);
+        SetLevel(level);
     }
 
-    public Character(Velocity velocity)
-    {
-        _mobility = new MobileBehavior(Body, velocity);
-    }
 
-
-    /// <summary>
-    /// Used by clients to uniquely identify a character across updates.
-    /// </summary>
     public Guid Id { get; init; } = Guid.NewGuid();
-
+    public string Name { get; init; }
+    public Serializer Serializer { get; init; }
     public BodyBehavior Body { get; init; } = new();
-
+    public TerminateBehavior Termination { get; init; }
     public Coordinates Coordinates { get => Body.Location; set => Body.Location = value; }
+    public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
+    public int MaxHitPoints { get; set; }
+    protected virtual string Type => "character";
+    protected int Level { get; private set; }
+    protected int DamagePerHit { get; private set; } // tie DPH to character instead of weapon so unarmed works
 
+
+    public void SetLevel(int level)
+    {
+        Level = level;
+
+        // avoid virtual call in ctor: https://stackoverflow.com/q/119506
+        UpdateStatsBase();
+    }
+
+    public virtual void UpdateStats()
+    {
+        UpdateStatsBase();
+    }
+
+    private void UpdateStatsBase()
+    {
+        MaxHitPoints = GetMaxHitPointsByLevel(Level);
+        DamagePerHit = GetDamagePerHitByLevel(Level);
+    }
 
     public void StartMovingIn(Direction direction)
     {
@@ -41,18 +67,45 @@ public class Character : IDynamicGameObject
         _mobility.StopMovingIn(direction);
     }
 
-    public IDynamicGameObjectJson ToJson()
+    public void SetSpeed(Speed speed)
     {
-        return new CharacterJson(
-            Id,
-            _mobility.Coordinates.XInPixels, 
-            _mobility.Coordinates.YInPixels
-        );
+        _mobility.Velocity = _mobility.Velocity.WithSpeed(speed);
     }
 
-    public void Update()
+    public virtual void TakeDamage(int damage)
+    {
+        DamageTaken += damage;
+        if (DamageTaken > MaxHitPoints)
+        {
+            DamageTaken = MaxHitPoints;
+        }
+    }
+
+    public void HealPercent(double percent)
+    {
+        DamageTaken -= (int)(MaxHitPoints*percent);
+        if (DamageTaken < 0)
+        {
+            DamageTaken = 0;
+        }
+    }
+
+    public virtual void Update()
     {
         _mobility.UpdateMovement();
+    }
+
+    protected virtual string Serialize(JsonSerializerOptions options)
+    {
+        var json = new CharacterJson(
+            Id,
+            Name,
+            Level,
+            _mobility.Coordinates.XInPixels, 
+            _mobility.Coordinates.YInPixels,
+            new FractionJson(MaxHitPoints - DamageTaken, MaxHitPoints)
+        );
+        return JsonSerializer.Serialize(json, options);
     }
 
     public override bool Equals(object? obj)
@@ -67,5 +120,19 @@ public class Character : IDynamicGameObject
     public override int GetHashCode()
     {
         return Id.GetHashCode();
+    }
+
+    protected virtual int GetMaxHitPointsByLevel(int level)
+    {
+        // ranges from 120 to 500
+        var result = 100 + 20*level;
+        return result;
+    }
+
+    private int GetDamagePerHitByLevel(int level)
+    {
+        // ranges from 50 to 183
+        var result = 43 + 7*level;
+        return result;
     }
 }
