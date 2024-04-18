@@ -4,7 +4,8 @@ using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Stable.Items;
 
-public class EquipmentSlot : IStableGameObject
+public class EquipmentSlot<T> : IStableGameObject
+where T : Equipment
 {
     private readonly Guid _ownerId;
 
@@ -17,7 +18,7 @@ public class EquipmentSlot : IStableGameObject
         );
     }
 
-    public Equipment? Value { get; set; }
+    public T? Value { get; set; }
 
     public Serializer Serializer { get; init; }
 

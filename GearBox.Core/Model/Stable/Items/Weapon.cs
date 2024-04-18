@@ -21,6 +21,4 @@ public class Weapon : Equipment
     public AttackRange AttackRange { get; init; }
     public override IEnumerable<string> Details => ListExtensions.Of($"Range: {AttackRange}")
         .Concat(StatBoosts.Details);
-
-    public override EquipmentSlot GetSlot(PlayerCharacter player) => player.Weapon;
 }

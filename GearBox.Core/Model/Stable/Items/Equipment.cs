@@ -47,12 +47,6 @@ public abstract class Equipment : IItem
         return inventory.Equipment;
     }
 
-    /// <summary>
-    /// Returns the equipment slot this should be equipped in
-    /// </summary>
-    public abstract EquipmentSlot GetSlot(PlayerCharacter player);
-
-
     public override bool Equals(object? obj)
     {
         var other = obj as Equipment;

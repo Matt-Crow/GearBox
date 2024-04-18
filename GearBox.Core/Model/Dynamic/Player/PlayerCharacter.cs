@@ -22,7 +22,7 @@ public class PlayerCharacter : Character
     private int MaxEnergy { get; set; }
     public PlayerStats Stats { get; init; } = new();
     public Inventory Inventory { get; init; }
-    public EquipmentSlot Weapon { get; init; }
+    public EquipmentSlot<Weapon> Weapon { get; init; }
 
     public override void UpdateStats()
     {
@@ -39,6 +39,7 @@ public class PlayerCharacter : Character
         base.UpdateStats();
     }
 
+    // todo split into other methods, such as EquipWeapon
     public void Equip(Equipment equipment)
     {
         if (!Inventory.Equipment.Contains(equipment))
@@ -46,7 +47,7 @@ public class PlayerCharacter : Character
             throw new ArgumentException(nameof(equipment));
         }
 
-        var slot = equipment.GetSlot(this);
+        var slot = Weapon;
         
         // check if something is already in the slot
         if (slot.Value != null)
@@ -54,7 +55,7 @@ public class PlayerCharacter : Character
             Inventory.Add(slot.Value);
         }
 
-        slot.Value = equipment;
+        slot.Value = (Weapon?)equipment; // todo
         Inventory.Remove(equipment);
 
         UpdateStats();
@@ -62,6 +63,9 @@ public class PlayerCharacter : Character
 
     public void EquipById(Guid id)
     {
+        // todo different tabs for each type of equipment? might be annoying in the UI
+        // EquipWeaponById?
+        // better to just make Equip.cs call EquipWeapon?
         var equipment = Inventory.Equipment.GetItemById(id) as Equipment;
         if (equipment != null)
         {
