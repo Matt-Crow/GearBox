@@ -12,16 +12,16 @@ namespace GearBox.Core.Model.Stable.Items;
 public class LootChest : IStableGameObject
 {
     private readonly Guid _id = Guid.NewGuid();
-    private readonly HashSet<Guid> _collectedBy = new();
-    private readonly List<IItem> _contents;
+    private readonly HashSet<Guid> _collectedBy = [];
+    private readonly Inventory _contents = new();
 
-    public LootChest(Coordinates location, params IItem[] contents)
+    public LootChest(Coordinates location, Inventory contents)
     {
         Body = new BodyBehavior()
         {
             Location = location
         };
-        _contents = new List<IItem>(contents);
+        _contents = contents;
         Serializer = new("lootChest", Serialize);
     }
 
@@ -41,11 +41,7 @@ public class LootChest : IStableGameObject
         if (Body.CollidesWith(player.Body))
         {
             _collectedBy.Add(player.Id);
-            foreach (var item in _contents)
-            {
-                var tab = item.GetTab(player.Inventory);
-                tab.Add(item);
-            }
+            player.Inventory.Add(_contents);
         }
     }
 

@@ -8,9 +8,9 @@ namespace GearBox.Core.Model.Stable.Items;
 /// </summary>
 public class Inventory : IStableGameObject
 {
-    public Inventory(Guid ownerId)
+    public Inventory(Guid? ownerId = null)
     {
-        OwnerId = ownerId;
+        OwnerId = ownerId ?? Guid.Empty;
         Serializer = new("inventory", Serialize);
     }
 
@@ -27,6 +27,23 @@ public class Inventory : IStableGameObject
     {
         var tabToAddTo = item.GetTab(this);
         tabToAddTo.Add(item);
+    }
+
+    /// <summary>
+    /// Adds all items from the other inventory to this one
+    /// </summary>
+    public void Add(Inventory other)
+    {
+        // todo no stacks for equipment
+        foreach (var equipmentStack in other.Equipment.Content)
+        {
+            // do I need to clone equipment to avoid duplication?
+            Equipment.Add(equipmentStack.Item, equipmentStack.Quantity);
+        }
+        foreach (var materialStack in other.Materials.Content)
+        {
+            Materials.Add(materialStack.Item, materialStack.Quantity);
+        }
     }
 
     public void Remove(IItem item)

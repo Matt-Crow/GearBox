@@ -5,31 +5,45 @@ namespace GearBox.Core.Model.Stable.Items;
 /// </summary>
 public class LootTable
 {
-    private readonly Dictionary<Grade, List<ItemDefinition>> _gradeToDefinitions = Grade.ALL.ToDictionary(x => x, _ => new List<ItemDefinition>());
+    private readonly Dictionary<Grade, ItemDefinitionsForGrade> _values = Grade.ALL.ToDictionary(x => x, _ => new ItemDefinitionsForGrade());
 
-    public void Add(ItemDefinition itemDefinition)
+    public void AddEquipment(ItemDefinition<Equipment> itemDefinition)
     {
-        _gradeToDefinitions[itemDefinition.Type.Grade].Add(itemDefinition);
+        _values[itemDefinition.Type.Grade].AddEquipment(itemDefinition);
     }
 
-    public IItem GetRandomItem()
+    public void AddMaterial(ItemDefinition<Material> itemDefinition)
+    {
+        _values[itemDefinition.Type.Grade].AddMaterial(itemDefinition);
+    }
+
+    public Inventory GetRandomItems()
+    {
+        var result = new Inventory();
+        var numItems = Random.Shared.Next(0, 3) + 1;
+        for (int i = 0; i < numItems; i++)
+        {
+            AddRandomItemTo(result);
+        }
+        return result;
+    }
+
+    private void AddRandomItemTo(Inventory inventory)
     {
         var grade = ChooseRandomGrade();
-        var bucket = _gradeToDefinitions[grade];
-        var i = Random.Shared.Next(bucket.Count);
-        var result = bucket[i].Create();
-        return result;
+        var definitions = _values[grade];
+        definitions.AddRandomItemTo(inventory);
     }
 
     private Grade ChooseRandomGrade()
     {
-        var options = _gradeToDefinitions
-            .Where(kv => kv.Value.Any())
-            .Select(kv => kv.Key)
+        var options = _values
+            .Where(x => x.Value.HasAnyDefinitions())
+            .Select(x => x.Key)
             .OrderBy(k => k.Order)
             .ToList();
         
-        if (!options.Any())
+        if (options.Count == 0)
         {
             throw new InvalidOperationException($"LootTable has no items");
         }

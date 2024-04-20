@@ -14,7 +14,7 @@ public class PlayerCharacter : Character
     public PlayerCharacter(string name, int level) : base(name, level)
     {
         Inventory = new(Id);
-        Weapon = new(Id);
+        Weapon = new(Id, "equippedWeapon");
         UpdateStats();
     }
 

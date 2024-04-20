@@ -33,5 +33,6 @@ public interface IItem
     /// <summary>
     /// Gets the inventory tab this belongs in
     /// </summary>
+    [Obsolete]
     InventoryTab GetTab(Inventory inventory);
 }

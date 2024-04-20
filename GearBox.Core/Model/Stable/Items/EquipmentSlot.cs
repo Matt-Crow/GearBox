@@ -9,11 +9,11 @@ where T : Equipment
 {
     private readonly Guid _ownerId;
 
-    public EquipmentSlot(Guid ownerId)
+    public EquipmentSlot(Guid ownerId, string type)
     {
         _ownerId = ownerId;
         Serializer = new Serializer(
-            "equippedWeapon", // todo change when generics are used
+            type,
             options => JsonSerializer.Serialize(new EquipmentSlotJson(_ownerId, ValueJson()), options)
         );
     }

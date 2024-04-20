@@ -3,7 +3,8 @@ namespace GearBox.Core.Model.Stable.Items;
 /// <summary>
 /// Defines how to instantiate an item
 /// </summary>
-public readonly struct ItemDefinition
+public class ItemDefinition<T>
+where T: IItem
 {
     public ItemDefinition(ItemType type, Func<ItemType, IItem> typeToItem)
     {

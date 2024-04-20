@@ -13,17 +13,13 @@ public class WorldBuilder
     private readonly LootTable _loot = new();
     private readonly List<Func<Character>> _enemies = [];
 
-    public WorldBuilder DefineItem(ItemDefinition itemDefinition)
-    {
-        _loot.Add(itemDefinition);
-        _itemTypes.Add(itemDefinition.Type);
-        return this;
-    }
 
     public WorldBuilder DefineMaterial(string name, string description, Grade grade)
     {
-        var itemDefinition = new ItemDefinition(new ItemType(name, grade), t => new Material(t, description));
-        return DefineItem(itemDefinition);
+        var itemDefinition = new ItemDefinition<Material>(new ItemType(name, grade), t => new Material(t, description));
+        _loot.AddMaterial(itemDefinition);
+        _itemTypes.Add(itemDefinition.Type);
+        return this;
     }
 
     public WorldBuilder DefineWeapon(string name, Grade grade, Action<WeaponBuilder> modifyBuilder)
@@ -31,8 +27,10 @@ public class WorldBuilder
         var itemType = new ItemType(name, grade);
         var builder = new WeaponBuilder(itemType);
         modifyBuilder(builder);
-        var itemDefinition = new ItemDefinition(itemType, _ => builder.Build(1)); // in the future, this will be based on the area level
-        return DefineItem(itemDefinition);
+        var itemDefinition = new ItemDefinition<Equipment>(itemType, _ => builder.Build(1)); // in the future, this will be based on the area level
+        _loot.AddEquipment(itemDefinition);
+        _itemTypes.Add(itemType);
+        return this;
     }
 
     // todo move to extension method once skills are added

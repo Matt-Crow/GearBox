@@ -10,7 +10,7 @@ public class EquipmentSlotTester
     public void DynamicValues_AfterEquipping_Change()
     {
         var hasher = new DynamicHasher();
-        var sut = new EquipmentSlot<Weapon>(Guid.Empty);
+        var sut = new EquipmentSlot<Weapon>(Guid.Empty, "");
         var hashBefore = hasher.Hash(sut);
     
         sut.Value = new Weapon(new ItemType("foo"));
@@ -23,7 +23,7 @@ public class EquipmentSlotTester
     public void DynamicValues_AfterSwitching_Change()
     {
         var hasher = new DynamicHasher();
-        var sut = new EquipmentSlot<Weapon>(Guid.Empty)
+        var sut = new EquipmentSlot<Weapon>(Guid.Empty, "")
         {
             Value = new Weapon(new ItemType("foo"))
         };
