@@ -16,9 +16,9 @@ public class WorldBuilder
 
     public WorldBuilder DefineMaterial(string name, string description, Grade grade)
     {
-        var itemDefinition = new ItemDefinition<Material>(new ItemType(name, grade), t => new Material(t, description));
-        _loot.AddMaterial(itemDefinition);
-        _itemTypes.Add(itemDefinition.Type);
+        var type = new ItemType(name, grade);
+        _loot.AddMaterial(new Material(type, description));
+        _itemTypes.Add(type);
         return this;
     }
 
@@ -27,8 +27,7 @@ public class WorldBuilder
         var itemType = new ItemType(name, grade);
         var builder = new WeaponBuilder(itemType);
         modifyBuilder(builder);
-        var itemDefinition = new ItemDefinition<Equipment>(itemType, _ => builder.Build(1)); // in the future, this will be based on the area level
-        _loot.AddEquipment(itemDefinition);
+        _loot.AddEquipment(builder.Build(1)); // in the future, this will be based on the area level
         _itemTypes.Add(itemType);
         return this;
     }

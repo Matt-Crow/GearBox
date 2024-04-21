@@ -21,4 +21,9 @@ public class Weapon : Equipment
     public AttackRange AttackRange { get; init; }
     public override IEnumerable<string> Details => ListExtensions.Of($"Range: {AttackRange}")
         .Concat(StatBoosts.Details);
+
+    public override Equipment ToOwned()
+    {
+        return new Weapon(Type, Description, Level, Guid.NewGuid(), AttackRange, StatBoosts);
+    }
 }

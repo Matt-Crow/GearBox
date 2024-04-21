@@ -57,4 +57,9 @@ public abstract class Equipment : IItem
     {
         return Id.GetHashCode();
     }
+
+    /// <summary>
+    /// Returns this if it is immutable, or a clone otherwise
+    /// </summary>
+    public abstract Equipment ToOwned();
 }

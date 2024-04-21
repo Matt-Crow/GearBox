@@ -35,4 +35,9 @@ public interface IItem
     /// </summary>
     [Obsolete]
     InventoryTab GetTab(Inventory inventory);
+
+    /*
+    // can't do "IItem ToOwned()" https://stackoverflow.com/a/5709191
+    //IItem ToOwned();
+    */
 }

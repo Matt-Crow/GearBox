@@ -7,12 +7,12 @@ public class LootTable
 {
     private readonly Dictionary<Grade, ItemDefinitionsForGrade> _values = Grade.ALL.ToDictionary(x => x, _ => new ItemDefinitionsForGrade());
 
-    public void AddEquipment(ItemDefinition<Equipment> itemDefinition)
+    public void AddEquipment(Equipment itemDefinition)
     {
         _values[itemDefinition.Type.Grade].AddEquipment(itemDefinition);
     }
 
-    public void AddMaterial(ItemDefinition<Material> itemDefinition)
+    public void AddMaterial(Material itemDefinition)
     {
         _values[itemDefinition.Type.Grade].AddMaterial(itemDefinition);
     }

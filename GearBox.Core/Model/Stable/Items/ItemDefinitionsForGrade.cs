@@ -3,15 +3,15 @@ namespace GearBox.Core.Model.Stable.Items;
 // could refactor this into Inventory if ItemDefinition is not needed
 public class ItemDefinitionsForGrade
 {
-    private readonly List<ItemDefinition<Equipment>> _equipment = [];
-    private readonly List<ItemDefinition<Material>> _materials = [];
+    private readonly List<Equipment> _equipment = [];
+    private readonly List<Material> _materials = [];
 
-    public void AddEquipment(ItemDefinition<Equipment> item)
+    public void AddEquipment(Equipment item)
     {
         _equipment.Add(item);
     }
 
-    public void AddMaterial(ItemDefinition<Material> material)
+    public void AddMaterial(Material material)
     {
         _materials.Add(material);
     }
@@ -27,12 +27,12 @@ public class ItemDefinitionsForGrade
         if (addMaterial && _materials.Count > 0)
         {
             var x = Random.Shared.Next(_materials.Count);
-            inventory.Materials.Add(_materials[x].Create());
+            inventory.Materials.Add(_materials[x].ToOwned());
         }
         else
         {
             var x = Random.Shared.Next(_equipment.Count);
-            inventory.Equipment.Add(_equipment[x].Create());
+            inventory.Equipment.Add(_equipment[x].ToOwned());
         }
     }
 

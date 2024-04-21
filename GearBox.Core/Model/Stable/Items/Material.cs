@@ -34,4 +34,9 @@ public class Material : IItem
     {
         return Type.GetHashCode();
     }
+
+    public Material ToOwned()
+    {
+        return this;
+    }
 }

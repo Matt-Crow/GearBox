@@ -13,17 +13,31 @@ public class LootTableTester
     }
 
     [Fact]
-    public void GetRandomItem_GivenSingle_ReturnsCopyOfIt()
+    public void GetRandomItem_GivenMaterial_ReturnsIt()
     {
         var sut = new LootTable();
-        var definition = new ItemDefinition<Material>(new ItemType("foo"), t => new Material(t));
-        sut.AddMaterial(definition);
+        var expected = new Material(new ItemType("foo"));
+        sut.AddMaterial(expected);
 
-        var expected = definition.Create();
         var inventory = sut.GetRandomItems();
         var actual = inventory.Materials.Content.First().Item;
 
         Assert.Equal(expected, actual);
+        Assert.True(expected == actual);
+    }
+
+    [Fact]
+    public void GetRandomItem_GivenWeapon_ReturnsCopyOfIt()
+    {
+        var sut = new LootTable();
+        var expected = new Weapon(new ItemType("foo"));
+        sut.AddEquipment(expected);
+
+        var inventory = sut.GetRandomItems();
+        var actual = inventory.Equipment.Content.First().Item;
+
+        // IDs are different
+        Assert.NotEqual(expected, actual);
         Assert.False(expected == actual);
     }
 }
