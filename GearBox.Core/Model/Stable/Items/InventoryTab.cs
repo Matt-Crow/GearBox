@@ -43,6 +43,14 @@ public class InventoryTab : ISerializable<InventoryTabJson>
         }
     }
 
+    public bool Any()
+    {
+        var result = Content
+            .Where(stack => stack.Quantity > 0)
+            .Any();
+        return result;
+    }
+
     public void Remove(IItem item)
     {
         var stackToRemoveFrom = _content.AsEnumerable()

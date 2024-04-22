@@ -5,16 +5,16 @@ namespace GearBox.Core.Model.Stable.Items;
 /// </summary>
 public class LootTable
 {
-    private readonly Dictionary<Grade, ItemDefinitionsForGrade> _values = Grade.ALL.ToDictionary(x => x, _ => new ItemDefinitionsForGrade());
+    private readonly Dictionary<Grade, Inventory> _values = Grade.ALL.ToDictionary(x => x, _ => new Inventory());
 
     public void AddEquipment(Equipment itemDefinition)
     {
-        _values[itemDefinition.Type.Grade].AddEquipment(itemDefinition);
+        _values[itemDefinition.Type.Grade].Equipment.Add(itemDefinition);
     }
 
     public void AddMaterial(Material itemDefinition)
     {
-        _values[itemDefinition.Type.Grade].AddMaterial(itemDefinition);
+        _values[itemDefinition.Type.Grade].Materials.Add(itemDefinition);
     }
 
     public Inventory GetRandomItems()
@@ -31,14 +31,13 @@ public class LootTable
     private void AddRandomItemTo(Inventory inventory)
     {
         var grade = ChooseRandomGrade();
-        var definitions = _values[grade];
-        definitions.AddRandomItemTo(inventory);
+        AddRandomItemFromGrade(grade, inventory);
     }
 
     private Grade ChooseRandomGrade()
     {
         var options = _values
-            .Where(x => x.Value.HasAnyDefinitions())
+            .Where(x => x.Value.Any())
             .Select(x => x.Key)
             .OrderBy(k => k.Order)
             .ToList();
@@ -68,5 +67,67 @@ public class LootTable
             randomNumber -= grade.Weight;
         }
         throw new Exception("Something went wrong when chosing a random grade");
+    }
+
+    private void AddRandomItemFromGrade(Grade grade, Inventory destination)
+    {
+        var source = _values[grade];
+        var equipment = GetRandomItemFrom(source.Equipment) as Equipment; // change once generic
+        var material = GetRandomItemFrom(source.Materials) as Material; // change once generic
+        var options = new List<AddItemCommand>()
+        {
+            new AddItemCommand(equipment?.ToOwned(), (item, inventory) => inventory.Equipment.Add(item)),
+            new AddItemCommand(material?.ToOwned(), (item, inventory) => inventory.Materials.Add(item))
+        };
+        var possibleOptions = options
+            .Where(option => option.IsPossible())
+            .ToList();
+        
+        if (!possibleOptions.Any())
+        {
+            throw new InvalidOperationException("source inventory has no items");
+        }
+
+        var i = Random.Shared.Next(possibleOptions.Count);
+        possibleOptions[i].ExecuteOn(destination);
+    }
+
+    private static IItem? GetRandomItemFrom(InventoryTab tab)
+    {
+        var options = tab.Content.AsEnumerable()
+            .Where(stack => stack.Quantity > 0)
+            .Select(stack => stack.Item)
+            .ToList();
+        if (!options.Any())
+        {
+            return null;
+        }
+        var i = Random.Shared.Next(options.Count);
+        return options[i];
+    }
+
+    private class AddItemCommand
+    {
+        private readonly IItem? _value;
+        private readonly Action<IItem, Inventory> _action;
+
+        public AddItemCommand(IItem? value, Action<IItem, Inventory> action)
+        {
+            _value = value;
+            _action = action;
+        }
+
+        public bool IsPossible()
+        {
+            return _value != null;
+        } 
+
+        public void ExecuteOn(Inventory destination)
+        {
+            if (_value != null)
+            {
+                _action.Invoke(_value, destination);
+            }
+        }
     }
 }

@@ -46,6 +46,11 @@ public class Inventory : IStableGameObject
         }
     }
 
+    public bool Any()
+    {
+        return Equipment.Any() || Materials.Any();
+    }
+
     public void Remove(IItem item)
     {
         var tabToRemoveFrom = item.GetTab(this);
