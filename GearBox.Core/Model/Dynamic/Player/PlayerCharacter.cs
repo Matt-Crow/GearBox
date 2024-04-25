@@ -52,11 +52,11 @@ public class PlayerCharacter : Character
         // check if something is already in the slot
         if (slot.Value != null)
         {
-            Inventory.Add(slot.Value);
+            Inventory.Equipment.Add(slot.Value);
         }
 
         slot.Value = (Weapon?)equipment; // todo
-        Inventory.Remove(equipment);
+        Inventory.Equipment.Remove(equipment);
 
         UpdateStats();
     }

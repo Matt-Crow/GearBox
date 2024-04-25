@@ -41,12 +41,6 @@ public abstract class Equipment : IItem
     /// </summary>
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>();
 
-
-    public InventoryTab GetTab(Inventory inventory)
-    {
-        return inventory.Equipment;
-    }
-
     public override bool Equals(object? obj)
     {
         var other = obj as Equipment;

@@ -18,7 +18,7 @@ public class PlayerCharacterTester
     {
         var sut = new PlayerCharacter("foo", 1);
         var weapon = new Weapon(new ItemType("weapon"));
-        sut.Inventory.Add(weapon);
+        sut.Inventory.Equipment.Add(weapon);
 
         sut.Equip(weapon);
 
@@ -30,11 +30,11 @@ public class PlayerCharacterTester
     {
         var sut = new PlayerCharacter("foo", 1);
         var weapon = new Weapon(new ItemType("weapon"));
-        sut.Inventory.Add(weapon);
+        sut.Inventory.Equipment.Add(weapon);
 
         sut.Equip(weapon);
 
-        Assert.False(sut.Inventory.Contains(weapon));
+        Assert.False(sut.Inventory.Equipment.Contains(weapon));
     }
 
     [Fact]
@@ -43,12 +43,12 @@ public class PlayerCharacterTester
         var sut = new PlayerCharacter("foo", 1);
         var alreadyEquipped = new Weapon(new ItemType("weapon 1"));
         var notYetEquipped = new Weapon(new ItemType("weapon 2"));
-        sut.Inventory.Add(alreadyEquipped);
-        sut.Inventory.Add(notYetEquipped);
+        sut.Inventory.Equipment.Add(alreadyEquipped);
+        sut.Inventory.Equipment.Add(notYetEquipped);
         sut.Equip(alreadyEquipped);
 
         sut.Equip(notYetEquipped);
 
-        Assert.True(sut.Inventory.Contains(alreadyEquipped));
+        Assert.True(sut.Inventory.Equipment.Contains(alreadyEquipped));
     }
 }

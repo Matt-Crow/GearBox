@@ -22,13 +22,6 @@ public class Inventory : IStableGameObject
         .Concat(Equipment.DynamicValues)
         .Concat(Materials.DynamicValues);
 
-
-    public void Add(IItem item)
-    {
-        var tabToAddTo = item.GetTab(this);
-        tabToAddTo.Add(item);
-    }
-
     /// <summary>
     /// Adds all items from the other inventory to this one
     /// </summary>
@@ -49,18 +42,6 @@ public class Inventory : IStableGameObject
     public bool Any()
     {
         return Equipment.Any() || Materials.Any();
-    }
-
-    public void Remove(IItem item)
-    {
-        var tabToRemoveFrom = item.GetTab(this);
-        tabToRemoveFrom.Remove(item);
-    }
-
-    public bool Contains(IItem item)
-    {
-        var tabToCheck = item.GetTab(this);
-        return tabToCheck.Contains(item);
     }
 
     public void Update()
