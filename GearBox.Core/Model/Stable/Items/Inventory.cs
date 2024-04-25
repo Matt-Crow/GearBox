@@ -16,8 +16,8 @@ public class Inventory : IStableGameObject
 
     public Guid OwnerId { get; init; }
     public Serializer Serializer { get; init; }
-    public InventoryTab Equipment { get; init; } = new();
-    public InventoryTab Materials { get; init; } = new();
+    public InventoryTab<Equipment> Equipment { get; init; } = new();
+    public InventoryTab<Material> Materials { get; init; } = new();
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
         .Concat(Equipment.DynamicValues)
         .Concat(Materials.DynamicValues);

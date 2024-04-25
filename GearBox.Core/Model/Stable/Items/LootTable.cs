@@ -72,12 +72,12 @@ public class LootTable
     private void AddRandomItemFromGrade(Grade grade, Inventory destination)
     {
         var source = _values[grade];
-        var equipment = GetRandomItemFrom(source.Equipment) as Equipment; // change once generic
-        var material = GetRandomItemFrom(source.Materials) as Material; // change once generic
+        var equipment = GetRandomItemFrom(source.Equipment); 
+        var material = GetRandomItemFrom(source.Materials);
         var options = new List<AddItemCommand>()
         {
-            new AddItemCommand(equipment?.ToOwned(), (item, inventory) => inventory.Equipment.Add(item)),
-            new AddItemCommand(material?.ToOwned(), (item, inventory) => inventory.Materials.Add(item))
+            new AddItemCommand(equipment?.ToOwned(), () => destination.Equipment.Add(equipment?.ToOwned())),
+            new AddItemCommand(material?.ToOwned(), () => destination.Materials.Add(material?.ToOwned())),
         };
         var possibleOptions = options
             .Where(option => option.IsPossible())
@@ -89,10 +89,11 @@ public class LootTable
         }
 
         var i = Random.Shared.Next(possibleOptions.Count);
-        possibleOptions[i].ExecuteOn(destination);
+        possibleOptions[i].ExecuteIfAble();
     }
 
-    private static IItem? GetRandomItemFrom(InventoryTab tab)
+    private static T? GetRandomItemFrom<T>(InventoryTab<T> tab)
+    where T : class,IItem
     {
         var options = tab.Content.AsEnumerable()
             .Where(stack => stack.Quantity > 0)
@@ -109,9 +110,9 @@ public class LootTable
     private class AddItemCommand
     {
         private readonly IItem? _value;
-        private readonly Action<IItem, Inventory> _action;
+        private readonly Action _action;
 
-        public AddItemCommand(IItem? value, Action<IItem, Inventory> action)
+        public AddItemCommand(IItem? value, Action action)
         {
             _value = value;
             _action = action;
@@ -122,11 +123,11 @@ public class LootTable
             return _value != null;
         } 
 
-        public void ExecuteOn(Inventory destination)
+        public void ExecuteIfAble()
         {
             if (_value != null)
             {
-                _action.Invoke(_value, destination);
+                _action.Invoke();
             }
         }
     }

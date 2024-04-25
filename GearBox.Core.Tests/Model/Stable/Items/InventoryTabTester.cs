@@ -8,7 +8,7 @@ public class InventoryTabTester
     [Fact]
     public void Add_GivenEmptyInventory_Works()
     {
-        var sut = new InventoryTab();
+        var sut = new InventoryTab<Material>();
         var expected = new Material(new ItemType("foo"));
         
         sut.Add(expected, 42);
@@ -20,7 +20,7 @@ public class InventoryTabTester
     [Fact]
     public void Add_GivenStackableDuplicate_Sums()
     {
-        var sut = new InventoryTab();
+        var sut = new InventoryTab<Material>();
         var type = new ItemType("foo");
         
         sut.Add(new Material(type), 2);
@@ -34,7 +34,7 @@ public class InventoryTabTester
     [Fact]
     public void Add_GivenDifferent_DoesNotSum()
     {
-        var sut = new InventoryTab();
+        var sut = new InventoryTab<Material>();
         var item1 = new Material(new ItemType("foo"));
         var item2 = new Material(new ItemType("bar"));
         
@@ -49,7 +49,7 @@ public class InventoryTabTester
     [Fact]
     public void Add_GivenEquipment_DoesNotSum()
     {
-        var sut = new InventoryTab();
+        var sut = new InventoryTab<Equipment>();
         var item1 = new Weapon(new ItemType("foo"));
         var item2 = new Weapon(new ItemType("foo"));
     
