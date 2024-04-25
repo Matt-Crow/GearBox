@@ -12,9 +12,9 @@ public class InventoryTab : ISerializable<InventoryTabJson>
         While a List is less performant than a Dictionary for lookups, 
         I want to maintain insertion order
     */
-    private readonly SafeList<ItemStack> _content = new();
+    private readonly SafeList<ItemStack<IItem>> _content = new();
 
-    public IEnumerable<ItemStack> Content => _content.AsEnumerable();
+    public IEnumerable<ItemStack<IItem>> Content => _content.AsEnumerable();
 
     public IEnumerable<object?> DynamicValues => Content.SelectMany(stack => stack.DynamicValues);
 
@@ -26,7 +26,7 @@ public class InventoryTab : ISerializable<InventoryTabJson>
             .LastOrDefault();
         if (currentStack == null)
         {
-            _content.Add(new ItemStack(item, quantity));
+            _content.Add(new ItemStack<IItem>(item, quantity));
         }
         else
         {
