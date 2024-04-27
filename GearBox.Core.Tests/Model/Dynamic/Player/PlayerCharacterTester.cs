@@ -10,7 +10,7 @@ public class PlayerCharacterTester
     public void Equip_GivenNotInInventory_Throws()
     {
         var sut = new PlayerCharacter("foo", 1);
-        Assert.Throws<ArgumentException>(() => sut.Equip(new Weapon(new ItemType("bar"))));
+        Assert.Throws<ArgumentException>(() => sut.EquipWeapon(new Weapon(new ItemType("bar"))));
     }
 
     [Fact]
@@ -18,9 +18,9 @@ public class PlayerCharacterTester
     {
         var sut = new PlayerCharacter("foo", 1);
         var weapon = new Weapon(new ItemType("weapon"));
-        sut.Inventory.Equipment.Add(weapon);
+        sut.Inventory.Weapons.Add(weapon);
 
-        sut.Equip(weapon);
+        sut.EquipWeapon(weapon);
 
         Assert.Equal(weapon, sut.Weapon.Value);
     }
@@ -30,11 +30,11 @@ public class PlayerCharacterTester
     {
         var sut = new PlayerCharacter("foo", 1);
         var weapon = new Weapon(new ItemType("weapon"));
-        sut.Inventory.Equipment.Add(weapon);
+        sut.Inventory.Weapons.Add(weapon);
 
-        sut.Equip(weapon);
+        sut.EquipWeapon(weapon);
 
-        Assert.False(sut.Inventory.Equipment.Contains(weapon));
+        Assert.False(sut.Inventory.Weapons.Contains(weapon));
     }
 
     [Fact]
@@ -43,12 +43,12 @@ public class PlayerCharacterTester
         var sut = new PlayerCharacter("foo", 1);
         var alreadyEquipped = new Weapon(new ItemType("weapon 1"));
         var notYetEquipped = new Weapon(new ItemType("weapon 2"));
-        sut.Inventory.Equipment.Add(alreadyEquipped);
-        sut.Inventory.Equipment.Add(notYetEquipped);
-        sut.Equip(alreadyEquipped);
+        sut.Inventory.Weapons.Add(alreadyEquipped);
+        sut.Inventory.Weapons.Add(notYetEquipped);
+        sut.EquipWeapon(alreadyEquipped);
 
-        sut.Equip(notYetEquipped);
+        sut.EquipWeapon(notYetEquipped);
 
-        Assert.True(sut.Inventory.Equipment.Contains(alreadyEquipped));
+        Assert.True(sut.Inventory.Weapons.Contains(alreadyEquipped));
     }
 }

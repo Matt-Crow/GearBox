@@ -7,9 +7,9 @@ public class LootTable
 {
     private readonly Dictionary<Grade, Inventory> _values = Grade.ALL.ToDictionary(x => x, _ => new Inventory());
 
-    public void AddEquipment(Equipment itemDefinition)
+    public void AddWeapon(Weapon itemDefinition)
     {
-        _values[itemDefinition.Type.Grade].Equipment.Add(itemDefinition);
+        _values[itemDefinition.Type.Grade].Weapons.Add(itemDefinition);
     }
 
     public void AddMaterial(Material itemDefinition)
@@ -72,11 +72,11 @@ public class LootTable
     private void AddRandomItemFromGrade(Grade grade, Inventory destination)
     {
         var source = _values[grade];
-        var equipment = GetRandomItemFrom(source.Equipment); 
+        var weapon = GetRandomItemFrom(source.Weapons); 
         var material = GetRandomItemFrom(source.Materials);
         var options = new List<AddItemCommand>()
         {
-            new AddItemCommand(equipment?.ToOwned(), () => destination.Equipment.Add(equipment?.ToOwned())),
+            new AddItemCommand(weapon?.ToOwned(), () => destination.Weapons.Add(weapon?.ToOwned())),
             new AddItemCommand(material?.ToOwned(), () => destination.Materials.Add(material?.ToOwned())),
         };
         var possibleOptions = options

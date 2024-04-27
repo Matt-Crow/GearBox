@@ -39,12 +39,11 @@ public class PlayerCharacter : Character
         base.UpdateStats();
     }
 
-    // todo split into other methods, such as EquipWeapon
-    public void Equip(Equipment equipment)
+    public void EquipWeapon(Weapon weapon)
     {
-        if (!Inventory.Equipment.Contains(equipment))
+        if (!Inventory.Weapons.Contains(weapon))
         {
-            throw new ArgumentException(nameof(equipment));
+            throw new ArgumentException(nameof(weapon));
         }
 
         var slot = Weapon;
@@ -52,24 +51,21 @@ public class PlayerCharacter : Character
         // check if something is already in the slot
         if (slot.Value != null)
         {
-            Inventory.Equipment.Add(slot.Value);
+            Inventory.Weapons.Add(slot.Value);
         }
 
-        slot.Value = (Weapon?)equipment; // todo
-        Inventory.Equipment.Remove(equipment);
+        slot.Value = weapon;
+        Inventory.Weapons.Remove(weapon);
 
         UpdateStats();
     }
 
-    public void EquipById(Guid id)
+    public void EquipWeaponById(Guid id)
     {
-        // todo different tabs for each type of equipment? might be annoying in the UI
-        // EquipWeaponById?
-        // better to just make Equip.cs call EquipWeapon?
-        var equipment = Inventory.Equipment.GetItemById(id) as Equipment;
+        var equipment = Inventory.Weapons.GetItemById(id);
         if (equipment != null)
         {
-            Equip(equipment);
+            EquipWeapon(equipment);
         }
     }
 
@@ -89,7 +85,7 @@ public class PlayerCharacter : Character
             return;
         }
         
-        var weapon = Weapon.Value as Weapon;
+        var weapon = Weapon.Value;
         var range = weapon?.AttackRange.Range ?? AttackRange.MELEE.Range;
         var damage = DamagePerHit * (1.0 + Stats.Offense.Value);
         var attack = new Attack(this, (int)damage);

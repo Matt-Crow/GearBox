@@ -14,6 +14,6 @@ public class Equip : IControlCommand
 
     public void ExecuteOn(PlayerCharacter target, World inWorld)
     {
-        target.EquipById(_equipmentId);
+        target.EquipWeaponById(_equipmentId);
     }
 }

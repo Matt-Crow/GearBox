@@ -27,7 +27,7 @@ public class WorldBuilder
         var itemType = new ItemType(name, grade);
         var builder = new WeaponBuilder(itemType);
         modifyBuilder(builder);
-        _loot.AddEquipment(builder.Build(1)); // in the future, this will be based on the area level
+        _loot.AddWeapon(builder.Build(1)); // in the future, this will be based on the area level
         _itemTypes.Add(itemType);
         return this;
     }

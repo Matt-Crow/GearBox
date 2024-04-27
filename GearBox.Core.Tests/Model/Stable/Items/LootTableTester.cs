@@ -31,10 +31,10 @@ public class LootTableTester
     {
         var sut = new LootTable();
         var expected = new Weapon(new ItemType("foo"));
-        sut.AddEquipment(expected);
+        sut.AddWeapon(expected);
 
         var inventory = sut.GetRandomItems();
-        var actual = inventory.Equipment.Content.First().Item;
+        var actual = inventory.Weapons.Content.First().Item;
 
         // IDs are different
         Assert.NotEqual(expected, actual);

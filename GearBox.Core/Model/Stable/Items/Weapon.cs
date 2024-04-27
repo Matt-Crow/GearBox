@@ -22,7 +22,7 @@ public class Weapon : Equipment
     public override IEnumerable<string> Details => ListExtensions.Of($"Range: {AttackRange}")
         .Concat(StatBoosts.Details);
 
-    public override Equipment ToOwned()
+    public override Weapon ToOwned()
     {
         return new Weapon(Type, Description, Level, Guid.NewGuid(), AttackRange, StatBoosts);
     }

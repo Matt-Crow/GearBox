@@ -16,10 +16,10 @@ public class Inventory : IStableGameObject
 
     public Guid OwnerId { get; init; }
     public Serializer Serializer { get; init; }
-    public InventoryTab<Equipment> Equipment { get; init; } = new();
+    public InventoryTab<Weapon> Weapons { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
-        .Concat(Equipment.DynamicValues)
+        .Concat(Weapons.DynamicValues)
         .Concat(Materials.DynamicValues);
 
     /// <summary>
@@ -27,21 +27,20 @@ public class Inventory : IStableGameObject
     /// </summary>
     public void Add(Inventory other)
     {
-        // todo no stacks for equipment
-        foreach (var equipmentStack in other.Equipment.Content)
+        // todo no stacks for weapons
+        foreach (var weaponStack in other.Weapons.Content)
         {
-            // do I need to clone equipment to avoid duplication?
-            Equipment.Add(equipmentStack.Item, equipmentStack.Quantity);
+            Weapons.Add(weaponStack.Item.ToOwned(), weaponStack.Quantity);
         }
         foreach (var materialStack in other.Materials.Content)
         {
-            Materials.Add(materialStack.Item, materialStack.Quantity);
+            Materials.Add(materialStack.Item.ToOwned(), materialStack.Quantity);
         }
     }
 
     public bool Any()
     {
-        return Equipment.Any() || Materials.Any();
+        return Weapons.Any() || Materials.Any();
     }
 
     public void Update()
@@ -53,7 +52,7 @@ public class Inventory : IStableGameObject
     {
         var json = new InventoryJson(
             OwnerId,
-            Equipment.ToJson(),
+            Weapons.ToJson(),
             Materials.ToJson()
         );
         return JsonSerializer.Serialize(json, options);
