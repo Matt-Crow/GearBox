@@ -79,8 +79,7 @@ public class WorldServer
             player.Coordinates = spawnLocation.Value.CenteredOnTile();
         }
 
-        _world.StableContent.AddPlayer(player);
-        _world.DynamicContent.AddDynamicObject(player);
+        _world.Add(player);
         _connections.Add(id, connection);
         _players.Add(id, player);
         var worldInit = new WorldInitJson(

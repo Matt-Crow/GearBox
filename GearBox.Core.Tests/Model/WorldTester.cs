@@ -1,4 +1,5 @@
 using GearBox.Core.Model;
+using GearBox.Core.Model.Dynamic.Player;
 using GearBox.Core.Tests.Model.Dynamic;
 using Xunit;
 
@@ -46,5 +47,18 @@ public class WorldTester
         var sut = new World();
         var actual = sut.SpawnEnemy();
         Assert.NotNull(actual);
+    }
+
+    [Fact]
+    public void Add_GivenSamePlayerTwice_OnlyAddsOnce()
+    {
+        var sut = new World();
+        var player = new PlayerCharacter("foo", 1);
+
+        sut.Add(player);
+        sut.Add(player);
+        sut.Update(); // apply changes
+
+        Assert.Single(sut.DynamicContent.DynamicObjects);
     }
 }

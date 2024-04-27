@@ -11,13 +11,18 @@ public class StableWorldContent
     private readonly SafeList<LootChest> _lootChests = new ();
     private readonly Dictionary<IStableGameObject, ChangeTracker> _changeTrackers = [];
 
-
     // need this method, as there are special behaviors associated with players
     public void AddPlayer(PlayerCharacter player)
     {
         Add(player.Inventory);
         Add(player.Weapon);
         _players.Add(player);
+        player.Termination.Terminated += (sender, args) => RemovePlayer(player);
+    }
+
+    public bool ContainsPlayer(PlayerCharacter player)
+    {
+        return _players.Contains(player);
     }
 
     public void RemovePlayer(PlayerCharacter player)

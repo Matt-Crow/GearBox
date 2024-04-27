@@ -1,3 +1,4 @@
+import { GameOverScreen } from "../components/gameOverScreen.js";
 import { Change, ChangeHandlers } from "../infrastructure/change.js";
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
@@ -96,15 +97,18 @@ export class WorldInitHandler {
 
 export class WorldUpdateHandler {
     #world;
+    #gameOverScreen;
     #changeHandlers;
     #deserializers;
 
     /**
      * @param {World} world 
+     * @param {GameOverScreen} gameOverScreen 
      * @param {ChangeHandlers} changeHandlers 
      */
-    constructor(world, changeHandlers) {
+    constructor(world, gameOverScreen, changeHandlers) {
         this.#world = world;
+        this.#gameOverScreen = gameOverScreen;
         this.#changeHandlers = changeHandlers;
         this.#deserializers = new JsonDeserializers();
     }
@@ -121,6 +125,8 @@ export class WorldUpdateHandler {
     handleWorldUpdate(obj) {
         const dynamicGameObjects = obj.gameObjects.map(gameObjectJson => this.#deserialize(gameObjectJson));
         this.#world.dynamicGameObjects = dynamicGameObjects;
+
+        this.#gameOverScreen.update(this.#world);
         
         const changes = obj.changes.map(json => Change.fromJson(json));
         changes.forEach(change => this.#changeHandlers.handle(change));

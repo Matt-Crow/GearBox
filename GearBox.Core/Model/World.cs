@@ -1,6 +1,7 @@
 namespace GearBox.Core.Model;
 
 using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.Dynamic.Player;
 using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Static;
@@ -43,6 +44,16 @@ public class World
     public StableWorldContent StableContent { get; init; }
     public IItemTypeRepository ItemTypes { get; init; }
 
+    public void Add(PlayerCharacter player)
+    {
+        if (StableContent.ContainsPlayer(player))
+        {
+            return;
+        }
+        StableContent.AddPlayer(player);
+        DynamicContent.AddDynamicObject(player);
+    }
+    
     public void AddTimer(WorldTimer timer)
     {
         _timers.Add(timer);

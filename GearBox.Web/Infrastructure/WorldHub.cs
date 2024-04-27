@@ -38,6 +38,7 @@ public class WorldHub : Hub
     public Task StopMovingDown() => Receive(StopMoving.DOWN);
     public Task StopMovingLeft() => Receive(StopMoving.LEFT);
     public Task StopMovingRight() => Receive(StopMoving.RIGHT);
+    public Task Respawn() => Receive(new Respawn());
 
     /// <summary>
     /// Note the parameter is the bearing in degrees, so 0 means up, 90 means to the right, etc.

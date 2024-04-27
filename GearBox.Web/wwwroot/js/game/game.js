@@ -1,4 +1,5 @@
 import { Canvas } from "./components/canvas.js";
+import { GameOverScreen } from "./components/gameOverScreen.js";
 import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
 import { ChangeHandlers } from "./infrastructure/change.js";
@@ -26,6 +27,8 @@ export class Game {
      */
     #playerHud;
 
+    #gameOverScreen;
+
     /**
      * The current function for handling messages from the server.
      * Currently, this assumes the server will always start by sending WorldInitJson,
@@ -40,11 +43,13 @@ export class Game {
      * @param {Canvas} canvas the custom canvas component to draw on.
      * @param {InventoryModal} inventoryModal the modal for the current player's inventory.
      * @param {PlayerHud} playerHud the player HUD for the current player
+     * @param {GameOverScreen} gameOverScreen 
      */
-    constructor(canvas, inventoryModal, playerHud) {
+    constructor(canvas, inventoryModal, playerHud, gameOverScreen) {
         this.#canvas = canvas
         this.#inventoryModal = inventoryModal;
         this.#playerHud = playerHud;
+        this.#gameOverScreen = gameOverScreen;
         this.#handleMessage = (message) => this.#handleInit(message);
         this.#world = null;
     }
@@ -79,7 +84,7 @@ export class Game {
                 itemDeserializer,
                 this.#inventoryModal.weaponChangeListener
             ));
-        const updateHandler = new WorldUpdateHandler(world, changeHandlers)
+        const updateHandler = new WorldUpdateHandler(world, this.#gameOverScreen, changeHandlers)
             .withDynamicObjectDeserializer(new CharacterJsonDeserializer())
             .withDynamicObjectDeserializer(new PlayerChangeHandler(world.playerId, this.#playerHud.playerUpdateListener))
             .withDynamicObjectDeserializer(new ProjectileJsonDeserializer());

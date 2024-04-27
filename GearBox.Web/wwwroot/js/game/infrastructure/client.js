@@ -44,4 +44,8 @@ export class Client {
     useBasicAttack(bearingInDegrees) {
         this.#signalr.invoke("UseBasicAttack", bearingInDegrees);
     }
+
+    respawn() {
+        this.#signalr.invoke("Respawn");
+    }
 }
