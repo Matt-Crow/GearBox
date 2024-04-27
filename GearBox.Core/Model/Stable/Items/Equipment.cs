@@ -41,18 +41,6 @@ public abstract class Equipment : IItem
     /// </summary>
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>();
 
-
-    public InventoryTab GetTab(Inventory inventory)
-    {
-        return inventory.Equipment;
-    }
-
-    /// <summary>
-    /// Returns the equipment slot this should be equipped in
-    /// </summary>
-    public abstract EquipmentSlot GetSlot(PlayerCharacter player);
-
-
     public override bool Equals(object? obj)
     {
         var other = obj as Equipment;
@@ -63,4 +51,9 @@ public abstract class Equipment : IItem
     {
         return Id.GetHashCode();
     }
+
+    /// <summary>
+    /// Returns this if it is immutable, or a clone otherwise
+    /// </summary>
+    public abstract Equipment ToOwned();
 }

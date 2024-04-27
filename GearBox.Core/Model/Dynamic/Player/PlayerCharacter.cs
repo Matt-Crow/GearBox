@@ -14,7 +14,7 @@ public class PlayerCharacter : Character
     public PlayerCharacter(string name, int level) : base(name, level)
     {
         Inventory = new(Id);
-        Weapon = new(Id);
+        Weapon = new(Id, "equippedWeapon");
         UpdateStats();
     }
 
@@ -22,7 +22,7 @@ public class PlayerCharacter : Character
     private int MaxEnergy { get; set; }
     public PlayerStats Stats { get; init; } = new();
     public Inventory Inventory { get; init; }
-    public EquipmentSlot Weapon { get; init; }
+    public EquipmentSlot<Weapon> Weapon { get; init; }
 
     public override void UpdateStats()
     {
@@ -39,33 +39,33 @@ public class PlayerCharacter : Character
         base.UpdateStats();
     }
 
-    public void Equip(Equipment equipment)
+    public void EquipWeapon(Weapon weapon)
     {
-        if (!Inventory.Equipment.Contains(equipment))
+        if (!Inventory.Weapons.Contains(weapon))
         {
-            throw new ArgumentException(nameof(equipment));
+            throw new ArgumentException(nameof(weapon));
         }
 
-        var slot = equipment.GetSlot(this);
+        var slot = Weapon;
         
         // check if something is already in the slot
         if (slot.Value != null)
         {
-            Inventory.Add(slot.Value);
+            Inventory.Weapons.Add(slot.Value);
         }
 
-        slot.Value = equipment;
-        Inventory.Remove(equipment);
+        slot.Value = weapon;
+        Inventory.Weapons.Remove(weapon);
 
         UpdateStats();
     }
 
-    public void EquipById(Guid id)
+    public void EquipWeaponById(Guid id)
     {
-        var equipment = Inventory.Equipment.GetItemById(id) as Equipment;
+        var equipment = Inventory.Weapons.GetItemById(id);
         if (equipment != null)
         {
-            Equip(equipment);
+            EquipWeapon(equipment);
         }
     }
 
@@ -85,7 +85,7 @@ public class PlayerCharacter : Character
             return;
         }
         
-        var weapon = Weapon.Value as Weapon;
+        var weapon = Weapon.Value;
         var range = weapon?.AttackRange.Range ?? AttackRange.MELEE.Range;
         var damage = DamagePerHit * (1.0 + Stats.Offense.Value);
         var attack = new Attack(this, (int)damage);

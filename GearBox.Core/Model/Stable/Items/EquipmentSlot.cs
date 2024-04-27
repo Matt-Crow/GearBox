@@ -4,20 +4,21 @@ using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Stable.Items;
 
-public class EquipmentSlot : IStableGameObject
+public class EquipmentSlot<T> : IStableGameObject
+where T : Equipment
 {
     private readonly Guid _ownerId;
 
-    public EquipmentSlot(Guid ownerId)
+    public EquipmentSlot(Guid ownerId, string type)
     {
         _ownerId = ownerId;
         Serializer = new Serializer(
-            "equippedWeapon", // todo change when generics are used
+            type,
             options => JsonSerializer.Serialize(new EquipmentSlotJson(_ownerId, ValueJson()), options)
         );
     }
 
-    public Equipment? Value { get; set; }
+    public T? Value { get; set; }
 
     public Serializer Serializer { get; init; }
 

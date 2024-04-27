@@ -8,37 +8,39 @@ namespace GearBox.Core.Model.Stable.Items;
 /// </summary>
 public class Inventory : IStableGameObject
 {
-    public Inventory(Guid ownerId)
+    public Inventory(Guid? ownerId = null)
     {
-        OwnerId = ownerId;
+        OwnerId = ownerId ?? Guid.Empty;
         Serializer = new("inventory", Serialize);
     }
 
     public Guid OwnerId { get; init; }
     public Serializer Serializer { get; init; }
-    public InventoryTab Equipment { get; init; } = new();
-    public InventoryTab Materials { get; init; } = new();
+    public InventoryTab<Weapon> Weapons { get; init; } = new();
+    public InventoryTab<Material> Materials { get; init; } = new();
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
-        .Concat(Equipment.DynamicValues)
+        .Concat(Weapons.DynamicValues)
         .Concat(Materials.DynamicValues);
 
-
-    public void Add(IItem item)
+    /// <summary>
+    /// Adds all items from the other inventory to this one
+    /// </summary>
+    public void Add(Inventory other)
     {
-        var tabToAddTo = item.GetTab(this);
-        tabToAddTo.Add(item);
+        // todo no stacks for weapons
+        foreach (var weaponStack in other.Weapons.Content)
+        {
+            Weapons.Add(weaponStack.Item.ToOwned(), weaponStack.Quantity);
+        }
+        foreach (var materialStack in other.Materials.Content)
+        {
+            Materials.Add(materialStack.Item.ToOwned(), materialStack.Quantity);
+        }
     }
 
-    public void Remove(IItem item)
+    public bool Any()
     {
-        var tabToRemoveFrom = item.GetTab(this);
-        tabToRemoveFrom.Remove(item);
-    }
-
-    public bool Contains(IItem item)
-    {
-        var tabToCheck = item.GetTab(this);
-        return tabToCheck.Contains(item);
+        return Weapons.Any() || Materials.Any();
     }
 
     public void Update()
@@ -50,7 +52,7 @@ public class Inventory : IStableGameObject
     {
         var json = new InventoryJson(
             OwnerId,
-            Equipment.ToJson(),
+            Weapons.ToJson(),
             Materials.ToJson()
         );
         return JsonSerializer.Serialize(json, options);

@@ -50,17 +50,11 @@ public class World
 
     public void SpawnLootChest()
     {
-        var chestItems = new List<IItem>();
-        var numItems = Random.Shared.Next(0, 3) + 1;
-        for (var i = 0; i < numItems; i++)
-        {
-            chestItems.Add(_loot.GetRandomItem());
-        }
-        
+        var inventory = _loot.GetRandomItems();
         var location = Map.GetRandomOpenTile();
         if (location != null)
         {
-            var lootChest = new LootChest(location.Value.CenteredOnTile(), chestItems.ToArray());
+            var lootChest = new LootChest(location.Value.CenteredOnTile(), inventory);
             StableContent.AddLootChest(lootChest);
         }
     }

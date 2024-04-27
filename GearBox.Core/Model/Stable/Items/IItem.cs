@@ -30,8 +30,8 @@ public interface IItem
     /// </summary>
     IEnumerable<object?> DynamicValues { get; }
 
-    /// <summary>
-    /// Gets the inventory tab this belongs in
-    /// </summary>
-    InventoryTab GetTab(Inventory inventory);
+    /*
+    // can't do "IItem ToOwned()" https://stackoverflow.com/a/5709191
+    //IItem ToOwned();
+    */
 }
