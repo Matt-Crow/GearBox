@@ -9,9 +9,8 @@ namespace GearBox.Core.Model.Stable.Items;
 /// <summary>
 /// A LootChest provides players with loot
 /// </summary>
-public class LootChest : IStableGameObject
+public class LootChest : IDynamicGameObject
 {
-    private readonly Guid _id = Guid.NewGuid();
     private readonly HashSet<Guid> _collectedBy = [];
     private readonly Inventory _contents = new();
 
@@ -26,10 +25,8 @@ public class LootChest : IStableGameObject
     }
 
     public Serializer Serializer { get; init; }
-    public IEnumerable<object?> DynamicValues => _collectedBy
-        .Select(x => (object?)x) // not sure why it requires this explicit cast
-        .AsEnumerable();
     public BodyBehavior Body { get; init; }
+    public TerminateBehavior? Termination => null;
 
     public void CheckForCollisions(PlayerCharacter player)
     {
@@ -53,7 +50,6 @@ public class LootChest : IStableGameObject
     private string Serialize(JsonSerializerOptions options)
     {
         var asJson = new LootChestJson(
-            _id, 
             Body.Location.XInPixels,
             Body.Location.YInPixels,
             _collectedBy.ToList()

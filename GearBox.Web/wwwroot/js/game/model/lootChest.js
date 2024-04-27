@@ -1,61 +1,37 @@
-import { ChangeHandler } from "../infrastructure/change.js";
+import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { PIXELS_PER_TILE } from "./constants.js";
-import { World } from "./world.js";
 
-export class LootChestChangeHandler extends ChangeHandler {
-    #world;
-
-    /**
-     * @param {World} world 
-     */
-    constructor(world) {
-        super("lootChest");
-        this.#world = world;
+export class LootChestJsonDeserializer extends JsonDeserializer {
+    #playerId;
+    
+    constructor(playerId) {
+        super("lootChest", obj => this.#handle(obj));
+        this.#playerId = playerId;
     }
 
-    handleContent(obj) {
-        const lootChest = this.#deserialize(obj);
-        if (lootChest.hasBeenCollectedBy(this.#world.playerId)) {
-            this.#world.removeStableGameObject(lootChest.id);
-        } else {
-            this.#world.saveStableGameObject(lootChest);
-        }
-    }
-
-    handleDelete(obj) {
-        this.#world.removeStableGameObject(obj.id);
-    }
-
-    #deserialize(json) {
-        const result = new LootChest(json.id, json.x, json.y, json.collectedBy);
+    #handle(json) {
+        const chest = new LootChest(json.x, json.y, json.collectedBy);
+        const result = chest.hasBeenCollectedBy(this.#playerId) 
+            ? null 
+            : chest;
         return result;
     }
 }
 
 export class LootChest {
-    #id;
     #x;
     #y;
     #collectedBy;
 
     /**
-     * @param {string} id 
      * @param {number} x center of the LootChest
      * @param {number} y center of the LootChest
      * @param {string[]} collectedBy 
      */
-    constructor(id, x, y, collectedBy) {
-        this.#id = id;
+    constructor(x, y, collectedBy) {
         this.#x = x;
         this.#y = y;
         this.#collectedBy = collectedBy;
-    }
-
-    /**
-     * @returns {string}
-     */
-    get id() {
-        return this.#id;
     }
 
     /**

@@ -8,8 +8,9 @@ public class StableWorldContent
 {
     private readonly SafeList<IStableGameObject> _objects = new();
     private readonly SafeList<PlayerCharacter> _players = new ();
-    private readonly SafeList<LootChest> _lootChests = new ();
     private readonly Dictionary<IStableGameObject, ChangeTracker> _changeTrackers = [];
+
+    public IEnumerable<PlayerCharacter> Players => _players.AsEnumerable();
 
     // need this method, as there are special behaviors associated with players
     public void AddPlayer(PlayerCharacter player)
@@ -30,13 +31,6 @@ public class StableWorldContent
         Remove(player.Inventory);
         Remove(player.Weapon);
         _players.Remove(player);
-    }
-
-    // player-interactables
-    public void AddLootChest(LootChest lootChest)
-    {
-        Add(lootChest);
-        _lootChests.Add(lootChest);
     }
 
     public void Add(IStableGameObject obj)
@@ -67,13 +61,6 @@ public class StableWorldContent
         {
             obj.Update(); 
         }
-        foreach (var lootChest in _lootChests.AsEnumerable())
-        {
-            foreach (var player in _players.AsEnumerable())
-            {
-                lootChest.CheckForCollisions(player);
-            }
-        }
 
         // notify caller of objects added, removed, or changed during iteration
         var result = _changeTrackers.Values
@@ -97,7 +84,6 @@ public class StableWorldContent
         
         _objects.ApplyChanges();
         _players.ApplyChanges();
-        _lootChests.ApplyChanges();
 
         return result;
     }

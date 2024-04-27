@@ -5,6 +5,7 @@ using GearBox.Core.Model.Dynamic.Player;
 using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Static;
+using GearBox.Core.Utils;
 
 /// <summary>
 /// For now, a World is the topmost container for game objects.
@@ -12,8 +13,12 @@ using GearBox.Core.Model.Static;
 /// </summary>
 public class World
 {
-    private readonly List<WorldTimer> _timers = new();
+    private readonly List<WorldTimer> _timers = [];
     private readonly LootTable _loot;
+    
+    // todo player-interactables
+    private readonly SafeList<LootChest> _lootChests = new(); 
+    
     private readonly List<Func<Character>> _enemies = [];
 
     public World(
@@ -66,7 +71,8 @@ public class World
         if (location != null)
         {
             var lootChest = new LootChest(location.Value.CenteredOnTile(), inventory);
-            StableContent.AddLootChest(lootChest);
+            _lootChests.Add(lootChest);
+            DynamicContent.AddDynamicObject(lootChest);
         }
     }
 
@@ -100,6 +106,14 @@ public class World
                 DynamicContent.CheckForCollisions(body);
             }
         }
+        foreach (var lootChest in _lootChests.AsEnumerable())
+        {
+            foreach (var player in StableContent.Players)
+            {
+                lootChest.CheckForCollisions(player);
+            }
+        }
+        _lootChests.ApplyChanges();
         return StableContent.Update();
     }
 

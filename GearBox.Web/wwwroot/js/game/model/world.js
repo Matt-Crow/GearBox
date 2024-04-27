@@ -10,23 +10,19 @@ export class World {
     #playerId; // need reference to changing player
     #map;
     #dynamicGameObjects;
-    #stableGameObjects;
     #itemTypes;
 
     constructor(playerId, map, itemTypes) {
         this.#playerId = playerId;
         this.#map = map;
         this.#dynamicGameObjects = [];
-        this.#stableGameObjects = new Map();
         this.#itemTypes = new ItemTypeRepository(itemTypes);
     }
 
     /**
      * @param {any[]} value
      */
-    set dynamicGameObjects(value) {
-        this.#dynamicGameObjects = value;
-    }
+    set dynamicGameObjects(value) { this.#dynamicGameObjects = value; }
 
     /**
      * @returns {Character} the player the client controls
@@ -38,35 +34,19 @@ export class World {
     /**
      * @returns {string}
      */
-    get playerId() {
-        return this.#playerId;
-    }
+    get playerId() { return this.#playerId; }
 
     /**
      * @returns {number}
      */
-    get widthInPixels() {
-        return this.#map.widthInPixels;
-    }
+    get widthInPixels() { return this.#map.widthInPixels; }
 
     /**
      * @returns {number}
      */
-    get heightInPixels() {
-        return this.#map.heightInPixels;
-    }
+    get heightInPixels() { return this.#map.heightInPixels; }
 
-    get itemTypes() {
-        return this.#itemTypes;
-    }
-
-    saveStableGameObject(obj) {
-        this.#stableGameObjects.set(obj.id, obj);
-    }
-
-    removeStableGameObject(id) {
-        this.#stableGameObjects.delete(id);
-    }
+    get itemTypes() { return this.#itemTypes; }
 
     /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
@@ -74,9 +54,6 @@ export class World {
     draw(context) {
         this.#map.draw(context);
         this.#dynamicGameObjects.forEach(obj => obj.draw(context));
-        for (const obj of this.#stableGameObjects.values()) {
-            obj.draw(context);
-        }
     }
 }
 
@@ -123,7 +100,9 @@ export class WorldUpdateHandler {
     }
 
     handleWorldUpdate(obj) {
-        const dynamicGameObjects = obj.gameObjects.map(gameObjectJson => this.#deserialize(gameObjectJson));
+        const dynamicGameObjects = obj.gameObjects
+            .map(gameObjectJson => this.#deserialize(gameObjectJson))
+            .filter(obj => obj !== null);
         this.#world.dynamicGameObjects = dynamicGameObjects;
 
         this.#gameOverScreen.update(this.#world);
