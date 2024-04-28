@@ -110,6 +110,9 @@ public class PlayerCharacter : Character
     {
         base.Update();
 
+        Inventory.Update();
+        Weapon.Update();
+
         // restore 5% HP & energy per second
         _frameCount++;
         if (_frameCount >= Duration.FromSeconds(5).InFrames)
@@ -126,9 +129,8 @@ public class PlayerCharacter : Character
         }
     }
 
-    protected override string Serialize(JsonSerializerOptions options)
+    protected override string Serialize(SerializationOptions options)
     {
-        // serialize neither inventory nor weapon - those are handled elsewhere
         var asJson = new PlayerJson(
             Id, 
             Name,
@@ -136,9 +138,10 @@ public class PlayerCharacter : Character
             Coordinates.XInPixels,
             Coordinates.YInPixels,
             new FractionJson(MaxHitPoints - DamageTaken, MaxHitPoints),
-            new FractionJson(MaxEnergy - _energyExpended, MaxEnergy)
+            new FractionJson(MaxEnergy - _energyExpended, MaxEnergy),
+            Weapon.ToJson(options.IsWorldInit)
         );
-        return JsonSerializer.Serialize(asJson, options);
+        return JsonSerializer.Serialize(asJson, options.JsonSerializerOptions);
     }
 
     protected override int GetMaxHitPointsByLevel(int level)

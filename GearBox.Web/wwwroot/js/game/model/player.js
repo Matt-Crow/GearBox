@@ -31,21 +31,24 @@ export class Player extends Character {
 export class PlayerChangeHandler extends JsonDeserializer {
     #playerId;
     #changeListener;
+    #weaponChangeHandler;
 
-    constructor(playerId, changeListener) {
+    constructor(playerId, changeListener, weaponChangeHandler) {
         super("playerCharacter", obj => this.#handle(obj));
         this.#playerId = playerId;
         this.#changeListener = changeListener;
+        this.#weaponChangeHandler = weaponChangeHandler;
     }
 
     /**
-     * @param {object} obj 
+     * @param {object} json 
      * @returns {Player}
      */
-    #handle(obj) {
-        const player = this.#deserialize(obj);
+    #handle(json) {
+        const player = this.#deserialize(json);
         if (player.id === this.#playerId) {
             this.#changeListener(player);
+            this.#handleWeaponChange(json.weapon);
         }
         return player;
     }
@@ -61,5 +64,12 @@ export class PlayerChangeHandler extends JsonDeserializer {
             new Fraction(json.energy.current, json.energy.max)
         );
         return result;
+    }
+
+    #handleWeaponChange(json) {
+        if (json.hasChanged) {
+            const weaponSlot = JSON.parse(json.body);
+            this.#weaponChangeHandler.handleContent(weaponSlot);
+        }
     }
 }

@@ -91,11 +91,11 @@ public class WorldServer
 
         // need to send all StableGameObjects to client
         var allStableObjects = _world.StableContent.GetAll()
-            .Select(obj => Change.Content(obj))
-            .Select(change => change.ToJson())
+            .Select(Change.Content)
+            .Select(change => change.ToJson(true))
             .ToList();
         var worldUpdate = new WorldUpdateJson(
-            _world.DynamicContent.ToJson(),
+            _world.DynamicContent.ToJson(true),
             allStableObjects
         );
         await connection.Send(worldUpdate);
@@ -163,8 +163,8 @@ public class WorldServer
         var stableChanges = _world.Update();
         // notify everyone of the update
         var message = new WorldUpdateJson(
-            _world.DynamicContent.ToJson(),
-            stableChanges.Select(c => c.ToJson()).ToList()
+            _world.DynamicContent.ToJson(false),
+            stableChanges.Select(c => c.ToJson(false)).ToList()
         );
         var tasks = _connections.Values
             .Select(conn => conn.Send(message))

@@ -51,12 +51,12 @@ public class Projectile : IDynamicGameObject
         _distanceTraveledInPixels += _mobility.Velocity.Magnitude.InPixelsPerFrame;
     }
 
-    private string Serialize(JsonSerializerOptions options)
+    private string Serialize(SerializationOptions options)
     {
         var json = new ProjectileJson(
             Body.Location.XInPixels, 
             Body.Location.YInPixels
         );
-        return JsonSerializer.Serialize(json, options);
+        return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
     }
 }

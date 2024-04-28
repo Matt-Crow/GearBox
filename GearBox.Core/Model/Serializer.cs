@@ -14,17 +14,18 @@ public class Serializer
     };
     
     private readonly string _type;
-    private readonly Func<JsonSerializerOptions, string> _mapper;
+    private readonly Func<SerializationOptions, string> _mapper;
 
-    public Serializer(string type, Func<JsonSerializerOptions, string> mapper)
+    public Serializer(string type, Func<SerializationOptions, string> mapper)
     {
         _type = type;
         _mapper = mapper;
     }
 
-    public GameObjectJson Serialize()
+    public GameObjectJson Serialize(bool isWorldInit)
     {
-        var result = new GameObjectJson(_type, _mapper.Invoke(JSON_OPTIONS));
+        var options = new SerializationOptions(isWorldInit);
+        var result = new GameObjectJson(_type, _mapper.Invoke(options));
         return result;
     }
 }

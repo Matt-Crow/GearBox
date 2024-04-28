@@ -48,13 +48,13 @@ public class Inventory : IStableGameObject
         // do nothing
     }
 
-    public string Serialize(JsonSerializerOptions options)
+    public string Serialize(SerializationOptions options)
     {
         var json = new InventoryJson(
             OwnerId,
             Weapons.ToJson(),
             Materials.ToJson()
         );
-        return JsonSerializer.Serialize(json, options);
+        return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
     }
 }

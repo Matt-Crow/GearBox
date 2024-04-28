@@ -1,5 +1,4 @@
 using GearBox.Core.Model.Dynamic.Player;
-using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Stable;
@@ -16,7 +15,6 @@ public class StableWorldContent
     public void AddPlayer(PlayerCharacter player)
     {
         Add(player.Inventory);
-        Add(player.Weapon);
         _players.Add(player);
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
     }
@@ -29,7 +27,6 @@ public class StableWorldContent
     public void RemovePlayer(PlayerCharacter player)
     {
         Remove(player.Inventory);
-        Remove(player.Weapon);
         _players.Remove(player);
     }
 

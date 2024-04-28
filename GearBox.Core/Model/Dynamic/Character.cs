@@ -95,7 +95,7 @@ public class Character : IDynamicGameObject
         _mobility.UpdateMovement();
     }
 
-    protected virtual string Serialize(JsonSerializerOptions options)
+    protected virtual string Serialize(SerializationOptions options)
     {
         var json = new CharacterJson(
             Id,
@@ -105,7 +105,7 @@ public class Character : IDynamicGameObject
             _mobility.Coordinates.YInPixels,
             new FractionJson(MaxHitPoints - DamageTaken, MaxHitPoints)
         );
-        return JsonSerializer.Serialize(json, options);
+        return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
     }
 
     public override bool Equals(object? obj)

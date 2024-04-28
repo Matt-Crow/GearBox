@@ -63,11 +63,11 @@ public class DynamicWorldContent
         return obj.Termination != null && obj.Termination.IsTerminated;
     }
 
-    public List<GameObjectJson> ToJson()
+    public List<GameObjectJson> ToJson(bool isWorldInit)
     {
         var objs = _gameObjects.AsEnumerable()
             .Where(obj => obj.Serializer is not null)
-            .Select(obj => obj.Serializer!.Serialize())
+            .Select(obj => obj.Serializer!.Serialize(isWorldInit))
             .ToList();
         return objs;
     }

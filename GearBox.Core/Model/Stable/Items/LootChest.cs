@@ -47,13 +47,13 @@ public class LootChest : IDynamicGameObject
         // do nothing
     }
 
-    private string Serialize(JsonSerializerOptions options)
+    private string Serialize(SerializationOptions options)
     {
         var asJson = new LootChestJson(
             Body.Location.XInPixels,
             Body.Location.YInPixels,
             _collectedBy.ToList()
         );
-        return JsonSerializer.Serialize(asJson, options);
+        return JsonSerializer.Serialize(asJson, options.JsonSerializerOptions);
     }
 }

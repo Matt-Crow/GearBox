@@ -2,7 +2,16 @@ namespace GearBox.Core.Model.Json;
 
 public readonly struct PlayerJson : IJson
 {
-    public PlayerJson(Guid id, string name, int level, int x, int y, FractionJson hitPoints, FractionJson energy)
+    public PlayerJson(
+        Guid id, 
+        string name, 
+        int level, 
+        int x, 
+        int y, 
+        FractionJson hitPoints, 
+        FractionJson energy,
+        StableJson weapon
+    )
     {
         Id = id;
         Name = name;
@@ -11,6 +20,7 @@ public readonly struct PlayerJson : IJson
         Y = y;
         HitPoints = hitPoints;
         Energy = energy;
+        Weapon = weapon;
     }
 
     public Guid Id { get; init; }
@@ -20,4 +30,5 @@ public readonly struct PlayerJson : IJson
     public int Y { get; init; }
     public FractionJson HitPoints { get; init; }
     public FractionJson Energy { get; init; }
+    public StableJson Weapon { get; init; }
 }

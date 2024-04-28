@@ -77,15 +77,17 @@ export class Game {
                 world.playerId, 
                 new InventoryDeserializer(itemDeserializer), 
                 this.#inventoryModal.inventoryChangeListener
-            ))
-            .withChangeHandler(new EquippedWeaponChangeHandler(
-                world.playerId,
-                itemDeserializer,
-                this.#inventoryModal.weaponChangeListener
             ));
         const updateHandler = new WorldUpdateHandler(world, this.#gameOverScreen, changeHandlers)
             .withDynamicObjectDeserializer(new CharacterJsonDeserializer())
-            .withDynamicObjectDeserializer(new PlayerChangeHandler(world.playerId, this.#playerHud.playerUpdateListener))
+            .withDynamicObjectDeserializer(new PlayerChangeHandler(
+                world.playerId, 
+                this.#playerHud.playerUpdateListener, 
+                new EquippedWeaponChangeHandler(
+                    itemDeserializer,
+                    this.#inventoryModal.weaponChangeListener
+                )
+            ))
             .withDynamicObjectDeserializer(new ProjectileJsonDeserializer())
             .withDynamicObjectDeserializer(new LootChestJsonDeserializer(world.playerId))
             ;

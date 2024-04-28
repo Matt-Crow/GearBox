@@ -7,7 +7,7 @@ namespace GearBox.Core.Model.Stable;
 /// A change can be one of two type: Content, or Delete.
 /// Content could be either adding or updating.
 /// </summary>
-public readonly struct Change : ISerializable<ChangeJson>
+public readonly struct Change 
 {
     private Change(IStableGameObject changed, bool isDelete)
     {
@@ -29,9 +29,9 @@ public readonly struct Change : ISerializable<ChangeJson>
     public bool IsContent => !IsDelete;
     public bool IsDelete { get; init; }
 
-    public ChangeJson ToJson()
+    public ChangeJson ToJson(bool isWorldInit)
     {
-        var asJson = Changed.Serializer?.Serialize() 
+        var asJson = Changed.Serializer?.Serialize(isWorldInit) 
             ?? throw new NotSupportedException("support for non-serializable stable game objects is not yet supported");
         return new ChangeJson(asJson.Type, asJson.Content, IsDelete);
     }
