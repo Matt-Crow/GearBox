@@ -13,6 +13,7 @@ public class WorldServer
     private readonly World _world;
     private readonly Dictionary<string, IConnection> _connections = [];
     private readonly Dictionary<string, PlayerCharacter> _players = [];
+    private readonly List<PendingCommand> _pendingCommands = [];
     private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
 
@@ -137,15 +138,11 @@ public class WorldServer
     }
 
     /// <summary>
-    /// Executes the given command on the player of the user with the given ID
+    /// Enqueues the given command so it will be executed during updates
     /// </summary>
-    public void ExecuteCommand(string id, IControlCommand command)
+    public void EnqueueCommand(string id, IControlCommand command)
     {
-        if (!_players.ContainsKey(id))
-        {
-            throw new Exception($"Invalid id: \"{id}\"");
-        }
-        command.ExecuteOn(_players[id], _world);
+        _pendingCommands.Add(new(id, command));
     }
 
     public async Task Update()
@@ -160,6 +157,15 @@ public class WorldServer
 
     private async Task DoUpdate()
     {
+        var executeThese = _pendingCommands
+            .Where(pc => _players.ContainsKey(pc.ConnectionId))
+            .ToList();
+        _pendingCommands.Clear();
+        foreach (var command in executeThese)
+        {
+            command.Command.ExecuteOn(_players[command.ConnectionId], _world);
+        }
+
         var stableChanges = _world.Update();
         // notify everyone of the update
         var message = new WorldUpdateJson(

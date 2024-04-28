@@ -48,7 +48,7 @@ public class WorldHub : Hub
     private Task Receive(IControlCommand command)
     {
         var id = Context.ConnectionId;
-        _server.ExecuteCommand(id, command);
+        _server.EnqueueCommand(id, command);
         return Task.CompletedTask;
     }
 }
