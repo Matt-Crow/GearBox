@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Json;
+
 namespace GearBox.Core.Model.Stable.Items;
 
 /// <summary>
@@ -14,4 +16,9 @@ public interface IItemTypeRepository
     /// Retrieves all item type definitions
     /// </summary>
     IEnumerable<ItemType> GetAll();
+
+    /// <summary>
+    /// Gets the contents of the repository as JSON
+    /// </summary>
+    List<ItemTypeJson> ToJson();
 }

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using GearBox.Core.Model.Json;
 
 namespace GearBox.Core.Model.Stable.Items;
 
@@ -32,5 +33,13 @@ public class ItemTypeRepository : IItemTypeRepository
     public IEnumerable<ItemType> GetAll()
     {
         return _inner.Values.AsEnumerable();
+    }
+
+    public List<ItemTypeJson> ToJson()
+    {
+        var result = _inner.Values
+            .Select(x => x.ToJson())
+            .ToList();
+        return result;
     }
 }

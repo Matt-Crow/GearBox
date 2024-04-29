@@ -2,6 +2,7 @@ namespace GearBox.Core.Model;
 
 using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Dynamic.Player;
+using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Static;
@@ -49,7 +50,7 @@ public class World
     public StableWorldContent StableContent { get; init; }
     public IItemTypeRepository ItemTypes { get; init; }
 
-    public void Add(PlayerCharacter player)
+    public void AddPlayer(PlayerCharacter player)
     {
         if (StableContent.ContainsPlayer(player))
         {
@@ -57,6 +58,12 @@ public class World
         }
         StableContent.AddPlayer(player);
         DynamicContent.AddDynamicObject(player);
+    }
+
+    public void RemovePlayer(PlayerCharacter player)
+    {
+        DynamicContent.RemoveDynamicObject(player);
+        StableContent.RemovePlayer(player);
     }
     
     public void AddTimer(WorldTimer timer)
@@ -115,6 +122,34 @@ public class World
         }
         _lootChests.ApplyChanges();
         return StableContent.Update();
+    }
+
+    public WorldInitJson GetWorldInitJsonFor(PlayerCharacter player)
+    {
+        var result = new WorldInitJson(
+            player.Id,
+            Map.ToJson(),
+            ItemTypes.ToJson()
+        );
+        return result;
+    }
+
+    /// <summary>
+    /// Gets the JSON for a world update, 
+    /// except it includes all stable values, 
+    /// regardless of whether they've changed
+    /// </summary>
+    public WorldUpdateJson GetCompleteWorldUpdateJson()
+    {
+        var allStableObjects = StableContent.GetAll()
+            .Select(Change.Content)
+            .Select(change => change.ToJson(true))
+            .ToList();
+        var result = new WorldUpdateJson(
+            DynamicContent.ToJson(true),
+            allStableObjects
+        );
+        return result;
     }
 
     public override bool Equals(object? other)

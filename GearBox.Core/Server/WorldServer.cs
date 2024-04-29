@@ -3,7 +3,6 @@ using GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Dynamic.Player;
 using GearBox.Core.Model.Json;
-using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Server;
@@ -26,19 +25,6 @@ public class WorldServer
     {
         _world = world;
 
-        // testing LootChests
-        _world.AddTimer(new WorldTimer(() => _world.SpawnLootChest(), 50));
-
-        // testing EnemySpawner
-        _world.DynamicContent.AddDynamicObject(new EnemySpawner(
-            _world, 
-            new EnemySpawnerOptions()
-            {
-                WaveSize = 3,
-                MaxChildren = 10
-            }
-        ));
-        
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
         
@@ -74,32 +60,17 @@ public class WorldServer
         }
 
         var player = new PlayerCharacter("The Player", 1); // will eventually read from repo
-        var spawnLocation = _world.Map.GetRandomOpenTile();
-        if (spawnLocation != null)
-        {
-            player.Coordinates = spawnLocation.Value.CenteredOnTile();
-        }
+        var spawnLocation = _world.Map.GetRandomOpenTile()
+            ?? throw new Exception("Failed to find open tile. This should not happen.");
+        player.Coordinates = spawnLocation.CenteredOnTile();
 
-        _world.Add(player);
+        _world.AddPlayer(player);
         _connections.Add(id, connection);
         _players.Add(id, player);
-        var worldInit = new WorldInitJson(
-            player.Id,
-            _world.Map.ToJson(),
-            _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
-        );
-        await connection.Send(worldInit);
 
-        // need to send all StableGameObjects to client
-        var allStableObjects = _world.StableContent.GetAll()
-            .Select(Change.Content)
-            .Select(change => change.ToJson(true))
-            .ToList();
-        var worldUpdate = new WorldUpdateJson(
-            _world.DynamicContent.ToJson(true),
-            allStableObjects
-        );
-        await connection.Send(worldUpdate);
+        // client needs to know both the world init and current state of stable objects
+        await connection.Send(_world.GetWorldInitJsonFor(player));
+        await connection.Send(_world.GetCompleteWorldUpdateJson());
 
         if (!_timer.Enabled)
         {
@@ -122,12 +93,7 @@ public class WorldServer
             return;
         }
 
-        var player = _players[id];
-        if (player is not null)
-        {
-            _world.DynamicContent.RemoveDynamicObject(player);
-            _world.StableContent.RemovePlayer(player);
-        }
+        _world.RemovePlayer(_players[id]);
         _players.Remove(id);
         _connections.Remove(id);
 
@@ -166,6 +132,7 @@ public class WorldServer
             command.Command.ExecuteOn(_players[command.ConnectionId], _world);
         }
 
+        // clean this up once StableGameObjects is gone!
         var stableChanges = _world.Update();
         // notify everyone of the update
         var message = new WorldUpdateJson(

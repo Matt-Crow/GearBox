@@ -1,4 +1,5 @@
 using GearBox.Core.Model;
+using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 
@@ -10,6 +11,19 @@ var world = new WorldBuilder()
     .AddDefaultEnemies()
     .WithDesertMap()
     .Build();
+
+// testing LootChests
+world.AddTimer(new WorldTimer(() => world.SpawnLootChest(), 50));
+
+// testing EnemySpawner
+world.DynamicContent.AddDynamicObject(new EnemySpawner(
+    world, 
+    new EnemySpawnerOptions()
+    {
+        WaveSize = 3,
+        MaxChildren = 10
+    }
+));
 
 // Add services to the container.
 builder.Services.AddRazorPages();
