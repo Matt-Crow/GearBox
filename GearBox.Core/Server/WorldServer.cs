@@ -132,13 +132,10 @@ public class WorldServer
             command.Command.ExecuteOn(_players[command.ConnectionId], _world);
         }
 
-        // clean this up once StableGameObjects is gone!
-        var stableChanges = _world.Update();
+        // pull this into World!
+        _world.Update();
         // notify everyone of the update
-        var message = new WorldUpdateJson(
-            _world.DynamicContent.ToJson(false),
-            stableChanges.Select(c => c.ToJson(false)).ToList()
-        );
+        var message = new WorldUpdateJson(_world.DynamicContent.ToJson(false));
         var tasks = _connections.Values
             .Select(conn => conn.Send(message))
             .ToList();

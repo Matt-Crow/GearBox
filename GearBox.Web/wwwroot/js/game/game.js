@@ -2,7 +2,6 @@ import { Canvas } from "./components/canvas.js";
 import { GameOverScreen } from "./components/gameOverScreen.js";
 import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
-import { ChangeHandlers } from "./infrastructure/change.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
 import { EquippedWeaponChangeHandler, InventoryChangeHandler, InventoryDeserializer, ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
@@ -72,17 +71,15 @@ export class Game {
             .handleWorldInit(initMessage);
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
-        const changeHandlers = new ChangeHandlers()
-            .withChangeHandler(new InventoryChangeHandler(
-                world.playerId, 
-                new InventoryDeserializer(itemDeserializer), 
-                this.#inventoryModal.inventoryChangeListener
-            ));
-        const updateHandler = new WorldUpdateHandler(world, this.#gameOverScreen, changeHandlers)
+        const updateHandler = new WorldUpdateHandler(world, this.#gameOverScreen)
             .withDynamicObjectDeserializer(new CharacterJsonDeserializer())
             .withDynamicObjectDeserializer(new PlayerChangeHandler(
                 world.playerId, 
                 this.#playerHud.playerUpdateListener, 
+                new InventoryChangeHandler(
+                    new InventoryDeserializer(itemDeserializer),
+                    this.#inventoryModal.inventoryChangeListener
+                ),
                 new EquippedWeaponChangeHandler(
                     itemDeserializer,
                     this.#inventoryModal.weaponChangeListener

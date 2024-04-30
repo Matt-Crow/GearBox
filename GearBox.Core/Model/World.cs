@@ -3,7 +3,6 @@ namespace GearBox.Core.Model;
 using GearBox.Core.Model.Dynamic;
 using GearBox.Core.Model.Dynamic.Player;
 using GearBox.Core.Model.Json;
-using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Utils;
@@ -19,6 +18,7 @@ public class World
     
     // todo player-interactables
     private readonly SafeList<LootChest> _lootChests = new(); 
+    private readonly SafeList<PlayerCharacter> _players = new();
     
     private readonly List<Func<Character>> _enemies = [];
 
@@ -33,7 +33,6 @@ public class World
         Id = id ?? Guid.NewGuid();
         Map = map ?? new();
         DynamicContent = new DynamicWorldContent();
-        StableContent = new StableWorldContent();
         ItemTypes = itemTypes ?? ItemTypeRepository.Empty();
         _loot = loot ?? new LootTable();
         _enemies = enemies ?? [];
@@ -47,23 +46,27 @@ public class World
     public Guid Id { get; init; }
     public Map Map { get; init; }
     public DynamicWorldContent DynamicContent { get; init; }
-    public StableWorldContent StableContent { get; init; }
     public IItemTypeRepository ItemTypes { get; init; }
 
     public void AddPlayer(PlayerCharacter player)
     {
-        if (StableContent.ContainsPlayer(player))
+        if (_players.Contains(player))
         {
             return;
         }
-        StableContent.AddPlayer(player);
         DynamicContent.AddDynamicObject(player);
+        _players.Add(player);
+        player.Termination.Terminated += (sender, args) => RemovePlayer(player);
     }
 
     public void RemovePlayer(PlayerCharacter player)
     {
+        if (!_players.Contains(player))
+        {
+            return;
+        }
         DynamicContent.RemoveDynamicObject(player);
-        StableContent.RemovePlayer(player);
+        _players.Remove(player);
     }
     
     public void AddTimer(WorldTimer timer)
@@ -99,8 +102,7 @@ public class World
     /// Called each game tick.
     /// Updates the world and everything in it
     /// </summary>
-    /// <returns>Changes to stable content</returns>
-    public IEnumerable<Change> Update()
+    public void Update()
     {
         _timers.ForEach(t => t.Update());
         DynamicContent.Update();
@@ -115,13 +117,13 @@ public class World
         }
         foreach (var lootChest in _lootChests.AsEnumerable())
         {
-            foreach (var player in StableContent.Players)
+            foreach (var player in _players.AsEnumerable())
             {
                 lootChest.CheckForCollisions(player);
             }
         }
         _lootChests.ApplyChanges();
-        return StableContent.Update();
+        _players.ApplyChanges();
     }
 
     public WorldInitJson GetWorldInitJsonFor(PlayerCharacter player)
@@ -141,14 +143,7 @@ public class World
     /// </summary>
     public WorldUpdateJson GetCompleteWorldUpdateJson()
     {
-        var allStableObjects = StableContent.GetAll()
-            .Select(Change.Content)
-            .Select(change => change.ToJson(true))
-            .ToList();
-        var result = new WorldUpdateJson(
-            DynamicContent.ToJson(true),
-            allStableObjects
-        );
+        var result = new WorldUpdateJson(DynamicContent.ToJson(true));
         return result;
     }
 

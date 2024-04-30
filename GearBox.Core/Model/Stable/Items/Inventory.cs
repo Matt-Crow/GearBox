@@ -6,12 +6,16 @@ namespace GearBox.Core.Model.Stable.Items;
 /// <summary>
 /// Contains items a player has picked up.
 /// </summary>
-public class Inventory : IStableGameObject
+public class Inventory : IDynamic
 {
+    private readonly ChangeTracker _changeTracker;
+    private bool _updatedLastFrame = true;
+
     public Inventory(Guid? ownerId = null)
     {
         OwnerId = ownerId ?? Guid.Empty;
         Serializer = new("inventory", Serialize);
+        _changeTracker = new(this);
     }
 
     public Guid OwnerId { get; init; }
@@ -45,10 +49,11 @@ public class Inventory : IStableGameObject
 
     public void Update()
     {
-        // do nothing
+        _updatedLastFrame = _changeTracker.HasChanged;
+        _changeTracker.Update();
     }
 
-    public string Serialize(SerializationOptions options)
+    private string Serialize(SerializationOptions options)
     {
         var json = new InventoryJson(
             OwnerId,
@@ -56,5 +61,13 @@ public class Inventory : IStableGameObject
             Materials.ToJson()
         );
         return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
+    }
+
+    public StableJson ToJson(bool isWorldInit)
+    {
+        var result = _updatedLastFrame || isWorldInit
+            ? StableJson.Changed(Serializer.Serialize(isWorldInit).Content)
+            : StableJson.NoChanges();
+        return result;
     }
 }

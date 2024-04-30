@@ -8,7 +8,7 @@ public class EquipmentSlot<T> : IDynamic
 where T : Equipment
 {
     private readonly Guid _ownerId;
-    private readonly ChangeTracker2 _changeTracker;
+    private readonly ChangeTracker _changeTracker;
     private bool _updatedLastFrame = true;
 
     public EquipmentSlot(Guid ownerId, string type)
@@ -58,7 +58,6 @@ where T : Equipment
 
     public void Update()
     {
-        // might have heisenbug on whether this goes off
         _updatedLastFrame = _changeTracker.HasChanged;
         _changeTracker.Update();
     }

@@ -1,4 +1,4 @@
-import { ChangeHandler, ChangeListener } from "../infrastructure/change.js";
+import { ChangeListener } from "../infrastructure/change.js";
 import { TestCase, TestSuite } from "../testing/tests.js";
 
 export class Inventory {
@@ -39,37 +39,22 @@ export class InventoryDeserializer {
     }
 }
 
-export class InventoryChangeHandler extends ChangeHandler {
-    #playerId;
+export class InventoryChangeHandler {
     #deserializer;
     #changeListeners;
 
     /**
-     * @param {string} playerId 
      * @param {InventoryDeserializer} deserializer 
      * @param  {...ChangeListener} changeListeners 
      */
-    constructor(playerId, deserializer, ...changeListeners) {
-        super("inventory");
-        this.#playerId = playerId;
+    constructor(deserializer, ...changeListeners) {
         this.#deserializer = deserializer;
         this.#changeListeners = changeListeners;
     }
 
-    handleContent(obj) {
-        if (obj.ownerId != this.#playerId) {
-            return; // don't bother handling changes to other players' inventories
-        }
-        const inventory = this.#deserializer.deserialize(obj);
+    handleContent(json) {
+        const inventory = this.#deserializer.deserialize(json);
         this.#changeListeners.forEach(listener => listener.changed(inventory));
-    }
-
-    handleDelete(obj) {
-        if (obj.ownerId != this.#playerId) {
-            return; // don't bother handling changes to other players' inventories
-        }
-        const inventory = this.#deserializer.deserialize(obj);
-        this.#changeListeners.forEach(listener => listener.removed(inventory));
     }
 }
 

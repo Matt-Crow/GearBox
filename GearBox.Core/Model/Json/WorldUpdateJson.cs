@@ -5,15 +5,10 @@ namespace GearBox.Core.Model.Json;
 /// </summary>
 public readonly struct WorldUpdateJson : IJson
 {
-    public WorldUpdateJson(
-        List<GameObjectJson> gameObjects,
-        List<ChangeJson> changes
-    )
+    public WorldUpdateJson(List<GameObjectJson> gameObjects)
     {
         GameObjects = gameObjects;
-        Changes = changes;
     }
     
     public List<GameObjectJson> GameObjects { get; init; }
-    public List<ChangeJson> Changes { get; init; }
 }
