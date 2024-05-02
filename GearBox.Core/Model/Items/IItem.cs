@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 public interface IItem
 {

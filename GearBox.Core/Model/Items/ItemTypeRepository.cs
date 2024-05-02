@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using GearBox.Core.Model.Json;
 
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 public class ItemTypeRepository : IItemTypeRepository
 {

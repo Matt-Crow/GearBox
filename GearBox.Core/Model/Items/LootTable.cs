@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 /// <summary>
 /// Used to determine what items players can get from LootChests

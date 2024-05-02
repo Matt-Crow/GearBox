@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 /// <summary>
 /// A Material is a type of item which are only used for crafting

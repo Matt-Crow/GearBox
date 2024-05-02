@@ -1,7 +1,7 @@
 using GearBox.Core.Model.Json;
 using GearBox.Core.Utils;
 
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 /// <summary>
 /// Each Inventory is broken down into multiple tabs, which each hold a different category of item.

@@ -1,7 +1,8 @@
 using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Stable;
 using System.Text.Json;
 
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 /// <summary>
 /// Contains items a player has picked up.

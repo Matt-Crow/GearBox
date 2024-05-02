@@ -1,6 +1,6 @@
 using GearBox.Core.Model.Json;
 
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 /// <summary>
 /// Stores all item type definitions

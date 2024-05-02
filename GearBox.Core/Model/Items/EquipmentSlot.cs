@@ -1,8 +1,9 @@
 using System.Text.Json;
 using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Stable;
 using GearBox.Core.Utils;
 
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 public class EquipmentSlot<T> : IDynamic
 where T : Equipment

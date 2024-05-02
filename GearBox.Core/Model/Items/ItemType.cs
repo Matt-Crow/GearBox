@@ -1,6 +1,6 @@
 using GearBox.Core.Model.Json;
 
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 public readonly struct ItemType
 {

@@ -1,7 +1,7 @@
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 public class WeaponBuilder
 {

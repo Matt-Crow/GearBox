@@ -1,7 +1,7 @@
-using GearBox.Core.Model.Stable.Items;
+using GearBox.Core.Model.Items;
 using Xunit;
 
-namespace GearBox.Core.Tests.Model.Stable.Items;
+namespace GearBox.Core.Tests.Model.Items;
 
 public class ItemTypeRepositoryTester
 {

@@ -2,7 +2,7 @@ using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Utils;
 
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 public class Weapon : Equipment
 {

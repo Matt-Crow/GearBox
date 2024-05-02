@@ -1,6 +1,6 @@
 using GearBox.Core.Model.Json;
 
-namespace GearBox.Core.Model.Stable.Items;
+namespace GearBox.Core.Model.Items;
 
 public class ItemStack<T> : ISerializable<ItemJson>
 where T : IItem
