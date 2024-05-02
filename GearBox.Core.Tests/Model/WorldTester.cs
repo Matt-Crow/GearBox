@@ -24,11 +24,11 @@ public class WorldTester
     }
 
     [Fact]
-    public void UpdateForwardsToAllDynamicObjects()
+    public void Update_GivenGameObjectsInWorld_ForwardsToThem()
     {
-        var spy = new DynamicGameObjectSpy();
+        var spy = new GameObjectSpy();
         var sut = new World();
-        sut.DynamicContent.AddDynamicObject(spy);
+        sut.GameObjects.AddGameObject(spy);
         sut.Update();
         Assert.True(spy.HasBeenUpdated);
     }
@@ -59,6 +59,6 @@ public class WorldTester
         sut.SpawnPlayer(player);
         sut.Update(); // apply changes
 
-        Assert.Single(sut.DynamicContent.DynamicObjects);
+        Assert.Single(sut.GameObjects.GameObjects);
     }
 }

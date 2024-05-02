@@ -4,15 +4,15 @@ using GearBox.Core.Utils;
 namespace GearBox.Core.Model.GameObjects;
 
 /// <summary>
-/// Dynamic content can change with each update.
+/// GameObjects in a world
 /// </summary>
-public class DynamicWorldContent
+public class GameObjectCollection
 {
     private readonly SafeList<IGameObject> _gameObjects = new();
 
-    public IEnumerable<IGameObject> DynamicObjects => _gameObjects.AsEnumerable();
+    public IEnumerable<IGameObject> GameObjects => _gameObjects.AsEnumerable();
 
-    public void AddDynamicObject(IGameObject obj)
+    public void AddGameObject(IGameObject obj)
     {
         if (!_gameObjects.Contains(obj))
         {
@@ -20,7 +20,7 @@ public class DynamicWorldContent
         }
     }
 
-    public void RemoveDynamicObject(IGameObject obj)
+    public void RemoveGameObject(IGameObject obj)
     {
         _gameObjects.Remove(obj);
     }

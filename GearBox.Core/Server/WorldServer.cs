@@ -135,7 +135,7 @@ public class WorldServer
         // pull this into World!
         _world.Update();
         // notify everyone of the update
-        var message = new WorldUpdateJson(_world.DynamicContent.ToJson(false));
+        var message = new WorldUpdateJson(_world.GameObjects.ToJson(false));
         var tasks = _connections.Values
             .Select(conn => conn.Send(message))
             .ToList();

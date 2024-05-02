@@ -3,7 +3,7 @@ using GearBox.Core.Model.GameObjects;
 
 namespace GearBox.Core.Tests.Model.GameObjects;
 
-public class DynamicGameObjectSpy : IGameObject
+public class GameObjectSpy : IGameObject
 {
     private int _timesUpdated = 0;
     public int TimesUpdated => _timesUpdated;

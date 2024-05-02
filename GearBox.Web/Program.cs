@@ -16,7 +16,7 @@ var world = new WorldBuilder()
 world.AddTimer(new WorldTimer(() => world.SpawnLootChest(), 50));
 
 // testing EnemySpawner
-world.DynamicContent.AddDynamicObject(new EnemySpawner(
+world.GameObjects.AddGameObject(new EnemySpawner(
     world, 
     new EnemySpawnerOptions()
     {

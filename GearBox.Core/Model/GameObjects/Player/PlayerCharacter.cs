@@ -95,7 +95,7 @@ public class PlayerCharacter : Character
             range,
             attack
         );
-        inWorld.DynamicContent.AddDynamicObject(projectile);
+        inWorld.GameObjects.AddGameObject(projectile);
 
         _basicAttackCooldownInFrames = Duration.FromSeconds(0.5).InFrames;
     }

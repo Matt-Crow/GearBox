@@ -3,9 +3,9 @@ using GearBox.Core.Model.GameObjects;
 
 namespace GearBox.Core.Tests.Model.GameObjects;
 
-public class TerminatingDynamicGameObject : IGameObject
+public class TerminatingGameObject : IGameObject
 {
-    public TerminatingDynamicGameObject()
+    public TerminatingGameObject()
     {
         Termination = new(this, () => IsTerminated);
     }

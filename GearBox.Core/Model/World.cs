@@ -32,7 +32,7 @@ public class World
     {
         Id = id ?? Guid.NewGuid();
         Map = map ?? new();
-        DynamicContent = new DynamicWorldContent();
+        GameObjects = new GameObjectCollection();
         ItemTypes = itemTypes ?? ItemTypeRepository.Empty();
         _loot = loot ?? new LootTable();
         _enemies = enemies ?? [];
@@ -45,7 +45,7 @@ public class World
 
     public Guid Id { get; init; }
     public Map Map { get; init; }
-    public DynamicWorldContent DynamicContent { get; init; }
+    public GameObjectCollection GameObjects { get; init; }
     public IItemTypeRepository ItemTypes { get; init; }
 
 
@@ -60,7 +60,7 @@ public class World
             return;
         }
         player.HealPercent(100.0);
-        DynamicContent.AddDynamicObject(player);
+        GameObjects.AddGameObject(player);
         _players.Add(player);
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
     }
@@ -76,7 +76,7 @@ public class World
         {
             return;
         }
-        DynamicContent.RemoveDynamicObject(player);
+        GameObjects.RemoveGameObject(player);
         _players.Remove(player);
     }
     
@@ -93,7 +93,7 @@ public class World
         {
             var lootChest = new LootChest(location.Value.CenteredOnTile(), inventory);
             _lootChests.Add(lootChest);
-            DynamicContent.AddDynamicObject(lootChest);
+            GameObjects.AddGameObject(lootChest);
         }
     }
 
@@ -105,7 +105,7 @@ public class World
         var tile = Map.GetRandomOpenTile() ?? throw new Exception("Map has no open tiles");
         enemy.Coordinates = tile.CenteredOnTile();
 
-        DynamicContent.AddDynamicObject(enemy);
+        GameObjects.AddGameObject(enemy);
         return enemy;
     }
 
@@ -116,14 +116,14 @@ public class World
     public void Update()
     {
         _timers.ForEach(t => t.Update());
-        DynamicContent.Update();
-        foreach (var obj in DynamicContent.DynamicObjects)
+        GameObjects.Update();
+        foreach (var obj in GameObjects.GameObjects)
         {
             var body = obj.Body;
             if (body is not null)
             {
                 Map.CheckForCollisions(body);
-                DynamicContent.CheckForCollisions(body);
+                GameObjects.CheckForCollisions(body);
             }
         }
         foreach (var lootChest in _lootChests.AsEnumerable())
@@ -154,7 +154,7 @@ public class World
     /// </summary>
     public WorldUpdateJson GetCompleteWorldUpdateJson()
     {
-        var result = new WorldUpdateJson(DynamicContent.ToJson(true));
+        var result = new WorldUpdateJson(GameObjects.ToJson(true));
         return result;
     }
 

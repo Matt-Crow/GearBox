@@ -3,7 +3,7 @@ namespace GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Units;
 
 /// <summary>
-/// Rather than implementing a different interface, mobile dynamic objects 
+/// Rather than implementing a different interface, mobile game objects 
 /// should have an instance of this object.
 /// </summary>
 public class MobileBehavior
