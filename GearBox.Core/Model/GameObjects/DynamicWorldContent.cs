@@ -8,11 +8,11 @@ namespace GearBox.Core.Model.GameObjects;
 /// </summary>
 public class DynamicWorldContent
 {
-    private readonly SafeList<IDynamicGameObject> _gameObjects = new();
+    private readonly SafeList<IGameObject> _gameObjects = new();
 
-    public IEnumerable<IDynamicGameObject> DynamicObjects => _gameObjects.AsEnumerable();
+    public IEnumerable<IGameObject> DynamicObjects => _gameObjects.AsEnumerable();
 
-    public void AddDynamicObject(IDynamicGameObject obj)
+    public void AddDynamicObject(IGameObject obj)
     {
         if (!_gameObjects.Contains(obj))
         {
@@ -20,7 +20,7 @@ public class DynamicWorldContent
         }
     }
 
-    public void RemoveDynamicObject(IDynamicGameObject obj)
+    public void RemoveDynamicObject(IGameObject obj)
     {
         _gameObjects.Remove(obj);
     }
@@ -58,7 +58,7 @@ public class DynamicWorldContent
         _gameObjects.ApplyChanges();
     }
 
-    private static bool IsTerminated(IDynamicGameObject obj)
+    private static bool IsTerminated(IGameObject obj)
     {
         return obj.Termination != null && obj.Termination.IsTerminated;
     }

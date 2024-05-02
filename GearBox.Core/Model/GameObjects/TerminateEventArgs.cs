@@ -2,10 +2,10 @@ namespace GearBox.Core.Model.GameObjects;
 
 public class TerminateEventArgs : EventArgs
 {
-    public TerminateEventArgs(IDynamicGameObject terminated)
+    public TerminateEventArgs(IGameObject terminated)
     {
         Terminated = terminated;
     }
 
-    public IDynamicGameObject Terminated { get; init; }
+    public IGameObject Terminated { get; init; }
 }

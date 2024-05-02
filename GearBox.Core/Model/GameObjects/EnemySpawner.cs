@@ -2,7 +2,7 @@ using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.GameObjects;
 
-public class EnemySpawner : IDynamicGameObject
+public class EnemySpawner : IGameObject
 {
     private static readonly Duration COOLDOWN = Duration.FromSeconds(10);
     private readonly World _world;

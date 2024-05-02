@@ -9,7 +9,7 @@ namespace GearBox.Core.Model.Stable.Items;
 /// <summary>
 /// A LootChest provides players with loot
 /// </summary>
-public class LootChest : IDynamicGameObject
+public class LootChest : IGameObject
 {
     private readonly HashSet<Guid> _collectedBy = [];
     private readonly Inventory _contents = new();

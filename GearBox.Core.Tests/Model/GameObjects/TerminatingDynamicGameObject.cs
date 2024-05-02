@@ -3,7 +3,7 @@ using GearBox.Core.Model.GameObjects;
 
 namespace GearBox.Core.Tests.Model.GameObjects;
 
-public class TerminatingDynamicGameObject : IDynamicGameObject
+public class TerminatingDynamicGameObject : IGameObject
 {
     public TerminatingDynamicGameObject()
     {

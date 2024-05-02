@@ -3,7 +3,7 @@ using GearBox.Core.Model.GameObjects;
 
 namespace GearBox.Core.Tests.Model.GameObjects;
 
-public class DuplicatingDynamicGameObject : IDynamicGameObject
+public class DuplicatingDynamicGameObject : IGameObject
 {
     private readonly DynamicWorldContent _content;
 

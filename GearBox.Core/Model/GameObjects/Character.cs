@@ -7,7 +7,7 @@ namespace GearBox.Core.Model.GameObjects;
 /// <summary>
 /// A Character is something sentient in the game world.
 /// </summary>
-public class Character : IDynamicGameObject
+public class Character : IGameObject
 {
     public static readonly int MAX_LEVEL = 20;
     protected static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);

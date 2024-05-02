@@ -2,10 +2,10 @@ namespace GearBox.Core.Model.GameObjects;
 
 public class TerminateBehavior
 {
-    private readonly IDynamicGameObject _obj;
+    private readonly IGameObject _obj;
     private readonly Func<bool> _isTerminated;
 
-    public TerminateBehavior(IDynamicGameObject obj, Func<bool> isTerminated)
+    public TerminateBehavior(IGameObject obj, Func<bool> isTerminated)
     {
         _obj = obj;
         _isTerminated = isTerminated;
