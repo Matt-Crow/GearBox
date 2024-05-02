@@ -1,6 +1,6 @@
 using System.Text.Json;
 using GearBox.Core.Model.Json;
-using GearBox.Core.Model.Stable;
+using GearBox.Core.Model.GameObjects.ChangeTracking;
 using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Items;

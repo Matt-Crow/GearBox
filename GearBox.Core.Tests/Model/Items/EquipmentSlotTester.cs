@@ -1,4 +1,4 @@
-using GearBox.Core.Model.Stable;
+using GearBox.Core.Model.GameObjects.ChangeTracking;
 using GearBox.Core.Model.Items;
 using Xunit;
 
@@ -9,29 +9,25 @@ public class EquipmentSlotTester
     [Fact]
     public void DynamicValues_AfterEquipping_Change()
     {
-        var hasher = new DynamicHasher();
         var sut = new EquipmentSlot<Weapon>(Guid.Empty, "");
-        var hashBefore = hasher.Hash(sut);
-    
+        var tracker = new ChangeTracker(sut);
+        
         sut.Value = new Weapon(new ItemType("foo"));
-        var hashAfter = hasher.Hash(sut);
-
-        Assert.NotEqual(hashBefore, hashAfter);
+        
+        Assert.True(tracker.HasChanged);
     }
 
     [Fact]
     public void DynamicValues_AfterSwitching_Change()
     {
-        var hasher = new DynamicHasher();
         var sut = new EquipmentSlot<Weapon>(Guid.Empty, "")
         {
             Value = new Weapon(new ItemType("foo"))
         };
-        var hashBefore = hasher.Hash(sut);
+        var tracker = new ChangeTracker(sut);
 
         sut.Value = new Weapon(new ItemType("foo"));
-        var hashAfter = hasher.Hash(sut);
 
-        Assert.NotEqual(hashBefore, hashAfter);
+        Assert.True(tracker.HasChanged);
     }
 }

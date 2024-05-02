@@ -1,5 +1,5 @@
 using GearBox.Core.Model.Json;
-using GearBox.Core.Model.Stable;
+using GearBox.Core.Model.GameObjects.ChangeTracking;
 using System.Text.Json;
 
 namespace GearBox.Core.Model.Items;
