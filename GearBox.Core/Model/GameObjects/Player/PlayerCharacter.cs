@@ -3,7 +3,7 @@ using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Units;
 using System.Text.Json;
 
-namespace GearBox.Core.Model.Dynamic.Player;
+namespace GearBox.Core.Model.GameObjects.Player;
 
 public class PlayerCharacter : Character
 {

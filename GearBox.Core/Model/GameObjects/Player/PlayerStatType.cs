@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace GearBox.Core.Model.Dynamic.Player;
+namespace GearBox.Core.Model.GameObjects.Player;
 
 public class PlayerStatType
 {

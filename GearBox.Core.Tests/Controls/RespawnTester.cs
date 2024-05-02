@@ -1,6 +1,6 @@
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
-using GearBox.Core.Model.Dynamic.Player;
+using GearBox.Core.Model.GameObjects.Player;
 using Xunit;
 
 namespace GearBox.Core.Tests.Controls;

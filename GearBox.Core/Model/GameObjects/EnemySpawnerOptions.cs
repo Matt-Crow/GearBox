@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Dynamic;
+namespace GearBox.Core.Model.GameObjects;
 
 public class EnemySpawnerOptions
 {

@@ -1,5 +1,5 @@
-using GearBox.Core.Model.Dynamic;
-using GearBox.Core.Model.Dynamic.Player;
+using GearBox.Core.Model.GameObjects;
+using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 using System.Text.Json;

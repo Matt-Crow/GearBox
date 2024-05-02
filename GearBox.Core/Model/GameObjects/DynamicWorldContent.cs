@@ -1,7 +1,7 @@
 using GearBox.Core.Model.Json;
 using GearBox.Core.Utils;
 
-namespace GearBox.Core.Model.Dynamic;
+namespace GearBox.Core.Model.GameObjects;
 
 /// <summary>
 /// Dynamic content can change with each update.

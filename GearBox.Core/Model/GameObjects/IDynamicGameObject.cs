@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Dynamic;
+namespace GearBox.Core.Model.GameObjects;
 
 /// <summary>
 /// An object in a world which updates every game tick

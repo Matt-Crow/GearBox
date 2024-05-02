@@ -1,5 +1,5 @@
 using GearBox.Core.Model;
-using GearBox.Core.Model.Dynamic.Player;
+using GearBox.Core.Model.GameObjects.Player;
 
 namespace GearBox.Core.Controls;
 

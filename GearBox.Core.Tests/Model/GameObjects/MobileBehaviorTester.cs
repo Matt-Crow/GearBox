@@ -1,6 +1,6 @@
-namespace GearBox.Core.Tests.Model.Dynamic;
+namespace GearBox.Core.Tests.Model.GameObjects;
 
-using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Units;
 using Xunit;
 

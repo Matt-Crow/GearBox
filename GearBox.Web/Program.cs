@@ -1,5 +1,5 @@
 using GearBox.Core.Model;
-using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 

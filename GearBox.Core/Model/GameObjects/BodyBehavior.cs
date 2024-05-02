@@ -1,6 +1,6 @@
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model.Dynamic;
+namespace GearBox.Core.Model.GameObjects;
 
 /// <summary>
 /// Defines behavior for an object which physically exists within a world.

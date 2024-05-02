@@ -1,7 +1,7 @@
 namespace GearBox.Core.Tests.Model.Static;
 
 using GearBox.Core.Model;
-using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 using Xunit;

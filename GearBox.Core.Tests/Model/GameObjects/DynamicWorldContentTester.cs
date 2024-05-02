@@ -1,7 +1,7 @@
-using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.GameObjects;
 using Xunit;
 
-namespace GearBox.Core.Tests.Model.Dynamic;
+namespace GearBox.Core.Tests.Model.GameObjects;
 
 public class DynamicWorldContentTester
 {

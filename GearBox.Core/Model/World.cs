@@ -1,7 +1,7 @@
 namespace GearBox.Core.Model;
 
-using GearBox.Core.Model.Dynamic;
-using GearBox.Core.Model.Dynamic.Player;
+using GearBox.Core.Model.GameObjects;
+using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Stable.Items;
 using GearBox.Core.Model.Static;

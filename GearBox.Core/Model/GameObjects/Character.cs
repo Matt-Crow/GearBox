@@ -2,7 +2,7 @@ using System.Text.Json;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model.Dynamic;
+namespace GearBox.Core.Model.GameObjects;
 
 /// <summary>
 /// A Character is something sentient in the game world.
