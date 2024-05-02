@@ -4,11 +4,11 @@ using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Controls;
 
-public class UseBasicAttackCommand : IControlCommand
+public class UseBasicAttack : IControlCommand
 {
     private readonly Direction _inDirection;
 
-    public UseBasicAttackCommand(Direction inDirection)
+    public UseBasicAttack(Direction inDirection)
     {
         _inDirection = inDirection;
     }

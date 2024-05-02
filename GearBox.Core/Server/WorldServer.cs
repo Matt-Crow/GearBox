@@ -64,7 +64,7 @@ public class WorldServer
             ?? throw new Exception("Failed to find open tile. This should not happen.");
         player.Coordinates = spawnLocation.CenteredOnTile();
 
-        _world.AddPlayer(player);
+        _world.SpawnPlayer(player);
         _connections.Add(id, connection);
         _players.Add(id, player);
 

@@ -3,17 +3,17 @@ using GearBox.Core.Model.Dynamic.Player;
 
 namespace GearBox.Core.Controls;
 
-public class Equip : IControlCommand
+public class EquipWeapon : IControlCommand
 {
-    private readonly Guid _equipmentId;
+    private readonly Guid _weaponId;
 
-    public Equip(Guid equipmentId)
+    public EquipWeapon(Guid weaponId)
     {
-        _equipmentId = equipmentId;
+        _weaponId = weaponId;
     }
 
     public void ExecuteOn(PlayerCharacter target, World inWorld)
     {
-        target.EquipWeaponById(_equipmentId);
+        target.EquipWeaponById(_weaponId);
     }
 }

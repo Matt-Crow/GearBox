@@ -55,8 +55,8 @@ public class WorldTester
         var sut = new World();
         var player = new PlayerCharacter("foo", 1);
 
-        sut.AddPlayer(player);
-        sut.AddPlayer(player);
+        sut.SpawnPlayer(player);
+        sut.SpawnPlayer(player);
         sut.Update(); // apply changes
 
         Assert.Single(sut.DynamicContent.DynamicObjects);

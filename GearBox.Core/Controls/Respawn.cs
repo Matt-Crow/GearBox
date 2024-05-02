@@ -7,7 +7,6 @@ public class Respawn : IControlCommand
 {
     public void ExecuteOn(PlayerCharacter target, World inWorld)
     {
-        target.HealPercent(100.0);
-        inWorld.AddPlayer(target);
+        inWorld.SpawnPlayer(target);
     }
 }

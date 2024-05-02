@@ -14,5 +14,5 @@ public class PendingCommand
     }
     
     public string ConnectionId { get; init; }
-    public IControlCommand Command { get; set; }
+    public IControlCommand Command { get; init; }
 }

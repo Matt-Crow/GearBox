@@ -48,20 +48,31 @@ public class World
     public DynamicWorldContent DynamicContent { get; init; }
     public IItemTypeRepository ItemTypes { get; init; }
 
-    public void AddPlayer(PlayerCharacter player)
+
+    /// <summary>
+    /// Spawns a player into the world an heals them back to full,
+    /// if they are not already in the world
+    /// </summary>
+    public void SpawnPlayer(PlayerCharacter player)
     {
-        if (_players.Contains(player))
+        if (ContainsPlayer(player))
         {
             return;
         }
+        player.HealPercent(100.0);
         DynamicContent.AddDynamicObject(player);
         _players.Add(player);
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
     }
+    
+    public bool ContainsPlayer(PlayerCharacter player)
+    {
+        return _players.Contains(player);
+    }
 
     public void RemovePlayer(PlayerCharacter player)
     {
-        if (!_players.Contains(player))
+        if (!ContainsPlayer(player))
         {
             return;
         }
