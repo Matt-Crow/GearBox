@@ -1,4 +1,3 @@
-import { ChangeListener } from "../infrastructure/change.js";
 import { TestCase, TestSuite } from "../testing/tests.js";
 
 export class Inventory {
@@ -45,7 +44,7 @@ export class InventoryChangeHandler {
 
     /**
      * @param {InventoryDeserializer} deserializer 
-     * @param  {...ChangeListener} changeListeners 
+     * @param  {...(Inventory) => any} changeListeners 
      */
     constructor(deserializer, ...changeListeners) {
         this.#deserializer = deserializer;
@@ -54,7 +53,7 @@ export class InventoryChangeHandler {
 
     handleContent(json) {
         const inventory = this.#deserializer.deserialize(json);
-        this.#changeListeners.forEach(listener => listener.changed(inventory));
+        this.#changeListeners.forEach(listener => listener(inventory));
     }
 }
 
@@ -64,7 +63,7 @@ export class EquippedWeaponChangeHandler {
 
     /**
      * @param {ItemDeserializer} deserializer 
-     * @param  {...ChangeListener} changeListeners 
+     * @param  {...(Item?) => any} changeListeners 
      */
     constructor(deserializer, ...changeListeners) {
         this.#deserializer = deserializer;
@@ -75,7 +74,7 @@ export class EquippedWeaponChangeHandler {
         const weapon = json.value
             ? this.#deserializer.deserialize(json.value) // see EquipmentSlotJson
             : null;
-        this.#changeListeners.forEach(listener => listener.changed(weapon));
+        this.#changeListeners.forEach(listener => listener(weapon));
     }
 }
 

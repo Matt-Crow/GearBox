@@ -1,4 +1,3 @@
-import { ChangeListener } from "../infrastructure/change.js";
 import { Client } from "../infrastructure/client.js";
 import { Inventory, Item } from "../model/item.js";
 
@@ -6,8 +5,6 @@ export class InventoryModal {
     #modal;
     #materialRows;
     #equipmentRows;
-    #inventoryChangeListener;
-    #weaponChangeListener;
     #client;
 
     /**
@@ -18,21 +15,10 @@ export class InventoryModal {
         this.#modal = modal;
         this.#materialRows = document.querySelector("#materialRows");
         this.#equipmentRows = document.querySelector("#equipmentRows");
-        this.#inventoryChangeListener = new ChangeListener({
-            onChanged: (inventory) => this.#setInventory(inventory),
-            onRemoved: () => this.#clear() 
-        });
-        this.#weaponChangeListener = new ChangeListener({
-            onChanged: (weapon) => this.#setWeapon(weapon),
-            onRemoved: () => this.#setWeapon(null)
-        });
         this.#client = client;
-        this.#setWeapon(null);
+        this.setWeapon(null);
         this.#setCompareWeapon(null);
     }
-
-    get inventoryChangeListener() { return this.#inventoryChangeListener; }
-    get weaponChangeListener() { return this.#weaponChangeListener; }
 
     toggle() {
         if (this.#modal.open) {
@@ -50,7 +36,7 @@ export class InventoryModal {
     /**
      * @param {Inventory} inventory 
      */
-    #setInventory(inventory) {
+    setInventory(inventory) {
         this.#clear();
         inventory.materials.forEach(item => this.#addMaterial(item));
         inventory.equipment.forEach(item => this.#addEquipment(item));
@@ -111,7 +97,7 @@ export class InventoryModal {
     /**
      * @param {Item?} weapon 
      */
-    #setWeapon(weapon) {
+    setWeapon(weapon) {
         if (!weapon) {
             $("#noWeapon").show();
             $("#yesWeapon").hide();

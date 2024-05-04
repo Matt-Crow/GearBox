@@ -71,22 +71,17 @@ export class Game {
             .handleWorldInit(initMessage);
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
-        const updateHandler = new WorldUpdateHandler(world, this.#gameOverScreen)
-            .withDynamicObjectDeserializer(new CharacterJsonDeserializer())
-            .withDynamicObjectDeserializer(new PlayerChangeHandler(
+        const updateHandler = new WorldUpdateHandler(world)
+            .addGameObjectType(new CharacterJsonDeserializer())
+            .addGameObjectType(new PlayerChangeHandler(
                 world.playerId, 
                 this.#playerHud.playerUpdateListener, 
-                new InventoryChangeHandler(
-                    new InventoryDeserializer(itemDeserializer),
-                    this.#inventoryModal.inventoryChangeListener
-                ),
-                new EquippedWeaponChangeHandler(
-                    itemDeserializer,
-                    this.#inventoryModal.weaponChangeListener
-                )
+                new InventoryChangeHandler(new InventoryDeserializer(itemDeserializer), inv => this.#inventoryModal.setInventory(inv)),
+                new EquippedWeaponChangeHandler(itemDeserializer, wea => this.#inventoryModal.setWeapon(wea))
             ))
-            .withDynamicObjectDeserializer(new ProjectileJsonDeserializer())
-            .withDynamicObjectDeserializer(new LootChestJsonDeserializer(world.playerId))
+            .addGameObjectType(new ProjectileJsonDeserializer())
+            .addGameObjectType(new LootChestJsonDeserializer(world.playerId))
+            .addUpdateListener(w => this.#gameOverScreen.update(w))
             ;
 
         // unregisters handleInit, switches to handling updates instead

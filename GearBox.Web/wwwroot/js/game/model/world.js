@@ -1,58 +1,51 @@
-import { GameOverScreen } from "../components/gameOverScreen.js";
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
-import { Character } from "./character.js";
 import { ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
-import { deserializeMapJson } from "./map.js";
+import { WorldMap, deserializeMapJson } from "./map.js";
+import { Player } from "./player.js";
 
 export class World {
     #playerId; // need reference to changing player
     #map;
-    #dynamicGameObjects;
+    #gameObjects;
     #itemTypes;
 
+    /**
+     * 
+     * @param {string} playerId 
+     * @param {WorldMap} map 
+     * @param {ItemTypeRepository} itemTypes 
+     */
     constructor(playerId, map, itemTypes) {
         this.#playerId = playerId;
         this.#map = map;
-        this.#dynamicGameObjects = [];
+        this.#gameObjects = [];
         this.#itemTypes = new ItemTypeRepository(itemTypes);
     }
 
     /**
      * @param {any[]} value
      */
-    set dynamicGameObjects(value) { this.#dynamicGameObjects = value; }
+    set gameObjects(value) { this.#gameObjects = value; }
+
+    get playerId() { return this.#playerId; }
+    get widthInPixels() { return this.#map.widthInPixels; }
+    get heightInPixels() { return this.#map.heightInPixels; }
+    get itemTypes() { return this.#itemTypes; }
 
     /**
-     * @returns {Character} the player the client controls
+     * @returns {Player} the player the client controls
      */
     get player() {
-        return this.#dynamicGameObjects.find(obj => obj.id == this.#playerId);
+        return this.#gameObjects.find(obj => obj.id == this.#playerId);
     }
-
-    /**
-     * @returns {string}
-     */
-    get playerId() { return this.#playerId; }
-
-    /**
-     * @returns {number}
-     */
-    get widthInPixels() { return this.#map.widthInPixels; }
-
-    /**
-     * @returns {number}
-     */
-    get heightInPixels() { return this.#map.heightInPixels; }
-
-    get itemTypes() { return this.#itemTypes; }
 
     /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
     draw(context) {
         this.#map.draw(context);
-        this.#dynamicGameObjects.forEach(obj => obj.draw(context));
+        this.#gameObjects.forEach(obj => obj.draw(context));
     }
 }
 
@@ -73,34 +66,40 @@ export class WorldInitHandler {
 
 export class WorldUpdateHandler {
     #world;
-    #gameOverScreen;
-    #deserializers;
+    #deserializers = new JsonDeserializers();
+    #updateListeners = [];
 
     /**
      * @param {World} world 
-     * @param {GameOverScreen} gameOverScreen 
      */
-    constructor(world, gameOverScreen) {
+    constructor(world) {
         this.#world = world;
-        this.#gameOverScreen = gameOverScreen;
-        this.#deserializers = new JsonDeserializers();
     }
 
     /**
      * @param {JsonDeserializer} deserializer used to deserialize dynamic game objects
      * @returns {WorldUpdateHandler} this, for chaining
      */
-    withDynamicObjectDeserializer(deserializer) {
+    addGameObjectType(deserializer) {
         this.#deserializers.addDeserializer(deserializer);
         return this;
     }
 
+    /**
+     * @param {(World) => any} updateListener 
+     * @returns {WorldUpdateHandler}
+     */
+    addUpdateListener(updateListener) {
+        this.#updateListeners.push(updateListener);
+        return this;
+    }
+
     handleWorldUpdate(obj) {
-        const dynamicGameObjects = obj.gameObjects
+        const newGameObject = obj.gameObjects
             .map(gameObjectJson => this.#deserialize(gameObjectJson))
             .filter(obj => obj !== null);
-        this.#world.dynamicGameObjects = dynamicGameObjects;
-        this.#gameOverScreen.update(this.#world);
+        this.#world.gameObjects = newGameObject;
+        this.#updateListeners.forEach(listener => listener(this.#world));
     }
 
     #deserialize(gameObjectJson) {
