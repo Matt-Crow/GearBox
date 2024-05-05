@@ -3,7 +3,7 @@ import { GameOverScreen } from "./components/gameOverScreen.js";
 import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
 import { CharacterJsonDeserializer } from "./model/character.js";
-import { EquippedWeaponChangeHandler, InventoryChangeHandler, InventoryDeserializer, ItemDeserializer } from "./model/item.js";
+import { EquippedWeaponChangeHandler, InventoryDeserializer, ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
 import { PlayerChangeHandler } from "./model/player.js";
 import { ProjectileJsonDeserializer } from "./model/projectile.js";
@@ -71,17 +71,17 @@ export class Game {
             .handleWorldInit(initMessage);
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
-        const updateHandler = new WorldUpdateHandler(world)
+        const updateHandler = new WorldUpdateHandler(world, new InventoryDeserializer(itemDeserializer))
             .addGameObjectType(new CharacterJsonDeserializer())
             .addGameObjectType(new PlayerChangeHandler(
                 world.playerId, 
                 this.#playerHud.playerUpdateListener, 
-                new InventoryChangeHandler(new InventoryDeserializer(itemDeserializer), inv => this.#inventoryModal.setInventory(inv)),
                 new EquippedWeaponChangeHandler(itemDeserializer, wea => this.#inventoryModal.setWeapon(wea))
             ))
             .addGameObjectType(new ProjectileJsonDeserializer())
             .addGameObjectType(new LootChestJsonDeserializer(world.playerId))
             .addUpdateListener(w => this.#gameOverScreen.update(w))
+            .addInventoryChangeListener(inv => this.#inventoryModal.setInventory(inv))
             ;
 
         // unregisters handleInit, switches to handling updates instead

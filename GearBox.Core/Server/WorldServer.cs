@@ -70,7 +70,7 @@ public class WorldServer
 
         // client needs to know both the world init and current state of stable objects
         await connection.Send(_world.GetWorldInitJsonFor(player));
-        await connection.Send(_world.GetCompleteWorldUpdateJson());
+        await connection.Send(_world.GetCompleteWorldUpdateJsonFor(player));
 
         if (!_timer.Enabled)
         {
@@ -132,12 +132,11 @@ public class WorldServer
             command.Command.ExecuteOn(_players[command.ConnectionId], _world);
         }
 
-        // pull this into World!
         _world.Update();
+
         // notify everyone of the update
-        var message = new WorldUpdateJson(_world.GameObjects.ToJson(false));
-        var tasks = _connections.Values
-            .Select(conn => conn.Send(message))
+        var tasks = _connections
+            .Select(kv => kv.Value.Send(_world.GetWorldUpdateJsonFor(_players[kv.Key])))
             .ToList();
         await Task.WhenAll(tasks);
     }

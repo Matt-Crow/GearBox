@@ -1,6 +1,6 @@
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
-import { ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
+import { InventoryDeserializer, ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
 import { WorldMap, deserializeMapJson } from "./map.js";
 import { Player } from "./player.js";
 
@@ -66,14 +66,18 @@ export class WorldInitHandler {
 
 export class WorldUpdateHandler {
     #world;
+    #inventoryDeserializer;
     #deserializers = new JsonDeserializers();
     #updateListeners = [];
+    #inventoryChangeHandlers = [];
 
     /**
      * @param {World} world 
+     * @param {InventoryDeserializer} inventoryDeserializer 
      */
-    constructor(world) {
+    constructor(world, inventoryDeserializer) {
         this.#world = world;
+        this.#inventoryDeserializer = inventoryDeserializer;
     }
 
     /**
@@ -94,12 +98,26 @@ export class WorldUpdateHandler {
         return this;
     }
 
-    handleWorldUpdate(obj) {
-        const newGameObject = obj.gameObjects
+    /**
+     * @param {(Inventory) => any} changeHandler 
+     */
+    addInventoryChangeListener(changeHandler) {
+        this.#inventoryChangeHandlers.push(changeHandler);
+        return this;
+    }
+
+    handleWorldUpdate(json) {
+        const newGameObject = json.gameObjects
             .map(gameObjectJson => this.#deserialize(gameObjectJson))
             .filter(obj => obj !== null);
         this.#world.gameObjects = newGameObject;
+        
         this.#updateListeners.forEach(listener => listener(this.#world));
+
+        if (json.inventory.hasChanged) {
+            const inventory = this.#inventoryDeserializer.deserialize(JSON.parse(json.inventory.body));
+            this.#inventoryChangeHandlers.forEach(handler => handler(inventory));
+        }
     }
 
     #deserialize(gameObjectJson) {

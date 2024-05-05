@@ -10,7 +10,6 @@ public readonly struct PlayerJson : IJson
         int y, 
         FractionJson hitPoints, 
         FractionJson energy,
-        StableJson inventory,
         StableJson weapon
     )
     {
@@ -21,7 +20,6 @@ public readonly struct PlayerJson : IJson
         Y = y;
         HitPoints = hitPoints;
         Energy = energy;
-        Inventory = inventory;
         Weapon = weapon;
     }
 
@@ -32,6 +30,5 @@ public readonly struct PlayerJson : IJson
     public int Y { get; init; }
     public FractionJson HitPoints { get; init; }
     public FractionJson Energy { get; init; }
-    public StableJson Inventory { get; init; }
     public StableJson Weapon { get; init; }
 }

@@ -13,7 +13,7 @@ public class PlayerCharacter : Character
 
     public PlayerCharacter(string name, int level) : base(name, level)
     {
-        Inventory = new(Id);
+        Inventory = new();
         Weapon = new(Id, "equippedWeapon");
         UpdateStats();
     }
@@ -139,7 +139,6 @@ public class PlayerCharacter : Character
             Coordinates.YInPixels,
             new FractionJson(MaxHitPoints - DamageTaken, MaxHitPoints),
             new FractionJson(MaxEnergy - _energyExpended, MaxEnergy),
-            Inventory.ToJson(options.IsWorldInit),
             Weapon.ToJson(options.IsWorldInit)
         );
         return JsonSerializer.Serialize(asJson, options.JsonSerializerOptions);

@@ -1,22 +1,18 @@
 import { TestCase, TestSuite } from "../testing/tests.js";
 
 export class Inventory {
-    #ownerId;
     #equipment;
     #materials;
 
     /**
-     * @param {string} ownerId 
      * @param {Item[]} equipment 
      * @param {Item[]} materials 
      */
-    constructor(ownerId, equipment=[], materials=[]) {
-        this.#ownerId = ownerId;
+    constructor(equipment=[], materials=[]) {
         this.#equipment = equipment;
         this.#materials = materials;
     }
 
-    get ownerId() { return this.#ownerId; }
     get equipment() { return this.#equipment; }
     get materials() { return this.#materials; }
 }
@@ -34,26 +30,7 @@ export class InventoryDeserializer {
     deserialize(json) {
         const equipment = json.equipment.items.map(x => this.#itemDeserializer.deserialize(x));
         const materials = json.materials.items.map(x => this.#itemDeserializer.deserialize(x));
-        return new Inventory(json.ownerId, equipment, materials);
-    }
-}
-
-export class InventoryChangeHandler {
-    #deserializer;
-    #changeListeners;
-
-    /**
-     * @param {InventoryDeserializer} deserializer 
-     * @param  {...(Inventory) => any} changeListeners 
-     */
-    constructor(deserializer, ...changeListeners) {
-        this.#deserializer = deserializer;
-        this.#changeListeners = changeListeners;
-    }
-
-    handleContent(json) {
-        const inventory = this.#deserializer.deserialize(json);
-        this.#changeListeners.forEach(listener => listener(inventory));
+        return new Inventory(equipment, materials);
     }
 }
 

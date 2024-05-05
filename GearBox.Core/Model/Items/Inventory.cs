@@ -12,14 +12,12 @@ public class Inventory : IDynamic
     private readonly ChangeTracker _changeTracker;
     private bool _updatedLastFrame = true;
 
-    public Inventory(Guid? ownerId = null)
+    public Inventory()
     {
-        OwnerId = ownerId ?? Guid.Empty;
         Serializer = new("inventory", Serialize);
         _changeTracker = new(this);
     }
 
-    public Guid OwnerId { get; init; }
     public Serializer Serializer { get; init; }
     public InventoryTab<Weapon> Weapons { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
@@ -56,11 +54,7 @@ public class Inventory : IDynamic
 
     private string Serialize(SerializationOptions options)
     {
-        var json = new InventoryJson(
-            OwnerId,
-            Weapons.ToJson(),
-            Materials.ToJson()
-        );
+        var json = new InventoryJson(Weapons.ToJson(), Materials.ToJson());
         return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
     }
 

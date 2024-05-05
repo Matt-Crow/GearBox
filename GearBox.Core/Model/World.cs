@@ -152,9 +152,19 @@ public class World
     /// except it includes all stable values, 
     /// regardless of whether they've changed
     /// </summary>
-    public WorldUpdateJson GetCompleteWorldUpdateJson()
+    public WorldUpdateJson GetCompleteWorldUpdateJsonFor(PlayerCharacter player)
     {
-        var result = new WorldUpdateJson(GameObjects.ToJson(true));
+        return InnerGetWorldUpdateJsonFor(player, true);
+    }
+
+    public WorldUpdateJson GetWorldUpdateJsonFor(PlayerCharacter player)
+    {
+        return InnerGetWorldUpdateJsonFor(player, false);
+    }
+
+    private WorldUpdateJson InnerGetWorldUpdateJsonFor(PlayerCharacter player, bool isWorldInit)
+    {
+        var result = new WorldUpdateJson(GameObjects.ToJson(isWorldInit), player.Inventory.ToJson(isWorldInit));
         return result;
     }
 
