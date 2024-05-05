@@ -1,5 +1,5 @@
-using System.Text.Json;
 using GearBox.Core.Model.Json;
+using System.Text.Json;
 
 namespace GearBox.Core.Model;
 
@@ -22,9 +22,9 @@ public class Serializer
         _mapper = mapper;
     }
 
-    public GameObjectJson Serialize(bool isWorldInit)
+    public GameObjectJson Serialize()
     {
-        var options = new SerializationOptions(isWorldInit);
+        var options = new SerializationOptions();
         var result = new GameObjectJson(_type, _mapper.Invoke(options));
         return result;
     }

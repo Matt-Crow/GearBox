@@ -70,7 +70,7 @@ public class WorldServer
 
         // client needs to know both the world init and current state of stable objects
         await connection.Send(_world.GetWorldInitJsonFor(player));
-        await connection.Send(_world.GetCompleteWorldUpdateJsonFor(player));
+        await connection.Send(_world.GetWorldUpdateJsonFor(player));
 
         if (!_timer.Enabled)
         {

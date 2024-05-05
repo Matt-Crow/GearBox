@@ -8,16 +8,14 @@ namespace GearBox.Core.Model.Items;
 public class EquipmentSlot<T> : IDynamic
 where T : Equipment
 {
-    private readonly Guid _ownerId;
     private readonly ChangeTracker _changeTracker;
     private bool _updatedLastFrame = true;
 
-    public EquipmentSlot(Guid ownerId, string type)
+    public EquipmentSlot(string type)
     {
-        _ownerId = ownerId;
         Serializer = new Serializer(
             type,
-            options => JsonSerializer.Serialize(new EquipmentSlotJson(_ownerId, ValueJson()), options.JsonSerializerOptions)
+            options => JsonSerializer.Serialize(ValueJson(), options.JsonSerializerOptions)
         );
         _changeTracker = new(this);
     }
@@ -31,10 +29,10 @@ where T : Equipment
         ? ListExtensions.Of<object?>(false)
         : ListExtensions.Of<object?>(true).Append(Value.Id).Concat(Value.DynamicValues);
     
-    public StableJson ToJson(bool isWorldInit)
+    public StableJson ToJson()
     {
-        var result = _updatedLastFrame || isWorldInit // _changeTracker.HasChanged is cleared before it gets here
-            ? StableJson.Changed(Serializer.Serialize(isWorldInit).Content)
+        var result = _updatedLastFrame // _changeTracker.HasChanged is cleared before it gets here
+            ? StableJson.Changed(Serializer.Serialize().Content)
             : StableJson.NoChanges();
         return result;
     }

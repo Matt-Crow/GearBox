@@ -63,11 +63,11 @@ public class GameObjectCollection
         return obj.Termination != null && obj.Termination.IsTerminated;
     }
 
-    public List<GameObjectJson> ToJson(bool isWorldInit)
+    public List<GameObjectJson> ToJson()
     {
         var objs = _gameObjects.AsEnumerable()
             .Where(obj => obj.Serializer is not null)
-            .Select(obj => obj.Serializer!.Serialize(isWorldInit))
+            .Select(obj => obj.Serializer!.Serialize())
             .ToList();
         return objs;
     }

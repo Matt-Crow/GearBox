@@ -34,27 +34,6 @@ export class InventoryDeserializer {
     }
 }
 
-export class EquippedWeaponChangeHandler {
-    #deserializer;
-    #changeListeners;
-
-    /**
-     * @param {ItemDeserializer} deserializer 
-     * @param  {...(Item?) => any} changeListeners 
-     */
-    constructor(deserializer, ...changeListeners) {
-        this.#deserializer = deserializer;
-        this.#changeListeners = changeListeners;
-    }
-
-    handleContent(json) {
-        const weapon = json.value
-            ? this.#deserializer.deserialize(json.value) // see EquipmentSlotJson
-            : null;
-        this.#changeListeners.forEach(listener => listener(weapon));
-    }
-}
-
 export class Item {
     #id;
     #type;

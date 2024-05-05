@@ -58,10 +58,10 @@ public class Inventory : IDynamic
         return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
     }
 
-    public StableJson ToJson(bool isWorldInit)
+    public StableJson ToJson()
     {
-        var result = _updatedLastFrame || isWorldInit
-            ? StableJson.Changed(Serializer.Serialize(isWorldInit).Content)
+        var result = _updatedLastFrame
+            ? StableJson.Changed(Serializer.Serialize().Content)
             : StableJson.NoChanges();
         return result;
     }

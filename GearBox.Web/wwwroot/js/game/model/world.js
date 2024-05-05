@@ -1,6 +1,6 @@
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
-import { InventoryDeserializer, ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
+import { InventoryDeserializer, ItemDeserializer, ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
 import { WorldMap, deserializeMapJson } from "./map.js";
 import { Player } from "./player.js";
 
@@ -67,17 +67,20 @@ export class WorldInitHandler {
 export class WorldUpdateHandler {
     #world;
     #inventoryDeserializer;
+    #itemDeserializer;
     #deserializers = new JsonDeserializers();
     #updateListeners = [];
-    #inventoryChangeHandlers = [];
+    #inventoryChangeListeners = [];
+    #weaponChangeListeners = [];
 
     /**
      * @param {World} world 
-     * @param {InventoryDeserializer} inventoryDeserializer 
+     * @param {ItemDeserializer} itemDeserializer 
      */
-    constructor(world, inventoryDeserializer) {
+    constructor(world, itemDeserializer) {
         this.#world = world;
-        this.#inventoryDeserializer = inventoryDeserializer;
+        this.#inventoryDeserializer = new InventoryDeserializer(itemDeserializer);
+        this.#itemDeserializer = itemDeserializer;
     }
 
     /**
@@ -99,10 +102,20 @@ export class WorldUpdateHandler {
     }
 
     /**
-     * @param {(Inventory) => any} changeHandler 
+     * @param {(Inventory) => any} changeListener 
+     * @returns {WorldUpdateHandler}
      */
-    addInventoryChangeListener(changeHandler) {
-        this.#inventoryChangeHandlers.push(changeHandler);
+    addInventoryChangeListener(changeListener) {
+        this.#inventoryChangeListeners.push(changeListener);
+        return this;
+    }
+
+    /**
+     * @param {(Item?) => any} changeListener 
+     * @returns {WorldUpdateHandler}
+     */
+    addWeaponChangeListener(changeListener) {
+        this.#weaponChangeListeners.push(changeListener);
         return this;
     }
 
@@ -116,7 +129,15 @@ export class WorldUpdateHandler {
 
         if (json.inventory.hasChanged) {
             const inventory = this.#inventoryDeserializer.deserialize(JSON.parse(json.inventory.body));
-            this.#inventoryChangeHandlers.forEach(handler => handler(inventory));
+            this.#inventoryChangeListeners.forEach(listener => listener(inventory));
+        }
+
+        if (json.weapon.hasChanged) {
+            const maybeWeapon = JSON.parse(json.weapon.body);
+            const weapon = maybeWeapon
+                ? this.#itemDeserializer.deserialize(maybeWeapon)
+                : null;
+            this.#weaponChangeListeners.forEach(listener => listener(weapon));
         }
     }
 

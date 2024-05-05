@@ -9,12 +9,10 @@ public class SerializationOptions
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
-    public SerializationOptions(bool isWorldInit)
+    public SerializationOptions()
     {
-        IsWorldInit = isWorldInit;
         JsonSerializerOptions = JSON_OPTIONS;
     }
 
-    public bool IsWorldInit { get; init; }
     public JsonSerializerOptions JsonSerializerOptions { get; init; }
 }
