@@ -15,7 +15,9 @@ where T : IItem
     */
     private readonly SafeList<ItemStack<T>> _content = new();
 
-    public IEnumerable<ItemStack<T>> Content => _content.AsEnumerable();
+    public IEnumerable<ItemStack<T>> Content => _content
+        .AsEnumerable()
+        .Where(stack => stack.Quantity > 0);
 
     public IEnumerable<object?> DynamicValues => Content.SelectMany(stack => stack.DynamicValues);
 
@@ -49,18 +51,18 @@ where T : IItem
         return result;
     }
 
-    public void Remove(T item)
+    public void Remove(T item, int quantity=1)
     {
         var stackToRemoveFrom = _content.AsEnumerable()
             .Where(stack => stack.Item.Equals(item))
             .FirstOrDefault();
-        stackToRemoveFrom?.RemoveQuantity(1);
+        stackToRemoveFrom?.RemoveQuantity(quantity);
     }
 
-    public bool Contains(T item)
+    public bool Contains(T item, int quantity=1)
     {
         var result = _content.AsEnumerable()
-            .Any(stack => stack.Item.Equals(item) && stack.Quantity > 0);
+            .Any(stack => stack.Item.Equals(item) && stack.Quantity >= quantity);
         return result;
     }
 
