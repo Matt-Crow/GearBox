@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Items;
+namespace GearBox.Core.Model.Items.Crafting;
 
 public class CraftingRecipeBuilder
 {

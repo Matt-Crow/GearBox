@@ -1,6 +1,7 @@
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.GameObjects.ChangeTracking;
 using System.Text.Json;
+using GearBox.Core.Model.Items.Crafting;
 
 namespace GearBox.Core.Model.Items;
 

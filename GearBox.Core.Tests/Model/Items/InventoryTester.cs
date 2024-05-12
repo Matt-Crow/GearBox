@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Items;
+using GearBox.Core.Model.Items.Crafting;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model.Items;

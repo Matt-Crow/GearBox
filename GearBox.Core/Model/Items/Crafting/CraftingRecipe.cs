@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Items;
+namespace GearBox.Core.Model.Items.Crafting;
 
 /// <summary>
 /// Details how to convert materials into another item
