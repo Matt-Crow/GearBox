@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Json;
+
 namespace GearBox.Core.Model.Items;
 
 /// <summary>
@@ -24,4 +26,17 @@ public class ItemUnion
 
     public Material? Material { get; init; }
     public Weapon? Weapon { get; init; }
+
+    public ItemJson ToJson()
+    {
+        if (Material != null)
+        {
+            return new ItemStack<Material>(Material).ToJson();
+        }
+        if (Weapon != null)
+        {
+            return new ItemStack<Weapon>(Weapon).ToJson();
+        }
+        throw new Exception("ItemUnion has no item");
+    }
 }

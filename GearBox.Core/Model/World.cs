@@ -6,6 +6,7 @@ using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Utils;
+using GearBox.Core.Model.Items.Crafting;
 
 /// <summary>
 /// For now, a World is the topmost container for game objects.
@@ -26,6 +27,7 @@ public class World
         Guid? id = null, 
         Map? map = null, 
         IItemTypeRepository? itemTypes = null, 
+        CraftingRecipeRepository? craftingRecipes = null,
         LootTable? loot = null,
         List<Func<Character>>? enemies = null
     )
@@ -34,6 +36,7 @@ public class World
         Map = map ?? new();
         GameObjects = new GameObjectCollection();
         ItemTypes = itemTypes ?? ItemTypeRepository.Empty();
+        CraftingRecipes = craftingRecipes ?? CraftingRecipeRepository.Empty();
         _loot = loot ?? new LootTable();
         _enemies = enemies ?? [];
 
@@ -47,7 +50,7 @@ public class World
     public Map Map { get; init; }
     public GameObjectCollection GameObjects { get; init; }
     public IItemTypeRepository ItemTypes { get; init; }
-
+    public CraftingRecipeRepository CraftingRecipes { get; init; }
 
     /// <summary>
     /// Spawns a player into the world an heals them back to full,
@@ -142,7 +145,8 @@ public class World
         var result = new WorldInitJson(
             player.Id,
             Map.ToJson(),
-            ItemTypes.ToJson()
+            ItemTypes.ToJson(),
+            CraftingRecipes.ToJson()
         );
         return result;
     }

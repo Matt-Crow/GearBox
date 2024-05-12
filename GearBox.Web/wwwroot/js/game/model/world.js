@@ -1,5 +1,6 @@
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
+import { CraftingRecipe, CraftingRecipeDeserializer, CraftingRecipeRepository } from "./crafting.js";
 import { InventoryDeserializer, ItemDeserializer, ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
 import { WorldMap, deserializeMapJson } from "./map.js";
 import { Player } from "./player.js";
@@ -9,18 +10,21 @@ export class World {
     #map;
     #gameObjects;
     #itemTypes;
+    #craftingRecipes;
 
     /**
      * 
      * @param {string} playerId 
      * @param {WorldMap} map 
-     * @param {ItemTypeRepository} itemTypes 
+     * @param {ItemType[]} itemTypes 
+     * @param {CraftingRecipe[]} craftingRecipes 
      */
-    constructor(playerId, map, itemTypes) {
+    constructor(playerId, map, itemTypes, craftingRecipes) {
         this.#playerId = playerId;
         this.#map = map;
         this.#gameObjects = [];
         this.#itemTypes = new ItemTypeRepository(itemTypes);
+        this.#craftingRecipes = new CraftingRecipeRepository(craftingRecipes);
     }
 
     /**
@@ -32,6 +36,7 @@ export class World {
     get widthInPixels() { return this.#map.widthInPixels; }
     get heightInPixels() { return this.#map.heightInPixels; }
     get itemTypes() { return this.#itemTypes; }
+    get craftingRecipes() { return this.#craftingRecipes; }
 
     /**
      * @returns {Player} the player the client controls
@@ -59,7 +64,14 @@ export class WorldInitHandler {
     handleWorldInit(obj) {
         const map = deserializeMapJson(obj.map);
         const itemTypes = obj.itemTypes.map(deserializeItemTypeJson);
-        const deserialized = new World(obj.playerId, map, itemTypes);
+
+        // need item types to resolve crafting recipes, dependency injection won't work
+        const itemTypeRepository = new ItemTypeRepository(itemTypes);
+        const itemDeserializer = new ItemDeserializer(itemTypeRepository);
+        const craftingRecipeDeserializer = new CraftingRecipeDeserializer(itemDeserializer);
+
+        const craftingRecipes = obj.craftingRecipes.map(x => craftingRecipeDeserializer.deserialize(x));
+        const deserialized = new World(obj.playerId, map, itemTypes, craftingRecipes);
         return deserialized;
     }
 }
