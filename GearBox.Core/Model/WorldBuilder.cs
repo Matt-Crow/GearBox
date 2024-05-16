@@ -1,6 +1,7 @@
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
+using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 
@@ -10,45 +11,63 @@ public class WorldBuilder
 {
     private Map? _map;
     private readonly List<ItemType> _itemTypes = [];
+    private readonly List<CraftingRecipe> _craftingRecipes = [];
     private readonly LootTable _loot = new();
     private readonly List<Func<Character>> _enemies = [];
 
-
-    public WorldBuilder DefineMaterial(string name, string description, Grade grade)
+    public WorldBuilder DefineMaterial(Material material)
     {
-        var type = new ItemType(name, grade);
-        _loot.AddMaterial(new Material(type, description));
-        _itemTypes.Add(type);
+        _loot.AddMaterial(material);
+        _itemTypes.Add(material.Type);
         return this;
     }
 
-    public WorldBuilder DefineWeapon(string name, Grade grade, Action<WeaponBuilder> modifyBuilder)
+    public WorldBuilder DefineWeapon(WeaponBuilder builder)
     {
-        var itemType = new ItemType(name, grade);
-        var builder = new WeaponBuilder(itemType);
-        modifyBuilder(builder);
         _loot.AddWeapon(builder.Build(1)); // in the future, this will be based on the area level
-        _itemTypes.Add(itemType);
+        _itemTypes.Add(builder.ItemType);
+        return this;
+    }
+
+    public WorldBuilder DefineEnemy(Func<Character> definition)
+    {
+        _enemies.Add(definition);
         return this;
     }
 
     // todo move to extension method once skills are added
     public WorldBuilder AddMiningSkill()
     {
+        var bronze = new Material(new ItemType("Bronze", Grade.UNCOMMON), "Used to craft low-level melee equipment");
         var result = this
-            .DefineMaterial("Stone", "A low-grade mining material, but it's better than nothing.", Grade.COMMON)
-            .DefineMaterial("Bronze", "Used to craft low-level melee equipment.", Grade.UNCOMMON)
-            .DefineMaterial("Silver", "Used to craft enhancements for your equipment.", Grade.RARE)
-            .DefineMaterial("Gold", "Used to craft powerful magical artifacts.", Grade.EPIC)
-            .DefineMaterial("Titanium", "A high-grade mining material for crafting powerful melee equipment.", Grade.LEGENDARY);
-        
+            .DefineMaterial(new Material(new ItemType("Stone", Grade.COMMON), "A low-grade mining material, but it's better than nothing."))
+            .DefineMaterial(bronze)
+            .DefineMaterial(new Material(new ItemType("Silver", Grade.RARE), "Used to craft enhancements for your equipment."))
+            .DefineMaterial(new Material(new ItemType("Gold", Grade.EPIC), "Used to craft powerful magical artifacts."))
+            .DefineMaterial(new Material(new ItemType("Titanium", Grade.LEGENDARY), "A high-grade mining material for crafting powerful melee equipment."))
+            ;
+
+        var khopeshBuilder = new WeaponBuilder(new ItemType("Bronze Khopesh", Grade.UNCOMMON))
+            .WithDescription("An ancient weapon for the modern age.")
+            .WithRange(AttackRange.MELEE)
+            .WithStatWeights(weights => weights
+                .Weigh(PlayerStatType.OFFENSE, 2)
+                .Weigh(PlayerStatType.DEFENSE, 1)
+            );
+        result = result.DefineWeapon(khopeshBuilder);
+
+        var khopeshRecipe = new CraftingRecipeBuilder()
+            .And(bronze, 25)
+            .Makes(() => ItemUnion.Of(khopeshBuilder.Build(1))); // what level should the crafted weapon be?
+        _craftingRecipes.Add(khopeshRecipe);
+
         return result;
     }
 
     public WorldBuilder AddStarterWeapons()
     {
         var result = this 
-            .DefineWeapon("Training Sword", Grade.COMMON, builder => builder
+            .DefineWeapon(new WeaponBuilder(new ItemType("Training Sword", Grade.COMMON))
                 .WithDescription("No special ability")
                 .WithRange(AttackRange.MELEE)
                 .WithStatWeights(weights => weights
@@ -56,7 +75,7 @@ public class WorldBuilder
                     .Weigh(PlayerStatType.DEFENSE, 1)
                 )
             )
-            .DefineWeapon("Training Bow", Grade.COMMON, builder => builder
+            .DefineWeapon(new WeaponBuilder(new ItemType("Training Bow", Grade.COMMON))
                 .WithDescription("Hit stuff from far away.")
                 .WithRange(AttackRange.LONG)
                 .WithStatWeights(weights => weights
@@ -64,7 +83,7 @@ public class WorldBuilder
                     .Weigh(PlayerStatType.SPEED, 1)
                 )
             )
-            .DefineWeapon("Training Staff", Grade.COMMON, builder => builder
+            .DefineWeapon(new WeaponBuilder(new ItemType("Training Staff", Grade.COMMON))
                 .WithDescription("Also no special ability.")
                 .WithRange(AttackRange.MEDIUM)
                 .WithStatWeights(weights => weights
@@ -73,12 +92,6 @@ public class WorldBuilder
                 )
             );
         return result;
-    }
-
-    public WorldBuilder DefineEnemy(Func<Character> definition)
-    {
-        _enemies.Add(definition);
-        return this;
     }
 
     public WorldBuilder AddDefaultEnemies()
@@ -135,6 +148,7 @@ public class WorldBuilder
             Guid.NewGuid(),
             _map,
             ItemTypeRepository.Of(_itemTypes),
+            CraftingRecipeRepository.Of(_craftingRecipes),
             _loot,
             _enemies
         );

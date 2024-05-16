@@ -1,9 +1,11 @@
 import { Client } from "../infrastructure/client.js";
+import { CraftingRecipe } from "../model/crafting.js";
 import { Inventory, Item } from "../model/item.js";
 
 export class InventoryModal {
     #modal;
     #materialRows;
+    #recipeRows;
     #equipmentRows;
     #client;
 
@@ -14,6 +16,7 @@ export class InventoryModal {
     constructor(modal, client) {
         this.#modal = modal;
         this.#materialRows = document.querySelector("#materialRows");
+        this.#recipeRows = document.querySelector("#recipeRows");
         this.#equipmentRows = document.querySelector("#equipmentRows");
         this.#client = client;
         this.setWeapon(null);
@@ -28,7 +31,7 @@ export class InventoryModal {
         }
     }
 
-    #clear() {
+    #clearInventory() {
         this.#materialRows.replaceChildren();
         this.#equipmentRows.replaceChildren();
     }
@@ -37,7 +40,7 @@ export class InventoryModal {
      * @param {Inventory} inventory 
      */
     setInventory(inventory) {
-        this.#clear();
+        this.#clearInventory();
         inventory.materials.forEach(item => this.#addMaterial(item));
         inventory.equipment.forEach(item => this.#addEquipment(item));
     }
@@ -92,6 +95,57 @@ export class InventoryModal {
         tr.appendChild(equipButton);
 
         this.#equipmentRows.appendChild(tr);
+    }
+
+    /**
+     * @param {CraftingRecipe[]} craftingRecipes 
+     */
+    setCraftingRecipes(craftingRecipes) {
+        craftingRecipes.forEach(craftingRecipe => this.#addCraftingRecipe(craftingRecipe));
+    }
+
+    /**
+     * @param {CraftingRecipe} craftingRecipe 
+     */
+    #addCraftingRecipe(craftingRecipe) {
+        const tds = [
+            craftingRecipe.makes.type.name,
+            craftingRecipe.ingredients.map(i => `${i.type.name} x${i.quantity}`).join(", ")
+        ].map(data => {
+            const e = document.createElement("td");
+            e.innerText = data;
+            return e;
+        });
+        const tr = document.createElement("tr");
+        $(tr).hover(
+            () => this.#setCraftPreview(craftingRecipe.makes),
+            () => this.#setCraftPreview(null)
+        );
+        tds.forEach(td => tr.appendChild(td));
+
+        const craftButton = document.createElement("button");
+        craftButton.innerText = "craft";
+        craftButton.type = "button";
+        craftButton.classList.add("btn");
+        craftButton.classList.add("btn-primary");
+
+        craftButton.addEventListener("click", (e) => this.#client.craft(craftingRecipe.id));
+
+        tr.appendChild(craftButton);
+
+        this.#recipeRows.appendChild(tr);
+    }
+
+    /**
+     * @param {Item?} item 
+     */
+    #setCraftPreview(item) {
+        if (!item) {
+            $("#craftPreview").hide();
+            return;
+        }
+        $("#craftPreview").show();
+        this.#bindWeaponCard("#craftPreview", item);
     }
 
     /**

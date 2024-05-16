@@ -1,6 +1,7 @@
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.GameObjects.ChangeTracking;
 using System.Text.Json;
+using GearBox.Core.Model.Items.Crafting;
 
 namespace GearBox.Core.Model.Items;
 
@@ -44,6 +45,28 @@ public class Inventory : IDynamic
     public bool Any()
     {
         return Weapons.Any() || Materials.Any();
+    }
+
+    public void Craft(CraftingRecipe recipe)
+    {
+        if (!CanCraft(recipe))
+        {
+            return;
+        }
+
+        foreach (var ingredient in recipe.Ingredients)
+        {
+            Materials.Remove(ingredient.Item, ingredient.Quantity);
+        }
+        var crafted = recipe.Maker.Invoke();
+        Weapons.Add(crafted.Weapon);
+        Materials.Add(crafted.Material);
+    }
+
+    private bool CanCraft(CraftingRecipe recipe)
+    {
+        var result = recipe.Ingredients.All(ingredient => Materials.Contains(ingredient.Item, ingredient.Quantity));
+        return result;
     }
 
     public void Update()

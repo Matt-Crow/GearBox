@@ -41,6 +41,10 @@ export class Client {
         this.#signalr.invoke("StopMovingRight");
     }
 
+    craft(recipeId) {
+        this.#signalr.invoke("Craft", recipeId);
+    }
+
     useBasicAttack(bearingInDegrees) {
         this.#signalr.invoke("UseBasicAttack", bearingInDegrees);
     }

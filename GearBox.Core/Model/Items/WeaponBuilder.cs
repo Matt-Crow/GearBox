@@ -5,15 +5,16 @@ namespace GearBox.Core.Model.Items;
 
 public class WeaponBuilder
 {
-    private readonly ItemType _type;
     private string? _description;
     private AttackRange _attackRange = AttackRange.MELEE;
     private readonly WeaponStatWeights _statWeights = new();
 
     public WeaponBuilder(ItemType type)
     {
-        _type = type;
+        ItemType = type;
     }
+
+    public ItemType ItemType { get; init; }
 
     public WeaponBuilder WithDescription(string description)
     {
@@ -40,12 +41,12 @@ public class WeaponBuilder
     {
         var totalPoints = (int)(
             PointsForLevel(level) 
-            * _type.Grade.PointMultiplier 
+            * ItemType.Grade.PointMultiplier 
             * _attackRange.WeaponStatMultiplier
         );
 
         var result = new Weapon(
-            _type, 
+            ItemType, 
             _description,
             level,
             null, // id is null
