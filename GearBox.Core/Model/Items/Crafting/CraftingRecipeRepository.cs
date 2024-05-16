@@ -9,7 +9,7 @@ public class CraftingRecipeRepository
 
     private CraftingRecipeRepository(IEnumerable<CraftingRecipe> recipes)
     {
-        _recipes = recipes.ToFrozenDictionary(_ => Guid.NewGuid(), recipe => recipe);
+        _recipes = recipes.ToFrozenDictionary(recipe => recipe.Id, recipe => recipe);
     }
 
     public static CraftingRecipeRepository Of(IEnumerable<CraftingRecipe> recipes)
@@ -27,6 +27,12 @@ public class CraftingRecipeRepository
         var result = _recipes.Values
             .Select(recipe => recipe.ToJson())
             .ToList();
+        return result;
+    }
+
+    public CraftingRecipe? GetById(Guid id)
+    {
+        _recipes.TryGetValue(id, out CraftingRecipe? result);
         return result;
     }
 }

@@ -129,7 +129,7 @@ export class InventoryModal {
         craftButton.classList.add("btn");
         craftButton.classList.add("btn-primary");
 
-        craftButton.addEventListener("click", (e) => console.log(craftingRecipe)); // todo send command
+        craftButton.addEventListener("click", (e) => this.#client.craft(craftingRecipe.id));
 
         tr.appendChild(craftButton);
 

@@ -13,6 +13,7 @@ public class CraftingRecipe
         Maker = maker;
     }
 
+    public Guid Id { get; init; } = Guid.NewGuid();
     public IEnumerable<ItemStack<Material>> Ingredients { get; init; }
     public Func<ItemUnion> Maker { get; init; }
 
@@ -22,7 +23,7 @@ public class CraftingRecipe
             .Select(stack => stack.ToJson())
             .ToList();
         var makes = Maker.Invoke().ToJson();
-        var result = new CraftingRecipeJson(ingredients, makes);
+        var result = new CraftingRecipeJson(Id, ingredients, makes);
         return result;
     }
 }
