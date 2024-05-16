@@ -45,4 +45,6 @@ export class CraftingRecipeRepository {
     constructor(recipes=[]) {
         this.#recipes = recipes;
     }
+
+    get recipes() { return this.#recipes; }
 }

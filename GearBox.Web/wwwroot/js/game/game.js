@@ -69,6 +69,7 @@ export class Game {
     #handleInit(initMessage) {
         const world = new WorldInitHandler()
             .handleWorldInit(initMessage);
+        this.#inventoryModal.setCraftingRecipes(world.craftingRecipes.recipes);
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
         const updateHandler = new WorldUpdateHandler(world, itemDeserializer)
