@@ -1,6 +1,7 @@
 import { Client } from "../infrastructure/client.js";
 import { CraftingRecipe } from "../model/crafting.js";
 import { Inventory, Item } from "../model/item.js";
+import { ItemDisplay } from "./itemDisplay.js";
 
 export class InventoryModal {
     #modal;
@@ -8,6 +9,9 @@ export class InventoryModal {
     #recipeRows;
     #equipmentRows;
     #client;
+    #craftPreview;
+    #currentWeapon;
+    #compareWeapon;
 
     /**
      * @param {HTMLDialogElement} modal
@@ -19,6 +23,13 @@ export class InventoryModal {
         this.#recipeRows = document.querySelector("#recipeRows");
         this.#equipmentRows = document.querySelector("#equipmentRows");
         this.#client = client;
+        this.#craftPreview = new ItemDisplay("#craftPreview", "Preview", "Hover over a craft button to preview")
+            .spawnHtml();
+        this.#currentWeapon = new ItemDisplay("#currentWeapon", "Current Weapon", "No weapon equipped")
+            .spawnHtml();
+        this.#compareWeapon = new ItemDisplay("#compareWeapon", "Other Weapon", "Hover over a weapon to preview")
+            .spawnHtml();
+
         this.setWeapon(null);
         this.#setCompareWeapon(null);
     }
@@ -140,68 +151,20 @@ export class InventoryModal {
      * @param {Item?} item 
      */
     #setCraftPreview(item) {
-        if (!item) {
-            $("#craftPreview").hide();
-            return;
-        }
-        $("#craftPreview").show();
-        this.#bindWeaponCard("#craftPreview", item);
+        this.#craftPreview.bind(item);
     }
 
     /**
      * @param {Item?} weapon 
      */
     setWeapon(weapon) {
-        if (!weapon) {
-            $("#noWeapon").show();
-            $("#yesWeapon").hide();
-            return;
-        }
-
-        $("#noWeapon").hide();
-        $("#yesWeapon").show();
-
-        this.#bindWeaponCard("#yesWeapon", weapon);
+        this.#currentWeapon.bind(weapon);
     }
 
     /**
      * @param {Item?} weapon 
      */
     #setCompareWeapon(weapon) {
-        if (!weapon) {
-            $("#compareWeapon").hide();
-            return;
-        }
-        $("#compareWeapon").show();
-
-        this.#bindWeaponCard("#compareWeapon", weapon);
+        this.#compareWeapon.bind(weapon);
     }
-
-    #bindWeaponCard(selector, weapon) {
-        $(selector)
-            .find(".weaponName")
-            .text(`${weapon.type.name} LV ${weapon.level} ${stars(weapon.type.gradeOrder)}`);
-        
-        $(selector)
-            .find(".weaponDescription")
-            .text(weapon.description);
-
-        const details = weapon.details.map(str => {
-            const e = document.createElement("li");
-            e.innerText = str;
-            return e;
-        });
-        $(selector)
-            .find(".weaponDetails")
-            .empty()
-            .append(details);
-    }
-}
-
-function stars(num) {
-    let result = "";
-    for (let i = 0; i < num; i++) {
-        result += "*";
-    }
-    return result;
 }
