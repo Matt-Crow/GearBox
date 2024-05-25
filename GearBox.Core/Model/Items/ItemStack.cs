@@ -14,7 +14,9 @@ where T : IItem
 
     public T Item { get; init; }
     public int Quantity { get; private set; }
-    public IEnumerable<object?> DynamicValues => Item.DynamicValues.Append(Quantity);
+    public IEnumerable<object?> DynamicValues => Item.DynamicValues
+        .Append(Item.Id)
+        .Append(Quantity);
 
     public void AddQuantity(int quantity)
     {

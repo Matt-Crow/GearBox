@@ -1,4 +1,6 @@
 using System.Text.Json;
+using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.GameObjects.Ai;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 
@@ -22,21 +24,24 @@ public class Character : IGameObject
         Serializer = new(Type, Serialize);
         Termination = new(this, () => DamageTaken >= MaxHitPoints);
         SetLevel(level);
+        BasicAttack = new(this);
     }
 
 
     public Guid Id { get; init; } = Guid.NewGuid();
     public string Name { get; init; }
     public Serializer Serializer { get; init; }
+    public IAiBehavior AiBehavior { get; set; } = new NullAiBehavior();
     public BodyBehavior Body { get; init; } = new();
     public TerminateBehavior Termination { get; init; }
     public Coordinates Coordinates { get => Body.Location; set => Body.Location = value; }
     public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
     public int MaxHitPoints { get; set; }
     protected virtual string Type => "character";
-    protected int Level { get; private set; }
-    protected int DamagePerHit { get; private set; } // tie DPH to character instead of weapon so unarmed works
-
+    public int Level { get; private set; }
+    public double DamageModifier { get; protected set; } = 0.0;
+    public BasicAttack BasicAttack { get; init; }
+    public World? World { get; set; }
 
     public void SetLevel(int level)
     {
@@ -54,7 +59,6 @@ public class Character : IGameObject
     private void UpdateStatsBase()
     {
         MaxHitPoints = GetMaxHitPointsByLevel(Level);
-        DamagePerHit = GetDamagePerHitByLevel(Level);
     }
 
     public void StartMovingIn(Direction direction)
@@ -67,9 +71,19 @@ public class Character : IGameObject
         _mobility.StopMovingIn(direction);
     }
 
+    public void StopMoving()
+    {
+        _mobility.StopMoving();
+    }
+
     public void SetSpeed(Speed speed)
     {
         _mobility.Velocity = _mobility.Velocity.WithSpeed(speed);
+    }
+
+    public void UseBasicAttack(World inWorld, Direction inDirection)
+    {
+        BasicAttack.Use(inWorld, inDirection);
     }
 
     public virtual void TakeDamage(int damage)
@@ -92,7 +106,9 @@ public class Character : IGameObject
 
     public virtual void Update()
     {
+        AiBehavior.Update();
         _mobility.UpdateMovement();
+        BasicAttack.Update();
     }
 
     protected virtual string Serialize(SerializationOptions options)
@@ -126,13 +142,6 @@ public class Character : IGameObject
     {
         // ranges from 120 to 500
         var result = 100 + 20*level;
-        return result;
-    }
-
-    private int GetDamagePerHitByLevel(int level)
-    {
-        // ranges from 50 to 183
-        var result = 43 + 7*level;
         return result;
     }
 }

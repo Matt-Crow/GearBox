@@ -1,13 +1,13 @@
-namespace GearBox.Core.Model;
-
 using GearBox.Core.Model.GameObjects;
+using GearBox.Core.Model.GameObjects.Ai;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Items;
+using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Utils;
-using GearBox.Core.Model.Items.Crafting;
 
+namespace GearBox.Core.Model;
 /// <summary>
 /// For now, a World is the topmost container for game objects.
 /// Future versions will need separate containers for the different game areas.
@@ -63,6 +63,7 @@ public class World
             return;
         }
         player.HealPercent(100.0);
+        player.World = this;
         GameObjects.AddGameObject(player);
         _players.Add(player);
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
@@ -104,12 +105,27 @@ public class World
     {
         var enemyFactory = _enemies[Random.Shared.Next(_enemies.Count)];
         var enemy = enemyFactory.Invoke();
+        enemy.AiBehavior = new WanderAiBehavior(enemy);
+        enemy.World = this;
         
         var tile = Map.GetRandomOpenTile() ?? throw new Exception("Map has no open tiles");
         enemy.Coordinates = tile.CenteredOnTile();
 
         GameObjects.AddGameObject(enemy);
         return enemy;
+    }
+
+    public Character? GetNearestEnemy(Character character)
+    {
+        var result = GameObjects.GameObjects
+            .Select(obj => obj as Character)
+            .Where(maybeCharacter => maybeCharacter != null)
+            .Select(character => character!)
+            .Where(other => other != character) // not the same
+            .Where(x => true) // todo are on different teams
+            .OrderBy(enemy => enemy.Coordinates.DistanceFrom(character.Coordinates).InPixels)
+            .FirstOrDefault();
+        return result;
     }
 
     /// <summary>

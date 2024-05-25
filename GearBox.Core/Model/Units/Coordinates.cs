@@ -54,6 +54,14 @@ public readonly struct Coordinates
         return Plus(Distance.FromTiles(0.5), Distance.FromTiles(0.5));
     }
 
+    public Distance DistanceFrom(Coordinates other)
+    {
+        var pixelsDx = other.XInPixels - XInPixels;
+        var pixelsDy = other.YInPixels - YInPixels;
+        var pixels = Math.Sqrt(Math.Pow(pixelsDx, 2) + Math.Pow(pixelsDy, 2));
+        return Distance.FromPixels((int)pixels);
+    }
+
     public override string ToString()
     {
         return $"({_x}, {_y})";
