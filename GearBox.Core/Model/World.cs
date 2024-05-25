@@ -1,13 +1,13 @@
-namespace GearBox.Core.Model;
-
 using GearBox.Core.Model.GameObjects;
+using GearBox.Core.Model.GameObjects.Ai;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Items;
+using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Utils;
-using GearBox.Core.Model.Items.Crafting;
 
+namespace GearBox.Core.Model;
 /// <summary>
 /// For now, a World is the topmost container for game objects.
 /// Future versions will need separate containers for the different game areas.
@@ -104,6 +104,7 @@ public class World
     {
         var enemyFactory = _enemies[Random.Shared.Next(_enemies.Count)];
         var enemy = enemyFactory.Invoke();
+        enemy.AiBehavior = new WanderAiBehavior(enemy);
         
         var tile = Map.GetRandomOpenTile() ?? throw new Exception("Map has no open tiles");
         enemy.Coordinates = tile.CenteredOnTile();

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.GameObjects.Ai;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 
@@ -30,6 +31,7 @@ public class Character : IGameObject
     public Guid Id { get; init; } = Guid.NewGuid();
     public string Name { get; init; }
     public Serializer Serializer { get; init; }
+    public IAiBehavior AiBehavior { get; set; } = new NullAiBehavior();
     public BodyBehavior Body { get; init; } = new();
     public TerminateBehavior Termination { get; init; }
     public Coordinates Coordinates { get => Body.Location; set => Body.Location = value; }
@@ -98,6 +100,7 @@ public class Character : IGameObject
 
     public virtual void Update()
     {
+        AiBehavior.Update();
         _mobility.UpdateMovement();
         BasicAttack.Update();
     }
