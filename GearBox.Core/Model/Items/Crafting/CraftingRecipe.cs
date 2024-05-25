@@ -26,4 +26,14 @@ public class CraftingRecipe
         var result = new CraftingRecipeJson(Id, ingredients, makes);
         return result;
     }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is CraftingRecipe other && other.Id == Id;
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 }

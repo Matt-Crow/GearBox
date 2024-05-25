@@ -10,21 +10,21 @@ namespace GearBox.Core.Model;
 public class WorldBuilder
 {
     private Map? _map;
-    private readonly List<ItemType> _itemTypes = [];
-    private readonly List<CraftingRecipe> _craftingRecipes = [];
+    private readonly HashSet<ItemType> _itemTypes = [];
+    private readonly HashSet<CraftingRecipe> _craftingRecipes = [];
     private readonly LootTable _loot = new();
     private readonly List<Func<Character>> _enemies = [];
 
+
     public WorldBuilder DefineMaterial(Material material)
     {
-        _loot.AddMaterial(material);
         _itemTypes.Add(material.Type);
+        _loot.AddMaterial(material); // all materials are loot for now
         return this;
     }
 
     public WorldBuilder DefineWeapon(WeaponBuilder builder)
     {
-        _loot.AddWeapon(builder.Build(1)); // in the future, this will be based on the area level
         _itemTypes.Add(builder.ItemType);
         return this;
     }
@@ -55,6 +55,7 @@ public class WorldBuilder
                 .Weigh(PlayerStatType.DEFENSE, 1)
             );
         result = result.DefineWeapon(khopeshBuilder);
+        _loot.AddWeapon(khopeshBuilder.Build(1)); // in the future, this will be based on the area level
 
         var khopeshRecipe = new CraftingRecipeBuilder()
             .And(bronze, 25)
