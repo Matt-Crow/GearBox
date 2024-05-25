@@ -1,4 +1,5 @@
 using System.Text.Json;
+using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 
@@ -13,7 +14,6 @@ public class Character : IGameObject
     protected static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);
 
     private readonly MobileBehavior _mobility;
-    private int _basicAttackCooldownInFrames;
 
 
     public Character(string name, int level)
@@ -23,6 +23,7 @@ public class Character : IGameObject
         Serializer = new(Type, Serialize);
         Termination = new(this, () => DamageTaken >= MaxHitPoints);
         SetLevel(level);
+        BasicAttack = new(this);
     }
 
 
@@ -35,10 +36,9 @@ public class Character : IGameObject
     public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
     public int MaxHitPoints { get; set; }
     protected virtual string Type => "character";
-    protected int Level { get; private set; }
-    private int DamagePerHit { get; set; } // tie DPH to character instead of weapon so unarmed works
-    protected virtual AttackRange BasicAttackRange => AttackRange.MELEE;
-    protected virtual double DamageModifier => 0.0;
+    public int Level { get; private set; }
+    public double DamageModifier { get; protected set; } = 0.0;
+    protected BasicAttack BasicAttack { get; init; }
 
     public void SetLevel(int level)
     {
@@ -56,7 +56,6 @@ public class Character : IGameObject
     private void UpdateStatsBase()
     {
         MaxHitPoints = GetMaxHitPointsByLevel(Level);
-        DamagePerHit = GetDamagePerHitByLevel(Level);
     }
 
     public void StartMovingIn(Direction direction)
@@ -76,22 +75,7 @@ public class Character : IGameObject
 
     public void UseBasicAttack(World inWorld, Direction inDirection)
     {
-        if (_basicAttackCooldownInFrames != 0)
-        {
-            return;
-        }
-        
-        var range = BasicAttackRange.Range;
-        var damage = DamagePerHit * (1.0 + DamageModifier);
-        var attack = new Attack(this, (int)damage);
-        var projectile = new Projectile(
-            Coordinates, 
-            Velocity.FromPolar(Speed.FromTilesPerSecond(range.InTiles), inDirection),
-            range,
-            attack
-        );
-        inWorld.GameObjects.AddGameObject(projectile);
-        _basicAttackCooldownInFrames = Duration.FromSeconds(0.5).InFrames;
+        BasicAttack.Use(inWorld, inDirection);
     }
 
     public virtual void TakeDamage(int damage)
@@ -115,12 +99,7 @@ public class Character : IGameObject
     public virtual void Update()
     {
         _mobility.UpdateMovement();
-
-        _basicAttackCooldownInFrames--;
-        if (_basicAttackCooldownInFrames < 0)
-        {
-            _basicAttackCooldownInFrames = 0;
-        }
+        BasicAttack.Update();
     }
 
     protected virtual string Serialize(SerializationOptions options)
@@ -154,13 +133,6 @@ public class Character : IGameObject
     {
         // ranges from 120 to 500
         var result = 100 + 20*level;
-        return result;
-    }
-
-    private int GetDamagePerHitByLevel(int level)
-    {
-        // ranges from 50 to 183
-        var result = 43 + 7*level;
         return result;
     }
 }

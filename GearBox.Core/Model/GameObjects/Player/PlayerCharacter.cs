@@ -18,8 +18,6 @@ public class PlayerCharacter : Character
     }
 
     protected override string Type => "playerCharacter";
-    protected override AttackRange BasicAttackRange => Weapon.Value?.AttackRange ?? AttackRange.MELEE;
-    protected override double DamageModifier => Stats.Offense.Value;
     private int MaxEnergy { get; set; }
     public PlayerStats Stats { get; init; } = new();
     public Inventory Inventory { get; init; }
@@ -32,6 +30,8 @@ public class PlayerCharacter : Character
         Stats.SetStatBoosts(boosts);
 
         MaxEnergy = GetMaxEnergyByLevel(Level);
+
+        DamageModifier = Stats.Offense.Value;
 
         // update movement speed
         var multiplier = 1.0+Stats.Speed.Value;
@@ -57,6 +57,7 @@ public class PlayerCharacter : Character
 
         slot.Value = weapon;
         Inventory.Weapons.Remove(weapon);
+        BasicAttack.Range = weapon.AttackRange;
 
         UpdateStats();
     }
