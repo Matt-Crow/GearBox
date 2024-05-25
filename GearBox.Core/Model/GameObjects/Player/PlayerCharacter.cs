@@ -9,7 +9,6 @@ public class PlayerCharacter : Character
 {
     private int _energyExpended = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     private int _frameCount = 0; // used for regeneration
-    private int _basicAttackCooldownInFrames = 0;
 
     public PlayerCharacter(string name, int level) : base(name, level)
     {
@@ -19,6 +18,8 @@ public class PlayerCharacter : Character
     }
 
     protected override string Type => "playerCharacter";
+    protected override AttackRange BasicAttackRange => Weapon.Value?.AttackRange ?? AttackRange.MELEE;
+    protected override double DamageModifier => Stats.Offense.Value;
     private int MaxEnergy { get; set; }
     public PlayerStats Stats { get; init; } = new();
     public Inventory Inventory { get; init; }
@@ -78,28 +79,6 @@ public class PlayerCharacter : Character
         }
     }
 
-    public void UseBasicAttack(World inWorld, Direction inDirection)
-    {
-        if (_basicAttackCooldownInFrames != 0)
-        {
-            return;
-        }
-        
-        var weapon = Weapon.Value;
-        var range = weapon?.AttackRange.Range ?? AttackRange.MELEE.Range;
-        var damage = DamagePerHit * (1.0 + Stats.Offense.Value);
-        var attack = new Attack(this, (int)damage);
-        var projectile = new Projectile(
-            Coordinates, 
-            Velocity.FromPolar(Speed.FromTilesPerSecond(range.InTiles), inDirection),
-            range,
-            attack
-        );
-        inWorld.GameObjects.AddGameObject(projectile);
-
-        _basicAttackCooldownInFrames = Duration.FromSeconds(0.5).InFrames;
-    }
-
     public override void TakeDamage(int damage)
     {
         var reducedDamage = damage * (1.0 - Stats.Defense.Value);
@@ -120,12 +99,6 @@ public class PlayerCharacter : Character
             HealPercent(0.05);
             RechargePercent(0.05);
             _frameCount = 0;
-        }
-
-        _basicAttackCooldownInFrames--;
-        if (_basicAttackCooldownInFrames < 0)
-        {
-            _basicAttackCooldownInFrames = 0;
         }
     }
 

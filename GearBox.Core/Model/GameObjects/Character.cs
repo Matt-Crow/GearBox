@@ -13,6 +13,7 @@ public class Character : IGameObject
     protected static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);
 
     private readonly MobileBehavior _mobility;
+    private int _basicAttackCooldownInFrames;
 
 
     public Character(string name, int level)
@@ -35,8 +36,9 @@ public class Character : IGameObject
     public int MaxHitPoints { get; set; }
     protected virtual string Type => "character";
     protected int Level { get; private set; }
-    protected int DamagePerHit { get; private set; } // tie DPH to character instead of weapon so unarmed works
-
+    private int DamagePerHit { get; set; } // tie DPH to character instead of weapon so unarmed works
+    protected virtual AttackRange BasicAttackRange => AttackRange.MELEE;
+    protected virtual double DamageModifier => 0.0;
 
     public void SetLevel(int level)
     {
@@ -72,6 +74,26 @@ public class Character : IGameObject
         _mobility.Velocity = _mobility.Velocity.WithSpeed(speed);
     }
 
+    public void UseBasicAttack(World inWorld, Direction inDirection)
+    {
+        if (_basicAttackCooldownInFrames != 0)
+        {
+            return;
+        }
+        
+        var range = BasicAttackRange.Range;
+        var damage = DamagePerHit * (1.0 + DamageModifier);
+        var attack = new Attack(this, (int)damage);
+        var projectile = new Projectile(
+            Coordinates, 
+            Velocity.FromPolar(Speed.FromTilesPerSecond(range.InTiles), inDirection),
+            range,
+            attack
+        );
+        inWorld.GameObjects.AddGameObject(projectile);
+        _basicAttackCooldownInFrames = Duration.FromSeconds(0.5).InFrames;
+    }
+
     public virtual void TakeDamage(int damage)
     {
         DamageTaken += damage;
@@ -93,6 +115,12 @@ public class Character : IGameObject
     public virtual void Update()
     {
         _mobility.UpdateMovement();
+
+        _basicAttackCooldownInFrames--;
+        if (_basicAttackCooldownInFrames < 0)
+        {
+            _basicAttackCooldownInFrames = 0;
+        }
     }
 
     protected virtual string Serialize(SerializationOptions options)

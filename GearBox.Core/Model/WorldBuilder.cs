@@ -23,9 +23,13 @@ public class WorldBuilder
         return this;
     }
 
-    public WorldBuilder DefineWeapon(WeaponBuilder builder)
+    public WorldBuilder DefineWeapon(WeaponBuilder builder, bool isLoot)
     {
         _itemTypes.Add(builder.ItemType);
+        if (isLoot)
+        {
+            _loot.AddWeapon(builder.Build(1)); // todo use area level
+        }
         return this;
     }
 
@@ -54,8 +58,7 @@ public class WorldBuilder
                 .Weigh(PlayerStatType.OFFENSE, 2)
                 .Weigh(PlayerStatType.DEFENSE, 1)
             );
-        result = result.DefineWeapon(khopeshBuilder);
-        _loot.AddWeapon(khopeshBuilder.Build(1)); // in the future, this will be based on the area level
+        result = result.DefineWeapon(khopeshBuilder, false);
 
         var khopeshRecipe = new CraftingRecipeBuilder()
             .And(bronze, 25)
@@ -74,7 +77,7 @@ public class WorldBuilder
                 .WithStatWeights(weights => weights
                     .Weigh(PlayerStatType.OFFENSE, 1)
                     .Weigh(PlayerStatType.DEFENSE, 1)
-                )
+                ), true
             )
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Bow", Grade.COMMON))
                 .WithDescription("Hit stuff from far away.")
@@ -82,7 +85,7 @@ public class WorldBuilder
                 .WithStatWeights(weights => weights
                     .Weigh(PlayerStatType.OFFENSE, 1)
                     .Weigh(PlayerStatType.SPEED, 1)
-                )
+                ), true
             )
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Staff", Grade.COMMON))
                 .WithDescription("Also no special ability.")
@@ -90,7 +93,7 @@ public class WorldBuilder
                 .WithStatWeights(weights => weights
                     .Weigh(PlayerStatType.DEFENSE, 1)
                     .Weigh(PlayerStatType.MAX_ENERGY, 1)
-                )
+                ), true
             );
         return result;
     }
