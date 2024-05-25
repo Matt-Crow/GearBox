@@ -26,11 +26,22 @@ public class WanderAiBehavior : IAiBehavior
 
     public void Update()
     {
-        // todo set to pursue, search for enemies
         _framesLeftToWander--;
         if (_framesLeftToWander == 0)
         {
             ChooseNewDirection();
         }
+
+        var nearestEnemy = _target.World?.GetNearestEnemy(_target);
+        if (nearestEnemy != null && IsCloseEnoughToSee(nearestEnemy))
+        {
+            _target.AiBehavior = new PursueAiBehavior(_target, nearestEnemy);
+        }
+    }
+
+    private bool IsCloseEnoughToSee(Character enemy)
+    {
+        var distance = _target.Coordinates.DistanceFrom(enemy.Coordinates);
+        return distance.InTiles <= 5;
     }
 }

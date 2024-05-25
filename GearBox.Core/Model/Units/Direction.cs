@@ -126,6 +126,16 @@ public readonly struct Direction
         return FromBearingDegrees(degrees);
     }
 
+    public static Direction FromAToB(Coordinates a, Coordinates b)
+    {
+        var dx = b.XInPixels - a.XInPixels;
+        var dy = b.YInPixels - a.YInPixels;
+        var thetaInRadians = Math.Atan2(-dy, dx);
+        var thetaInDegrees = 180 * thetaInRadians / Math.PI;
+        var bearingDegrees = 90 - thetaInDegrees;
+        return FromBearingDegrees((int)bearingDegrees);
+    }
+
     public double XMultiplier { get => Math.Cos(Math.PI/2 - _bearingInRadians); }
     public double YMultiplier { get => -Math.Sin(Math.PI/2 - _bearingInRadians); }
     public bool IsCardinal { get => _bearingInDegrees % 90 == 0; }

@@ -41,6 +41,7 @@ public class Character : IGameObject
     public int Level { get; private set; }
     public double DamageModifier { get; protected set; } = 0.0;
     protected BasicAttack BasicAttack { get; init; }
+    public World? World { get; set; }
 
     public void SetLevel(int level)
     {
@@ -68,6 +69,11 @@ public class Character : IGameObject
     public void StopMovingIn(Direction direction)
     {
         _mobility.StopMovingIn(direction);
+    }
+
+    public void StopMoving()
+    {
+        _mobility.StopMoving();
     }
 
     public void SetSpeed(Speed speed)

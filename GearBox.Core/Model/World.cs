@@ -63,6 +63,7 @@ public class World
             return;
         }
         player.HealPercent(100.0);
+        player.World = this;
         GameObjects.AddGameObject(player);
         _players.Add(player);
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
@@ -105,12 +106,26 @@ public class World
         var enemyFactory = _enemies[Random.Shared.Next(_enemies.Count)];
         var enemy = enemyFactory.Invoke();
         enemy.AiBehavior = new WanderAiBehavior(enemy);
+        enemy.World = this;
         
         var tile = Map.GetRandomOpenTile() ?? throw new Exception("Map has no open tiles");
         enemy.Coordinates = tile.CenteredOnTile();
 
         GameObjects.AddGameObject(enemy);
         return enemy;
+    }
+
+    public Character? GetNearestEnemy(Character character)
+    {
+        var result = GameObjects.GameObjects
+            .Select(obj => obj as Character)
+            .Where(maybeCharacter => maybeCharacter != null)
+            .Select(character => character!)
+            .Where(other => other != character) // not the same
+            .Where(x => true) // todo are on different teams
+            .OrderBy(enemy => enemy.Coordinates.DistanceFrom(character.Coordinates).InPixels)
+            .FirstOrDefault();
+        return result;
     }
 
     /// <summary>

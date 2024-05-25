@@ -67,6 +67,11 @@ public class MobileBehavior
         }
     }
 
+    public void StopMoving()
+    {
+        IsMoving = false;
+    }
+
     public void UpdateMovement()
     {
         if (IsMoving)
