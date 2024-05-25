@@ -19,6 +19,10 @@ public class PursueAiBehavior : IAiBehavior
         var newDirection = Direction.FromAToB(_controlling.Coordinates, _pursuing.Coordinates);
         _controlling.StartMovingIn(newDirection);
 
-        // todo check if close enough to attack
+        // check if close enough to attack
+        if (_controlling.BasicAttack.CanReach(_pursuing))
+        {
+            _controlling.AiBehavior = new AttackAiBehavior(_controlling, _pursuing);
+        }
     }
 }

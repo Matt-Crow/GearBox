@@ -40,7 +40,7 @@ public class Character : IGameObject
     protected virtual string Type => "character";
     public int Level { get; private set; }
     public double DamageModifier { get; protected set; } = 0.0;
-    protected BasicAttack BasicAttack { get; init; }
+    public BasicAttack BasicAttack { get; init; }
     public World? World { get; set; }
 
     public void SetLevel(int level)

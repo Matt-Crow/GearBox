@@ -15,6 +15,12 @@ public class BasicAttack
 
     public AttackRange Range { get; set; } = AttackRange.MELEE;
 
+    public bool CanReach(Character target)
+    {
+        var distance = _user.Coordinates.DistanceFrom(target.Coordinates);
+        return distance.InPixels <= Range.Range.InPixels;
+    }
+
     public void Use(World inWorld, Direction inDirection)
     {
         if (_cooldownInFrames != 0)
