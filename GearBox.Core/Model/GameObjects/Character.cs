@@ -42,6 +42,7 @@ public class Character : IGameObject
     public double DamageModifier { get; protected set; } = 0.0;
     public BasicAttack BasicAttack { get; init; }
     public World? World { get; set; }
+    public Team Team { get; set; } = new(); // default to each on their own team
 
     public void SetLevel(int level)
     {

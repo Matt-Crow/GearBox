@@ -22,6 +22,8 @@ public class World
     private readonly SafeList<PlayerCharacter> _players = new();
     
     private readonly List<Func<Character>> _enemies = [];
+    private readonly Team _playerTeam = new("Players");
+    private readonly Team _enemyTeam = new("Enemies");
 
     public World(
         Guid? id = null, 
@@ -64,6 +66,7 @@ public class World
         }
         player.HealPercent(100.0);
         player.World = this;
+        player.Team = _playerTeam;
         GameObjects.AddGameObject(player);
         _players.Add(player);
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
@@ -107,6 +110,7 @@ public class World
         var enemy = enemyFactory.Invoke();
         enemy.AiBehavior = new WanderAiBehavior(enemy);
         enemy.World = this;
+        enemy.Team = _enemyTeam;
         
         var tile = Map.GetRandomOpenTile() ?? throw new Exception("Map has no open tiles");
         enemy.Coordinates = tile.CenteredOnTile();
@@ -122,7 +126,7 @@ public class World
             .Where(maybeCharacter => maybeCharacter != null)
             .Select(character => character!)
             .Where(other => other != character) // not the same
-            .Where(x => true) // todo are on different teams
+            .Where(other => other.Team != character.Team)
             .OrderBy(enemy => enemy.Coordinates.DistanceFrom(character.Coordinates).InPixels)
             .FirstOrDefault();
         return result;

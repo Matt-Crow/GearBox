@@ -14,12 +14,11 @@ public class Attack
 
     public bool CanResolveAgainst(Character target)
     {
-        return target != _usedBy && !_collidedWith.Contains(target);
+        return target != _usedBy && !_collidedWith.Contains(target) && target.Team != _usedBy.Team;
     }
 
     public void HandleCollision(object? sender, CollideEventArgs args)
     {
-        // in the future, this will use Teams as well
         var target = args.CollidedWith;
 
         if (CanResolveAgainst(target))
