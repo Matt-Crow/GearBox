@@ -56,7 +56,7 @@ public class WorldBuilder
             .WithRange(AttackRange.MELEE)
             .WithStatWeights(weights => weights
                 .Weigh(PlayerStatType.OFFENSE, 2)
-                .Weigh(PlayerStatType.DEFENSE, 1)
+                .Weigh(PlayerStatType.MAX_HIT_POINTS, 1)
             );
         result = result.DefineWeapon(khopeshBuilder, false);
 
@@ -76,7 +76,7 @@ public class WorldBuilder
                 .WithRange(AttackRange.MELEE)
                 .WithStatWeights(weights => weights
                     .Weigh(PlayerStatType.OFFENSE, 1)
-                    .Weigh(PlayerStatType.DEFENSE, 1)
+                    .Weigh(PlayerStatType.MAX_HIT_POINTS, 1)
                 ), true
             )
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Bow", Grade.COMMON))
@@ -91,7 +91,7 @@ public class WorldBuilder
                 .WithDescription("Also no special ability.")
                 .WithRange(AttackRange.MEDIUM)
                 .WithStatWeights(weights => weights
-                    .Weigh(PlayerStatType.DEFENSE, 1)
+                    .Weigh(PlayerStatType.MAX_HIT_POINTS, 1)
                     .Weigh(PlayerStatType.MAX_ENERGY, 1)
                 ), true
             );

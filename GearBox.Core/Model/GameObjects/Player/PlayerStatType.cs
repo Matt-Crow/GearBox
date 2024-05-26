@@ -10,14 +10,12 @@ public class PlayerStatType
     public static readonly PlayerStatType MAX_HIT_POINTS = new("HP", stats => stats.MaxHitPoints);
     public static readonly PlayerStatType MAX_ENERGY = new("Energy", stats => stats.MaxEnergy);
     public static readonly PlayerStatType OFFENSE = new("Offense", stats => stats.Offense);
-    public static readonly PlayerStatType DEFENSE = new("Defense", stats => stats.Defense);
     public static readonly PlayerStatType SPEED = new("Speed", stats => stats.Speed);
 
-    public static readonly IEnumerable<PlayerStatType> ALL = ImmutableArray.Create<PlayerStatType>([
+    public static readonly IEnumerable<PlayerStatType> ALL = ImmutableArray.Create([
         MAX_HIT_POINTS,
         MAX_ENERGY,
         OFFENSE,
-        DEFENSE,
         SPEED
     ]);
 

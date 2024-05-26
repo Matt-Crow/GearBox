@@ -80,12 +80,6 @@ public class PlayerCharacter : Character
         }
     }
 
-    public override void TakeDamage(int damage)
-    {
-        var reducedDamage = damage * (1.0 - Stats.Defense.Value);
-        base.TakeDamage((int)reducedDamage);
-    }
-
     public override void Update()
     {
         base.Update();
