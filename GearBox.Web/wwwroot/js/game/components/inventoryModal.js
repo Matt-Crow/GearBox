@@ -1,17 +1,17 @@
 import { Client } from "../infrastructure/client.js";
 import { CraftingRecipe } from "../model/crafting.js";
 import { Inventory, Item } from "../model/item.js";
+import { EquipmentTab } from "./equipmentTab.js";
 import { ItemDisplay } from "./itemDisplay.js";
 
 export class InventoryModal {
     #modal;
     #materialRows;
     #recipeRows;
-    #equipmentRows;
     #client;
     #craftPreview;
-    #currentWeapon;
-    #compareWeapon;
+    #weaponTab;
+    #armorTab;
 
     /**
      * @param {HTMLDialogElement} modal
@@ -21,17 +21,13 @@ export class InventoryModal {
         this.#modal = modal;
         this.#materialRows = document.querySelector("#materialRows");
         this.#recipeRows = document.querySelector("#recipeRows");
-        this.#equipmentRows = document.querySelector("#equipmentRows");
         this.#client = client;
         this.#craftPreview = new ItemDisplay("#craftPreview", "Preview", "Hover over a craft button to preview")
             .spawnHtml();
-        this.#currentWeapon = new ItemDisplay("#currentWeapon", "Current Weapon", "No weapon equipped")
-            .spawnHtml();
-        this.#compareWeapon = new ItemDisplay("#compareWeapon", "Other Weapon", "Hover over a weapon to preview")
-            .spawnHtml();
+        this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equip(id));
+        this.#armorTab = new EquipmentTab("#armorTab", id => console.log("todo equip armor " + id));
 
         this.setWeapon(null);
-        this.#setCompareWeapon(null);
     }
 
     toggle() {
@@ -44,7 +40,6 @@ export class InventoryModal {
 
     #clearInventory() {
         this.#materialRows.replaceChildren();
-        this.#equipmentRows.replaceChildren();
     }
 
     /**
@@ -53,7 +48,8 @@ export class InventoryModal {
     setInventory(inventory) {
         this.#clearInventory();
         inventory.materials.forEach(item => this.#addMaterial(item));
-        inventory.weapons.forEach(item => this.#addEquipment(item));
+        this.#weaponTab.bindRows(inventory.weapons);
+        this.#armorTab.bindRows(inventory.armors);
     }
 
     /**
@@ -72,40 +68,6 @@ export class InventoryModal {
         const tr = document.createElement("tr");
         tds.forEach(td => tr.appendChild(td));
         this.#materialRows.appendChild(tr);
-    }
-
-    /**
-     * @param {Item} item 
-     */
-    #addEquipment(item) {
-        const tds = [
-            item.type.name,
-            item.type.gradeName,
-            item.level,
-            item.description
-        ].map(data => {
-            const e = document.createElement("td");
-            e.innerText = data;
-            return e;
-        });
-        const tr = document.createElement("tr");
-        $(tr).hover(
-            () => this.#setCompareWeapon(item),
-            () => this.#setCompareWeapon(null)
-        );
-        tds.forEach(td => tr.appendChild(td));
-
-        const equipButton = document.createElement("button");
-        equipButton.innerText = "Equip";
-        equipButton.type = "button";
-        equipButton.classList.add("btn");
-        equipButton.classList.add("btn-primary");
-
-        equipButton.addEventListener("click", (e) => this.#client.equip(item.id));
-        
-        tr.appendChild(equipButton);
-
-        this.#equipmentRows.appendChild(tr);
     }
 
     /**
@@ -158,13 +120,6 @@ export class InventoryModal {
      * @param {Item?} weapon 
      */
     setWeapon(weapon) {
-        this.#currentWeapon.bind(weapon);
-    }
-
-    /**
-     * @param {Item?} weapon 
-     */
-    #setCompareWeapon(weapon) {
-        this.#compareWeapon.bind(weapon);
+        this.#weaponTab.setCurrent(weapon);
     }
 }
