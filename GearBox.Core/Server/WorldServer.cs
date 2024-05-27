@@ -113,31 +113,25 @@ public class WorldServer
 
     public async Task Update()
     {
-        var task = Task.CompletedTask;
+        var tasks = new List<Task>();
         lock (connectionLock)
         {
-            task = DoUpdate();
+            var executeThese = _pendingCommands
+                .Where(pc => _players.ContainsKey(pc.ConnectionId))
+                .ToList();
+            _pendingCommands.Clear();
+            foreach (var command in executeThese)
+            {
+                command.Command.ExecuteOn(_players[command.ConnectionId], _world);
+            }
+
+            _world.Update();
+
+            // notify everyone of the update
+            tasks = _connections
+                .Select(kv => kv.Value.Send(_world.GetWorldUpdateJsonFor(_players[kv.Key])))
+                .ToList();
         }
-        await task;
-    }
-
-    private async Task DoUpdate()
-    {
-        var executeThese = _pendingCommands
-            .Where(pc => _players.ContainsKey(pc.ConnectionId))
-            .ToList();
-        _pendingCommands.Clear();
-        foreach (var command in executeThese)
-        {
-            command.Command.ExecuteOn(_players[command.ConnectionId], _world);
-        }
-
-        _world.Update();
-
-        // notify everyone of the update
-        var tasks = _connections
-            .Select(kv => kv.Value.Send(_world.GetWorldUpdateJsonFor(_players[kv.Key])))
-            .ToList();
         await Task.WhenAll(tasks);
     }
 }
