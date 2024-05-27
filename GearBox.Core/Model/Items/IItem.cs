@@ -25,11 +25,6 @@ public interface IItem
     /// </summary>
     IEnumerable<string> Details { get; }
 
-    /// <summary>
-    /// Values which may change throughout the life of an IItem
-    /// </summary>
-    IEnumerable<object?> DynamicValues { get; }
-
     /*
     // can't do "IItem ToOwned()" https://stackoverflow.com/a/5709191
     //IItem ToOwned();

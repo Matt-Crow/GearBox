@@ -24,10 +24,9 @@ where T : Equipment
 
     public Serializer Serializer { get; init; }
 
-    // start by outputting a boolean to distinguish between no Value and Value with no dynamic values
     public IEnumerable<object?> DynamicValues => Value == null
-        ? ListExtensions.Of<object?>(false)
-        : ListExtensions.Of<object?>(true).Append(Value.Id).Concat(Value.DynamicValues);
+        ? [false]
+        : [true, Value.Id];
     
     public StableJson ToJson()
     {

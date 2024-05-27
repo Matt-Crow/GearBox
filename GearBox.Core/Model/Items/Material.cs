@@ -16,7 +16,6 @@ public class Material : IItem
     public string Description { get; init; }
     public int Level => 0; // players of any level can use any material
     public IEnumerable<string> Details => []; // materials have no details for now
-    public IEnumerable<object?> DynamicValues => Array.Empty<object?>(); // resources never change
 
     public override bool Equals(object? obj)
     {

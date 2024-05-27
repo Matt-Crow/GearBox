@@ -5,7 +5,6 @@ namespace GearBox.Core.Model.Items;
 
 public class WeaponBuilder
 {
-    private string? _description;
     private AttackRange _attackRange = AttackRange.MELEE;
     private readonly WeaponStatWeights _statWeights = new();
 
@@ -15,12 +14,6 @@ public class WeaponBuilder
     }
 
     public ItemType ItemType { get; init; }
-
-    public WeaponBuilder WithDescription(string description)
-    {
-        _description = description;
-        return this;
-    }
 
     public WeaponBuilder WithRange(AttackRange range)
     {
@@ -47,7 +40,6 @@ public class WeaponBuilder
 
         var result = new Weapon(
             ItemType, 
-            _description,
             level,
             null, // id is null
             _attackRange,

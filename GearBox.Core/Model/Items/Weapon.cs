@@ -8,12 +8,11 @@ public class Weapon : Equipment
 {
     public Weapon(
         ItemType type, 
-        string? description = null, 
         int? level = null,
         Guid? id = null, 
         AttackRange? attackRange = null, 
         PlayerStatBoosts? boosts = null
-    ) : base(type, description, level, boosts, id)
+    ) : base(type, level, boosts, id)
     {
         AttackRange = attackRange ?? AttackRange.MELEE;
     }
@@ -24,6 +23,6 @@ public class Weapon : Equipment
 
     public override Weapon ToOwned()
     {
-        return new Weapon(Type, Description, Level, Guid.NewGuid(), AttackRange, StatBoosts);
+        return new Weapon(Type, Level, Guid.NewGuid(), AttackRange, StatBoosts);
     }
 }

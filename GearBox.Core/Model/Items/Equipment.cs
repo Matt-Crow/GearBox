@@ -9,14 +9,12 @@ public abstract class Equipment : IItem
 {
     public Equipment(
         ItemType type, 
-        string? description = null, 
         int? level = null,
         PlayerStatBoosts? statBoosts = null, 
         Guid? id = null
     )
     {
         Type = type;
-        Description = description ?? "no description provided";
         Level = level ?? 0;
         StatBoosts = statBoosts ?? new PlayerStatBoosts();
         Id = id ?? Guid.NewGuid();
@@ -26,7 +24,7 @@ public abstract class Equipment : IItem
     
     public ItemType Type { get; init; }
 
-    public string Description { get; init; }
+    public string Description => ""; // equipment doesn't need a description
     public int Level { get; init; }
     
     public abstract IEnumerable<string> Details { get; }
@@ -35,11 +33,6 @@ public abstract class Equipment : IItem
     /// The stat boosts this provides when equipped
     /// </summary>
     public PlayerStatBoosts StatBoosts { get; init; }
-
-    /// <summary>
-    /// Subclasses should override this if they can change at runtime
-    /// </summary>
-    public IEnumerable<object?> DynamicValues => Array.Empty<object?>();
 
     public override bool Equals(object? obj)
     {

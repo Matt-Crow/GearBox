@@ -52,7 +52,6 @@ public class WorldBuilder
             ;
 
         var khopeshBuilder = new WeaponBuilder(new ItemType("Bronze Khopesh", Grade.UNCOMMON))
-            .WithDescription("An ancient weapon for the modern age.")
             .WithRange(AttackRange.MELEE)
             .WithStatWeights(weights => weights
                 .Weigh(PlayerStatType.OFFENSE, 2)
@@ -72,7 +71,6 @@ public class WorldBuilder
     {
         var result = this 
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Sword", Grade.COMMON))
-                .WithDescription("No special ability")
                 .WithRange(AttackRange.MELEE)
                 .WithStatWeights(weights => weights
                     .Weigh(PlayerStatType.OFFENSE, 1)
@@ -80,7 +78,6 @@ public class WorldBuilder
                 ), true
             )
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Bow", Grade.COMMON))
-                .WithDescription("Hit stuff from far away.")
                 .WithRange(AttackRange.LONG)
                 .WithStatWeights(weights => weights
                     .Weigh(PlayerStatType.OFFENSE, 1)
@@ -88,7 +85,6 @@ public class WorldBuilder
                 ), true
             )
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Staff", Grade.COMMON))
-                .WithDescription("Also no special ability.")
                 .WithRange(AttackRange.MEDIUM)
                 .WithStatWeights(weights => weights
                     .Weigh(PlayerStatType.MAX_HIT_POINTS, 1)
