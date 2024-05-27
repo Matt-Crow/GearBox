@@ -4,7 +4,6 @@ public readonly struct ArmorClass
 {
     private readonly string _asString;
     private readonly double _damageReduction;
-    private readonly double _armorStatMultiplier;
 
 
     public static readonly ArmorClass NONE = new("No armor", 0.0, 1.0);
@@ -17,9 +16,11 @@ public readonly struct ArmorClass
     {
         _asString = asString;
         _damageReduction = damageReduction;
-        _armorStatMultiplier = armorStatMultiplier;
+        ArmorStatMultiplier = armorStatMultiplier;
     }
 
+    public double ArmorStatMultiplier { get; init; }
+    
     public int ReduceDamage(int damage)
     {
         var multiplier = 1.0 - _damageReduction;

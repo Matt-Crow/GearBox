@@ -23,7 +23,7 @@ public class WorldBuilder
         return this;
     }
 
-    public WorldBuilder DefineWeapon(WeaponBuilder builder, bool isLoot)
+    public WorldBuilder DefineWeapon(EquipmentBuilder<Weapon> builder, bool isLoot)
     {
         _itemTypes.Add(builder.ItemType);
         if (isLoot)
