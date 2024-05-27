@@ -1,4 +1,5 @@
 using GearBox.Core.Model.GameObjects;
+using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.Items;
@@ -6,7 +7,8 @@ namespace GearBox.Core.Model.Items;
 public class WeaponBuilder
 {
     private AttackRange _attackRange = AttackRange.MELEE;
-    private readonly WeaponStatWeights _statWeights = new();
+    private Dictionary<PlayerStatType, int>? _statWeights;
+
 
     public WeaponBuilder(ItemType type)
     {
@@ -21,9 +23,9 @@ public class WeaponBuilder
         return this;
     }
 
-    public WeaponBuilder WithStatWeights(Action<WeaponStatWeights> action)
+    public WeaponBuilder WithStatWeights(Dictionary<PlayerStatType, int> statWeights)
     {
-        action(_statWeights);
+        _statWeights = statWeights;
         return this;
     }
 
@@ -43,7 +45,7 @@ public class WeaponBuilder
             level,
             null, // id is null
             _attackRange,
-            _statWeights.Build(totalPoints)
+            new PlayerStatBoosts(_statWeights, totalPoints)
         );
         return result;
     }

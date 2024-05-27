@@ -53,10 +53,11 @@ public class WorldBuilder
 
         var khopeshBuilder = new WeaponBuilder(new ItemType("Bronze Khopesh", Grade.UNCOMMON))
             .WithRange(AttackRange.MELEE)
-            .WithStatWeights(weights => weights
-                .Weigh(PlayerStatType.OFFENSE, 2)
-                .Weigh(PlayerStatType.MAX_HIT_POINTS, 1)
-            );
+            .WithStatWeights(new Dictionary<PlayerStatType, int>()
+            {
+                {PlayerStatType.OFFENSE, 2},
+                {PlayerStatType.MAX_HIT_POINTS, 1}
+            });
         result = result.DefineWeapon(khopeshBuilder, false);
 
         var khopeshRecipe = new CraftingRecipeBuilder()
@@ -72,24 +73,27 @@ public class WorldBuilder
         var result = this 
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Sword", Grade.COMMON))
                 .WithRange(AttackRange.MELEE)
-                .WithStatWeights(weights => weights
-                    .Weigh(PlayerStatType.OFFENSE, 1)
-                    .Weigh(PlayerStatType.MAX_HIT_POINTS, 1)
-                ), true
+                .WithStatWeights(new Dictionary<PlayerStatType, int>()
+                {
+                    {PlayerStatType.OFFENSE, 1},
+                    {PlayerStatType.MAX_HIT_POINTS, 1}
+                }), true
             )
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Bow", Grade.COMMON))
                 .WithRange(AttackRange.LONG)
-                .WithStatWeights(weights => weights
-                    .Weigh(PlayerStatType.OFFENSE, 1)
-                    .Weigh(PlayerStatType.SPEED, 1)
-                ), true
+                .WithStatWeights(new Dictionary<PlayerStatType, int>()
+                {
+                    {PlayerStatType.OFFENSE, 1},
+                    {PlayerStatType.SPEED, 1}
+                }), true
             )
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Staff", Grade.COMMON))
                 .WithRange(AttackRange.MEDIUM)
-                .WithStatWeights(weights => weights
-                    .Weigh(PlayerStatType.MAX_HIT_POINTS, 1)
-                    .Weigh(PlayerStatType.MAX_ENERGY, 1)
-                ), true
+                .WithStatWeights(new Dictionary<PlayerStatType, int>()
+                {
+                    {PlayerStatType.MAX_HIT_POINTS, 1},
+                    {PlayerStatType.MAX_ENERGY, 1}
+                }), true
             );
         return result;
     }

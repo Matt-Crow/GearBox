@@ -2,25 +2,35 @@ namespace GearBox.Core.Model.GameObjects.Player;
 
 public class PlayerStatBoosts
 {
-    private readonly Dictionary<PlayerStatType, int> _values = new();
+    private readonly Dictionary<PlayerStatType, int> _values = [];
     private readonly List<string> _details = [];
 
-    public PlayerStatBoosts(Dictionary<PlayerStatType, int>? values = null)
+    public PlayerStatBoosts(Dictionary<PlayerStatType, int>? weights=null, int totalPoints=0)
     {
-        values ??= [];
+        weights ??= [];
+        var totalWeights = weights.Values.Sum();
+        if (totalWeights == 0)
+        {
+            totalWeights = 1; // prevent divide by 0s
+        }
         foreach (var statType in PlayerStatType.ALL)
         {
             var points = 0;
-            if (values.TryGetValue(statType, out int value))
+            if (weights.TryGetValue(statType, out int weightForStat))
             {
-                points = value;
+                points = weightForStat * totalPoints / totalWeights;
             }
             _values[statType] = points;
             if (points != 0)
             {
-                _details.Add($"+{values[statType]} {statType}");
+                _details.Add($"+{points} {statType}");
             }
         }
+    }
+
+    public static PlayerStatBoosts Empty()
+    {
+        return new PlayerStatBoosts([], 0);
     }
 
     /// <summary>
@@ -38,8 +48,9 @@ public class PlayerStatBoosts
         {
             copyOfValues[statType] = Get(statType) + other.Get(statType);
         }
+        var totalPoints = copyOfValues.Values.Sum();
 
-        return new PlayerStatBoosts(copyOfValues);
+        return new PlayerStatBoosts(copyOfValues, totalPoints);
     }
 
     public int Get(PlayerStatType type) => _values[type];

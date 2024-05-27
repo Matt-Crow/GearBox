@@ -16,7 +16,7 @@ public abstract class Equipment : IItem
     {
         Type = type;
         Level = level ?? 0;
-        StatBoosts = statBoosts ?? new PlayerStatBoosts();
+        StatBoosts = statBoosts ?? PlayerStatBoosts.Empty();
         Id = id ?? Guid.NewGuid();
     }
     

@@ -25,7 +25,7 @@ public class PlayerCharacter : Character
 
     public override void UpdateStats()
     {
-        var boosts = new PlayerStatBoosts();
+        var boosts = PlayerStatBoosts.Empty();
         boosts = boosts.Combine(Weapon.Value?.StatBoosts);
         Stats.SetStatBoosts(boosts);
 
