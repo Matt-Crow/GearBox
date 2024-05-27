@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var world = new WorldBuilder()
     .AddMiningSkill()
-    .AddStarterWeapons()
+    .AddStarterEquipment()
     .AddDefaultEnemies()
     .WithDesertMap()
     .Build();

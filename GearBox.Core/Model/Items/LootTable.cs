@@ -12,6 +12,11 @@ public class LootTable
         _values[itemDefinition.Type.Grade].Weapons.Add(itemDefinition);
     }
 
+    public void AddArmor(Armor itemDefinition)
+    {
+        _values[itemDefinition.Type.Grade].Armors.Add(itemDefinition);
+    }
+
     public void AddMaterial(Material itemDefinition)
     {
         _values[itemDefinition.Type.Grade].Materials.Add(itemDefinition);
@@ -73,11 +78,13 @@ public class LootTable
     {
         var source = _values[grade];
         var weapon = GetRandomItemFrom(source.Weapons); 
+        var armor = GetRandomItemFrom(source.Armors);
         var material = GetRandomItemFrom(source.Materials);
         var options = new List<AddItemCommand>()
         {
-            new AddItemCommand(weapon?.ToOwned(), () => destination.Weapons.Add(weapon?.ToOwned())),
-            new AddItemCommand(material?.ToOwned(), () => destination.Materials.Add(material?.ToOwned())),
+            new(weapon?.ToOwned(), () => destination.Weapons.Add(weapon?.ToOwned())),
+            new(armor?.ToOwned(), () => destination.Armors.Add(armor?.ToOwned())),
+            new(material?.ToOwned(), () => destination.Materials.Add(material?.ToOwned())),
         };
         var possibleOptions = options
             .Where(option => option.IsPossible())

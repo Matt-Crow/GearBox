@@ -33,6 +33,16 @@ public class WorldBuilder
         return this;
     }
 
+    public WorldBuilder DefineArmor(EquipmentBuilder<Armor> builder, bool isLoot)
+    {
+        _itemTypes.Add(builder.ItemType);
+        if (isLoot)
+        {
+            _loot.AddArmor(builder.Build(1)); // todo use area level
+        }
+        return this;
+    }
+
     public WorldBuilder DefineEnemy(Func<Character> definition)
     {
         _enemies.Add(definition);
@@ -65,10 +75,25 @@ public class WorldBuilder
             .Makes(() => ItemUnion.Of(khopeshBuilder.Build(1))); // what level should the crafted weapon be?
         _craftingRecipes.Add(khopeshRecipe);
 
+        var bronzeArmorBuilder = new ArmorBuilder(new ItemType("Bronze Armor", Grade.UNCOMMON))
+            .WithArmorClass(ArmorClass.HEAVY)
+            .WithStatWeights(new Dictionary<PlayerStatType, int>()
+            {
+                {PlayerStatType.OFFENSE, 1},
+                {PlayerStatType.MAX_HIT_POINTS, 2},
+                {PlayerStatType.MAX_ENERGY, 1}
+            });
+        result = result.DefineArmor(bronzeArmorBuilder, false);
+
+        var bronzeArmorRecipe = new CraftingRecipeBuilder()
+            .And(bronze, 25)
+            .Makes(() => ItemUnion.Of(bronzeArmorBuilder.Build(1)));
+        _craftingRecipes.Add(bronzeArmorRecipe);
+
         return result;
     }
 
-    public WorldBuilder AddStarterWeapons()
+    public WorldBuilder AddStarterEquipment()
     {
         var result = this 
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Sword", Grade.COMMON))
@@ -93,6 +118,30 @@ public class WorldBuilder
                 {
                     {PlayerStatType.MAX_HIT_POINTS, 1},
                     {PlayerStatType.MAX_ENERGY, 1}
+                }), true
+            )
+            .DefineArmor(new ArmorBuilder(new ItemType("Fighter Initiate's Armor", Grade.COMMON))
+                .WithArmorClass(ArmorClass.HEAVY)
+                .WithStatWeights(new Dictionary<PlayerStatType, int>()
+                {
+                    {PlayerStatType.MAX_HIT_POINTS, 1},
+                    {PlayerStatType.OFFENSE, 1}
+                }), true
+            )
+            .DefineArmor(new ArmorBuilder(new ItemType("Archer Initiate's Armor", Grade.COMMON))
+                .WithArmorClass(ArmorClass.MEDIUM)
+                .WithStatWeights(new Dictionary<PlayerStatType, int>()
+                {
+                    {PlayerStatType.SPEED, 1},
+                    {PlayerStatType.OFFENSE, 1}
+                }), true
+            )
+            .DefineArmor(new ArmorBuilder(new ItemType("Mage Initiate's Armor", Grade.COMMON))
+                .WithArmorClass(ArmorClass.LIGHT)
+                .WithStatWeights(new Dictionary<PlayerStatType, int>()
+                {
+                    {PlayerStatType.MAX_ENERGY, 1},
+                    {PlayerStatType.OFFENSE, 1}
                 }), true
             );
         return result;

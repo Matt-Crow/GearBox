@@ -21,9 +21,11 @@ public class Inventory : IDynamic
 
     public Serializer Serializer { get; init; }
     public InventoryTab<Weapon> Weapons { get; init; } = new();
+    public InventoryTab<Armor> Armors { get; set; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
         .Concat(Weapons.DynamicValues)
+        .Concat(Armors.DynamicValues)
         .Concat(Materials.DynamicValues);
 
     /// <summary>
@@ -36,6 +38,11 @@ public class Inventory : IDynamic
         {
             Weapons.Add(weaponStack.Item.ToOwned(), weaponStack.Quantity);
         }
+        // todo no stacks for armors
+        foreach (var armorStack in other.Armors.Content)
+        {
+            Armors.Add(armorStack.Item.ToOwned(), armorStack.Quantity);
+        }
         foreach (var materialStack in other.Materials.Content)
         {
             Materials.Add(materialStack.Item.ToOwned(), materialStack.Quantity);
@@ -44,7 +51,7 @@ public class Inventory : IDynamic
 
     public bool Any()
     {
-        return Weapons.Any() || Materials.Any();
+        return Weapons.Any() || Armors.Any() || Materials.Any();
     }
 
     public void Craft(CraftingRecipe recipe)
@@ -60,6 +67,7 @@ public class Inventory : IDynamic
         }
         var crafted = recipe.Maker.Invoke();
         Weapons.Add(crafted.Weapon);
+        Armors.Add(crafted.Armor);
         Materials.Add(crafted.Material);
     }
 
