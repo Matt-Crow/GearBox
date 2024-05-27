@@ -53,7 +53,7 @@ export class InventoryModal {
     setInventory(inventory) {
         this.#clearInventory();
         inventory.materials.forEach(item => this.#addMaterial(item));
-        inventory.equipment.forEach(item => this.#addEquipment(item));
+        inventory.weapons.forEach(item => this.#addEquipment(item));
     }
 
     /**

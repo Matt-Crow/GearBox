@@ -1,19 +1,23 @@
 import { TestCase, TestSuite } from "../testing/tests.js";
 
 export class Inventory {
-    #equipment;
+    #weapons;
+    #armors;
     #materials;
 
     /**
-     * @param {Item[]} equipment 
+     * @param {Item[]} weapons 
+     * @param {Item[]} armors 
      * @param {Item[]} materials 
      */
-    constructor(equipment=[], materials=[]) {
-        this.#equipment = equipment;
+    constructor(weapons=[], armors=[], materials=[]) {
+        this.#weapons = weapons;
+        this.#armors = armors;
         this.#materials = materials;
     }
 
-    get equipment() { return this.#equipment; }
+    get weapons() { return this.#weapons; }
+    get armors() { return this.#armors; }
     get materials() { return this.#materials; }
 }
 
@@ -28,9 +32,10 @@ export class InventoryDeserializer {
     }
 
     deserialize(json) {
-        const equipment = json.equipment.items.map(x => this.#itemDeserializer.deserialize(x));
+        const weapons = json.weapons.items.map(x => this.#itemDeserializer.deserialize(x));
+        const armors = json.armors.items.map(x => this.#itemDeserializer.deserialize(x));
         const materials = json.materials.items.map(x => this.#itemDeserializer.deserialize(x));
-        return new Inventory(equipment, materials);
+        return new Inventory(weapons, armors, materials);
     }
 }
 

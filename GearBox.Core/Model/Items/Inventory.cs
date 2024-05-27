@@ -21,7 +21,7 @@ public class Inventory : IDynamic
 
     public Serializer Serializer { get; init; }
     public InventoryTab<Weapon> Weapons { get; init; } = new();
-    public InventoryTab<Armor> Armors { get; set; } = new();
+    public InventoryTab<Armor> Armors { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
         .Concat(Weapons.DynamicValues)
@@ -85,7 +85,7 @@ public class Inventory : IDynamic
 
     private string Serialize(SerializationOptions options)
     {
-        var json = new InventoryJson(Weapons.ToJson(), Materials.ToJson());
+        var json = new InventoryJson(Weapons.ToJson(), Armors.ToJson(), Materials.ToJson());
         return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
     }
 
