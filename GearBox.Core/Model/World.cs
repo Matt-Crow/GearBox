@@ -176,7 +176,8 @@ public class World
         var result = new WorldUpdateJson(
             GameObjects.ToJson(), 
             player.Inventory.ToJson(), 
-            player.Weapon.ToJson()
+            player.WeaponSlot.ToJson(),
+            player.ArmorSlot.ToJson()
         );
         return result;
     }

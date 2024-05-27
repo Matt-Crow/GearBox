@@ -24,8 +24,8 @@ export class InventoryModal {
         this.#client = client;
         this.#craftPreview = new ItemDisplay("#craftPreview", "Preview", "Hover over a craft button to preview")
             .spawnHtml();
-        this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equip(id));
-        this.#armorTab = new EquipmentTab("#armorTab", id => console.log("todo equip armor " + id));
+        this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equipWeapon(id));
+        this.#armorTab = new EquipmentTab("#armorTab", id => client.equipArmor(id));
 
         this.setWeapon(null);
     }
@@ -121,5 +121,12 @@ export class InventoryModal {
      */
     setWeapon(weapon) {
         this.#weaponTab.setCurrent(weapon);
+    }
+
+    /**
+     * @param {Item?} armor 
+     */
+    setArmor(armor) {
+        this.#armorTab.setCurrent(armor);
     }
 }

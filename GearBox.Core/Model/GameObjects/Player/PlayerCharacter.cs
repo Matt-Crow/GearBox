@@ -13,7 +13,8 @@ public class PlayerCharacter : Character
     public PlayerCharacter(string name, int level) : base(name, level)
     {
         Inventory = new();
-        Weapon = new("equippedWeapon");
+        WeaponSlot = new("equippedWeapon");
+        ArmorSlot = new("equippedArmor");
         UpdateStats();
     }
 
@@ -21,12 +22,14 @@ public class PlayerCharacter : Character
     private int MaxEnergy { get; set; }
     public PlayerStats Stats { get; init; } = new();
     public Inventory Inventory { get; init; }
-    public EquipmentSlot<Weapon> Weapon { get; init; }
+    public EquipmentSlot<Weapon> WeaponSlot { get; init; }
+    public EquipmentSlot<Armor> ArmorSlot { get; init; }
 
     public override void UpdateStats()
     {
-        var boosts = PlayerStatBoosts.Empty();
-        boosts = boosts.Combine(Weapon.Value?.StatBoosts);
+        var boosts = PlayerStatBoosts.Empty()
+            .Combine(WeaponSlot.Value?.StatBoosts)
+            .Combine(ArmorSlot.Value?.StatBoosts);
         Stats.SetStatBoosts(boosts);
 
         MaxEnergy = GetMaxEnergyByLevel(Level);
@@ -40,35 +43,38 @@ public class PlayerCharacter : Character
         base.UpdateStats();
     }
 
-    public void EquipWeapon(Weapon weapon)
+    public void EquipWeaponById(Guid id)
     {
-        if (!Inventory.Weapons.Contains(weapon))
+        var weapon = Inventory.Weapons.GetItemById(id);
+        if (weapon == null)
         {
-            throw new ArgumentException(nameof(weapon));
+            return;
         }
 
-        var slot = Weapon;
-        
-        // check if something is already in the slot
-        if (slot.Value != null)
-        {
-            Inventory.Weapons.Add(slot.Value);
-        }
+        Inventory.Weapons.Add(WeaponSlot.Value); // put old weapon back in inventory
 
-        slot.Value = weapon;
+        WeaponSlot.Value = weapon;
         Inventory.Weapons.Remove(weapon);
         BasicAttack.Range = weapon.AttackRange;
 
         UpdateStats();
     }
 
-    public void EquipWeaponById(Guid id)
+    public void EquipArmorById(Guid id)
     {
-        var equipment = Inventory.Weapons.GetItemById(id);
-        if (equipment != null)
+        var armor = Inventory.Armors.GetItemById(id);
+        if (armor == null)
         {
-            EquipWeapon(equipment);
+            return;
         }
+
+        Inventory.Armors.Add(ArmorSlot.Value); // put old armor back in inventory
+
+        ArmorSlot.Value = armor;
+        Inventory.Armors.Remove(armor);
+        ArmorClass = armor.ArmorClass;
+
+        UpdateStats();
     }
 
     public void RechargePercent(double percent)
@@ -85,7 +91,7 @@ public class PlayerCharacter : Character
         base.Update();
 
         Inventory.Update();
-        Weapon.Update();
+        WeaponSlot.Update();
 
         // restore 5% HP & energy per second
         _frameCount++;
@@ -114,7 +120,7 @@ public class PlayerCharacter : Character
     protected override int GetMaxHitPointsByLevel(int level)
     {
         var multiplier = 1.0 + Stats.MaxHitPoints.Value;
-        var result = base.GetMaxHitPointsByLevel(level) * multiplier;
+        var result = base.GetMaxHitPointsByLevel(level) * multiplier * 10;
         return (int)result; 
     }
 

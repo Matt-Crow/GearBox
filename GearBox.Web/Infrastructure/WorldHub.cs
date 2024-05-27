@@ -28,7 +28,8 @@ public class WorldHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    public Task Equip(Guid id) => Receive(new EquipWeapon(id));
+    public Task EquipWeapon(Guid id) => Receive(new EquipWeapon(id));
+    public Task EquipArmor(Guid id) => Receive(new EquipArmor(id));
     public Task StartMovingUp() => Receive(StartMoving.UP);
     public Task StartMovingDown() => Receive(StartMoving.DOWN);
     public Task StartMovingLeft() => Receive(StartMoving.LEFT);

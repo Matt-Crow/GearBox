@@ -84,6 +84,7 @@ export class WorldUpdateHandler {
     #updateListeners = [];
     #inventoryChangeListeners = [];
     #weaponChangeListeners = [];
+    #armorChangeListeners = [];
 
     /**
      * @param {World} world 
@@ -131,6 +132,15 @@ export class WorldUpdateHandler {
         return this;
     }
 
+    /**
+     * @param {(Item?) => any} changeListener 
+     * @returns {WorldUpdateHandler}
+     */
+    addArmorChangeListener(changeListener) {
+        this.#armorChangeListeners.push(changeListener);
+        return this;
+    }
+
     handleWorldUpdate(json) {
         const newGameObject = json.gameObjects
             .map(gameObjectJson => this.#deserialize(gameObjectJson))
@@ -150,6 +160,14 @@ export class WorldUpdateHandler {
                 ? this.#itemDeserializer.deserialize(maybeWeapon)
                 : null;
             this.#weaponChangeListeners.forEach(listener => listener(weapon));
+        }
+
+        if (json.armor.hasChanged) {
+            const maybeArmor = JSON.parse(json.armor.body);
+            const armor = maybeArmor
+                ? this.#itemDeserializer.deserialize(maybeArmor)
+                : null;
+            this.#armorChangeListeners.forEach(listener => listener(armor));
         }
     }
 

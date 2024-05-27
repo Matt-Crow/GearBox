@@ -80,6 +80,7 @@ export class Game {
             .addUpdateListener(w => this.#gameOverScreen.update(w))
             .addInventoryChangeListener(inv => this.#inventoryModal.setInventory(inv))
             .addWeaponChangeListener(wea => this.#inventoryModal.setWeapon(wea))
+            .addArmorChangeListener(arm => this.#inventoryModal.setArmor(arm))
             ;
 
         // unregisters handleInit, switches to handling updates instead
