@@ -1,9 +1,10 @@
 import { Item } from "../model/item.js";
 import { ItemDisplay } from "./itemDisplay.js";
+import { ActionColumn, DataColumn, Table } from "./table.js";
 
-export class EquipmentTab
-{
+export class EquipmentTab {
     #selector;
+    #table;
     #onEquip;
     #currentEquipment;
     #compareEquipment;
@@ -16,6 +17,13 @@ export class EquipmentTab
     constructor(selector, onEquip) {
         this.#selector = selector;
         this.#onEquip = onEquip;
+        this.#table = new Table(`${this.#selector} .equipmentTable`, [
+            new DataColumn("Name", e => e.type.name),
+            new DataColumn("Grade", e => e.type.gradeName),
+            new DataColumn("Level", e => e.level),
+            new DataColumn("Description", e => e.description),
+            new ActionColumn("Action", "Equip", e => this.#onEquip(e.id))
+        ], e => this.#setCompare(e));
         this.#spawnHtml();
         this.#currentEquipment = new ItemDisplay(`${selector} .currentEquipment`, "Current equipment", "Nothing equipped")
             .spawnHtml();
@@ -28,18 +36,7 @@ export class EquipmentTab
         $(this.#selector)
             .empty()
             .append($("<div>").addClass("table-responsive").addClass("h-50")
-                .append($("<table>").addClass("table").addClass("table-striped").addClass("table-hove")
-                    .append($("<thead>").addClass("thead-dark")
-                        .append($("<tr>")
-                            .append($("<td>").text("Name"))
-                            .append($("<td>").text("Grade"))
-                            .append($("<td>").text("Level"))
-                            .append($("<td>").text("Description"))
-                            .append($("<td>").text("Action"))
-                        )
-                    )
-                    .append($("<tbody>").addClass("equipmentRows"))
-                )
+                .append($("<div>").addClass("equipmentTable"))
             )
             .append($("<div>").addClass("h-50").addClass("container")
                 .append($("<div>").addClass("row")
@@ -47,52 +44,14 @@ export class EquipmentTab
                     .append($("<div>").addClass("col-6").addClass("compareEquipment"))
                 )
             );
+        this.#table.spawnHtml();
     }
 
     /**
      * @param {Item[]} items 
      */
     bindRows(items) {
-        $(this.#selector)
-            .find(".equipmentRows")
-            .empty();
-        items.forEach(item => this.#addItem(item));
-    }
-
-    /**
-     * @param {Item} item 
-     */
-    #addItem(item) {
-        const tds = [
-            item.type.name,
-            item.type.gradeName,
-            item.level,
-            item.description
-        ].map(data => {
-            const e = document.createElement("td");
-            e.innerText = data;
-            return e;
-        });
-        const tr = document.createElement("tr");
-        $(tr).hover(
-            () => this.#setCompare(item),
-            () => this.#setCompare(null)
-        );
-        tds.forEach(td => tr.appendChild(td));
-
-        const equipButton = document.createElement("button");
-        equipButton.innerText = "Equip";
-        equipButton.type = "button";
-        equipButton.classList.add("btn");
-        equipButton.classList.add("btn-primary");
-
-        equipButton.addEventListener("click", (_) => this.#onEquip(item.id));
-
-        tr.appendChild(equipButton);
-
-        $(this.#selector)
-            .find(".equipmentRows")
-            .append(tr);
+        this.#table.setRecords(items);
     }
 
     setCurrent(item) {

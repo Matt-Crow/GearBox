@@ -3,11 +3,12 @@ import { CraftingRecipe } from "../model/crafting.js";
 import { Inventory, Item } from "../model/item.js";
 import { EquipmentTab } from "./equipmentTab.js";
 import { ItemDisplay } from "./itemDisplay.js";
+import { ActionColumn, DataColumn, Table } from "./table.js";
 
 export class InventoryModal {
     #modal;
-    #materialRows;
-    #recipeRows;
+    #materialTable;
+    #recipeTable;
     #client;
     #craftPreview;
     #weaponTab;
@@ -19,8 +20,21 @@ export class InventoryModal {
      */
     constructor(modal, client) {
         this.#modal = modal;
-        this.#materialRows = document.querySelector("#materialRows");
-        this.#recipeRows = document.querySelector("#recipeRows");
+
+        this.#materialTable = new Table("#materials", [
+            new DataColumn("Type", m => m.type.name),
+            new DataColumn("Description", m => m.description),
+            new DataColumn("Quantity", m => m.quantity)
+        ], _ => null); // do nothing on hover
+        this.#materialTable.spawnHtml();
+        
+        this.#recipeTable = new Table("#recipes", [
+            new DataColumn("Recipe", r => r.makes.type.name),
+            new DataColumn("Ingredients", r => r.ingredients.map(i => `${i.type.name} x${i.quantity}`).join(", ")),
+            new ActionColumn("Action", "craft", r => this.#client.craft(r.id))
+        ], r => this.#setCraftPreview(r?.makes));
+        this.#recipeTable.spawnHtml();
+
         this.#client = client;
         this.#craftPreview = new ItemDisplay("#craftPreview", "Preview", "Hover over a craft button to preview")
             .spawnHtml();
@@ -38,75 +52,20 @@ export class InventoryModal {
         }
     }
 
-    #clearInventory() {
-        this.#materialRows.replaceChildren();
-    }
-
     /**
      * @param {Inventory} inventory 
      */
     setInventory(inventory) {
-        this.#clearInventory();
-        inventory.materials.forEach(item => this.#addMaterial(item));
+        this.#materialTable.setRecords(inventory.materials);
         this.#weaponTab.bindRows(inventory.weapons);
         this.#armorTab.bindRows(inventory.armors);
-    }
-
-    /**
-     * @param {Item} item 
-     */
-    #addMaterial(item) {
-        const tds = [
-            item.type.name,
-            item.description,
-            item.quantity
-        ].map(data => {
-            const e = document.createElement("td");
-            e.innerText = data;
-            return e;
-        });
-        const tr = document.createElement("tr");
-        tds.forEach(td => tr.appendChild(td));
-        this.#materialRows.appendChild(tr);
     }
 
     /**
      * @param {CraftingRecipe[]} craftingRecipes 
      */
     setCraftingRecipes(craftingRecipes) {
-        craftingRecipes.forEach(craftingRecipe => this.#addCraftingRecipe(craftingRecipe));
-    }
-
-    /**
-     * @param {CraftingRecipe} craftingRecipe 
-     */
-    #addCraftingRecipe(craftingRecipe) {
-        const tds = [
-            craftingRecipe.makes.type.name,
-            craftingRecipe.ingredients.map(i => `${i.type.name} x${i.quantity}`).join(", ")
-        ].map(data => {
-            const e = document.createElement("td");
-            e.innerText = data;
-            return e;
-        });
-        const tr = document.createElement("tr");
-        $(tr).hover(
-            () => this.#setCraftPreview(craftingRecipe.makes),
-            () => this.#setCraftPreview(null)
-        );
-        tds.forEach(td => tr.appendChild(td));
-
-        const craftButton = document.createElement("button");
-        craftButton.innerText = "craft";
-        craftButton.type = "button";
-        craftButton.classList.add("btn");
-        craftButton.classList.add("btn-primary");
-
-        craftButton.addEventListener("click", (e) => this.#client.craft(craftingRecipe.id));
-
-        tr.appendChild(craftButton);
-
-        this.#recipeRows.appendChild(tr);
+        this.#recipeTable.setRecords(craftingRecipes);
     }
 
     /**
