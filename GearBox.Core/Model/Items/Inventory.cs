@@ -65,7 +65,13 @@ public class Inventory : IDynamic
         {
             Materials.Remove(ingredient.Item, ingredient.Quantity);
         }
+
+        /*
+            Craft the item at level 1.
+            This prevents players from getting overleveled items in low level areas
+        */
         var crafted = recipe.Maker.Invoke();
+        
         Weapons.Add(crafted.Weapon);
         Armors.Add(crafted.Armor);
         Materials.Add(crafted.Material);

@@ -72,7 +72,7 @@ public class WorldBuilder
 
         var khopeshRecipe = new CraftingRecipeBuilder()
             .And(bronze, 25)
-            .Makes(() => ItemUnion.Of(khopeshBuilder.Build(1))); // what level should the crafted weapon be?
+            .Makes(() => ItemUnion.Of(khopeshBuilder.Build(1))); // craft at level 1 so players don't just grind lv 20 weapons in lv 1 area
         _craftingRecipes.Add(khopeshRecipe);
 
         var bronzeArmorBuilder = new ArmorBuilder(new ItemType("Bronze Armor", Grade.UNCOMMON))

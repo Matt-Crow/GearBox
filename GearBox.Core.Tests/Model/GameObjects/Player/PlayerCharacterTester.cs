@@ -52,4 +52,17 @@ public class PlayerCharacterTester
 
         Assert.True(sut.Inventory.Weapons.Contains(alreadyEquipped));
     }
+
+    [Fact]
+    public void CannotEquipWeaponsAboveOwnLevel()
+    {
+        var sut = new PlayerCharacter("foo");
+        sut.SetLevel(1);
+        var weapon = new Weapon(new ItemType("bar"), 20);
+        sut.Inventory.Weapons.Add(weapon);
+
+        sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID should not be null"));
+
+        Assert.Null(sut.WeaponSlot.Value);
+    }
 }

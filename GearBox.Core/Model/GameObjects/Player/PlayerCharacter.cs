@@ -50,7 +50,7 @@ public class PlayerCharacter : Character
     public void EquipWeaponById(Guid id)
     {
         var weapon = Inventory.Weapons.GetItemById(id);
-        if (weapon == null)
+        if (weapon == null || weapon.Level > Level)
         {
             return;
         }
@@ -67,7 +67,7 @@ public class PlayerCharacter : Character
     public void EquipArmorById(Guid id)
     {
         var armor = Inventory.Armors.GetItemById(id);
-        if (armor == null)
+        if (armor == null || armor.Level > Level)
         {
             return;
         }
@@ -88,6 +88,7 @@ public class PlayerCharacter : Character
         while (_xp >= _xpToNextLevel)
         {
             SetLevel(Level + 1);
+            UpdateStats();
             _xpToNextLevel = GetXpByLevel(Level + 1);
         }
     }
