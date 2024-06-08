@@ -9,12 +9,16 @@ public class PlayerCharacter : Character
 {
     private int _energyExpended = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     private int _frameCount = 0; // used for regeneration
+    private int _xp = 0; // experience points
+    private int _xpToNextLevel;
 
-    public PlayerCharacter(string name, int level) : base(name, level)
+    public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp))
     {
         Inventory = new();
         WeaponSlot = new("equippedWeapon");
         ArmorSlot = new("equippedArmor");
+        _xp = xp;
+        _xpToNextLevel = GetXpByLevel(Level + 1);
         UpdateStats();
     }
 
@@ -77,6 +81,17 @@ public class PlayerCharacter : Character
         UpdateStats();
     }
 
+    public void GainXp(int xp)
+    {
+        // untested
+        _xp += xp;
+        while (_xp >= _xpToNextLevel)
+        {
+            SetLevel(Level + 1);
+            _xpToNextLevel = GetXpByLevel(Level + 1);
+        }
+    }
+
     public void RechargePercent(double percent)
     {
         _energyExpended -= (int)(MaxEnergy*percent);
@@ -128,6 +143,33 @@ public class PlayerCharacter : Character
     {
         var multiplier = 1.0 + Stats.MaxEnergy.Value;
         var result = (50 + 5*level) * multiplier;
+        return (int)result;
+    }
+
+    private static int GetLevelByXp(int xp)
+    {
+        // don't use mathematical inverse here, in case I change GetXpByLevel
+        for (var lv = MAX_LEVEL; lv > 0; lv--)
+        {
+            if (xp >= GetXpByLevel(lv))
+            {
+                return lv;
+            }
+        }
+        return 1;
+    }
+
+    private static int GetXpByLevel(int level)
+    {
+        /*
+            lv | xp
+            1  | 0
+            2  | 20
+            3  | 60
+            19 | 5.2m
+            20 | 10m
+        */
+        var result = 20 * (Math.Pow(2, level - 1) - 1);
         return (int)result;
     }
 }

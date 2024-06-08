@@ -53,7 +53,7 @@ public class WorldTester
     public void Add_GivenSamePlayerTwice_OnlyAddsOnce()
     {
         var sut = new World();
-        var player = new PlayerCharacter("foo", 1);
+        var player = new PlayerCharacter("foo");
 
         sut.SpawnPlayer(player);
         sut.SpawnPlayer(player);

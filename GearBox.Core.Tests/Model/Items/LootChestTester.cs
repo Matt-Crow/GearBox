@@ -14,7 +14,7 @@ public class LootChestTester
         var item = new Material(new ItemType("foo"));
         inventory.Materials.Add(item);
         var sut = new LootChest(Coordinates.ORIGIN, inventory);
-        var player = new PlayerCharacter("bar", 1)
+        var player = new PlayerCharacter("bar")
         {
             Coordinates = sut.Body.Location
         };

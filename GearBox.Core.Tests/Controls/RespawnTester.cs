@@ -12,7 +12,7 @@ public class RespawnTester
     {
         var sut = new Respawn();
         var world = new World();
-        var player = new PlayerCharacter("foo", 1);
+        var player = new PlayerCharacter("foo");
         world.SpawnPlayer(player);
 
         player.TakeDamage(999999);
@@ -31,7 +31,7 @@ public class RespawnTester
     {
         var sut = new Respawn();
         var world = new World();
-        var player = new PlayerCharacter("foo", 1);
+        var player = new PlayerCharacter("foo");
         world.SpawnPlayer(player);
         player.TakeDamage(42);
 

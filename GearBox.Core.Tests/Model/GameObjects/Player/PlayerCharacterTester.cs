@@ -9,7 +9,7 @@ public class PlayerCharacterTester
     [Fact]
     public void Equip_GivenNotInInventory_DoesNothing()
     {
-        var sut = new PlayerCharacter("foo", 1);
+        var sut = new PlayerCharacter("foo");
         sut.EquipWeaponById(Guid.Empty);
         Assert.Null(sut.WeaponSlot.Value);
     }
@@ -17,7 +17,7 @@ public class PlayerCharacterTester
     [Fact]
     public void Equip_GivenWeapon_SetsWeaponSlot()
     {
-        var sut = new PlayerCharacter("foo", 1);
+        var sut = new PlayerCharacter("foo");
         var weapon = new Weapon(new ItemType("weapon"));
         sut.Inventory.Weapons.Add(weapon);
 
@@ -29,7 +29,7 @@ public class PlayerCharacterTester
     [Fact]
     public void Equip_GivenWeapon_RemovesFromInventory()
     {
-        var sut = new PlayerCharacter("foo", 1);
+        var sut = new PlayerCharacter("foo");
         var weapon = new Weapon(new ItemType("weapon"));
         sut.Inventory.Weapons.Add(weapon);
 
@@ -41,7 +41,7 @@ public class PlayerCharacterTester
     [Fact]
     public void Equip_GivenWeaponAlreadyEquipped_AddsToInventory()
     {
-        var sut = new PlayerCharacter("foo", 1);
+        var sut = new PlayerCharacter("foo");
         var alreadyEquipped = new Weapon(new ItemType("weapon 1"));
         var notYetEquipped = new Weapon(new ItemType("weapon 2"));
         sut.Inventory.Weapons.Add(alreadyEquipped);
