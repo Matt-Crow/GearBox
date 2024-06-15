@@ -39,19 +39,16 @@ public class PlayerStatSummary : IDynamic
 
     private readonly PlayerCharacter _player;
     private readonly ChangeTracker _changeTracker;
-    private readonly Serializer _serializer;
-    private bool _updatedLastFrame = true;
 
     public PlayerStatSummary(PlayerCharacter player)
     {
         _player = player;
         _changeTracker = new(this);
-        _serializer = new("statSummary", Serialize);
     }
 
     public IEnumerable<object?> DynamicValues => _elements.SelectMany(e => e.DynamicValues(_player));
 
-    private string Serialize(SerializationOptions options)
+    public string Serialize(SerializationOptions options)
     {
         var lines = _elements
             .Select(e => e.ToString(_player))
@@ -65,17 +62,6 @@ public class PlayerStatSummary : IDynamic
         return $"{(int)(number*100)}%";
     }
 
-    public void Update()
-    {
-        _updatedLastFrame = _changeTracker.HasChanged;
-        _changeTracker.Update();
-    }
-
-    public StableJson ToJson()
-    {
-        var result = _updatedLastFrame
-            ? StableJson.Changed(_serializer.Serialize().Content)
-            : StableJson.NoChanges();
-        return result;
-    }
+    public void Update() => _changeTracker.Update();
+    public StableJson ToJson() => _changeTracker.ToJson();
 }
