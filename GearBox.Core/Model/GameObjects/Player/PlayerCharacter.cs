@@ -111,6 +111,7 @@ public class PlayerCharacter : Character
 
         Inventory.Update();
         WeaponSlot.Update();
+        ArmorSlot.Update();
 
         // restore 5% HP & energy per second
         _frameCount++;
