@@ -63,3 +63,24 @@ export class PlayerChangeHandler extends JsonDeserializer {
         return result;
     }
 }
+
+export class PlayerStatSummary {
+    #lines;
+
+    /**
+     * @param {string[]} lines 
+     */
+    constructor(lines) {
+        this.#lines = lines;
+    }
+
+    get lines() { return this.#lines; }
+
+    /**
+     * @param {object} json 
+     * @returns PlayerStatSummary
+     */
+    static fromJson(json) {
+        return new PlayerStatSummary(json.lines);
+    }
+}

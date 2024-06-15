@@ -177,7 +177,8 @@ public class World
             GameObjects.ToJson(), 
             player.Inventory.ToJson(), 
             player.WeaponSlot.ToJson(),
-            player.ArmorSlot.ToJson()
+            player.ArmorSlot.ToJson(),
+            player.GetStatSummaryJson()
         );
         return result;
     }

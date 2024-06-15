@@ -37,10 +37,11 @@ public class Character : IGameObject
     public Coordinates Coordinates { get => Body.Location; set => Body.Location = value; }
     public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping armor
     public int MaxHitPoints { get; set; }
+    public int HitPointsRemaining => MaxHitPoints - DamageTaken;
     protected virtual string Type => "character";
     public int Level { get; private set; }
     public double DamageModifier { get; protected set; } = 0.0;
-    protected ArmorClass ArmorClass { get; set; } = ArmorClass.NONE;
+    public ArmorClass ArmorClass { get; protected set; } = ArmorClass.NONE;
     public BasicAttack BasicAttack { get; init; }
     public World? World { get; set; }
     public Team Team { get; set; } = new(); // default to each on their own team

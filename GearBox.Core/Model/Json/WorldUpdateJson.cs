@@ -6,12 +6,13 @@ namespace GearBox.Core.Model.Json;
 /// </summary>
 public readonly struct WorldUpdateJson : IJson
 {
-    public WorldUpdateJson(List<GameObjectJson> gameObjects, StableJson inventory, StableJson weapon, StableJson armor)
+    public WorldUpdateJson(List<GameObjectJson> gameObjects, StableJson inventory, StableJson weapon, StableJson armor, StableJson statSummary)
     {
         GameObjects = gameObjects;
         Inventory = inventory;
         Weapon = weapon;
         Armor = armor;
+        StatSummary = statSummary;
     }
     
     /// <summary>
@@ -33,4 +34,9 @@ public readonly struct WorldUpdateJson : IJson
     /// Changes to the recipient's equipped armor
     /// </summary>
     public StableJson Armor { get; init; }
+
+    /// <summary>
+    /// Changes to the recipient's stats
+    /// </summary>
+    public StableJson StatSummary { get; init; }
 }

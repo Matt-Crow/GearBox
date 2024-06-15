@@ -7,23 +7,26 @@ namespace GearBox.Core.Model.GameObjects.Player;
 
 public class PlayerCharacter : Character
 {
-    private int _energyExpended = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     private int _frameCount = 0; // used for regeneration
-    private int _xp = 0; // experience points
-    private int _xpToNextLevel;
+    private readonly PlayerStatSummary _statSummary;
 
     public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp))
     {
         Inventory = new();
         WeaponSlot = new("equippedWeapon");
         ArmorSlot = new("equippedArmor");
-        _xp = xp;
-        _xpToNextLevel = GetXpByLevel(Level + 1);
+        Xp = xp;
+        XpToNextLevel = GetXpByLevel(Level + 1);
+        _statSummary = new PlayerStatSummary(this);
         UpdateStats();
     }
 
     protected override string Type => "playerCharacter";
-    private int MaxEnergy { get; set; }
+    public int Xp { get; private set; } // experience points
+    public int XpToNextLevel { get; private set; }
+    public int MaxEnergy { get; private set; }
+    public int EnergyExpended { get; private set; } = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
+    public int EnergyRemaining => MaxEnergy - EnergyExpended;
     public PlayerStats Stats { get; init; } = new();
     public Inventory Inventory { get; init; }
     public EquipmentSlot<Weapon> WeaponSlot { get; init; }
@@ -84,21 +87,21 @@ public class PlayerCharacter : Character
     public void GainXp(int xp)
     {
         // untested
-        _xp += xp;
-        while (_xp >= _xpToNextLevel)
+        Xp += xp;
+        while (Xp >= XpToNextLevel)
         {
             SetLevel(Level + 1);
             UpdateStats();
-            _xpToNextLevel = GetXpByLevel(Level + 1);
+            XpToNextLevel = GetXpByLevel(Level + 1);
         }
     }
 
     public void RechargePercent(double percent)
     {
-        _energyExpended -= (int)(MaxEnergy*percent);
-        if (_energyExpended < 0)
+        EnergyExpended -= (int)(MaxEnergy*percent);
+        if (EnergyExpended < 0)
         {
-            _energyExpended = 0;
+            EnergyExpended = 0;
         }
     }
 
@@ -117,6 +120,13 @@ public class PlayerCharacter : Character
             RechargePercent(0.05);
             _frameCount = 0;
         }
+
+        _statSummary.Update();
+    }
+
+    public StableJson GetStatSummaryJson()
+    {
+        return _statSummary.ToJson();
     }
 
     protected override string Serialize(SerializationOptions options)
@@ -128,7 +138,7 @@ public class PlayerCharacter : Character
             Coordinates.XInPixels,
             Coordinates.YInPixels,
             new FractionJson(MaxHitPoints - DamageTaken, MaxHitPoints),
-            new FractionJson(MaxEnergy - _energyExpended, MaxEnergy)
+            new FractionJson(MaxEnergy - EnergyExpended, MaxEnergy)
         );
         return JsonSerializer.Serialize(asJson, options.JsonSerializerOptions);
     }

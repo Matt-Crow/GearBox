@@ -3,7 +3,7 @@ import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
 import { CraftingRecipe, CraftingRecipeDeserializer, CraftingRecipeRepository } from "./crafting.js";
 import { InventoryDeserializer, ItemDeserializer, ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
 import { WorldMap, deserializeMapJson } from "./map.js";
-import { Player } from "./player.js";
+import { Player, PlayerStatSummary } from "./player.js";
 
 export class World {
     #playerId; // need reference to changing player
@@ -85,6 +85,7 @@ export class WorldUpdateHandler {
     #inventoryChangeListeners = [];
     #weaponChangeListeners = [];
     #armorChangeListeners = [];
+    #statSummaryChangeListeners = [];
 
     /**
      * @param {World} world 
@@ -141,6 +142,15 @@ export class WorldUpdateHandler {
         return this;
     }
 
+    /**
+     * @param {(PlayerStatSummary) => any} changeListener 
+     * @returns {WorldUpdateHandler}
+     */
+    addStatSummaryChangeListener(changeListener) {
+        this.#statSummaryChangeListeners.push(changeListener);
+        return this;
+    }
+
     handleWorldUpdate(json) {
         const newGameObject = json.gameObjects
             .map(gameObjectJson => this.#deserialize(gameObjectJson))
@@ -168,6 +178,12 @@ export class WorldUpdateHandler {
                 ? this.#itemDeserializer.deserialize(maybeArmor)
                 : null;
             this.#armorChangeListeners.forEach(listener => listener(armor));
+        }
+
+        if (json.statSummary.hasChanged) {
+            const statSummaryJson = JSON.parse(json.statSummary.body);
+            const statSummary = PlayerStatSummary.fromJson(statSummaryJson);
+            this.#statSummaryChangeListeners.forEach(listener => listener(statSummary));
         }
     }
 

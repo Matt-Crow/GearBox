@@ -1,6 +1,7 @@
 import { Client } from "../infrastructure/client.js";
 import { CraftingRecipe } from "../model/crafting.js";
 import { Inventory, Item } from "../model/item.js";
+import { PlayerStatSummary } from "../model/player.js";
 import { EquipmentTab } from "./equipmentTab.js";
 import { ItemDisplay } from "./itemDisplay.js";
 import { ActionColumn, DataColumn, Table } from "./table.js";
@@ -87,5 +88,14 @@ export class InventoryModal {
      */
     setArmor(armor) {
         this.#armorTab.setCurrent(armor);
+    }
+
+    /**
+     * @param {PlayerStatSummary} statSummary 
+     */
+    setStatSummary(statSummary) {
+        const $statsList = $("#statsList")
+            .empty();
+        statSummary.lines.forEach(line => $statsList.append($("<li>").text(line)));
     }
 }

@@ -3,7 +3,6 @@ namespace GearBox.Core.Model.Units;
 public readonly struct ArmorClass
 {
     private readonly string _asString;
-    private readonly double _damageReduction;
 
 
     public static readonly ArmorClass NONE = new("No armor", 0.0, 1.0);
@@ -15,15 +14,16 @@ public readonly struct ArmorClass
     private ArmorClass(string asString, double damageReduction, double armorStatMultiplier)
     {
         _asString = asString;
-        _damageReduction = damageReduction;
+        DamageReduction = damageReduction;
         ArmorStatMultiplier = armorStatMultiplier;
     }
 
     public double ArmorStatMultiplier { get; init; }
+    public double DamageReduction { get; init; }
     
     public int ReduceDamage(int damage)
     {
-        var multiplier = 1.0 - _damageReduction;
+        var multiplier = 1.0 - DamageReduction;
         var result = multiplier * damage;
         return (int)result;
     }

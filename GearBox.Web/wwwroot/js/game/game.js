@@ -81,6 +81,7 @@ export class Game {
             .addInventoryChangeListener(inv => this.#inventoryModal.setInventory(inv))
             .addWeaponChangeListener(wea => this.#inventoryModal.setWeapon(wea))
             .addArmorChangeListener(arm => this.#inventoryModal.setArmor(arm))
+            .addStatSummaryChangeListener(summary => this.#inventoryModal.setStatSummary(summary))
             ;
 
         // unregisters handleInit, switches to handling updates instead
