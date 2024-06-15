@@ -8,38 +8,31 @@ public class PlayerStatSummary : IDynamic
 {
     private readonly IEnumerable<PlayerStatSummaryElement> _elements = [
         new(
-            "Level", 
-            p => $"{p.Level}",
+            p => $"Level: {p.Level}",
             p => [p.Level]
         ),
         new(
-            "XP", 
-            p => $"{p.Xp}/{p.XpToNextLevel}",
+            p => $"XP: {p.Xp}/{p.XpToNextLevel}",
             p => [p.Xp, p.XpToNextLevel]
         ),
         new(
-            "HP", 
-            p => $"{p.HitPointsRemaining}/{p.MaxHitPoints}",
+            p => $"HP: {p.HitPointsRemaining}/{p.MaxHitPoints}",
             p => [p.HitPointsRemaining, p.MaxHitPoints]
         ),
         new(
-            "Energy", 
-            p => $"{p.EnergyRemaining}/{p.MaxEnergy}",
+            p => $"Energy: {p.EnergyRemaining}/{p.MaxEnergy}",
             p => [p.EnergyRemaining, p.MaxEnergy]
         ),
         new(
-            "Offense", 
-            p => $"{p.Stats.Offense.Points} (+{Percent(p.Stats.Offense.Value)} damage dealt)",
+            p => $"Offense: {p.Stats.Offense.Points} (+{Percent(p.Stats.Offense.Value)} damage dealt)",
             p => [p.Stats.Offense.Points]
         ),
         new(
-            "Speed", 
-            p => $"{p.Stats.Speed.Points} (+{Percent(p.Stats.Speed.Value)} movement speed)",
+            p => $"Speed: {p.Stats.Speed.Points} (+{Percent(p.Stats.Speed.Value)} movement speed)",
             p => [p.Stats.Speed.Points]
         ),
         new(
-            "Armor class", 
-            p => $"{p.ArmorClass} (-{Percent(p.ArmorClass.DamageReduction)} damage taken)",
+            p => $"Armor class: {p.ArmorClass} (-{Percent(p.ArmorClass.DamageReduction)} damage taken)",
             p => [p.ArmorClass]
         )
     ];
