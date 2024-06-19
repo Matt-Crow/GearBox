@@ -1,11 +1,12 @@
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
+import { getColorStringFromJson } from "./color.js";
 import { PIXELS_PER_TILE } from "./constants.js";
 
 export class Character {
     #id;
     #name;
     #level;
-    #color = "rgb(0 255 0)"; // todo read from server
+    #color;
     #x;
     #y;
     #hitPoints;
@@ -14,14 +15,16 @@ export class Character {
      * @param {string} id a unique identifier for this character (GUID)
      * @param {string} name 
      * @param {number} level 
+     * @param {string} color 
      * @param {number} x the x-coordinate of this character's center, in pixels
      * @param {number} y the y-coordinate of this character's center, in pixels 
      * @param {Fraction} hitPoints 
      */
-    constructor(id, name, level, x, y, hitPoints) {
+    constructor(id, name, level, color, x, y, hitPoints) {
         this.#id = id;
         this.#name = name;
         this.#level = level;
+        this.#color = color;
         this.#x = x;
         this.#y = y;
         this.#hitPoints = hitPoints;
@@ -89,6 +92,7 @@ export class CharacterJsonDeserializer extends JsonDeserializer {
             obj.id, 
             obj.name,
             obj.level,
+            getColorStringFromJson(obj.color),
             obj.x, 
             obj.y, 
             new Fraction(obj.hitPoints.current, obj.hitPoints.max)

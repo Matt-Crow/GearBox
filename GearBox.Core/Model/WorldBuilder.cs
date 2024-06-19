@@ -150,9 +150,9 @@ public class WorldBuilder
     public WorldBuilder AddDefaultEnemies()
     {
         var result = this
-            .DefineEnemy(() => new Character("Snake", 1))
-            .DefineEnemy(() => new Character("Scorpion", 1))
-            .DefineEnemy(() => new Character("Jackal", 2));
+            .DefineEnemy(() => new Character("Snake", 1, Color.LIGHT_GREEN))
+            .DefineEnemy(() => new Character("Scorpion", 1, Color.BLACK))
+            .DefineEnemy(() => new Character("Jackal", 2, Color.TAN));
         return result;
     }
 

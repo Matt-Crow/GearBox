@@ -1,3 +1,4 @@
+import { getColorStringFromJson } from "./color.js";
 import { PIXELS_PER_TILE } from "./constants.js";
 
 // avoids conflicts with build-in JS Map class
@@ -76,13 +77,7 @@ class Tile {
      * @returns {Tile}
      */
     static fromJson(json) {
-        const r = json.color.red;
-        const g = json.color.green;
-        const b = json.color.blue;
-        const color = `rgb(${r} ${g} ${b})`; // CSS color doesn't use commas
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
-
-        const result = new Tile(color, json.x, json.y);
+        const result = new Tile(getColorStringFromJson(json.color), json.x, json.y);
         return result;
     }
 

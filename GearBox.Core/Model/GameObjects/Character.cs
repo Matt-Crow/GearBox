@@ -17,9 +17,10 @@ public class Character : IGameObject
     private readonly MobileBehavior _mobility;
 
 
-    public Character(string name, int level)
+    public Character(string name, int level, Color? color = null)
     {
         Name = name;
+        Color = color ?? Color.GREEN;
         _mobility = new MobileBehavior(Body, Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
         Serializer = new(Type, Serialize);
         Termination = new(this, () => DamageTaken >= MaxHitPoints);
@@ -30,6 +31,7 @@ public class Character : IGameObject
 
     public Guid Id { get; init; } = Guid.NewGuid();
     public string Name { get; init; }
+    protected Color Color { get; init; }
     public Serializer Serializer { get; init; }
     public IAiBehavior AiBehavior { get; set; } = new NullAiBehavior();
     public BodyBehavior Body { get; init; } = new();
@@ -120,6 +122,7 @@ public class Character : IGameObject
             Id,
             Name,
             Level,
+            Color.ToJson(),
             _mobility.Coordinates.XInPixels, 
             _mobility.Coordinates.YInPixels,
             new FractionJson(MaxHitPoints - DamageTaken, MaxHitPoints)

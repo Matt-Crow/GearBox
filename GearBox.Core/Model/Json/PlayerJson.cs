@@ -6,6 +6,7 @@ public readonly struct PlayerJson : IJson
         Guid id, 
         string name, 
         int level, 
+        ColorJson color,
         int x, 
         int y, 
         FractionJson hitPoints, 
@@ -15,6 +16,7 @@ public readonly struct PlayerJson : IJson
         Id = id;
         Name = name;
         Level = level;
+        Color = color;
         X = x;
         Y = y;
         HitPoints = hitPoints;
@@ -24,6 +26,7 @@ public readonly struct PlayerJson : IJson
     public Guid Id { get; init; }
     public string Name { get; init; }
     public int Level { get; init; }
+    public ColorJson Color { get; init; }
     public int X { get; init; }
     public int Y { get; init; }
     public FractionJson HitPoints { get; init; }

@@ -10,7 +10,7 @@ public class PlayerCharacter : Character
     private int _frameCount = 0; // used for regeneration
     private readonly PlayerStatSummary _statSummary;
 
-    public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp))
+    public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp), Color.BLUE)
     {
         Inventory = new();
         WeaponSlot = new("equippedWeapon");
@@ -136,6 +136,7 @@ public class PlayerCharacter : Character
             Id, 
             Name,
             Level,
+            Color.ToJson(),
             Coordinates.XInPixels,
             Coordinates.YInPixels,
             new FractionJson(MaxHitPoints - DamageTaken, MaxHitPoints),
