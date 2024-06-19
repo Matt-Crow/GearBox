@@ -19,6 +19,11 @@ public class TileIterator
         _currentY = start.YInTiles;
     }
 
+    public TileIterator(Map map) : this(map, Coordinates.ORIGIN, new(map.Width, map.Height))
+    {
+        
+    }
+
     private Coordinates CurrentPoint { get => Coordinates.FromTiles(_currentX, _currentY); }
     public Tile Current { get => new(CurrentPoint, _map.GetTileAt(CurrentPoint)); }
     public bool Done { get; private set; } = false;

@@ -1,6 +1,7 @@
 
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.WorldInit;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.Static;
@@ -255,19 +256,32 @@ public class Map : ISerializable<MapJson>
     }
     public MapJson ToJson()
     {
-        // Convert 2d array to 2d list: https://stackoverflow.com/a/37458182/11110116
-        var tm = _tileMap.Cast<int>() 
-            .Select((x,i)=> new {x, index = i/_tileMap.GetLength(1)})
-            .GroupBy(x=>x.index)
-            .Select(x=>x.Select(s=>s.x).ToList())  
+        var tileTypeToTiles = _tileTypes.ToDictionary(e => e.Value, _ => new List<Tile>());
+        for (var iter = new TileIterator(this); !iter.Done; iter.Next())
+        {
+            var tile = iter.Current;
+            tileTypeToTiles[tile.TileType].Add(tile);
+        }
+        var pits = tileTypeToTiles
+            .Where(e => e.Key.Height == TileHeight.PIT)
+            .Select(e => new TileSetJson(
+                e.Key.ToJson(), 
+                e.Value
+                    .Select(t => new CoordinateJson(t.LeftInPixels, t.TopInPixels))
+                    .OrderByDescending(c => c.Y) // helps front-end draw correctly
+                    .ToList()
+            ))
+            .ToList();
+        var notPits = tileTypeToTiles
+            .Where(e => e.Key.Height != TileHeight.PIT)
+            .Select(e => new TileSetJson(
+                e.Key.ToJson(),
+                e.Value
+                    .Select(t => new CoordinateJson(t.LeftInPixels, t.TopInPixels))
+                    .ToList()
+            ))
             .ToList();
 
-        var tt = new List<KeyValueJson<int, TileTypeJson>>();
-        foreach (var kv in _tileTypes)
-        {
-            tt.Add(new KeyValueJson<int, TileTypeJson>(kv.Key, kv.Value.ToJson()));
-        }
-
-        return new MapJson(tm, tt);
+        return new MapJson(Width.InPixels, Height.InPixels, pits, notPits);
     }
 }

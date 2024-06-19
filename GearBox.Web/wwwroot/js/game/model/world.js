@@ -2,7 +2,7 @@ import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
 import { CraftingRecipe, CraftingRecipeDeserializer, CraftingRecipeRepository } from "./crafting.js";
 import { InventoryDeserializer, ItemDeserializer, ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
-import { WorldMap, deserializeMapJson } from "./map.js";
+import { WorldMap } from "./map.js";
 import { Player, PlayerStatSummary } from "./player.js";
 
 export class World {
@@ -62,7 +62,7 @@ export class WorldInitHandler {
      * @returns {World}
      */
     handleWorldInit(obj) {
-        const map = deserializeMapJson(obj.map);
+        const map = WorldMap.fromJson(obj.map);
         const itemTypes = obj.itemTypes.map(deserializeItemTypeJson);
 
         // need item types to resolve crafting recipes, dependency injection won't work
