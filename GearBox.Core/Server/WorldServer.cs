@@ -113,7 +113,6 @@ public class WorldServer
 
     public async Task Update()
     {
-        var tasks = new List<Task>();
         lock (connectionLock)
         {
             var executeThese = _pendingCommands
@@ -126,12 +125,8 @@ public class WorldServer
             }
 
             _world.Update();
-
-            // notify everyone of the update
-            tasks = _connections
-                .Select(kv => kv.Value.Send(_world.GetWorldUpdateJsonFor(_players[kv.Key])))
-                .ToList();
         }
-        await Task.WhenAll(tasks);
+        // notify everyone of the update
+        await Task.WhenAll(_connections.Select(kv => kv.Value.Send(_world.GetWorldUpdateJsonFor(_players[kv.Key]))));
     }
 }
