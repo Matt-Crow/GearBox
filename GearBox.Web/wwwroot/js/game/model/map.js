@@ -5,19 +5,22 @@ export class WorldMap {
     #width;
     #height;
     #pits;
-    #notPits;
+    #floors;
+    #walls;
     
     /**
      * @param {number} width in pixels
      * @param {number} height in pixels
      * @param {TileSet[]} pits 
-     * @param {TileSet[]} notPits 
+     * @param {TileSet[]} floors 
+     * @param {TileSet[]} walls 
      */
-    constructor(width, height, pits, notPits) {
+    constructor(width, height, pits, floors, walls) {
         this.#width = width;
         this.#height = height;
         this.#pits = pits;
-        this.#notPits = notPits;
+        this.#floors = floors;
+        this.#walls = walls;
     }
 
     /**
@@ -33,9 +36,16 @@ export class WorldMap {
     /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
-    draw(context) {
+    drawPitsAndFloor(context) {
         this.#pits.forEach(tileSet => tileSet.draw(context));
-        this.#notPits.forEach(tileSet => tileSet.draw(context));
+        this.#floors.forEach(tileSet => tileSet.draw(context));
+    }
+
+    /**
+     * @param {CanvasRenderingContext2D} context the canvas to draw on
+     */
+    drawWalls(context) {
+        this.#walls.forEach(tileSet => tileSet.draw(context));
     }
 
     /**
@@ -44,8 +54,9 @@ export class WorldMap {
      */
     static fromJson(json) {
         const pits = json.pits.map(j => TileSet.fromJson(j));
-        const notPits = json.notPits.map(j => TileSet.fromJson(j));
-        return new WorldMap(json.width, json.height, pits, notPits);
+        const floors = json.floors.map(j => TileSet.fromJson(j));
+        const walls = json.walls.map(j => TileSet.fromJson(j));
+        return new WorldMap(json.width, json.height, pits, floors, walls);
     }
 }
 
@@ -122,11 +133,13 @@ class TileType {
 }
 
 function drawWall(context, x, y, color) {
+    const offset = PIXELS_PER_TILE / 3;
+
     // draw outline
     context.fillStyle = "rgb(100, 100, 100)";
-    context.fillRect(x, y, PIXELS_PER_TILE, PIXELS_PER_TILE);
+    context.fillRect(x, y - offset, PIXELS_PER_TILE, PIXELS_PER_TILE + offset);
     
-    drawInnerTile(context, x, y, color);
+    drawInnerTile(context, x, y - offset, color);
 }
 
 function drawFloor(context, x, y, color) {

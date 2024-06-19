@@ -49,8 +49,9 @@ export class World {
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
     draw(context) {
-        this.#map.draw(context);
+        this.#map.drawPitsAndFloor(context);
         this.#gameObjects.forEach(obj => obj.draw(context));
+        this.#map.drawWalls(context);
     }
 }
 

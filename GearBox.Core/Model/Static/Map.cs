@@ -256,32 +256,27 @@ public class Map : ISerializable<MapJson>
     }
     public MapJson ToJson()
     {
-        var tileTypeToTiles = _tileTypes.ToDictionary(e => e.Value, _ => new List<Tile>());
+        var tileTypeToTiles = _tileTypes.ToDictionary(e => e.Value, _ => new List<CoordinateJson>());
         for (var iter = new TileIterator(this); !iter.Done; iter.Next())
         {
             var tile = iter.Current;
-            tileTypeToTiles[tile.TileType].Add(tile);
+            tileTypeToTiles[tile.TileType].Add(new CoordinateJson(tile.LeftInPixels, tile.TopInPixels));
         }
-        var pits = tileTypeToTiles
-            .Where(e => e.Key.Height == TileHeight.PIT)
-            .Select(e => new TileSetJson(
-                e.Key.ToJson(), 
-                e.Value
-                    .Select(t => new CoordinateJson(t.LeftInPixels, t.TopInPixels))
-                    .OrderByDescending(c => c.Y) // helps front-end draw correctly
-                    .ToList()
-            ))
-            .ToList();
-        var notPits = tileTypeToTiles
-            .Where(e => e.Key.Height != TileHeight.PIT)
+        var pits = GetTileSetsByHeight(tileTypeToTiles, TileHeight.PIT, cs => cs.OrderByDescending(c => c.Y)); // need to draw pits bottom to top
+        var floors = GetTileSetsByHeight(tileTypeToTiles, TileHeight.FLOOR, cs => cs);
+        var walls = GetTileSetsByHeight(tileTypeToTiles, TileHeight.WALL, cs => cs.OrderBy(c => c.Y)); // need to draw walls top to bottom
+        return new MapJson(Width.InPixels, Height.InPixels, pits, floors, walls);
+    }
+
+    private static List<TileSetJson> GetTileSetsByHeight(Dictionary<TileType, List<CoordinateJson>> tileTypeToTiles, TileHeight height, Func<IEnumerable<CoordinateJson>, IEnumerable<CoordinateJson>> sort)
+    {
+        var result = tileTypeToTiles
+            .Where(e => e.Key.Height == height)
             .Select(e => new TileSetJson(
                 e.Key.ToJson(),
-                e.Value
-                    .Select(t => new CoordinateJson(t.LeftInPixels, t.TopInPixels))
-                    .ToList()
+                sort(e.Value).ToList()
             ))
             .ToList();
-
-        return new MapJson(Width.InPixels, Height.InPixels, pits, notPits);
+        return result;
     }
 }
