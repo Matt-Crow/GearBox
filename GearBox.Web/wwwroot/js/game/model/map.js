@@ -11,9 +11,9 @@ export class WorldMap {
     /**
      * @param {number} width in pixels
      * @param {number} height in pixels
-     * @param {TileSet[]} pits 
-     * @param {TileSet[]} floors 
-     * @param {TileSet[]} walls 
+     * @param {Tile[]} pits 
+     * @param {Tile[]} floors 
+     * @param {Tile[]} walls 
      */
     constructor(width, height, pits, floors, walls) {
         this.#width = width;
@@ -37,15 +37,15 @@ export class WorldMap {
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
     drawPitsAndFloor(context) {
-        this.#pits.forEach(tileSet => tileSet.draw(context));
-        this.#floors.forEach(tileSet => tileSet.draw(context));
+        this.#pits.forEach(t => t.drawPit(context));
+        this.#floors.forEach(t => t.drawFloor(context));
     }
 
     /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
     drawWalls(context) {
-        this.#walls.forEach(tileSet => tileSet.draw(context));
+        this.#walls.forEach(t => t.drawWall(context));
     }
 
     /**
@@ -53,65 +53,28 @@ export class WorldMap {
      * @returns {WorldMap}
      */
     static fromJson(json) {
-        const pits = json.pits.map(j => TileSet.fromJson(j));
-        const floors = json.floors.map(j => TileSet.fromJson(j));
-        const walls = json.walls.map(j => TileSet.fromJson(j));
+        const pits = json.pits.map(j => Tile.fromJson(j));
+        const floors = json.floors.map(j => Tile.fromJson(j));
+        const walls = json.walls.map(j => Tile.fromJson(j));
         return new WorldMap(json.width, json.height, pits, floors, walls);
     }
 }
 
-class TileSet {
-    #tileType;
-    #coordinates;
+class Tile {
+    #color;
+    #x;
+    #y;
 
-    /**
-     * @param {TileType} tileType 
-     */
-    constructor(tileType, coordinates) {
-        this.#tileType = tileType;
-        this.#coordinates = coordinates;
+    constructor(color, x, y) {
+        this.#color = color;
+        this.#x = x;
+        this.#y = y;
     }
 
     /**
      * @param {object} json 
-     * @returns {TileSet}
+     * @returns {Tile}
      */
-    static fromJson(json) {
-        const result = new TileSet(TileType.fromJson(json.tileType), json.coordinates.map(j => [j.x, j.y]));
-        return result;
-    }
-
-    /**
-     * @param {CanvasRenderingContext2D} context
-     */
-    draw(context) {
-        this.#coordinates.forEach(c => this.#tileType.drawAt(context, c[0], c[1]));
-    }
-}
-
-class TileType {
-    #color;
-    #draw;
-
-    /**
-     * @param {string} color the CSS color of this tile type
-     * @param {(CanvasRenderingContext2D, number, number, string) => none} draw 
-     */
-    constructor(color, draw) {
-        this.#color = color;
-        this.#draw = draw;
-    }
-
-    /**
-     * 
-     * @param {CanvasRenderingContext2D} context the canvas context to draw on
-     * @param {number} x the x-coodinate, in pixels, of the upper-left corner
-     * @param {number} y the y-coodinate, in pixels, of the upper-left corner 
-     */
-    drawAt(context, x, y) {
-        this.#draw(context, x, y, this.#color);
-    }
-
     static fromJson(json) {
         const r = json.color.red;
         const g = json.color.green;
@@ -119,52 +82,46 @@ class TileType {
         const color = `rgb(${r} ${g} ${b})`; // CSS color doesn't use commas
         // https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
 
-        let draw = () => {throw new Error("Not implemented")};
-        if (json.height > 0) {
-            draw = drawWall;
-        } else if (json.height < 0) {
-            draw = drawPit;
-        } else { // json.height === 0
-            draw = drawFloor;
-        }
-
-        return new TileType(color, draw);
+        const result = new Tile(color, json.x, json.y);
+        return result;
     }
-}
 
-function drawWall(context, x, y, color) {
-    const offset = PIXELS_PER_TILE / 3;
+    drawPit(context) {
+        const offset = PIXELS_PER_TILE / 3;
 
-    // draw outline
-    context.fillStyle = "rgb(100, 100, 100)";
-    context.fillRect(x, y - offset, PIXELS_PER_TILE, PIXELS_PER_TILE + offset);
-    
-    drawInnerTile(context, x, y - offset, color);
-}
+        context.fillStyle = "black";
+        context.fillRect(this.#x, this.#y, PIXELS_PER_TILE, offset);
 
-function drawFloor(context, x, y, color) {
-    // draw outline
-    context.fillStyle = "rgb(200 200 200)";
-    context.fillRect(x, y, PIXELS_PER_TILE, PIXELS_PER_TILE);
+        context.fillStyle = this.#color;
+        context.fillRect(this.#x, this.#y + offset, PIXELS_PER_TILE, PIXELS_PER_TILE);
+    }
 
-    drawInnerTile(context, x, y, color);
-}
+    drawFloor(context) {
+        // draw outline
+        context.fillStyle = "rgb(200 200 200)";
+        context.fillRect(this.#x, this.#y, PIXELS_PER_TILE, PIXELS_PER_TILE);
 
-function drawPit(context, x, y, color) {
-    context.fillStyle = "black";
-    context.fillRect(x, y, PIXELS_PER_TILE, PIXELS_PER_TILE / 3);
+        this.#drawInnerTile(context, 0);
+    }
 
-    context.fillStyle = color;
-    context.fillRect(x, y + PIXELS_PER_TILE / 3, PIXELS_PER_TILE, PIXELS_PER_TILE);
-}
+    drawWall(context) {
+        const offset = PIXELS_PER_TILE / 3;
 
-function drawInnerTile(context, x, y, color) {
-    const offset = 10;
-    context.fillStyle = color;
-    context.fillRect(
-        x + offset, 
-        y + offset,
-        PIXELS_PER_TILE - 2*offset,
-        PIXELS_PER_TILE - 2*offset
-    );
+        // draw outline
+        context.fillStyle = "rgb(100, 100, 100)";
+        context.fillRect(this.#x, this.#y - offset, PIXELS_PER_TILE, PIXELS_PER_TILE + offset);
+        
+        this.#drawInnerTile(context, -offset);
+    }
+
+    #drawInnerTile(context, yOffset) {
+        const offset = 10;
+        context.fillStyle = this.#color;
+        context.fillRect(
+            this.#x + offset, 
+            this.#y + offset + yOffset,
+            PIXELS_PER_TILE - 2*offset,
+            PIXELS_PER_TILE - 2*offset
+        );
+    }
 }

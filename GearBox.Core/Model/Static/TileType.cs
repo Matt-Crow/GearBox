@@ -1,11 +1,9 @@
-using GearBox.Core.Model.Json;
-
 namespace GearBox.Core.Model.Static;
 
 /// <summary>
 /// defines one type of tile which may exist on a map
 /// </summary>
-public class TileType : ISerializable<TileTypeJson>
+public class TileType
 {
     public TileType(Color color, TileHeight height)
     {
@@ -15,9 +13,4 @@ public class TileType : ISerializable<TileTypeJson>
 
     public Color Color { get; init; }
     public TileHeight Height { get; init; }
-
-    public TileTypeJson ToJson()
-    {
-        return new TileTypeJson(Color.ToJson(), Height.Height);
-    }
 }

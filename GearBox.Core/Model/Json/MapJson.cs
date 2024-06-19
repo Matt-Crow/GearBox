@@ -7,9 +7,9 @@ public readonly struct MapJson : IJson
     public MapJson(
         int width,
         int height,
-        List<TileSetJson> pits,
-        List<TileSetJson> floors,
-        List<TileSetJson> walls)
+        List<TileJson> pits,
+        List<TileJson> floors,
+        List<TileJson> walls)
     {
         Width = width;
         Height = height;
@@ -20,7 +20,7 @@ public readonly struct MapJson : IJson
 
     public int Width { get; init; }
     public int Height { get; init; }
-    public List<TileSetJson> Pits { get; init; }
-    public List<TileSetJson> Floors { get; init; }
-    public List<TileSetJson> Walls { get; init; }
+    public List<TileJson> Pits { get; init; }
+    public List<TileJson> Floors { get; init; }
+    public List<TileJson> Walls { get; init; }
 }

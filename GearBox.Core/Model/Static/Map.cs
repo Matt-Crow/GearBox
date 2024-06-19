@@ -254,29 +254,27 @@ public class Map : ISerializable<MapJson>
         }
         return null;
     }
+    
     public MapJson ToJson()
     {
-        var tileTypeToTiles = _tileTypes.ToDictionary(e => e.Value, _ => new List<CoordinateJson>());
+        var tilesByHeight = new Dictionary<TileHeight, List<TileJson>>()
+        {
+            { TileHeight.PIT, []},
+            { TileHeight.FLOOR, []},
+            { TileHeight.WALL, []}
+        };
         for (var iter = new TileIterator(this); !iter.Done; iter.Next())
         {
             var tile = iter.Current;
-            tileTypeToTiles[tile.TileType].Add(new CoordinateJson(tile.LeftInPixels, tile.TopInPixels));
+            tilesByHeight[tile.TileType.Height].Add(new TileJson(tile.TileType.Color.ToJson(), tile.LeftInPixels, tile.TopInPixels));
         }
-        var pits = GetTileSetsByHeight(tileTypeToTiles, TileHeight.PIT, cs => cs.OrderByDescending(c => c.Y)); // need to draw pits bottom to top
-        var floors = GetTileSetsByHeight(tileTypeToTiles, TileHeight.FLOOR, cs => cs);
-        var walls = GetTileSetsByHeight(tileTypeToTiles, TileHeight.WALL, cs => cs.OrderBy(c => c.Y)); // need to draw walls top to bottom
-        return new MapJson(Width.InPixels, Height.InPixels, pits, floors, walls);
-    }
-
-    private static List<TileSetJson> GetTileSetsByHeight(Dictionary<TileType, List<CoordinateJson>> tileTypeToTiles, TileHeight height, Func<IEnumerable<CoordinateJson>, IEnumerable<CoordinateJson>> sort)
-    {
-        var result = tileTypeToTiles
-            .Where(e => e.Key.Height == height)
-            .Select(e => new TileSetJson(
-                e.Key.ToJson(),
-                sort(e.Value).ToList()
-            ))
+        var pits = tilesByHeight[TileHeight.PIT]
+            .OrderByDescending(t => t.Y) // need to draw pits bottom to top
             .ToList();
-        return result;
+        var floors = tilesByHeight[TileHeight.FLOOR];
+        var walls = tilesByHeight[TileHeight.WALL]
+            .OrderBy(t => t.Y) // need to draw walls top to bottom
+            .ToList();
+        return new MapJson(Width.InPixels, Height.InPixels, pits, floors, walls);
     }
 }
