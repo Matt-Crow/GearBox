@@ -15,9 +15,9 @@ public class Projectile : IGameObject
     private double _distanceTraveledInPixels = 0;
     private bool _terminating; 
 
-    public Projectile(Coordinates coordinates, Velocity velocity, Distance range, Attack attack)
+    public Projectile(Coordinates coordinates, Velocity velocity, Distance range, Attack attack, Color color)
     {
-        Body = new()
+        Body = new(Distance.FromTiles(0.25))
         {
             Location = coordinates
         };
@@ -28,12 +28,14 @@ public class Projectile : IGameObject
         _range = range;
         Serializer = new("projectile", Serialize);
         Termination = new(this, () => _terminating || _range.InPixels <= _distanceTraveledInPixels);
+        Color = color;
     }
 
 
     public Serializer Serializer { get; init; }
     public BodyBehavior Body { get; init; }
     public TerminateBehavior Termination { get; init; }
+    private Color Color { get; init; }
     
 
     private void HandleCollision(object? sender, CollideEventArgs e)
@@ -60,7 +62,10 @@ public class Projectile : IGameObject
     {
         var json = new ProjectileJson(
             Body.Location.XInPixels, 
-            Body.Location.YInPixels
+            Body.Location.YInPixels,
+            Body.Radius.InPixels,
+            _mobility.Velocity.Angle.BearingInDegrees,
+            Color.ToJson()
         );
         return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
     }

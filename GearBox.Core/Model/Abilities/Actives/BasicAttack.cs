@@ -34,7 +34,8 @@ public class BasicAttack
             _user.Coordinates, 
             Velocity.FromPolar(Speed.FromTilesPerSecond(Range.Range.InTiles), inDirection),
             Range.Range,
-            attack
+            attack,
+            Range.ProjectileColor
         );
         inWorld.GameObjects.AddGameObject(projectile);
         _cooldownInFrames = Duration.FromSeconds(0.5).InFrames;

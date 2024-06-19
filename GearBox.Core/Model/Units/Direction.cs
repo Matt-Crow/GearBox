@@ -2,7 +2,6 @@ namespace GearBox.Core.Model.Units;
 
 public readonly struct Direction
 {
-    private readonly int _bearingInDegrees;
     private readonly double _bearingInRadians;
 
     public static readonly Direction UP = FromBearingDegrees(0);
@@ -17,8 +16,8 @@ public readonly struct Direction
         {
             bearingInDegrees += 360;
         }
-        _bearingInDegrees = bearingInDegrees % 360;
-        _bearingInRadians = Math.PI * _bearingInDegrees / 180;
+        BearingInDegrees = bearingInDegrees % 360;
+        _bearingInRadians = Math.PI * BearingInDegrees / 180;
     }
 
     public static Direction FromBearingDegrees(int degrees)
@@ -29,12 +28,12 @@ public readonly struct Direction
     public static int DegreesBetween(Direction a, Direction b)
     {
         // make life easier by ensuring a < b
-        if (a._bearingInDegrees > b._bearingInDegrees)
+        if (a.BearingInDegrees > b.BearingInDegrees)
         {
             return DegreesBetween(b, a);
         }
         
-        var degrees = b._bearingInDegrees - a._bearingInDegrees;
+        var degrees = b.BearingInDegrees - a.BearingInDegrees;
 
         /*
             You can get from one angle to another by going either clockwise or
@@ -76,7 +75,7 @@ public readonly struct Direction
                 thus c = (a+b)/2
         */
 
-        var degrees = (a._bearingInDegrees + b._bearingInDegrees)/2;
+        var degrees = (a.BearingInDegrees + b.BearingInDegrees)/2;
 
         /*
             There are always 2 angles between a & b and of equal distance from
@@ -84,7 +83,7 @@ public readonly struct Direction
             (c') satisfy those requirements, so we need to check whether we've
             found c or c'
         */
-        if (Math.Abs(a._bearingInDegrees - degrees) > 90)
+        if (Math.Abs(a.BearingInDegrees - degrees) > 90)
         {
             // we've found c', so convert to c
             degrees -= 180;
@@ -122,7 +121,7 @@ public readonly struct Direction
                 and |b - c| = c - b = a - c
                 thus b = 2c - a
         */
-        var degrees = 2*c._bearingInDegrees - a._bearingInDegrees;
+        var degrees = 2*c.BearingInDegrees - a.BearingInDegrees;
         return FromBearingDegrees(degrees);
     }
 
@@ -136,9 +135,10 @@ public readonly struct Direction
         return FromBearingDegrees((int)bearingDegrees);
     }
 
-    public double XMultiplier { get => Math.Cos(Math.PI/2 - _bearingInRadians); }
-    public double YMultiplier { get => -Math.Sin(Math.PI/2 - _bearingInRadians); }
-    public bool IsCardinal { get => _bearingInDegrees % 90 == 0; }
+    public int BearingInDegrees { get; init; }
+    public double XMultiplier => Math.Cos(Math.PI/2 - _bearingInRadians);
+    public double YMultiplier => -Math.Sin(Math.PI/2 - _bearingInRadians);
+    public bool IsCardinal => BearingInDegrees % 90 == 0;
 
     public bool IsOrthogonalTo(Direction other)
     {
