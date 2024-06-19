@@ -46,14 +46,20 @@ export class LootChest {
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
     draw(context) {
-        const radius = PIXELS_PER_TILE / 2;
-        const small = PIXELS_PER_TILE / 20;
         context.fillStyle = "brown";
-        context.fillRect(
-            this.#x - radius + small, 
-            this.#y - radius + small, 
-            PIXELS_PER_TILE - small*2, 
-            PIXELS_PER_TILE - small*2
-        );
+        
+        // draw pentagon
+        // https://stackoverflow.com/a/36530121
+        const dt = 2*Math.PI / 5;
+        const radius = PIXELS_PER_TILE / 2;
+        context.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const theta = Math.PI/2 + dt*i;
+            context.lineTo(
+                this.#x - radius*Math.cos(theta),
+                this.#y - radius*Math.sin(theta)
+            );
+        }
+        context.fill();
     }
 }
