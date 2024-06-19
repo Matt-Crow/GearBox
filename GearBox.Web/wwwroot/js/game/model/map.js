@@ -1,5 +1,5 @@
 import { PIXELS_PER_TILE } from "./constants.js";
-import { TileType, deserializeTileTypeJson } from "./tileType.js";
+import { TileType } from "./tileType.js";
 
 // avoids conflicts with build-in JS Map class
 export class WorldMap {
@@ -33,24 +33,27 @@ export class WorldMap {
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
     draw(context) {
-        this.#tileMap.forEach((row, yIdx) => {
+        // BUG: needs to draw other tile heights after pits
+        // need to draw bottom to top so pits render correctly
+        for (let yIdx = this.#tileMap.length - 1; yIdx >= 0; yIdx--) {
+            const row = this.#tileMap[yIdx];
             row.forEach((tileTypeIdx, xIdx) => {
                 const tileType = this.#tileTypes.get(tileTypeIdx);
                 tileType.drawAt(context, xIdx * PIXELS_PER_TILE, yIdx * PIXELS_PER_TILE);
-            })
-        });
+            });
+        }
     }
 }
 
 /**
  * 
- * @param {{tileTypes: {key: number, value: {color: {red: number, green: number, blue: number}, isTangible: boolean}}[], tileMap: number[][]}} obj 
+ * @param {object} obj 
  * @returns {WorldMap}
  */
 export function deserializeMapJson(obj) {
     const tileTypes = new Map();
     obj.tileTypes.forEach(tileType => {
-        tileTypes.set(tileType.key, deserializeTileTypeJson(tileType.value));
+        tileTypes.set(tileType.key, TileType.FromJson(tileType.value));
     });
 
     return new WorldMap(obj.tileMap, tileTypes);

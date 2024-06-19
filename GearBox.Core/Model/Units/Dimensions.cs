@@ -6,7 +6,7 @@ public readonly struct Dimensions
     private readonly Distance _height;
 
 
-    private Dimensions(Distance width, Distance height)
+    public Dimensions(Distance width, Distance height)
     {
         _width = width;
         _height = height;

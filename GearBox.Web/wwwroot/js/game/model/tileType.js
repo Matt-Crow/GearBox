@@ -2,15 +2,15 @@ import { PIXELS_PER_TILE } from "./constants.js";
 
 export class TileType {
     #color;
-    #isTangible;
+    #draw;
 
     /**
      * @param {string} color the CSS color of this tile type
-     * @param {boolean} isTangible whether this tile type is tangible
+     * @param {(CanvasRenderingContext2D, number, number, string) => none} draw 
      */
-    constructor(color, isTangible) {
+    constructor(color, draw) {
         this.#color = color;
-        this.#isTangible = isTangible;
+        this.#draw = draw;
     }
 
     /**
@@ -20,35 +20,60 @@ export class TileType {
      * @param {number} y the y-coodinate, in pixels, of the upper-left corner 
      */
     drawAt(context, x, y) {
-        // draw outline
-        const grey = (this.#isTangible) ? 100 : 200;
-        context.fillStyle = `rgb(${grey} ${grey} ${grey})`;
-        context.fillRect(x, y, PIXELS_PER_TILE, PIXELS_PER_TILE);
+        this.#draw(context, x, y, this.#color);
+    }
 
-        // draw inner portion
-        const offset = 10;
-        context.fillStyle = this.#color;
-        context.fillRect(
-            x + offset, 
-            y + offset,
-            PIXELS_PER_TILE - 2*offset,
-            PIXELS_PER_TILE - 2*offset
-        );
+    static FromJson(json) {
+        const r = json.color.red;
+        const g = json.color.green;
+        const b = json.color.blue;
+        const color = `rgb(${r} ${g} ${b})`; // CSS color doesn't use commas
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
+
+        let draw = () => {throw new Error("Not implemented")};
+        if (json.height > 0) {
+            draw = drawWall;
+        } else if (json.height < 0) {
+            draw = drawPit;
+        } else { // json.height === 0
+            draw = drawFloor;
+        }
+
+        return new TileType(color, draw);
     }
 }
 
+function drawWall(context, x, y, color) {
+    // draw outline
+    context.fillStyle = "rgb(100, 100, 100)";
+    context.fillRect(x, y, PIXELS_PER_TILE, PIXELS_PER_TILE);
+    
+    drawInnerTile(context, x, y, color);
+}
 
-/**
- * 
- * @param {{color: {red: number, green: number, blue: number}, isTangible: boolean}} obj 
- * @returns {TileType}
- */
-export function deserializeTileTypeJson(obj) {
-    const r = obj.color.red;
-    const g = obj.color.green;
-    const b = obj.color.blue;
-    const color = `rgb(${r} ${g} ${b})`; // CSS color doesn't use commas
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
+function drawFloor(context, x, y, color) {
+    // draw outline
+    context.fillStyle = "rgb(200 200 200)";
+    context.fillRect(x, y, PIXELS_PER_TILE, PIXELS_PER_TILE);
 
-    return new TileType(color, obj.isTangible);
+    drawInnerTile(context, x, y, color);
+}
+
+function drawPit(context, x, y, color) {
+    context.fillStyle = "black";
+    context.fillRect(x, y, PIXELS_PER_TILE, PIXELS_PER_TILE / 3);
+
+    context.fillStyle = color;
+    context.fillRect(x, y + PIXELS_PER_TILE / 3, PIXELS_PER_TILE, PIXELS_PER_TILE);
+}
+
+function drawInnerTile(context, x, y, color) {
+    const offset = 10;
+    context.fillStyle = color;
+    context.fillRect(
+        x + offset, 
+        y + offset,
+        PIXELS_PER_TILE - 2*offset,
+        PIXELS_PER_TILE - 2*offset
+    );
 }

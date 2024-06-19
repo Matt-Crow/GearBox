@@ -95,7 +95,7 @@ public class World
     public void SpawnLootChest()
     {
         var inventory = _loot.GetRandomItems();
-        var location = Map.GetRandomOpenTile();
+        var location = Map.FindRandomFloorTile();
         if (location != null)
         {
             var lootChest = new LootChest(location.Value.CenteredOnTile(), inventory);
@@ -112,7 +112,7 @@ public class World
         enemy.World = this;
         enemy.Team = _enemyTeam;
         
-        var tile = Map.GetRandomOpenTile() ?? throw new Exception("Map has no open tiles");
+        var tile = Map.FindRandomFloorTile() ?? throw new Exception("Map has no open tiles");
         enemy.Coordinates = tile.CenteredOnTile();
 
         GameObjects.AddGameObject(enemy);
@@ -142,10 +142,18 @@ public class World
         GameObjects.Update();
         foreach (var obj in GameObjects.GameObjects)
         {
+            // todo move Projectiles to their own list
+            if (obj is Projectile projectile)
+            {
+                Map.CheckForCollisions(projectile);
+            } else if (obj.Body != null)
+            {
+                Map.CheckForCollisions(obj.Body);
+            }
+
             var body = obj.Body;
             if (body is not null)
             {
-                Map.CheckForCollisions(body);
                 GameObjects.CheckForCollisions(body);
             }
         }

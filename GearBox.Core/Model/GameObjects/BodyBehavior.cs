@@ -60,6 +60,13 @@ public class BodyBehavior
         return withinX && withinY;
     }
 
+    public bool IsWithin(Dimensions dimensions)
+    {
+        var withinX = LeftInPixels >= 0 && RightInPixels <= dimensions.WidthInPixels;
+        var withinY = TopInPixels >= 0 && BottomInPixels <= dimensions.HeightInPixels;
+        return withinX && withinY;
+    }
+
     public void OnCollided(CollideEventArgs args)
     {
         Collided?.Invoke(this, args);

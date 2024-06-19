@@ -13,7 +13,7 @@ public class Projectile : IGameObject
     private readonly Distance _range;
     private readonly Attack _attack;
     private double _distanceTraveledInPixels = 0;
-    private bool _hasCollided; 
+    private bool _terminating; 
 
     public Projectile(Coordinates coordinates, Velocity velocity, Distance range, Attack attack)
     {
@@ -27,7 +27,7 @@ public class Projectile : IGameObject
         _mobility.StartMovingIn(velocity.Angle); // MobileBehavior defaults to not moving
         _range = range;
         Serializer = new("projectile", Serialize);
-        Termination = new(this, () => _hasCollided || _range.InPixels <= _distanceTraveledInPixels);
+        Termination = new(this, () => _terminating || _range.InPixels <= _distanceTraveledInPixels);
     }
 
 
@@ -38,11 +38,16 @@ public class Projectile : IGameObject
 
     private void HandleCollision(object? sender, CollideEventArgs e)
     {
-        if (!_hasCollided && _attack.CanResolveAgainst(e.CollidedWith))
+        if (!_terminating && _attack.CanResolveAgainst(e.CollidedWith))
         {
             _attack.HandleCollision(sender, e);
-            _hasCollided = true;
+            _terminating = true;
         }
+    }
+
+    public void Terminate()
+    {
+        _terminating = true;
     }
     
     public void Update()

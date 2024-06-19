@@ -60,7 +60,7 @@ public class WorldServer
         }
 
         var player = new PlayerCharacter("The Player"); // will eventually read from repo
-        var spawnLocation = _world.Map.GetRandomOpenTile()
+        var spawnLocation = _world.Map.FindRandomFloorTile()
             ?? throw new Exception("Failed to find open tile. This should not happen.");
         player.Coordinates = spawnLocation.CenteredOnTile();
 

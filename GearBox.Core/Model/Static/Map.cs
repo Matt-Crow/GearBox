@@ -10,9 +10,8 @@ namespace GearBox.Core.Model.Static;
 /// </summary>
 public class Map : ISerializable<MapJson>
 {
-    // maybe don't even need more than just tangible & intangible colors
     private readonly int[,] _tileMap;
-    private readonly Dictionary<int, TileType> _tileTypes = new();
+    private readonly Dictionary<int, TileType> _tileTypes = [];
 
 
     public Map() : this(Dimensions.InTiles(20)) 
@@ -33,7 +32,7 @@ public class Map : ISerializable<MapJson>
             throw new ArgumentException("height must be positive");
         }
         _tileMap = new int[height, width]; // initializes all to 0
-        _tileTypes[0] = TileType.Intangible(Color.BLUE);
+        _tileTypes[0] = new TileType(Color.BLUE, TileHeight.FLOOR);
     }
 
 
@@ -44,17 +43,6 @@ public class Map : ISerializable<MapJson>
     public Map SetTileTypeForKey(int key, TileType value)
     {
         _tileTypes[key] = value;
-        return this;
-    }
-
-    public Map SetTileAt(Coordinates coordinates, TileType tileType)
-    {
-        if (!_tileTypes.ContainsValue(tileType))
-        {
-            throw new ArgumentException("unsupported tile type");
-        }
-        var i = _tileTypes.FirstOrDefault(x => x.Value == tileType).Key;
-        SetTileAt(coordinates, i);
         return this;
     }
 
@@ -131,7 +119,17 @@ public class Map : ISerializable<MapJson>
     public void CheckForCollisions(BodyBehavior body)
     {
         KeepInBounds(body);
-        ShoveOutOfTiles(body);
+        ForEachCollidingWallTile(body, h => h != TileHeight.FLOOR, t => t.ShoveOut(body));
+    }
+
+    public void CheckForCollisions(Projectile projectile)
+    {
+        if (!projectile.Body.IsWithin(new Dimensions(Width, Height)))
+        {
+            projectile.Terminate();
+            return;
+        }
+        ForEachCollidingWallTile(projectile.Body, h => h == TileHeight.WALL, _ => projectile.Terminate());
     }
 
     private void KeepInBounds(BodyBehavior body)
@@ -154,7 +152,7 @@ public class Map : ISerializable<MapJson>
         }
     }
 
-    private void ShoveOutOfTiles(BodyBehavior body)
+    private void ForEachCollidingWallTile(BodyBehavior body, Predicate<TileHeight> filter,  Action<Tile> doThis)
     {
         if (body.Radius.InPixels * 2 > Distance.FromTiles(1).InPixels)
         {
@@ -183,23 +181,23 @@ public class Map : ISerializable<MapJson>
         for (var iter = new TileIterator(this, upperLeftTile, Dimensions.InTiles(2)); !iter.Done; iter.Next())
         {
             var tile = iter.Current;
-            if (tile.TileType.IsTangible && tile.IsCollidingWith(body))
+            if (filter(tile.TileType.Height) && tile.IsCollidingWith(body))
             {
-                tile.ShoveOut(body);
+                doThis(tile);
             }
         }
     }
 
-    public Coordinates? GetRandomOpenTile()
+    public Coordinates? FindRandomFloorTile()
     {
         var random = new Random();
         var x = random.Next(Width.InTiles);
         var y = random.Next(Height.InTiles);
         var source = Coordinates.FromTiles(x, y);
-        return GetOpenTileAround(source);
+        return FindFloorTileAround(source);
     }
 
-    private Coordinates? GetOpenTileAround(Coordinates source, int searchRadius=0)
+    private Coordinates? FindFloorTileAround(Coordinates source, int searchRadius=0)
     {
         /*
             recursively search squares of tiles around a source
@@ -236,19 +234,19 @@ public class Map : ISerializable<MapJson>
         }
         
         Coordinates? found = null;
-        found ??= SearchForOpenTileAlongLine(upperL, upperR, 1, 0); // right across the top
-        found ??= SearchForOpenTileAlongLine(upperR, lowerR, 0, 1); // down the right
-        found ??= SearchForOpenTileAlongLine(lowerR, lowerL, -1, 0); // left across the bottom
-        found ??= SearchForOpenTileAlongLine(lowerL, upperL, 0, -1); // up the left
+        found ??= FindFloorTileAlongLine(upperL, upperR, 1, 0); // right across the top
+        found ??= FindFloorTileAlongLine(upperR, lowerR, 0, 1); // down the right
+        found ??= FindFloorTileAlongLine(lowerR, lowerL, -1, 0); // left across the bottom
+        found ??= FindFloorTileAlongLine(lowerL, upperL, 0, -1); // up the left
 
-        return found ?? GetOpenTileAround(source, searchRadius + 1);
+        return found ?? FindFloorTileAround(source, searchRadius + 1);
     }
 
-    private Coordinates? SearchForOpenTileAlongLine(Coordinates start, Coordinates end, int dx, int dy)
+    private Coordinates? FindFloorTileAlongLine(Coordinates start, Coordinates end, int dx, int dy)
     {
         for (var curr = start; !curr.Equals(end); curr = curr.PlusTiles(dx, dy))
         {
-            if (IsValid(curr) && !GetTileAt(curr).IsTangible)
+            if (IsValid(curr) && GetTileAt(curr).Height == TileHeight.FLOOR)
             {
                 return curr;
             }

@@ -183,10 +183,10 @@ public class WorldBuilder
             {3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2}
         };
         _map = new Map(Dimensions.InTiles(20))
-            .SetTileTypeForKey(0, TileType.Intangible(Color.TAN))
-            .SetTileTypeForKey(1, TileType.Tangible(Color.GRAY))
-            .SetTileTypeForKey(2, TileType.Tangible(Color.BLUE)) // water
-            .SetTileTypeForKey(3, TileType.Intangible(Color.LIGHT_GREEN)) // plants
+            .SetTileTypeForKey(0, new(Color.TAN, TileHeight.FLOOR))
+            .SetTileTypeForKey(1, new(Color.GRAY, TileHeight.WALL))
+            .SetTileTypeForKey(2, new(Color.BLUE, TileHeight.PIT)) // water
+            .SetTileTypeForKey(3, new(Color.LIGHT_GREEN, TileHeight.FLOOR)) // plants
             .SetTilesFrom(csv);
         return this;
     }
