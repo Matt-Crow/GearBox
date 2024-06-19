@@ -1,13 +1,19 @@
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
-import { PIXELS_PER_TILE } from "./constants.js";
+import { getColorStringFromJson } from "./color.js";
 
 export class Projectile {
     #x;
     #y;
+    #radius;
+    #bearingInDegrees;
+    #color;
 
-    constructor(x, y) {
+    constructor(x, y, radius, bearingInDegrees, color) {
         this.#x = x;
         this.#y = y;
+        this.#radius = radius;
+        this.#bearingInDegrees = bearingInDegrees;
+        this.#color = color;
     }
 
     get x() { return this.#x; }
@@ -17,18 +23,31 @@ export class Projectile {
      * @param {CanvasRenderingContext2D} context 
      */
     draw(context) {
-        const r = PIXELS_PER_TILE / 2;
-        context.fillStyle = "red";
+        const r = this.#radius;
+        context.fillStyle = this.#color;
 
-        // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/arc
+        // draw a triangle
+        const theta = (90 - this.#bearingInDegrees)*Math.PI / 180;
+        const dt = 2*Math.PI / 3;
         context.beginPath();
-        context.arc(this.#x, this.#y, r, 0, 2*Math.PI);
+        for (let i = 0; i < 3; i++) {
+            context.lineTo(
+                this.#x + r*Math.cos(theta+i*dt),
+                this.#y - r*Math.sin(theta+i*dt)
+            );
+        }
         context.fill();
     }
 }
 
 export class ProjectileJsonDeserializer extends JsonDeserializer {
     constructor() {
-        super("projectile", obj => new Projectile(obj.x, obj.y));
+        super("projectile", obj => new Projectile(
+            obj.x, 
+            obj.y, 
+            obj.radius, 
+            obj.bearingInDegrees, 
+            getColorStringFromJson(obj.color)
+        ));
     }
 }

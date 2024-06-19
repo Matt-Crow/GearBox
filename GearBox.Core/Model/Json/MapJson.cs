@@ -1,13 +1,26 @@
+using GearBox.Core.Model.Json.WorldInit;
+
 namespace GearBox.Core.Model.Json;
 
 public readonly struct MapJson : IJson
 {
-    public MapJson(List<List<int>> tileMap, List<KeyValueJson<int, TileTypeJson>> tileTypes)
+    public MapJson(
+        int width,
+        int height,
+        List<TileJson> pits,
+        List<TileJson> floors,
+        List<TileJson> walls)
     {
-        TileMap = tileMap;
-        TileTypes = tileTypes;
+        Width = width;
+        Height = height;
+        Pits = pits;
+        Floors = floors;
+        Walls = walls;
     }
 
-    public List<List<int>> TileMap { get; init; }
-    public List<KeyValueJson<int, TileTypeJson>> TileTypes { get; init; }
+    public int Width { get; init; }
+    public int Height { get; init; }
+    public List<TileJson> Pits { get; init; }
+    public List<TileJson> Floors { get; init; }
+    public List<TileJson> Walls { get; init; }
 }

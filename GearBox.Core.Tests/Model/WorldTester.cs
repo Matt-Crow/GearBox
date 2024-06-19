@@ -1,5 +1,6 @@
 using GearBox.Core.Model;
-using GearBox.Core.Tests.Model.Dynamic;
+using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Tests.Model.GameObjects;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model;
@@ -23,11 +24,11 @@ public class WorldTester
     }
 
     [Fact]
-    public void UpdateForwardsToAllDynamicObjects()
+    public void Update_GivenGameObjectsInWorld_ForwardsToThem()
     {
-        var spy = new DynamicGameObjectSpy();
+        var spy = new GameObjectSpy();
         var sut = new World();
-        sut.DynamicContent.AddDynamicObject(spy);
+        sut.GameObjects.AddGameObject(spy);
         sut.Update();
         Assert.True(spy.HasBeenUpdated);
     }
@@ -46,5 +47,18 @@ public class WorldTester
         var sut = new World();
         var actual = sut.SpawnEnemy();
         Assert.NotNull(actual);
+    }
+
+    [Fact]
+    public void Add_GivenSamePlayerTwice_OnlyAddsOnce()
+    {
+        var sut = new World();
+        var player = new PlayerCharacter("foo");
+
+        sut.SpawnPlayer(player);
+        sut.SpawnPlayer(player);
+        sut.Update(); // apply changes
+
+        Assert.Single(sut.GameObjects.GameObjects);
     }
 }

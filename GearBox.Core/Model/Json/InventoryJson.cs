@@ -2,14 +2,14 @@ namespace GearBox.Core.Model.Json;
 
 public readonly struct InventoryJson : IJson
 {
-    public InventoryJson(Guid ownerId, InventoryTabJson equipment, InventoryTabJson materials)
+    public InventoryJson(InventoryTabJson weapons, InventoryTabJson armors, InventoryTabJson materials)
     {
-        OwnerId = ownerId;
-        Equipment = equipment;
+        Weapons = weapons;
+        Armors = armors;
         Materials = materials;
     }
 
-    public Guid OwnerId { get; init; }
-    public InventoryTabJson Equipment { get; init; }
+    public InventoryTabJson Weapons { get; init; }
+    public InventoryTabJson Armors { get; init; }
     public InventoryTabJson Materials { get; init; }
 }

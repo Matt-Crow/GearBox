@@ -1,24 +1,23 @@
-import { ChangeHandler, ChangeListener } from "../infrastructure/change.js";
 import { TestCase, TestSuite } from "../testing/tests.js";
 
 export class Inventory {
-    #ownerId;
-    #equipment;
+    #weapons;
+    #armors;
     #materials;
 
     /**
-     * @param {string} ownerId 
-     * @param {Item[]} equipment 
+     * @param {Item[]} weapons 
+     * @param {Item[]} armors 
      * @param {Item[]} materials 
      */
-    constructor(ownerId, equipment=[], materials=[]) {
-        this.#ownerId = ownerId;
-        this.#equipment = equipment;
+    constructor(weapons=[], armors=[], materials=[]) {
+        this.#weapons = weapons;
+        this.#armors = armors;
         this.#materials = materials;
     }
 
-    get ownerId() { return this.#ownerId; }
-    get equipment() { return this.#equipment; }
+    get weapons() { return this.#weapons; }
+    get armors() { return this.#armors; }
     get materials() { return this.#materials; }
 }
 
@@ -33,81 +32,10 @@ export class InventoryDeserializer {
     }
 
     deserialize(json) {
-        const equipment = json.equipment.items.map(x => this.#itemDeserializer.deserialize(x));
+        const weapons = json.weapons.items.map(x => this.#itemDeserializer.deserialize(x));
+        const armors = json.armors.items.map(x => this.#itemDeserializer.deserialize(x));
         const materials = json.materials.items.map(x => this.#itemDeserializer.deserialize(x));
-        return new Inventory(json.ownerId, equipment, materials);
-    }
-}
-
-export class InventoryChangeHandler extends ChangeHandler {
-    #playerId;
-    #deserializer;
-    #changeListeners;
-
-    /**
-     * @param {string} playerId 
-     * @param {InventoryDeserializer} deserializer 
-     * @param  {...ChangeListener} changeListeners 
-     */
-    constructor(playerId, deserializer, ...changeListeners) {
-        super("inventory");
-        this.#playerId = playerId;
-        this.#deserializer = deserializer;
-        this.#changeListeners = changeListeners;
-    }
-
-    handleContent(obj) {
-        if (obj.ownerId != this.#playerId) {
-            return; // don't bother handling changes to other players' inventories
-        }
-        const inventory = this.#deserializer.deserialize(obj);
-        this.#changeListeners.forEach(listener => listener.changed(inventory));
-    }
-
-    handleDelete(obj) {
-        if (obj.ownerId != this.#playerId) {
-            return; // don't bother handling changes to other players' inventories
-        }
-        const inventory = this.#deserializer.deserialize(obj);
-        this.#changeListeners.forEach(listener => listener.removed(inventory));
-    }
-}
-
-export class EquippedWeaponChangeHandler extends ChangeHandler {
-    #playerId;
-    #deserializer;
-    #changeListeners;
-
-    /**
-     * @param {string} playerId 
-     * @param {ItemDeserializer} deserializer 
-     * @param  {...ChangeListener} changeListeners 
-     */
-    constructor(playerId, deserializer, ...changeListeners) {
-        super("equippedWeapon");
-        this.#playerId = playerId;
-        this.#deserializer = deserializer;
-        this.#changeListeners = changeListeners;
-    }
-
-    handleContent(obj) {
-        if (obj.ownerId != this.#playerId) {
-            return;
-        }
-        const weapon = obj.value
-            ? this.#deserializer.deserialize(obj.value) // obj.value - see EquipmentSlotJson
-            : null;
-        this.#changeListeners.forEach(listener => listener.changed(weapon));
-    }
-
-    handleDelete(obj) {
-        if (obj.ownerId != this.#playerId) {
-            return;
-        }
-        const weapon = obj.value
-            ? this.#deserializer.deserialize(obj.value)
-            : null;
-        this.#changeListeners.forEach(listener => listener.removed(weapon));
+        return new Inventory(weapons, armors, materials);
     }
 }
 

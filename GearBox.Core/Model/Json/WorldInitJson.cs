@@ -7,11 +7,12 @@ namespace GearBox.Core.Model.Json;
 /// </summary>
 public readonly struct WorldInitJson : IJson
 {
-    public WorldInitJson(Guid playerId, MapJson map, List<ItemTypeJson> itemTypes)
+    public WorldInitJson(Guid playerId, MapJson map, List<ItemTypeJson> itemTypes, List<CraftingRecipeJson> craftingRecipes)
     {
         PlayerId = playerId;
         Map = map;
         ItemTypes = itemTypes;
+        CraftingRecipes = craftingRecipes;
     }
 
     /// <summary>
@@ -28,4 +29,9 @@ public readonly struct WorldInitJson : IJson
     /// All the possible item types which can exist in the world.
     /// </summary>
     public List<ItemTypeJson> ItemTypes { get; init; }
+
+    /// <summary>
+    /// All the possible recipes players can craft
+    /// </summary>
+    public List<CraftingRecipeJson> CraftingRecipes { get; init; }
 }

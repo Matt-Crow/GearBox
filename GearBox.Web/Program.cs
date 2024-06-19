@@ -1,4 +1,5 @@
 using GearBox.Core.Model;
+using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 
@@ -6,10 +7,23 @@ var builder = WebApplication.CreateBuilder(args);
 
 var world = new WorldBuilder()
     .AddMiningSkill()
-    .AddStarterWeapons()
+    .AddStarterEquipment()
     .AddDefaultEnemies()
     .WithDesertMap()
     .Build();
+
+// testing LootChests
+world.AddTimer(new WorldTimer(() => world.SpawnLootChest(), 50));
+
+// testing EnemySpawner
+world.GameObjects.AddGameObject(new EnemySpawner(
+    world, 
+    new EnemySpawnerOptions()
+    {
+        WaveSize = 3,
+        MaxChildren = 10
+    }
+));
 
 // Add services to the container.
 builder.Services.AddRazorPages();

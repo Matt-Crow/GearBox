@@ -1,81 +1,57 @@
-import { Change, ChangeHandlers } from "../infrastructure/change.js";
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
-import { Character } from "./character.js";
-import { ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
-import { deserializeMapJson } from "./map.js";
+import { CraftingRecipe, CraftingRecipeDeserializer, CraftingRecipeRepository } from "./crafting.js";
+import { InventoryDeserializer, ItemDeserializer, ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
+import { WorldMap } from "./map.js";
+import { Player, PlayerStatSummary } from "./player.js";
 
 export class World {
     #playerId; // need reference to changing player
     #map;
-    #dynamicGameObjects;
-    #stableGameObjects;
+    #gameObjects;
     #itemTypes;
+    #craftingRecipes;
 
-    constructor(playerId, map, itemTypes) {
+    /**
+     * 
+     * @param {string} playerId 
+     * @param {WorldMap} map 
+     * @param {ItemType[]} itemTypes 
+     * @param {CraftingRecipe[]} craftingRecipes 
+     */
+    constructor(playerId, map, itemTypes, craftingRecipes) {
         this.#playerId = playerId;
         this.#map = map;
-        this.#dynamicGameObjects = [];
-        this.#stableGameObjects = new Map();
+        this.#gameObjects = [];
         this.#itemTypes = new ItemTypeRepository(itemTypes);
+        this.#craftingRecipes = new CraftingRecipeRepository(craftingRecipes);
     }
 
     /**
      * @param {any[]} value
      */
-    set dynamicGameObjects(value) {
-        this.#dynamicGameObjects = value;
-    }
+    set gameObjects(value) { this.#gameObjects = value; }
+
+    get playerId() { return this.#playerId; }
+    get widthInPixels() { return this.#map.widthInPixels; }
+    get heightInPixels() { return this.#map.heightInPixels; }
+    get itemTypes() { return this.#itemTypes; }
+    get craftingRecipes() { return this.#craftingRecipes; }
 
     /**
-     * @returns {Character} the player the client controls
+     * @returns {Player} the player the client controls
      */
     get player() {
-        return this.#dynamicGameObjects.find(obj => obj.id == this.#playerId);
-    }
-
-    /**
-     * @returns {string}
-     */
-    get playerId() {
-        return this.#playerId;
-    }
-
-    /**
-     * @returns {number}
-     */
-    get widthInPixels() {
-        return this.#map.widthInPixels;
-    }
-
-    /**
-     * @returns {number}
-     */
-    get heightInPixels() {
-        return this.#map.heightInPixels;
-    }
-
-    get itemTypes() {
-        return this.#itemTypes;
-    }
-
-    saveStableGameObject(obj) {
-        this.#stableGameObjects.set(obj.id, obj);
-    }
-
-    removeStableGameObject(id) {
-        this.#stableGameObjects.delete(id);
+        return this.#gameObjects.find(obj => obj.id == this.#playerId);
     }
 
     /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
      */
     draw(context) {
-        this.#map.draw(context);
-        this.#dynamicGameObjects.forEach(obj => obj.draw(context));
-        for (const obj of this.#stableGameObjects.values()) {
-            obj.draw(context);
-        }
+        this.#map.drawPitsAndFloor(context);
+        this.#gameObjects.forEach(obj => obj.draw(context));
+        this.#map.drawWalls(context);
     }
 }
 
@@ -87,43 +63,129 @@ export class WorldInitHandler {
      * @returns {World}
      */
     handleWorldInit(obj) {
-        const map = deserializeMapJson(obj.map);
+        const map = WorldMap.fromJson(obj.map);
         const itemTypes = obj.itemTypes.map(deserializeItemTypeJson);
-        const deserialized = new World(obj.playerId, map, itemTypes);
+
+        // need item types to resolve crafting recipes, dependency injection won't work
+        const itemTypeRepository = new ItemTypeRepository(itemTypes);
+        const itemDeserializer = new ItemDeserializer(itemTypeRepository);
+        const craftingRecipeDeserializer = new CraftingRecipeDeserializer(itemDeserializer);
+
+        const craftingRecipes = obj.craftingRecipes.map(x => craftingRecipeDeserializer.deserialize(x));
+        const deserialized = new World(obj.playerId, map, itemTypes, craftingRecipes);
         return deserialized;
     }
 }
 
 export class WorldUpdateHandler {
     #world;
-    #changeHandlers;
-    #deserializers;
+    #inventoryDeserializer;
+    #itemDeserializer;
+    #deserializers = new JsonDeserializers();
+    #updateListeners = [];
+    #inventoryChangeListeners = [];
+    #weaponChangeListeners = [];
+    #armorChangeListeners = [];
+    #statSummaryChangeListeners = [];
 
     /**
      * @param {World} world 
-     * @param {ChangeHandlers} changeHandlers 
+     * @param {ItemDeserializer} itemDeserializer 
      */
-    constructor(world, changeHandlers) {
+    constructor(world, itemDeserializer) {
         this.#world = world;
-        this.#changeHandlers = changeHandlers;
-        this.#deserializers = new JsonDeserializers();
+        this.#inventoryDeserializer = new InventoryDeserializer(itemDeserializer);
+        this.#itemDeserializer = itemDeserializer;
     }
 
     /**
      * @param {JsonDeserializer} deserializer used to deserialize dynamic game objects
      * @returns {WorldUpdateHandler} this, for chaining
      */
-    withDynamicObjectDeserializer(deserializer) {
+    addGameObjectType(deserializer) {
         this.#deserializers.addDeserializer(deserializer);
         return this;
     }
 
-    handleWorldUpdate(obj) {
-        const dynamicGameObjects = obj.gameObjects.map(gameObjectJson => this.#deserialize(gameObjectJson));
-        this.#world.dynamicGameObjects = dynamicGameObjects;
+    /**
+     * @param {(World) => any} updateListener 
+     * @returns {WorldUpdateHandler}
+     */
+    addUpdateListener(updateListener) {
+        this.#updateListeners.push(updateListener);
+        return this;
+    }
+
+    /**
+     * @param {(Inventory) => any} changeListener 
+     * @returns {WorldUpdateHandler}
+     */
+    addInventoryChangeListener(changeListener) {
+        this.#inventoryChangeListeners.push(changeListener);
+        return this;
+    }
+
+    /**
+     * @param {(Item?) => any} changeListener 
+     * @returns {WorldUpdateHandler}
+     */
+    addWeaponChangeListener(changeListener) {
+        this.#weaponChangeListeners.push(changeListener);
+        return this;
+    }
+
+    /**
+     * @param {(Item?) => any} changeListener 
+     * @returns {WorldUpdateHandler}
+     */
+    addArmorChangeListener(changeListener) {
+        this.#armorChangeListeners.push(changeListener);
+        return this;
+    }
+
+    /**
+     * @param {(PlayerStatSummary) => any} changeListener 
+     * @returns {WorldUpdateHandler}
+     */
+    addStatSummaryChangeListener(changeListener) {
+        this.#statSummaryChangeListeners.push(changeListener);
+        return this;
+    }
+
+    handleWorldUpdate(json) {
+        const newGameObject = json.gameObjects
+            .map(gameObjectJson => this.#deserialize(gameObjectJson))
+            .filter(obj => obj !== null);
+        this.#world.gameObjects = newGameObject;
         
-        const changes = obj.changes.map(json => Change.fromJson(json));
-        changes.forEach(change => this.#changeHandlers.handle(change));
+        this.#updateListeners.forEach(listener => listener(this.#world));
+
+        if (json.inventory.hasChanged) {
+            const inventory = this.#inventoryDeserializer.deserialize(JSON.parse(json.inventory.body));
+            this.#inventoryChangeListeners.forEach(listener => listener(inventory));
+        }
+
+        if (json.weapon.hasChanged) {
+            const maybeWeapon = JSON.parse(json.weapon.body);
+            const weapon = maybeWeapon
+                ? this.#itemDeserializer.deserialize(maybeWeapon)
+                : null;
+            this.#weaponChangeListeners.forEach(listener => listener(weapon));
+        }
+
+        if (json.armor.hasChanged) {
+            const maybeArmor = JSON.parse(json.armor.body);
+            const armor = maybeArmor
+                ? this.#itemDeserializer.deserialize(maybeArmor)
+                : null;
+            this.#armorChangeListeners.forEach(listener => listener(armor));
+        }
+
+        if (json.statSummary.hasChanged) {
+            const statSummaryJson = JSON.parse(json.statSummary.body);
+            const statSummary = PlayerStatSummary.fromJson(statSummaryJson);
+            this.#statSummaryChangeListeners.forEach(listener => listener(statSummary));
+        }
     }
 
     #deserialize(gameObjectJson) {

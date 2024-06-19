@@ -1,14 +1,19 @@
-import { ChangeListener } from "../infrastructure/change.js";
 import { Client } from "../infrastructure/client.js";
+import { CraftingRecipe } from "../model/crafting.js";
 import { Inventory, Item } from "../model/item.js";
+import { PlayerStatSummary } from "../model/player.js";
+import { EquipmentTab } from "./equipmentTab.js";
+import { ItemDisplay } from "./itemDisplay.js";
+import { ActionColumn, DataColumn, Table } from "./table.js";
 
 export class InventoryModal {
     #modal;
-    #materialRows;
-    #equipmentRows;
-    #inventoryChangeListener;
-    #weaponChangeListener;
+    #materialTable;
+    #recipeTable;
     #client;
+    #craftPreview;
+    #weaponTab;
+    #armorTab;
 
     /**
      * @param {HTMLDialogElement} modal
@@ -16,23 +21,29 @@ export class InventoryModal {
      */
     constructor(modal, client) {
         this.#modal = modal;
-        this.#materialRows = document.querySelector("#materialRows");
-        this.#equipmentRows = document.querySelector("#equipmentRows");
-        this.#inventoryChangeListener = new ChangeListener({
-            onChanged: (inventory) => this.#setInventory(inventory),
-            onRemoved: () => this.#clear() 
-        });
-        this.#weaponChangeListener = new ChangeListener({
-            onChanged: (weapon) => this.#setWeapon(weapon),
-            onRemoved: () => this.#setWeapon(null)
-        });
-        this.#client = client;
-        this.#setWeapon(null);
-        this.#setCompareWeapon(null);
-    }
 
-    get inventoryChangeListener() { return this.#inventoryChangeListener; }
-    get weaponChangeListener() { return this.#weaponChangeListener; }
+        this.#materialTable = new Table("#materials", [
+            new DataColumn("Type", m => m.type.name),
+            new DataColumn("Description", m => m.description),
+            new DataColumn("Quantity", m => m.quantity)
+        ], _ => null); // do nothing on hover
+        this.#materialTable.spawnHtml();
+        
+        this.#recipeTable = new Table("#recipes", [
+            new DataColumn("Recipe", r => r.makes.type.name),
+            new DataColumn("Ingredients", r => r.ingredients.map(i => `${i.type.name} x${i.quantity}`).join(", ")),
+            new ActionColumn("Action", "craft", r => this.#client.craft(r.id))
+        ], r => this.#setCraftPreview(r?.makes));
+        this.#recipeTable.spawnHtml();
+
+        this.#client = client;
+        this.#craftPreview = new ItemDisplay("#craftPreview", "Preview", "Hover over a craft button to preview")
+            .spawnHtml();
+        this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equipWeapon(id));
+        this.#armorTab = new EquipmentTab("#armorTab", id => client.equipArmor(id));
+
+        this.setWeapon(null);
+    }
 
     toggle() {
         if (this.#modal.open) {
@@ -42,126 +53,49 @@ export class InventoryModal {
         }
     }
 
-    #clear() {
-        this.#materialRows.replaceChildren();
-        this.#equipmentRows.replaceChildren();
-    }
-
     /**
      * @param {Inventory} inventory 
      */
-    #setInventory(inventory) {
-        this.#clear();
-        inventory.materials.forEach(item => this.#addMaterial(item));
-        inventory.equipment.forEach(item => this.#addEquipment(item));
+    setInventory(inventory) {
+        this.#materialTable.setRecords(inventory.materials);
+        this.#weaponTab.bindRows(inventory.weapons);
+        this.#armorTab.bindRows(inventory.armors);
     }
 
     /**
-     * @param {Item} item 
+     * @param {CraftingRecipe[]} craftingRecipes 
      */
-    #addMaterial(item) {
-        const tds = [
-            item.type.name,
-            item.description,
-            item.quantity
-        ].map(data => {
-            const e = document.createElement("td");
-            e.innerText = data;
-            return e;
-        });
-        const tr = document.createElement("tr");
-        tds.forEach(td => tr.appendChild(td));
-        this.#materialRows.appendChild(tr);
+    setCraftingRecipes(craftingRecipes) {
+        this.#recipeTable.setRecords(craftingRecipes);
     }
 
     /**
-     * @param {Item} item 
+     * @param {Item?} item 
      */
-    #addEquipment(item) {
-        const tds = [
-            item.type.name,
-            item.type.gradeName,
-            item.level,
-            item.description
-        ].map(data => {
-            const e = document.createElement("td");
-            e.innerText = data;
-            return e;
-        });
-        const tr = document.createElement("tr");
-        $(tr).hover(
-            () => this.#setCompareWeapon(item),
-            () => this.#setCompareWeapon(null)
-        );
-        tds.forEach(td => tr.appendChild(td));
-
-        const equipButton = document.createElement("button");
-        equipButton.innerText = "Equip";
-        equipButton.type = "button";
-        equipButton.classList.add("btn");
-        equipButton.classList.add("btn-primary");
-
-        equipButton.addEventListener("click", (e) => this.#client.equip(item.id));
-        
-        tr.appendChild(equipButton);
-
-        this.#equipmentRows.appendChild(tr);
+    #setCraftPreview(item) {
+        this.#craftPreview.bind(item);
     }
 
     /**
      * @param {Item?} weapon 
      */
-    #setWeapon(weapon) {
-        if (!weapon) {
-            $("#noWeapon").show();
-            $("#yesWeapon").hide();
-            return;
-        }
-
-        $("#noWeapon").hide();
-        $("#yesWeapon").show();
-
-        this.#bindWeaponCard("#yesWeapon", weapon);
+    setWeapon(weapon) {
+        this.#weaponTab.setCurrent(weapon);
     }
 
     /**
-     * @param {Item?} weapon 
+     * @param {Item?} armor 
      */
-    #setCompareWeapon(weapon) {
-        if (!weapon) {
-            $("#compareWeapon").hide();
-            return;
-        }
-        $("#compareWeapon").show();
-
-        this.#bindWeaponCard("#compareWeapon", weapon);
+    setArmor(armor) {
+        this.#armorTab.setCurrent(armor);
     }
 
-    #bindWeaponCard(selector, weapon) {
-        $(selector)
-            .find(".weaponName")
-            .text(`${weapon.type.name} LV ${weapon.level} ${stars(weapon.type.gradeOrder)}`);
-        
-        $(selector)
-            .find(".weaponDescription")
-            .text(weapon.description);
-
-        const details = weapon.details.map(str => {
-            const e = document.createElement("li");
-            e.innerText = str;
-            return e;
-        });
-        $(selector)
-            .find(".weaponDetails")
-            .empty()
-            .append(details);
+    /**
+     * @param {PlayerStatSummary} statSummary 
+     */
+    setStatSummary(statSummary) {
+        const $statsList = $("#statsList")
+            .empty();
+        statSummary.lines.forEach(line => $statsList.append($("<li>").text(line)));
     }
-}
-
-function stars(num) {
-    let result = "";
-    for (let i = 0; i < num; i++) {
-        result += "*";
-    }
-    return result;
 }

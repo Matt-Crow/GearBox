@@ -1,7 +1,7 @@
 namespace GearBox.Core.Tests.Model.Static;
 
 using GearBox.Core.Model;
-using GearBox.Core.Model.Dynamic;
+using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 using Xunit;
@@ -17,26 +17,25 @@ public class MapTester
     }
 
     [Fact]
-    public void TilesDefaultToIntangible()
+    public void TilesDefaultToFloor()
     {
         var sut = new Map();
         var aTile = sut.GetTileAt(Coordinates.ORIGIN);
-        Assert.False(aTile.IsTangible);
+        Assert.Equal(TileHeight.FLOOR, aTile.Height);
     }
 
     [Fact]
     public void MustAddTileTypeBeforeSettingTiles()
     {
         var sut = new Map();
-        var aTileType = TileType.Tangible(Color.GREEN);
-        Assert.Throws<ArgumentException>(() => sut.SetTileAt(Coordinates.ORIGIN, aTileType));
+        Assert.Throws<ArgumentException>(() => sut.SetTileAt(Coordinates.ORIGIN, -1));
     }
 
     [Fact]
     public void CanSetKeyMultipleTimes()
     {
-        var type1 = TileType.Tangible(Color.GREEN);
-        var type2 = TileType.Tangible(Color.RED);
+        var type1 = new TileType(Color.BLUE, TileHeight.WALL);
+        var type2 = new TileType(Color.RED, TileHeight.WALL);
         var sut = new Map()
             .SetTileTypeForKey(1, type1)
             .SetTileTypeForKey(1, type2)
@@ -52,9 +51,8 @@ public class MapTester
     [InlineData(100, 0)]
     public void CannotSetTileOutOfBounds(int x, int y)
     {
-        var aTileType = TileType.Tangible(Color.GREEN);
         var sut = new Map(Dimensions.InTiles(20))
-            .SetTileTypeForKey(1, aTileType);
+            .SetTileTypeForKey(1, AWall());
 
         Assert.Throws<ArgumentException>(() => sut.SetTileAt(Coordinates.FromTiles(x, y), 1));
     }
@@ -74,13 +72,36 @@ public class MapTester
     }
 
     [Fact]
+    public void TerminateProjectilesOutOfBounds()
+    {
+        var sut = new Map();
+        var projectile = new Projectile(Coordinates.FromTiles(-1, -1), Velocity.ZERO, Distance.FromTiles(5), new Attack(new Character("foo", 1), 1), Color.BLACK);
+
+        sut.CheckForCollisions(projectile);
+
+        Assert.True(projectile.Termination.IsTerminated);
+    }
+
+    [Fact]
+    public void TerminateProjectilesCollidingWithWalls()
+    {
+        var sut = new Map()
+            .SetTileTypeForKey(1, AWall())
+            .SetTileAt(Coordinates.ORIGIN, 1);
+        var projectile = new Projectile(Coordinates.ORIGIN.CenteredOnTile(), Velocity.ZERO, Distance.FromTiles(5), new Attack(new Character("foo", 1), 1), Color.BLACK);
+    
+        sut.CheckForCollisions(projectile);
+
+        Assert.True(projectile.Termination.IsTerminated);
+    }
+
+    [Fact]
     public void CheckForCollisions_GivenInTile_ShovesOut()
     {
-        var tangible = TileType.Tangible(Color.RED);
         var coordinates = Coordinates.FromTiles(2, 2);
         var sut = new Map()
-            .SetTileTypeForKey(1, tangible)
-            .SetTileAt(coordinates, tangible);
+            .SetTileTypeForKey(1, AWall())
+            .SetTileAt(coordinates, 1);
         var inTile = new BodyBehavior()
         {
             Location = coordinates
@@ -90,4 +111,6 @@ public class MapTester
 
         Assert.NotEqual(coordinates, inTile.Location);
     }
+
+    private static TileType AWall() => new(Color.RED, TileHeight.WALL);
 }

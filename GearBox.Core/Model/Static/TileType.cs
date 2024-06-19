@@ -1,33 +1,16 @@
-using GearBox.Core.Model.Json;
-
 namespace GearBox.Core.Model.Static;
 
 /// <summary>
 /// defines one type of tile which may exist on a map
 /// </summary>
-public class TileType : ISerializable<TileTypeJson>
+public class TileType
 {
-    public TileType(Color color, bool isTangible)
+    public TileType(Color color, TileHeight height)
     {
         Color = color;
-        IsTangible = isTangible;
-    }
-
-    public static TileType Tangible(Color color)
-    {
-        return new TileType(color, true);
-    }
-
-    public static TileType Intangible(Color color)
-    {
-        return new TileType(color, false);
+        Height = height;
     }
 
     public Color Color { get; init; }
-    public bool IsTangible { get; init; }
-
-    public TileTypeJson ToJson()
-    {
-        return new TileTypeJson(Color.ToJson(), IsTangible);
-    }
+    public TileHeight Height { get; init; }
 }

@@ -5,8 +5,12 @@ export class Client {
         this.#signalr = signalr;    
     }
 
-    equip(id) {
-        this.#signalr.invoke("Equip", id)
+    equipWeapon(id) {
+        this.#signalr.invoke("EquipWeapon", id)
+    }
+
+    equipArmor(id) {
+        this.#signalr.invoke("EquipArmor", id)
     }
 
     startMovingUp() {
@@ -41,7 +45,15 @@ export class Client {
         this.#signalr.invoke("StopMovingRight");
     }
 
+    craft(recipeId) {
+        this.#signalr.invoke("Craft", recipeId);
+    }
+
     useBasicAttack(bearingInDegrees) {
         this.#signalr.invoke("UseBasicAttack", bearingInDegrees);
+    }
+
+    respawn() {
+        this.#signalr.invoke("Respawn");
     }
 }

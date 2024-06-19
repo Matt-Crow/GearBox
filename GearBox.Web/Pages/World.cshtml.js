@@ -3,6 +3,7 @@ import { InventoryModal } from "../js/game/components/inventoryModal.js";
 import { PlayerHud } from "../js/game/components/playerHud.js";
 import { Client } from "../js/game/infrastructure/client.js";
 import { Canvas } from "../js/game/components/canvas.js";
+import { GameOverScreen } from "../js/game/components/gameOverScreen.js";
 
 $(async () => await main());
 
@@ -15,7 +16,8 @@ async function main() {
     const canvas = new Canvas(findElement("#canvas"));
     const inventoryModal = new InventoryModal(findElement("#inventoryModal"), client);
     const hud = new PlayerHud(findElement("#playerHud"));
-    const game = new Game(canvas, inventoryModal, hud);
+    const gameOverScreen = new GameOverScreen(findElement("#playerAlive"), findElement("#playerDead"), findElement("#respawnButton"), client);
+    const game = new Game(canvas, inventoryModal, hud, gameOverScreen);
     
     connection.on("receive", (message) => {
         const obj = JSON.parse(message);

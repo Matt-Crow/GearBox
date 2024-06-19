@@ -2,6 +2,8 @@ namespace GearBox.Core.Model.Units;
 
 public readonly struct Velocity
 {
+    public static readonly Velocity ZERO = new(Speed.FromTilesPerSecond(0), Direction.DOWN);
+    
     private Velocity(Speed magnitude, Direction angle)
     {
         Magnitude = magnitude;

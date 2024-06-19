@@ -56,4 +56,29 @@ public class WorldServerTester
         Assert.NotEmpty(client1.MessagesReceived);
         Assert.NotEmpty(client2.MessagesReceived);
     }
+
+    [Fact]
+    public async Task EnqueueCommand_GivenCommand_DoesNotExecuteImmediately()
+    {
+        var sut = new WorldServer();
+        await sut.AddConnection("foo", new SpyConnection());
+        var command = new SpyControlCommand();
+
+        sut.EnqueueCommand("foo", command);
+
+        Assert.False(command.HasBeenExecuted);
+    }
+
+    [Fact]
+    public async Task EnqueueCommand_GivenCommand_ExecutesAfterUpdate()
+    {
+        var sut = new WorldServer();
+        await sut.AddConnection("foo", new SpyConnection());
+        var command = new SpyControlCommand();
+
+        sut.EnqueueCommand("foo", command);
+        await sut.Update();
+
+        Assert.True(command.HasBeenExecuted);
+    }
 }

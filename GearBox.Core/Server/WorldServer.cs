@@ -1,9 +1,8 @@
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
-using GearBox.Core.Model.Dynamic;
-using GearBox.Core.Model.Dynamic.Player;
+using GearBox.Core.Model.GameObjects;
+using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Json;
-using GearBox.Core.Model.Stable;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Server;
@@ -13,6 +12,7 @@ public class WorldServer
     private readonly World _world;
     private readonly Dictionary<string, IConnection> _connections = [];
     private readonly Dictionary<string, PlayerCharacter> _players = [];
+    private readonly List<PendingCommand> _pendingCommands = [];
     private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
 
@@ -25,19 +25,6 @@ public class WorldServer
     {
         _world = world;
 
-        // testing LootChests
-        _world.AddTimer(new WorldTimer(() => _world.SpawnLootChest(), 50));
-
-        // testing EnemySpawner
-        _world.DynamicContent.AddDynamicObject(new EnemySpawner(
-            _world, 
-            new EnemySpawnerOptions()
-            {
-                WaveSize = 3,
-                MaxChildren = 10
-            }
-        ));
-        
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
         
@@ -72,34 +59,18 @@ public class WorldServer
             return;
         }
 
-        var player = new PlayerCharacter("The Player", 1); // will eventually read from repo
-        var spawnLocation = _world.Map.GetRandomOpenTile();
-        if (spawnLocation != null)
-        {
-            player.Coordinates = spawnLocation.Value.CenteredOnTile();
-        }
+        var player = new PlayerCharacter("The Player"); // will eventually read from repo
+        var spawnLocation = _world.Map.FindRandomFloorTile()
+            ?? throw new Exception("Failed to find open tile. This should not happen.");
+        player.Coordinates = spawnLocation.CenteredOnTile();
 
-        _world.StableContent.AddPlayer(player);
-        _world.DynamicContent.AddDynamicObject(player);
+        _world.SpawnPlayer(player);
         _connections.Add(id, connection);
         _players.Add(id, player);
-        var worldInit = new WorldInitJson(
-            player.Id,
-            _world.Map.ToJson(),
-            _world.ItemTypes.GetAll().Select(x => x.ToJson()).ToList()
-        );
-        await connection.Send(worldInit);
 
-        // need to send all StableGameObjects to client
-        var allStableObjects = _world.StableContent.GetAll()
-            .Select(obj => Change.Content(obj))
-            .Select(change => change.ToJson())
-            .ToList();
-        var worldUpdate = new WorldUpdateJson(
-            _world.DynamicContent.ToJson(),
-            allStableObjects
-        );
-        await connection.Send(worldUpdate);
+        // client needs to know both the world init and current state of stable objects
+        await connection.Send(_world.GetWorldInitJsonFor(player));
+        await connection.Send(_world.GetWorldUpdateJsonFor(player));
 
         if (!_timer.Enabled)
         {
@@ -122,12 +93,7 @@ public class WorldServer
             return;
         }
 
-        var player = _players[id];
-        if (player is not null)
-        {
-            _world.DynamicContent.RemoveDynamicObject(player);
-            _world.StableContent.RemovePlayer(player);
-        }
+        _world.RemovePlayer(_players[id]);
         _players.Remove(id);
         _connections.Remove(id);
 
@@ -138,38 +104,29 @@ public class WorldServer
     }
 
     /// <summary>
-    /// Executes the given command on the player of the user with the given ID
+    /// Enqueues the given command so it will be executed during updates
     /// </summary>
-    public void ExecuteCommand(string id, IControlCommand command)
+    public void EnqueueCommand(string id, IControlCommand command)
     {
-        if (!_players.ContainsKey(id))
-        {
-            throw new Exception($"Invalid id: \"{id}\"");
-        }
-        command.ExecuteOn(_players[id], _world);
+        _pendingCommands.Add(new(id, command));
     }
 
     public async Task Update()
     {
-        var task = Task.CompletedTask;
         lock (connectionLock)
         {
-            task = DoUpdate();
-        }
-        await task;
-    }
+            var executeThese = _pendingCommands
+                .Where(pc => _players.ContainsKey(pc.ConnectionId))
+                .ToList();
+            _pendingCommands.Clear();
+            foreach (var command in executeThese)
+            {
+                command.Command.ExecuteOn(_players[command.ConnectionId], _world);
+            }
 
-    private async Task DoUpdate()
-    {
-        var stableChanges = _world.Update();
+            _world.Update();
+        }
         // notify everyone of the update
-        var message = new WorldUpdateJson(
-            _world.DynamicContent.ToJson(),
-            stableChanges.Select(c => c.ToJson()).ToList()
-        );
-        var tasks = _connections.Values
-            .Select(conn => conn.Send(message))
-            .ToList();
-        await Task.WhenAll(tasks);
+        await Task.WhenAll(_connections.Select(kv => kv.Value.Send(_world.GetWorldUpdateJsonFor(_players[kv.Key]))));
     }
 }

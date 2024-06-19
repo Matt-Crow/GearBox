@@ -28,7 +28,8 @@ public class WorldHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    public Task Equip(Guid id) => Receive(new Equip(id));
+    public Task EquipWeapon(Guid id) => Receive(new EquipWeapon(id));
+    public Task EquipArmor(Guid id) => Receive(new EquipArmor(id));
     public Task StartMovingUp() => Receive(StartMoving.UP);
     public Task StartMovingDown() => Receive(StartMoving.DOWN);
     public Task StartMovingLeft() => Receive(StartMoving.LEFT);
@@ -38,16 +39,18 @@ public class WorldHub : Hub
     public Task StopMovingDown() => Receive(StopMoving.DOWN);
     public Task StopMovingLeft() => Receive(StopMoving.LEFT);
     public Task StopMovingRight() => Receive(StopMoving.RIGHT);
+    public Task Respawn() => Receive(new Respawn());
+    public Task Craft(Guid recipeId) => Receive(new Craft(recipeId));
 
     /// <summary>
     /// Note the parameter is the bearing in degrees, so 0 means up, 90 means to the right, etc.
     /// </summary>
-    public Task UseBasicAttack(int bearingInDegrees) => Receive(new UseBasicAttackCommand(Direction.FromBearingDegrees(bearingInDegrees)));
+    public Task UseBasicAttack(int bearingInDegrees) => Receive(new UseBasicAttack(Direction.FromBearingDegrees(bearingInDegrees)));
 
     private Task Receive(IControlCommand command)
     {
         var id = Context.ConnectionId;
-        _server.ExecuteCommand(id, command);
+        _server.EnqueueCommand(id, command);
         return Task.CompletedTask;
     }
 }
