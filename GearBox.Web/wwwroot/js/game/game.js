@@ -2,11 +2,11 @@ import { Canvas } from "./components/canvas.js";
 import { GameOverScreen } from "./components/gameOverScreen.js";
 import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
-import { CharacterJsonDeserializer } from "./model/character.js";
+import { characterDeserializer } from "./model/character.js";
 import { ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
 import { PlayerChangeHandler } from "./model/player.js";
-import { ProjectileJsonDeserializer } from "./model/projectile.js";
+import { projectileDeserializer } from "./model/projectile.js";
 import { AreaInitHandler, AreaUpdateHandler } from "./model/world.js";
 
 export class Game {
@@ -58,9 +58,9 @@ export class Game {
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
         const updateHandler = new AreaUpdateHandler(world, itemDeserializer)
-            .addGameObjectType(new CharacterJsonDeserializer())
+            .addGameObjectType(characterDeserializer)
             .addGameObjectType(new PlayerChangeHandler(world.playerId, this.#playerHud.playerUpdateListener))
-            .addGameObjectType(new ProjectileJsonDeserializer())
+            .addGameObjectType(projectileDeserializer)
             .addGameObjectType(new LootChestJsonDeserializer(world.playerId))
             .addUpdateListener(w => this.#gameOverScreen.update(w))
             .addInventoryChangeListener(inv => this.#inventoryModal.setInventory(inv))
