@@ -28,7 +28,7 @@ world.GameObjects.AddGameObject(new EnemySpawner(
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
-builder.Services.AddSingleton(new WorldServer(world)); // todo WorldRepository
+builder.Services.AddSingleton(new AreaServer(world)); // todo WorldRepository
 
 var app = builder.Build();
 
@@ -60,6 +60,6 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
-app.MapHub<WorldHub>("/world-hub");
+app.MapHub<AreaHub>("/area-hub");
 
 app.Run();

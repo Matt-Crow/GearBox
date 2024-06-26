@@ -3,13 +3,13 @@ using Xunit;
 
 namespace GearBox.Core.Tests.Server;
 
-public class WorldServerTester
+public class AreaServerTester
 {
     [Fact]
     public async Task CannotConnectTwice()
     {
         var spy = new SpyConnection();
-        var sut = new WorldServer();
+        var sut = new AreaServer();
 
         await sut.AddConnection("foo", spy);
         await sut.AddConnection("foo", spy);
@@ -21,7 +21,7 @@ public class WorldServerTester
     public async Task AddThenRemoveBehaveAsExpected()
     {
         var spy = new SpyConnection();
-        var sut = new WorldServer();
+        var sut = new AreaServer();
         Assert.Equal(0, sut.TotalConnections);
 
         await sut.AddConnection("foo", spy);
@@ -32,10 +32,10 @@ public class WorldServerTester
     }
 
     [Fact]
-    public async Task ClientReceivesWorldUponConnecting()
+    public async Task ClientReceivesAreaUponConnecting()
     {
         var spy = new SpyConnection();
-        var sut = new WorldServer();
+        var sut = new AreaServer();
 
         await sut.AddConnection("foo", spy);
 
@@ -43,11 +43,11 @@ public class WorldServerTester
     }
 
     [Fact]
-    public async Task EachClientReceivesWorldUponUpdate()
+    public async Task EachClientReceivesAreaUponUpdate()
     {
         var client1 = new SpyConnection();
         var client2 = new SpyConnection();
-        var sut = new WorldServer();
+        var sut = new AreaServer();
         await sut.AddConnection("foo", client1);
         await sut.AddConnection("bar", client2);
 
@@ -60,7 +60,7 @@ public class WorldServerTester
     [Fact]
     public async Task EnqueueCommand_GivenCommand_DoesNotExecuteImmediately()
     {
-        var sut = new WorldServer();
+        var sut = new AreaServer();
         await sut.AddConnection("foo", new SpyConnection());
         var command = new SpyControlCommand();
 
@@ -72,7 +72,7 @@ public class WorldServerTester
     [Fact]
     public async Task EnqueueCommand_GivenCommand_ExecutesAfterUpdate()
     {
-        var sut = new WorldServer();
+        var sut = new AreaServer();
         await sut.AddConnection("foo", new SpyConnection());
         var command = new SpyControlCommand();
 

@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.SignalR;
 namespace GearBox.Web.Infrastructure;
 
 // Hubs are transient: don't try storing data on them
-public class WorldHub : Hub
+public class AreaHub : Hub
 {
-    private readonly WorldServer _server;
+    private readonly AreaServer _server;
 
-    public WorldHub(WorldServer server)
+    public AreaHub(AreaServer server)
     {
         _server = server;
     }
@@ -19,7 +19,7 @@ public class WorldHub : Hub
     {
         var id = Context.ConnectionId;
         // new player
-        await _server.AddConnection(id, new WorldHubConnection(Clients.Caller));
+        await _server.AddConnection(id, new AreaHubConnection(Clients.Caller));
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -39,7 +39,7 @@ public class WorldHub : Hub
     public Task StopMovingDown() => Receive(StopMoving.DOWN);
     public Task StopMovingLeft() => Receive(StopMoving.LEFT);
     public Task StopMovingRight() => Receive(StopMoving.RIGHT);
-    public Task Respawn() => Receive(new Respawn(_server.World));
+    public Task Respawn() => Receive(new Respawn(_server.Area));
     public Task Craft(Guid recipeId) => Receive(new Craft(recipeId));
 
     /// <summary>

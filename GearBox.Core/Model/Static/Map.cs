@@ -189,13 +189,13 @@ public class Map : ISerializable<MapJson>
         }
     }
 
-    public Coordinates? FindRandomFloorTile()
+    public Coordinates GetRandomFloorTile()
     {
         var random = new Random();
         var x = random.Next(Width.InTiles);
         var y = random.Next(Height.InTiles);
         var source = Coordinates.FromTiles(x, y);
-        return FindFloorTileAround(source);
+        return FindFloorTileAround(source) ?? throw new Exception("No floor tiles");
     }
 
     private Coordinates? FindFloorTileAround(Coordinates source, int searchRadius=0)

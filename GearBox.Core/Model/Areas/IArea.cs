@@ -1,6 +1,9 @@
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items.Crafting;
+using GearBox.Core.Model.Json.AreaInit;
+using GearBox.Core.Model.Json.AreaUpdate;
+using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.Areas;
 
@@ -20,7 +23,21 @@ public interface IArea
     
     void AddProjectile(Projectile projectile);
 
+    void RemovePlayer(PlayerCharacter player);
+
     CraftingRecipe? GetCraftingRecipeById(Guid id);
 
     Character? GetNearestEnemy(Character character);
+
+    Coordinates GetRandomFloorTile();
+
+    AreaInitJson GetAreaInitJsonFor(PlayerCharacter player);
+
+    AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player);
+    
+    /// <summary>
+    /// Called each game tick.
+    /// Updates the area and everything in it
+    /// </summary>
+    void Update();
 }

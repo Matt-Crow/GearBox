@@ -1,11 +1,12 @@
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Server;
 
-public class WorldServer
+public class AreaServer
 {
     private readonly Dictionary<string, IConnection> _connections = [];
     private readonly Dictionary<string, PlayerCharacter> _players = [];
@@ -13,9 +14,9 @@ public class WorldServer
     private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
 
-    public WorldServer(World? world = null)
+    public AreaServer(IArea? area = null)
     {
-        World = world ?? new();
+        Area = area ?? new World();
 
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
@@ -29,11 +30,11 @@ public class WorldServer
         _timer.Elapsed += async (sender, e) => await Update();
     }
 
-    public World World { get; init; }
+    public IArea Area { get; init; }
     public int TotalConnections => _connections.Count;
 
     /// <summary>
-    /// Adds the given connection, then sends the world
+    /// Adds the given connection, then sends the area
     /// </summary>
     public async Task AddConnection(string id, IConnection connection)
     {
@@ -53,15 +54,14 @@ public class WorldServer
         }
 
         var player = new PlayerCharacter("The Player"); // will eventually read from repo
-        var spawnLocation = World.Map.FindRandomFloorTile()
-            ?? throw new Exception("Failed to find open tile. This should not happen.");
+        var spawnLocation = Area.GetRandomFloorTile();
         player.Coordinates = spawnLocation.CenteredOnTile();
 
-        World.SpawnPlayer(player);
+        Area.SpawnPlayer(player);
         _connections.Add(id, connection);
         _players.Add(id, player);
 
-        // client needs to know both the world init and current state of stable objects
+        // client needs to know both the area init and current state of stable objects
         await SendAreaInitTo(id);
         await SendAreaUpdateTo(id);
 
@@ -73,7 +73,7 @@ public class WorldServer
 
     private Task SendAreaInitTo(string id)
     {
-        var json = World.GetWorldInitJsonFor(_players[id]);
+        var json = Area.GetAreaInitJsonFor(_players[id]);
         return _connections[id].Send("AreaInit", json);
     }
 
@@ -81,24 +81,19 @@ public class WorldServer
     {
         lock (connectionLock)
         {
-            DoRemoveConnection(id);
-        }
-    }
+            if (!_connections.ContainsKey(id))
+            {
+                return;
+            }
 
-    private void DoRemoveConnection(string id)
-    {
-        if (!_connections.ContainsKey(id))
-        {
-            return;
-        }
+            Area.RemovePlayer(_players[id]);
+            _players.Remove(id);
+            _connections.Remove(id);
 
-        World.RemovePlayer(_players[id]);
-        _players.Remove(id);
-        _connections.Remove(id);
-
-        if (!_connections.Any())
-        {
-            _timer.Stop();
+            if (!_connections.Any())
+            {
+                _timer.Stop();
+            }
         }
     }
 
@@ -123,7 +118,7 @@ public class WorldServer
                 command.Command.ExecuteOn(_players[command.ConnectionId]);
             }
 
-            World.Update();
+            Area.Update();
         }
         // notify everyone of the update
         await Task.WhenAll(_connections.Keys.Select(SendAreaUpdateTo));
@@ -131,7 +126,7 @@ public class WorldServer
 
     private Task SendAreaUpdateTo(string playerId)
     {
-        var json = World.GetWorldUpdateJsonFor(_players[playerId]);
+        var json = Area.GetAreaUpdateJsonFor(_players[playerId]);
         return _connections[playerId].Send("AreaUpdate", json);
     }
 }

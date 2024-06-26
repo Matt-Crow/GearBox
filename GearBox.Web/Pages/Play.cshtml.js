@@ -9,7 +9,7 @@ $(async () => await main());
 
 async function main() {
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/world-hub")
+        .withUrl("/area-hub")
         .build();
     const client = new Client(connection);
     

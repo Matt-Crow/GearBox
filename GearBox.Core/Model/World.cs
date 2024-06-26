@@ -8,6 +8,7 @@ using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Utils;
 using GearBox.Core.Model.Json.AreaUpdate;
+using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model;
 /// <summary>
@@ -79,7 +80,7 @@ public class World : IArea
         enemy.SetArea(this);
         enemy.Team = _enemyTeam;
         
-        var tile = Map.FindRandomFloorTile() ?? throw new Exception("Map has no open tiles");
+        var tile = Map.GetRandomFloorTile();
         enemy.Coordinates = tile.CenteredOnTile();
 
         GameObjects.AddGameObject(enemy);
@@ -87,6 +88,19 @@ public class World : IArea
     }
     
     public void AddProjectile(Projectile projectile) => GameObjects.AddGameObject(projectile);
+
+    public void RemovePlayer(PlayerCharacter player)
+    {
+        if (!ContainsPlayer(player))
+        {
+            return;
+        }
+
+        player.SetArea(null); // might change when moving player to new area
+        GameObjects.RemoveGameObject(player);
+        _players.Remove(player);
+    }
+
     public CraftingRecipe? GetCraftingRecipeById(Guid id) => CraftingRecipes.GetById(id);
 
     public Character? GetNearestEnemy(Character character)
@@ -101,44 +115,29 @@ public class World : IArea
             .FirstOrDefault();
         return result;
     }
-    #endregion
-    
-    public bool ContainsPlayer(PlayerCharacter player)
+
+    public Coordinates GetRandomFloorTile() => Map.GetRandomFloorTile();
+
+    public AreaInitJson GetAreaInitJsonFor(PlayerCharacter player)
     {
-        return _players.Contains(player);
+        var result = new AreaInitJson(
+            player.Id,
+            Map.ToJson(),
+            ItemTypes.ToJson(),
+            CraftingRecipes.ToJson()
+        );
+        return result;
     }
 
-    public void RemovePlayer(PlayerCharacter player)
+    public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player)
     {
-        if (!ContainsPlayer(player))
-        {
-            return;
-        }
-        GameObjects.RemoveGameObject(player);
-        _players.Remove(player);
-    }
-    
-    public void AddTimer(GameTimer timer)
-    {
-        _timers.Add(timer);
+        var result = new AreaUpdateJson(
+            GameObjects.ToJson(),
+            player.GetChanges()
+        );
+        return result;
     }
 
-    public void SpawnLootChest()
-    {
-        var inventory = _loot.GetRandomItems();
-        var location = Map.FindRandomFloorTile();
-        if (location != null)
-        {
-            var lootChest = new LootChest(location.Value.CenteredOnTile(), inventory);
-            _lootChests.Add(lootChest);
-            GameObjects.AddGameObject(lootChest);
-        }
-    }
-
-    /// <summary>
-    /// Called each game tick.
-    /// Updates the world and everything in it
-    /// </summary>
     public void Update()
     {
         _timers.ForEach(t => t.Update());
@@ -170,25 +169,25 @@ public class World : IArea
         _lootChests.ApplyChanges();
         _players.ApplyChanges();
     }
-
-    public AreaInitJson GetWorldInitJsonFor(PlayerCharacter player)
+    #endregion
+    
+    public bool ContainsPlayer(PlayerCharacter player)
     {
-        var result = new AreaInitJson(
-            player.Id,
-            Map.ToJson(),
-            ItemTypes.ToJson(),
-            CraftingRecipes.ToJson()
-        );
-        return result;
+        return _players.Contains(player);
+    }
+    
+    public void AddTimer(GameTimer timer)
+    {
+        _timers.Add(timer);
     }
 
-    public AreaUpdateJson GetWorldUpdateJsonFor(PlayerCharacter player)
+    public void SpawnLootChest()
     {
-        var result = new AreaUpdateJson(
-            GameObjects.ToJson(),
-            player.GetChanges()
-        );
-        return result;
+        var inventory = _loot.GetRandomItems();
+        var location = Map.GetRandomFloorTile();
+        var lootChest = new LootChest(location.CenteredOnTile(), inventory);
+        _lootChests.Add(lootChest);
+        GameObjects.AddGameObject(lootChest);
     }
 
     public override bool Equals(object? other)

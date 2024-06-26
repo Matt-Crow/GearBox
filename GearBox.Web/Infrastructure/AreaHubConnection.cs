@@ -6,11 +6,11 @@ using System.Text.Json.Serialization;
 
 namespace GearBox.Web.Infrastructure;
 
-public class WorldHubConnection : IConnection
+public class AreaHubConnection : IConnection
 {
     private readonly ISingleClientProxy _player;
 
-    public WorldHubConnection(ISingleClientProxy player)
+    public AreaHubConnection(ISingleClientProxy player)
     {
         _player = player;
     }
