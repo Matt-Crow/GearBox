@@ -55,14 +55,13 @@ export class World {
     }
 }
 
-export class WorldInitHandler {
+export class AreaInitHandler {
 
     /**
-     * Deserializes and returns the world init message sent by the server
      * @param {object} obj 
      * @returns {World}
      */
-    handleWorldInit(obj) {
+    handleAreaInit(obj) {
         const map = TileMap.fromJson(obj.map);
         const itemTypes = obj.itemTypes.map(deserializeItemTypeJson);
 

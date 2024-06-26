@@ -7,7 +7,7 @@ import { ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
 import { PlayerChangeHandler } from "./model/player.js";
 import { ProjectileJsonDeserializer } from "./model/projectile.js";
-import { WorldInitHandler, AreaUpdateHandler } from "./model/world.js";
+import { AreaInitHandler, AreaUpdateHandler } from "./model/world.js";
 
 export class Game {
 
@@ -52,8 +52,8 @@ export class Game {
     }
 
     handleAreaInit(json) {
-        const world = new WorldInitHandler()
-            .handleWorldInit(json);
+        const world = new AreaInitHandler()
+            .handleAreaInit(json);
         this.#inventoryModal.setCraftingRecipes(world.craftingRecipes.recipes);
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);

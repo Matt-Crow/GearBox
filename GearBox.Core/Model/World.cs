@@ -2,7 +2,7 @@ using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Ai;
 using GearBox.Core.Model.GameObjects.Player;
-using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.AreaInit;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Static;
@@ -171,9 +171,9 @@ public class World : IArea
         _players.ApplyChanges();
     }
 
-    public WorldInitJson GetWorldInitJsonFor(PlayerCharacter player)
+    public AreaInitJson GetWorldInitJsonFor(PlayerCharacter player)
     {
-        var result = new WorldInitJson(
+        var result = new AreaInitJson(
             player.Id,
             Map.ToJson(),
             ItemTypes.ToJson(),

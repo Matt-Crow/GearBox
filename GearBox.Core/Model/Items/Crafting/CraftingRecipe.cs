@@ -1,4 +1,4 @@
-using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.AreaInit;
 
 namespace GearBox.Core.Model.Items.Crafting;
 

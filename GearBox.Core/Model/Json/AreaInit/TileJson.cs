@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Json.WorldInit;
+namespace GearBox.Core.Model.Json.AreaInit;
 
 public readonly struct TileJson
 {

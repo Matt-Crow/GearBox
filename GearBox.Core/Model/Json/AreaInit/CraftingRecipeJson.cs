@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Json;
+namespace GearBox.Core.Model.Json.AreaInit;
 
 public readonly struct CraftingRecipeJson : IJson
 {
