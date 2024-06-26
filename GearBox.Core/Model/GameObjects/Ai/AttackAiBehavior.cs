@@ -23,9 +23,8 @@ public class AttackAiBehavior : IAiBehavior
         {
             // turn and attack
             _controlling.StopMoving();
-            var world = _controlling.World ?? throw new Exception("world should not be null here");
             var angle = Direction.FromAToB(_controlling.Coordinates, _attacking.Coordinates);
-            _controlling.UseBasicAttack(world, angle);
+            _controlling.UseBasicAttack(angle);
         }
         else
         {

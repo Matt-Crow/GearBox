@@ -12,9 +12,12 @@ public class Craft : IControlCommand
         _recipeId = recipeId;
     }
 
-    public void ExecuteOn(PlayerCharacter target, World inWorld)
+    public void ExecuteOn(PlayerCharacter target)
     {
-        var recipe = inWorld.CraftingRecipes.GetById(_recipeId);
+        // this will change once recipes are stored in an aggregate of areas
+        var area = target.CurrentArea ?? throw new Exception("Cannot craft when not in an area");
+
+        var recipe = area.GetCraftingRecipeById(_recipeId);
         if (recipe != null)
         {
             target.Inventory.Craft(recipe);

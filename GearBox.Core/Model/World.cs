@@ -55,10 +55,7 @@ public class World : IArea
     public IItemTypeRepository ItemTypes { get; init; }
     public CraftingRecipeRepository CraftingRecipes { get; init; }
 
-    /// <summary>
-    /// Spawns a player into the world an heals them back to full,
-    /// if they are not already in the world
-    /// </summary>
+    #region Implement IArea
     public void SpawnPlayer(PlayerCharacter player)
     {
         if (ContainsPlayer(player))
@@ -66,12 +63,29 @@ public class World : IArea
             return;
         }
         player.HealPercent(100.0);
-        player.World = this;
+        player.SetArea(this);
         player.Team = _playerTeam;
         GameObjects.AddGameObject(player);
         _players.Add(player);
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
     }
+    
+    public void AddProjectile(Projectile projectile) => GameObjects.AddGameObject(projectile);
+    public CraftingRecipe? GetCraftingRecipeById(Guid id) => CraftingRecipes.GetById(id);
+
+    public Character? GetNearestEnemy(Character character)
+    {
+        var result = GameObjects.GameObjects
+            .Select(obj => obj as Character)
+            .Where(maybeCharacter => maybeCharacter != null)
+            .Select(character => character!)
+            .Where(other => other != character) // not the same
+            .Where(other => other.Team != character.Team)
+            .OrderBy(enemy => enemy.Coordinates.DistanceFrom(character.Coordinates).InPixels)
+            .FirstOrDefault();
+        return result;
+    }
+    #endregion
     
     public bool ContainsPlayer(PlayerCharacter player)
     {
@@ -110,7 +124,7 @@ public class World : IArea
         var enemyFactory = _enemies[Random.Shared.Next(_enemies.Count)];
         var enemy = enemyFactory.Invoke();
         enemy.AiBehavior = new WanderAiBehavior(enemy);
-        enemy.World = this;
+        enemy.SetArea(this);
         enemy.Team = _enemyTeam;
         
         var tile = Map.FindRandomFloorTile() ?? throw new Exception("Map has no open tiles");
@@ -118,19 +132,6 @@ public class World : IArea
 
         GameObjects.AddGameObject(enemy);
         return enemy;
-    }
-
-    public Character? GetNearestEnemy(Character character)
-    {
-        var result = GameObjects.GameObjects
-            .Select(obj => obj as Character)
-            .Where(maybeCharacter => maybeCharacter != null)
-            .Select(character => character!)
-            .Where(other => other != character) // not the same
-            .Where(other => other.Team != character.Team)
-            .OrderBy(enemy => enemy.Coordinates.DistanceFrom(character.Coordinates).InPixels)
-            .FirstOrDefault();
-        return result;
     }
 
     /// <summary>

@@ -32,7 +32,7 @@ public class WanderAiBehavior : IAiBehavior
             ChooseNewDirection();
         }
 
-        var nearestEnemy = _target.World?.GetNearestEnemy(_target);
+        var nearestEnemy = _target.CurrentArea?.GetNearestEnemy(_target);
         if (nearestEnemy != null && IsCloseEnoughToSee(nearestEnemy))
         {
             _target.AiBehavior = new PursueAiBehavior(_target, nearestEnemy);

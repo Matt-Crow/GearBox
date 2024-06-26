@@ -1,5 +1,6 @@
 using System.Text.Json;
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Ai;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
@@ -45,7 +46,7 @@ public class Character : IGameObject
     public double DamageModifier { get; protected set; } = 0.0;
     public ArmorClass ArmorClass { get; protected set; } = ArmorClass.NONE;
     public BasicAttack BasicAttack { get; init; }
-    public World? World { get; set; }
+    public IArea? CurrentArea { get; private set; }
     public Team Team { get; set; } = new(); // default to each on their own team
 
     public void SetLevel(int level)
@@ -54,6 +55,11 @@ public class Character : IGameObject
 
         // avoid virtual call in ctor: https://stackoverflow.com/q/119506
         UpdateStatsBase();
+    }
+
+    public virtual void SetArea(IArea? newArea)
+    {
+        CurrentArea = newArea;
     }
 
     public virtual void UpdateStats()
@@ -86,9 +92,9 @@ public class Character : IGameObject
         _mobility.Velocity = _mobility.Velocity.WithSpeed(speed);
     }
 
-    public void UseBasicAttack(World inWorld, Direction inDirection)
+    public void UseBasicAttack(Direction inDirection)
     {
-        BasicAttack.Use(inWorld, inDirection);
+        BasicAttack.Use(inDirection);
     }
 
     public void TakeDamage(int damage)

@@ -39,7 +39,7 @@ public class WorldHub : Hub
     public Task StopMovingDown() => Receive(StopMoving.DOWN);
     public Task StopMovingLeft() => Receive(StopMoving.LEFT);
     public Task StopMovingRight() => Receive(StopMoving.RIGHT);
-    public Task Respawn() => Receive(new Respawn());
+    public Task Respawn() => Receive(new Respawn(_server.World));
     public Task Craft(Guid recipeId) => Receive(new Craft(recipeId));
 
     /// <summary>

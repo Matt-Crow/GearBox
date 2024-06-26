@@ -1,3 +1,4 @@
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
@@ -21,6 +22,8 @@ public class PlayerCharacter : Character
         UpdateStats();
     }
 
+    public event EventHandler<AreaChangedEventArgs>? AreaChanged;
+
     protected override string Type => "playerCharacter";
     public int Xp { get; private set; } // experience points
     public int XpToNextLevel { get; private set; }
@@ -31,6 +34,12 @@ public class PlayerCharacter : Character
     public Inventory Inventory { get; init; }
     public EquipmentSlot<Weapon> WeaponSlot { get; init; }
     public EquipmentSlot<Armor> ArmorSlot { get; init; }
+
+    public override void SetArea(IArea? newArea)
+    {
+        AreaChanged?.Invoke(this, new AreaChangedEventArgs(this, CurrentArea, newArea));
+        base.SetArea(newArea);
+    }
 
     public override void UpdateStats()
     {

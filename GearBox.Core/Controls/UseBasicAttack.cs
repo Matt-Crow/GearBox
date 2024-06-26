@@ -1,4 +1,3 @@
-using GearBox.Core.Model;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Units;
 
@@ -13,8 +12,8 @@ public class UseBasicAttack : IControlCommand
         _inDirection = inDirection;
     }
 
-    public void ExecuteOn(PlayerCharacter target, World inWorld)
+    public void ExecuteOn(PlayerCharacter target)
     {
-        target.UseBasicAttack(inWorld, _inDirection);
+        target.UseBasicAttack(_inDirection);
     }
 }

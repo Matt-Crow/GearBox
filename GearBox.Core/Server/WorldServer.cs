@@ -1,15 +1,12 @@
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
-using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Player;
-using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Server;
 
 public class WorldServer
 {
-    private readonly World _world;
     private readonly Dictionary<string, IConnection> _connections = [];
     private readonly Dictionary<string, PlayerCharacter> _players = [];
     private readonly List<PendingCommand> _pendingCommands = [];
@@ -23,7 +20,7 @@ public class WorldServer
 
     public WorldServer(World world)
     {
-        _world = world;
+        World = world;
 
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
@@ -37,6 +34,7 @@ public class WorldServer
         _timer.Elapsed += async (sender, e) => await Update();
     }
 
+    public World World { get; init; }
     public int TotalConnections => _connections.Count;
 
     /// <summary>
@@ -60,17 +58,17 @@ public class WorldServer
         }
 
         var player = new PlayerCharacter("The Player"); // will eventually read from repo
-        var spawnLocation = _world.Map.FindRandomFloorTile()
+        var spawnLocation = World.Map.FindRandomFloorTile()
             ?? throw new Exception("Failed to find open tile. This should not happen.");
         player.Coordinates = spawnLocation.CenteredOnTile();
 
-        _world.SpawnPlayer(player);
+        World.SpawnPlayer(player);
         _connections.Add(id, connection);
         _players.Add(id, player);
 
         // client needs to know both the world init and current state of stable objects
-        await connection.Send(_world.GetWorldInitJsonFor(player));
-        await connection.Send(_world.GetWorldUpdateJsonFor(player));
+        await connection.Send(World.GetWorldInitJsonFor(player));
+        await connection.Send(World.GetWorldUpdateJsonFor(player));
 
         if (!_timer.Enabled)
         {
@@ -93,7 +91,7 @@ public class WorldServer
             return;
         }
 
-        _world.RemovePlayer(_players[id]);
+        World.RemovePlayer(_players[id]);
         _players.Remove(id);
         _connections.Remove(id);
 
@@ -121,12 +119,12 @@ public class WorldServer
             _pendingCommands.Clear();
             foreach (var command in executeThese)
             {
-                command.Command.ExecuteOn(_players[command.ConnectionId], _world);
+                command.Command.ExecuteOn(_players[command.ConnectionId]);
             }
 
-            _world.Update();
+            World.Update();
         }
         // notify everyone of the update
-        await Task.WhenAll(_connections.Select(kv => kv.Value.Send(_world.GetWorldUpdateJsonFor(_players[kv.Key]))));
+        await Task.WhenAll(_connections.Select(kv => kv.Value.Send(World.GetWorldUpdateJsonFor(_players[kv.Key]))));
     }
 }

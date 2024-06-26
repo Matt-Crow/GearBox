@@ -1,4 +1,3 @@
-using GearBox.Core.Model;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Units;
 
@@ -17,7 +16,7 @@ public class StartMoving : IControlCommand
         _direction = direction;
     }
 
-    public void ExecuteOn(PlayerCharacter target, World inWorld)
+    public void ExecuteOn(PlayerCharacter target)
     {
         target.StartMovingIn(_direction);
     }
