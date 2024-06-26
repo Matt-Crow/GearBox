@@ -138,10 +138,10 @@ public class PlayerCharacter : Character
     public ChangesJson GetChanges()
     {
         var result = new ChangesJson(
-            Inventory.ToJson(),
-            WeaponSlot.ToJson(),
-            ArmorSlot.ToJson(), 
-            _statSummary.ToJson()
+            Inventory.GetChanges(),
+            WeaponSlot.GetChanges(),
+            ArmorSlot.GetChanges(), 
+            _statSummary.GetChanges()
         );
         return result;
     }

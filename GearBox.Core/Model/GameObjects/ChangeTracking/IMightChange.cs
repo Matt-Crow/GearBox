@@ -10,5 +10,5 @@ public interface IMightChange<TJson>
     /// <summary>
     /// Called when the object changes
     /// </summary>
-    TJson AsJson();
+    TJson ToJson();
 }
