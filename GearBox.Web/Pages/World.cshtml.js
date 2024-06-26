@@ -19,15 +19,9 @@ async function main() {
     const gameOverScreen = new GameOverScreen(findElement("#playerAlive"), findElement("#playerDead"), findElement("#respawnButton"), client);
     const game = new Game(canvas, inventoryModal, hud, gameOverScreen);
     
-    connection.on("receive", (message) => {
-        const obj = JSON.parse(message);
-        try {
-            game.handle(obj);
-        } catch (e) {
-            // set breakpoint here if SignalR keeps suppressing error messages
-            console.error(e);
-        }
-    });
+    connection.on("AreaInit", handle(json => game.handleAreaInit(json)));
+    connection.on("AreaUpdate", handle(json => game.handleAreaUpdate(json)));
+    
     await connection.start();
 
     const keyMappings = new Map(); // value is [onUp, onDown]
@@ -62,10 +56,38 @@ async function main() {
     });
 }
 
+function handle(handler) {
+    const pipeline = new Pipeline()
+        .then(aString => JSON.parse(aString))
+        .then(json => handler(json));
+    return (message) => pipeline.consume(message);
+}
+
 function findElement(selector) {
     const e = document.querySelector(selector);
     if (e === null) {
         throw new Error(`Failed to locate element "${selector}"`);
     }
     return e;
+}
+
+class Pipeline {
+    #transforms = [];
+
+    then(transform) {
+        this.#transforms.push(transform);
+        return this;
+    }
+
+    consume(obj) {
+        let currValue = obj;
+        try {
+            for (let transform of this.#transforms) {
+                currValue = transform(currValue);
+            }
+        } catch(e) {
+            // set breakpoint here if SignalR keeps suppressing error messages
+            console.error(e);
+        }
+    }
 }

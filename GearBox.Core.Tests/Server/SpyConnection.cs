@@ -9,7 +9,7 @@ public class SpyConnection : IConnection
 
     public IEnumerable<IJson> MessagesReceived => _messagesReceived.AsEnumerable();
 
-    public Task Send<T>(T message) where T : IJson
+    public Task Send<T>(string type, T message) where T : IJson
     {
         _messagesReceived.Add(message);
         return Task.CompletedTask;

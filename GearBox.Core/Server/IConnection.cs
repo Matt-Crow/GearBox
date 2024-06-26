@@ -12,5 +12,5 @@ public interface IConnection
     /// <summary>
     /// Sends a message to the client.
     /// </summary>
-    public Task Send<T>(T message) where T : IJson;
+    public Task Send<T>(string type, T message) where T : IJson;
 }

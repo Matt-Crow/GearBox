@@ -13,14 +13,9 @@ public class WorldServer
     private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
 
-    public WorldServer() : this(new World())
+    public WorldServer(World? world = null)
     {
-
-    }
-
-    public WorldServer(World world)
-    {
-        World = world;
+        World = world ?? new();
 
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
@@ -67,13 +62,19 @@ public class WorldServer
         _players.Add(id, player);
 
         // client needs to know both the world init and current state of stable objects
-        await connection.Send(World.GetWorldInitJsonFor(player));
-        await connection.Send(World.GetWorldUpdateJsonFor(player));
+        await SendAreaInitTo(id);
+        await SendAreaUpdateTo(id);
 
         if (!_timer.Enabled)
         {
             _timer.Start();
         }
+    }
+
+    private Task SendAreaInitTo(string id)
+    {
+        var json = World.GetWorldInitJsonFor(_players[id]);
+        return _connections[id].Send("AreaInit", json);
     }
 
     public void RemoveConnection(string id)
@@ -125,6 +126,12 @@ public class WorldServer
             World.Update();
         }
         // notify everyone of the update
-        await Task.WhenAll(_connections.Select(kv => kv.Value.Send(World.GetWorldUpdateJsonFor(_players[kv.Key]))));
+        await Task.WhenAll(_connections.Keys.Select(SendAreaUpdateTo));
+    }
+
+    private Task SendAreaUpdateTo(string playerId)
+    {
+        var json = World.GetWorldUpdateJsonFor(_players[playerId]);
+        return _connections[playerId].Send("AreaUpdate", json);
     }
 }

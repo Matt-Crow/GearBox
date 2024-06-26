@@ -28,13 +28,7 @@ export class Game {
 
     #gameOverScreen;
 
-    /**
-     * The current function for handling messages from the server.
-     * Currently, this assumes the server will always start by sending WorldInitJson,
-     * followed by an number of WorldUpdates,
-     * and no other message types.
-     */
-    #handleMessage;
+    #areaUpdateHandler = () => {throw new Error("Cannot handle area update until after area init")};
 
     #world; // required for getting mouse cursor position relative to player :(
 
@@ -49,16 +43,7 @@ export class Game {
         this.#inventoryModal = inventoryModal;
         this.#playerHud = playerHud;
         this.#gameOverScreen = gameOverScreen;
-        this.#handleMessage = (message) => this.#handleInit(message);
         this.#world = null;
-    }
-
-    /**
-     * Called by SignalR to process messages.
-     * @param {object} message a JSON message received through SignalR
-     */
-    handle(message) {
-        this.#handleMessage(message); 
     }
 
     getPlayerCoords() {
@@ -66,9 +51,9 @@ export class Game {
         return [player?.x, player?.y];
     }
 
-    #handleInit(initMessage) {
+    handleAreaInit(json) {
         const world = new WorldInitHandler()
-            .handleWorldInit(initMessage);
+            .handleWorldInit(json);
         this.#inventoryModal.setCraftingRecipes(world.craftingRecipes.recipes);
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
@@ -84,11 +69,14 @@ export class Game {
             .addStatSummaryChangeListener(summary => this.#inventoryModal.setStatSummary(summary))
             ;
 
-        // unregisters handleInit, switches to handling updates instead
-        this.#handleMessage = (updateMessage) => updateHandler.handleAreaUpdate(updateMessage);
+        this.#areaUpdateHandler = json => updateHandler.handleAreaUpdate(json);
         
         setInterval(() => this.#canvas.draw(world), 1000 / 24);
 
         this.#world = world;
+    }
+
+    handleAreaUpdate(json) {
+        this.#areaUpdateHandler(json);
     }
 }

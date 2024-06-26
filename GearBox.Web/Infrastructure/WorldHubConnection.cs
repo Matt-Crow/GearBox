@@ -15,7 +15,7 @@ public class WorldHubConnection : IConnection
         _player = player;
     }
 
-    public async Task Send<T>(T message) where T : IJson
+    public async Task Send<T>(string type, T message) where T : IJson
     {
         var sendMe = JsonSerializer.Serialize(message, new JsonSerializerOptions()
         {
@@ -24,6 +24,6 @@ public class WorldHubConnection : IConnection
                 new JsonStringEnumConverter() 
             }
         });
-        await _player.SendAsync("receive", sendMe);
+        await _player.SendAsync(type, sendMe);
     }
 }
