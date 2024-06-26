@@ -1,3 +1,4 @@
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Ai;
 using GearBox.Core.Model.GameObjects.Player;
@@ -12,7 +13,7 @@ namespace GearBox.Core.Model;
 /// For now, a World is the topmost container for game objects.
 /// Future versions will need separate containers for the different game areas.
 /// </summary>
-public class World
+public class World : IArea
 {
     private readonly List<WorldTimer> _timers = [];
     private readonly LootTable _loot;
