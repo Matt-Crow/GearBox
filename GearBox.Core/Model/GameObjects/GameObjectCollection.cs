@@ -4,7 +4,7 @@ using GearBox.Core.Utils;
 namespace GearBox.Core.Model.GameObjects;
 
 /// <summary>
-/// GameObjects in a world
+/// GameObjects in an area
 /// </summary>
 public class GameObjectCollection
 {
@@ -39,10 +39,6 @@ public class GameObjectCollection
         }
     }
 
-    /// <summary>
-    /// Called each game tick.
-    /// Updates the world and everything in it
-    /// </summary>
     public void Update()
     {
         _gameObjects.ApplyChanges();

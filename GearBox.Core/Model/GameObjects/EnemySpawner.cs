@@ -1,18 +1,19 @@
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.GameObjects;
 
-public class EnemySpawner : IGameObject
+public class EnemySpawner : IGameObject // doesn't need to be a game object, use GameTimer instead
 {
     private static readonly Duration COOLDOWN = Duration.FromSeconds(10);
-    private readonly World _world;
+    private readonly IArea _area;
     private readonly EnemySpawnerOptions _options;
     private int _childCount = 0;
     private int _framesUntilNextUse = 0;
 
-    public EnemySpawner(World world, EnemySpawnerOptions? options=null)
+    public EnemySpawner(IArea area, EnemySpawnerOptions? options=null)
     {
-        _world = world;
+        _area = area;
         _options = options ?? new();
     }
 
@@ -42,7 +43,7 @@ public class EnemySpawner : IGameObject
             return;
         }
 
-        var enemy = _world.SpawnEnemy();
+        var enemy = _area.SpawnEnemy();
         if (enemy.Termination != null)
         {
             enemy.Termination.Terminated += ChildTerminated;
@@ -54,5 +55,4 @@ public class EnemySpawner : IGameObject
     {
         _childCount--;
     }
-
 }

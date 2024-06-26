@@ -2,7 +2,7 @@ import { getColorStringFromJson } from "./color.js";
 import { PIXELS_PER_TILE } from "./constants.js";
 
 // avoids conflicts with build-in JS Map class
-export class WorldMap {
+export class TileMap {
     #width;
     #height;
     #pits;
@@ -51,13 +51,13 @@ export class WorldMap {
 
     /**
      * @param {object} json 
-     * @returns {WorldMap}
+     * @returns {TileMap}
      */
     static fromJson(json) {
         const pits = json.pits.map(j => Tile.fromJson(j));
         const floors = json.floors.map(j => Tile.fromJson(j));
         const walls = json.walls.map(j => Tile.fromJson(j));
-        return new WorldMap(json.width, json.height, pits, floors, walls);
+        return new TileMap(json.width, json.height, pits, floors, walls);
     }
 }
 

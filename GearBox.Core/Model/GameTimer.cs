@@ -1,12 +1,12 @@
 namespace GearBox.Core.Model;
 
-public class WorldTimer
+public class GameTimer
 {
     private readonly Action _doThis;
     private readonly int _period;
     private int _ticks = 0;
 
-    public WorldTimer(Action doThis, int period)
+    public GameTimer(Action doThis, int period)
     {
         _doThis = doThis;
         _period = period;

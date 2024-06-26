@@ -8,7 +8,7 @@ using GearBox.Core.Model.Units;
 namespace GearBox.Core.Model.GameObjects;
 
 /// <summary>
-/// A Character is something sentient in the game world.
+/// A Character is something sentient in the game.
 /// </summary>
 public class Character : IGameObject
 {

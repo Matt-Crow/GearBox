@@ -15,7 +15,7 @@ namespace GearBox.Core.Model;
 /// </summary>
 public class World : IArea
 {
-    private readonly List<WorldTimer> _timers = [];
+    private readonly List<GameTimer> _timers = [];
     private readonly LootTable _loot;
     
     // todo player-interactables
@@ -69,6 +69,21 @@ public class World : IArea
         _players.Add(player);
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
     }
+
+    public Character SpawnEnemy()
+    {
+        var enemyFactory = _enemies[Random.Shared.Next(_enemies.Count)];
+        var enemy = enemyFactory.Invoke();
+        enemy.AiBehavior = new WanderAiBehavior(enemy);
+        enemy.SetArea(this);
+        enemy.Team = _enemyTeam;
+        
+        var tile = Map.FindRandomFloorTile() ?? throw new Exception("Map has no open tiles");
+        enemy.Coordinates = tile.CenteredOnTile();
+
+        GameObjects.AddGameObject(enemy);
+        return enemy;
+    }
     
     public void AddProjectile(Projectile projectile) => GameObjects.AddGameObject(projectile);
     public CraftingRecipe? GetCraftingRecipeById(Guid id) => CraftingRecipes.GetById(id);
@@ -102,7 +117,7 @@ public class World : IArea
         _players.Remove(player);
     }
     
-    public void AddTimer(WorldTimer timer)
+    public void AddTimer(GameTimer timer)
     {
         _timers.Add(timer);
     }
@@ -117,21 +132,6 @@ public class World : IArea
             _lootChests.Add(lootChest);
             GameObjects.AddGameObject(lootChest);
         }
-    }
-
-    public Character SpawnEnemy()
-    {
-        var enemyFactory = _enemies[Random.Shared.Next(_enemies.Count)];
-        var enemy = enemyFactory.Invoke();
-        enemy.AiBehavior = new WanderAiBehavior(enemy);
-        enemy.SetArea(this);
-        enemy.Team = _enemyTeam;
-        
-        var tile = Map.FindRandomFloorTile() ?? throw new Exception("Map has no open tiles");
-        enemy.Coordinates = tile.CenteredOnTile();
-
-        GameObjects.AddGameObject(enemy);
-        return enemy;
     }
 
     /// <summary>

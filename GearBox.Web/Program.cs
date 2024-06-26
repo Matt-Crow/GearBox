@@ -13,7 +13,7 @@ var world = new WorldBuilder()
     .Build();
 
 // testing LootChests
-world.AddTimer(new WorldTimer(() => world.SpawnLootChest(), 50));
+world.AddTimer(new GameTimer(() => world.SpawnLootChest(), 50));
 
 // testing EnemySpawner
 world.GameObjects.AddGameObject(new EnemySpawner(
