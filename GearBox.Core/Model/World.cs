@@ -7,6 +7,7 @@ using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Utils;
+using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model;
 /// <summary>
@@ -181,14 +182,11 @@ public class World : IArea
         return result;
     }
 
-    public WorldUpdateJson GetWorldUpdateJsonFor(PlayerCharacter player)
+    public AreaUpdateJson GetWorldUpdateJsonFor(PlayerCharacter player)
     {
-        var result = new WorldUpdateJson(
-            GameObjects.ToJson(), 
-            player.Inventory.ToJson(), 
-            player.WeaponSlot.ToJson(),
-            player.ArmorSlot.ToJson(),
-            player.GetStatSummaryJson()
+        var result = new AreaUpdateJson(
+            GameObjects.ToJson(),
+            player.GetChanges()
         );
         return result;
     }

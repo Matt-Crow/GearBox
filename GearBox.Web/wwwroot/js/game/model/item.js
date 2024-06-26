@@ -100,6 +100,9 @@ export class ItemDeserializer {
     }
 
     deserialize(json) {
+        if (!json) {
+            return null;
+        }
         const type = this.#itemTypes.getItemTypeByName(json.name);
         if (type === null) {
             throw new Error(`Bad item type name: "${json.name}"`);

@@ -1,6 +1,6 @@
-namespace GearBox.Core.Model.Json;
+namespace GearBox.Core.Model.Json.AreaUpdate;
 
-public readonly struct PlayerStatSummaryJson : IJson
+public readonly struct PlayerStatSummaryJson
 {
     public PlayerStatSummaryJson(List<string> lines)
     {

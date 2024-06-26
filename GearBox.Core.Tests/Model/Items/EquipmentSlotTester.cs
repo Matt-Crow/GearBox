@@ -1,5 +1,6 @@
 using GearBox.Core.Model.GameObjects.ChangeTracking;
 using GearBox.Core.Model.Items;
+using GearBox.Core.Model.Json;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model.Items;
@@ -10,7 +11,7 @@ public class EquipmentSlotTester
     public void DynamicValues_AfterEquipping_Change()
     {
         var sut = new EquipmentSlot<Weapon>("");
-        var tracker = new ChangeTracker(sut);
+        var tracker = new ChangeTracker<ItemJson?>(sut);
         
         sut.Value = new Weapon(new ItemType("foo"));
         
@@ -24,7 +25,7 @@ public class EquipmentSlotTester
         {
             Value = new Weapon(new ItemType("foo"))
         };
-        var tracker = new ChangeTracker(sut);
+        var tracker = new ChangeTracker<ItemJson?>(sut);
 
         sut.Value = new Weapon(new ItemType("foo"));
 

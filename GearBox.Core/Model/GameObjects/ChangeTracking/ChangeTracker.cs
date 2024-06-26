@@ -1,15 +1,15 @@
-using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model.GameObjects.ChangeTracking;
 
-public class ChangeTracker
+public class ChangeTracker<TJson>
 {
-    private readonly IDynamic _target;
+    private readonly IDynamic<TJson> _target;
     private readonly Serializer _serializer;
     private bool _hasChangedSinceLastTick = true;
     private int _lastHash;
 
-    public ChangeTracker(IDynamic target)
+    public ChangeTracker(IDynamic<TJson> target)
     {
         _target = target;
         _serializer = new Serializer("", _target.Serialize);
@@ -35,11 +35,11 @@ public class ChangeTracker
         return hashCode;
     }
 
-    public StableJson ToJson()
+    public MaybeChangeJson<TJson> ToJson()
     {
         var result = _hasChangedSinceLastTick
-            ? StableJson.Changed(_serializer.Serialize().Content)
-            : StableJson.NoChanges();
+            ? MaybeChangeJson<TJson>.Changed(_target.AsJson())
+            : MaybeChangeJson<TJson>.NoChanges();
         return result;
     }
 }

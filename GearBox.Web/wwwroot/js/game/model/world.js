@@ -77,7 +77,7 @@ export class WorldInitHandler {
     }
 }
 
-export class WorldUpdateHandler {
+export class AreaUpdateHandler {
     #world;
     #inventoryDeserializer;
     #itemDeserializer;
@@ -100,7 +100,7 @@ export class WorldUpdateHandler {
 
     /**
      * @param {JsonDeserializer} deserializer used to deserialize dynamic game objects
-     * @returns {WorldUpdateHandler} this, for chaining
+     * @returns {AreaUpdateHandler} this, for chaining
      */
     addGameObjectType(deserializer) {
         this.#deserializers.addDeserializer(deserializer);
@@ -109,7 +109,7 @@ export class WorldUpdateHandler {
 
     /**
      * @param {(World) => any} updateListener 
-     * @returns {WorldUpdateHandler}
+     * @returns {AreaUpdateHandler}
      */
     addUpdateListener(updateListener) {
         this.#updateListeners.push(updateListener);
@@ -118,7 +118,7 @@ export class WorldUpdateHandler {
 
     /**
      * @param {(Inventory) => any} changeListener 
-     * @returns {WorldUpdateHandler}
+     * @returns {AreaUpdateHandler}
      */
     addInventoryChangeListener(changeListener) {
         this.#inventoryChangeListeners.push(changeListener);
@@ -127,7 +127,7 @@ export class WorldUpdateHandler {
 
     /**
      * @param {(Item?) => any} changeListener 
-     * @returns {WorldUpdateHandler}
+     * @returns {AreaUpdateHandler}
      */
     addWeaponChangeListener(changeListener) {
         this.#weaponChangeListeners.push(changeListener);
@@ -136,7 +136,7 @@ export class WorldUpdateHandler {
 
     /**
      * @param {(Item?) => any} changeListener 
-     * @returns {WorldUpdateHandler}
+     * @returns {AreaUpdateHandler}
      */
     addArmorChangeListener(changeListener) {
         this.#armorChangeListeners.push(changeListener);
@@ -145,14 +145,14 @@ export class WorldUpdateHandler {
 
     /**
      * @param {(PlayerStatSummary) => any} changeListener 
-     * @returns {WorldUpdateHandler}
+     * @returns {AreaUpdateHandler}
      */
     addStatSummaryChangeListener(changeListener) {
         this.#statSummaryChangeListeners.push(changeListener);
         return this;
     }
 
-    handleWorldUpdate(json) {
+    handleAreaUpdate(json) {
         const newGameObject = json.gameObjects
             .map(gameObjectJson => this.#deserialize(gameObjectJson))
             .filter(obj => obj !== null);
@@ -160,31 +160,16 @@ export class WorldUpdateHandler {
         
         this.#updateListeners.forEach(listener => listener(this.#world));
 
-        if (json.inventory.hasChanged) {
-            const inventory = this.#inventoryDeserializer.deserialize(JSON.parse(json.inventory.body));
-            this.#inventoryChangeListeners.forEach(listener => listener(inventory));
-        }
+        this.#handleChanges(json.changes.inventory, v => this.#inventoryDeserializer.deserialize(v), this.#inventoryChangeListeners);
+        this.#handleChanges(json.changes.weapon, v => this.#itemDeserializer.deserialize(v), this.#weaponChangeListeners);
+        this.#handleChanges(json.changes.armor, v => this.#itemDeserializer.deserialize(v), this.#armorChangeListeners);
+        this.#handleChanges(json.changes.summary, PlayerStatSummary.fromJson, this.#statSummaryChangeListeners);
+    }
 
-        if (json.weapon.hasChanged) {
-            const maybeWeapon = JSON.parse(json.weapon.body);
-            const weapon = maybeWeapon
-                ? this.#itemDeserializer.deserialize(maybeWeapon)
-                : null;
-            this.#weaponChangeListeners.forEach(listener => listener(weapon));
-        }
-
-        if (json.armor.hasChanged) {
-            const maybeArmor = JSON.parse(json.armor.body);
-            const armor = maybeArmor
-                ? this.#itemDeserializer.deserialize(maybeArmor)
-                : null;
-            this.#armorChangeListeners.forEach(listener => listener(armor));
-        }
-
-        if (json.statSummary.hasChanged) {
-            const statSummaryJson = JSON.parse(json.statSummary.body);
-            const statSummary = PlayerStatSummary.fromJson(statSummaryJson);
-            this.#statSummaryChangeListeners.forEach(listener => listener(statSummary));
+    #handleChanges(maybeChange, deserialize, listeners) {
+        if (maybeChange.hasChanged) {
+            const value = deserialize(maybeChange.value);
+            listeners.forEach(listener => listener(value));
         }
     }
 

@@ -1,16 +1,16 @@
-using GearBox.Core.Model.Json;
 using GearBox.Core.Model.GameObjects.ChangeTracking;
 using System.Text.Json;
 using GearBox.Core.Model.Items.Crafting;
+using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model.Items;
 
 /// <summary>
 /// Contains items a player has picked up.
 /// </summary>
-public class Inventory : IDynamic
+public class Inventory : IDynamic<InventoryJson>
 {
-    private readonly ChangeTracker _changeTracker;
+    private readonly ChangeTracker<InventoryJson> _changeTracker;
 
     public Inventory()
     {
@@ -82,10 +82,10 @@ public class Inventory : IDynamic
 
     public string Serialize(SerializationOptions options)
     {
-        var json = new InventoryJson(Weapons.ToJson(), Armors.ToJson(), Materials.ToJson());
-        return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
+        return JsonSerializer.Serialize(AsJson(), options.JsonSerializerOptions);
     }
 
     public void Update() => _changeTracker.Update();
-    public StableJson ToJson() => _changeTracker.ToJson();
+    public MaybeChangeJson<InventoryJson> ToJson() => _changeTracker.ToJson();
+    public InventoryJson AsJson() => new(Weapons.ToJson(), Armors.ToJson(), Materials.ToJson());
 }

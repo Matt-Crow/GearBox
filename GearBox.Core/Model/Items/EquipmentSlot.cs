@@ -1,13 +1,14 @@
 using System.Text.Json;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.GameObjects.ChangeTracking;
+using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model.Items;
 
-public class EquipmentSlot<T> : IDynamic
+public class EquipmentSlot<T> : IDynamic<ItemJson?>
 where T : Equipment
 {
-    private readonly ChangeTracker _changeTracker;
+    private readonly ChangeTracker<ItemJson?> _changeTracker;
 
     public EquipmentSlot(string type)
     {
@@ -41,5 +42,6 @@ where T : Equipment
     }
 
     public void Update() => _changeTracker.Update();
-    public StableJson ToJson() => _changeTracker.ToJson();
+    public MaybeChangeJson<ItemJson?> ToJson() => _changeTracker.ToJson();
+    public ItemJson? AsJson() => ValueJson();
 }

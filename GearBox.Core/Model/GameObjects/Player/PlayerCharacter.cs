@@ -3,6 +3,7 @@ using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
 using System.Text.Json;
+using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model.GameObjects.Player;
 
@@ -134,9 +135,15 @@ public class PlayerCharacter : Character
         _statSummary.Update();
     }
 
-    public StableJson GetStatSummaryJson()
+    public ChangesJson GetChanges()
     {
-        return _statSummary.ToJson();
+        var result = new ChangesJson(
+            Inventory.ToJson(),
+            WeaponSlot.ToJson(),
+            ArmorSlot.ToJson(), 
+            _statSummary.ToJson()
+        );
+        return result;
     }
 
     protected override string Serialize(SerializationOptions options)

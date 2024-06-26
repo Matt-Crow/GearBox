@@ -7,7 +7,7 @@ import { ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
 import { PlayerChangeHandler } from "./model/player.js";
 import { ProjectileJsonDeserializer } from "./model/projectile.js";
-import { WorldInitHandler, WorldUpdateHandler } from "./model/world.js";
+import { WorldInitHandler, AreaUpdateHandler } from "./model/world.js";
 
 export class Game {
 
@@ -72,7 +72,7 @@ export class Game {
         this.#inventoryModal.setCraftingRecipes(world.craftingRecipes.recipes);
 
         const itemDeserializer = new ItemDeserializer(world.itemTypes);
-        const updateHandler = new WorldUpdateHandler(world, itemDeserializer)
+        const updateHandler = new AreaUpdateHandler(world, itemDeserializer)
             .addGameObjectType(new CharacterJsonDeserializer())
             .addGameObjectType(new PlayerChangeHandler(world.playerId, this.#playerHud.playerUpdateListener))
             .addGameObjectType(new ProjectileJsonDeserializer())
@@ -85,7 +85,7 @@ export class Game {
             ;
 
         // unregisters handleInit, switches to handling updates instead
-        this.#handleMessage = (updateMessage) => updateHandler.handleWorldUpdate(updateMessage);
+        this.#handleMessage = (updateMessage) => updateHandler.handleAreaUpdate(updateMessage);
         
         setInterval(() => this.#canvas.draw(world), 1000 / 24);
 

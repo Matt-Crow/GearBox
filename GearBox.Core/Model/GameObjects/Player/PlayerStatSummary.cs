@@ -1,10 +1,11 @@
 using System.Text.Json;
 using GearBox.Core.Model.GameObjects.ChangeTracking;
 using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model.GameObjects.Player;
 
-public class PlayerStatSummary : IDynamic
+public class PlayerStatSummary : IDynamic<PlayerStatSummaryJson>
 {
     private readonly IEnumerable<PlayerStatSummaryElement> _elements = [
         new(
@@ -38,7 +39,7 @@ public class PlayerStatSummary : IDynamic
     ];
 
     private readonly PlayerCharacter _player;
-    private readonly ChangeTracker _changeTracker;
+    private readonly ChangeTracker<PlayerStatSummaryJson> _changeTracker;
 
     public PlayerStatSummary(PlayerCharacter player)
     {
@@ -50,11 +51,7 @@ public class PlayerStatSummary : IDynamic
 
     public string Serialize(SerializationOptions options)
     {
-        var lines = _elements
-            .Select(e => e.ToString(_player))
-            .ToList();
-        var json = new PlayerStatSummaryJson(lines);
-        return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
+        return JsonSerializer.Serialize(AsJson(), options.JsonSerializerOptions);
     }
 
     private static string Percent(double number)
@@ -63,5 +60,13 @@ public class PlayerStatSummary : IDynamic
     }
 
     public void Update() => _changeTracker.Update();
-    public StableJson ToJson() => _changeTracker.ToJson();
+    public MaybeChangeJson<PlayerStatSummaryJson> ToJson() => _changeTracker.ToJson();
+    public PlayerStatSummaryJson AsJson()
+    {
+        var lines = _elements
+            .Select(e => e.ToString(_player))
+            .ToList();
+        var json = new PlayerStatSummaryJson(lines);
+        return json;
+    }
 }
