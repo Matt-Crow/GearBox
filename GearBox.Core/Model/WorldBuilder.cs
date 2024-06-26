@@ -198,7 +198,6 @@ public class WorldBuilder
             throw new Exception();
         }
         var result = new World(
-            Guid.NewGuid(),
             _map,
             ItemTypeRepository.Of(_itemTypes),
             CraftingRecipeRepository.Of(_craftingRecipes),

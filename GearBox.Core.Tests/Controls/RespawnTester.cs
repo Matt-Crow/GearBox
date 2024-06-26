@@ -19,11 +19,11 @@ public class RespawnTester
         Assert.True(player.Termination.IsTerminated);
 
         area.Update(); // update area so it removes the player
-        Assert.False(area.ContainsPlayer(player));
+        Assert.Null(player.CurrentArea);
 
         sut.ExecuteOn(player);
         Assert.False(player.Termination.IsTerminated);
-        Assert.True(area.ContainsPlayer(player));
+        Assert.Equal(area, player.CurrentArea);
     }
 
     [Fact]

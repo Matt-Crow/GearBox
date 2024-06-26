@@ -20,8 +20,10 @@ public interface IArea
     void SpawnPlayer(PlayerCharacter player);
 
     Character SpawnEnemy();
+    void SpawnLootChest();
     
     void AddProjectile(Projectile projectile);
+    void AddTimer(GameTimer timer);
 
     void RemovePlayer(PlayerCharacter player);
 

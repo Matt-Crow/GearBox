@@ -11,25 +11,26 @@ using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model;
+
 /// <summary>
 /// For now, a World is the topmost container for game objects.
 /// Future versions will need separate containers for the different game areas.
 /// </summary>
 public class World : IArea
 {
+    private readonly GameObjectCollection _gameObjects = new();
     private readonly List<GameTimer> _timers = [];
-    private readonly LootTable _loot;
-    
-    // todo player-interactables
     private readonly SafeList<LootChest> _lootChests = new(); 
     private readonly SafeList<PlayerCharacter> _players = new();
-    
-    private readonly List<Func<Character>> _enemies = [];
     private readonly Team _playerTeam = new("Players");
     private readonly Team _enemyTeam = new("Enemies");
+    private readonly Map _map;
+    private readonly IItemTypeRepository _itemTypes;
+    private readonly CraftingRecipeRepository _craftingRecipes;
+    private readonly LootTable _loot;
+    private readonly List<Func<Character>> _enemies;
 
     public World(
-        Guid? id = null, 
         Map? map = null, 
         IItemTypeRepository? itemTypes = null, 
         CraftingRecipeRepository? craftingRecipes = null,
@@ -37,11 +38,9 @@ public class World : IArea
         List<Func<Character>>? enemies = null
     )
     {
-        Id = id ?? Guid.NewGuid();
-        Map = map ?? new();
-        GameObjects = new GameObjectCollection();
-        ItemTypes = itemTypes ?? ItemTypeRepository.Empty();
-        CraftingRecipes = craftingRecipes ?? CraftingRecipeRepository.Empty();
+        _map = map ?? new();
+        _itemTypes = itemTypes ?? ItemTypeRepository.Empty();
+        _craftingRecipes = craftingRecipes ?? CraftingRecipeRepository.Empty();
         _loot = loot ?? new LootTable();
         _enemies = enemies ?? [];
 
@@ -51,23 +50,16 @@ public class World : IArea
         }
     }
 
-    public Guid Id { get; init; }
-    public Map Map { get; init; }
-    public GameObjectCollection GameObjects { get; init; }
-    public IItemTypeRepository ItemTypes { get; init; }
-    public CraftingRecipeRepository CraftingRecipes { get; init; }
-
-    #region Implement IArea
     public void SpawnPlayer(PlayerCharacter player)
     {
-        if (ContainsPlayer(player))
+        if (_players.Contains(player))
         {
             return;
         }
         player.HealPercent(100.0);
         player.SetArea(this);
         player.Team = _playerTeam;
-        GameObjects.AddGameObject(player);
+        _gameObjects.AddGameObject(player);
         _players.Add(player);
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
     }
@@ -80,32 +72,42 @@ public class World : IArea
         enemy.SetArea(this);
         enemy.Team = _enemyTeam;
         
-        var tile = Map.GetRandomFloorTile();
+        var tile = _map.GetRandomFloorTile();
         enemy.Coordinates = tile.CenteredOnTile();
 
-        GameObjects.AddGameObject(enemy);
+        _gameObjects.AddGameObject(enemy);
         return enemy;
     }
+
+    public void SpawnLootChest()
+    {
+        var inventory = _loot.GetRandomItems();
+        var location = _map.GetRandomFloorTile();
+        var lootChest = new LootChest(location.CenteredOnTile(), inventory);
+        _lootChests.Add(lootChest);
+        _gameObjects.AddGameObject(lootChest);
+    }
     
-    public void AddProjectile(Projectile projectile) => GameObjects.AddGameObject(projectile);
+    public void AddProjectile(Projectile projectile) => _gameObjects.AddGameObject(projectile);
+    public void AddTimer(GameTimer timer) => _timers.Add(timer);
 
     public void RemovePlayer(PlayerCharacter player)
     {
-        if (!ContainsPlayer(player))
+        if (!_players.Contains(player))
         {
             return;
         }
 
         player.SetArea(null); // might change when moving player to new area
-        GameObjects.RemoveGameObject(player);
+        _gameObjects.RemoveGameObject(player);
         _players.Remove(player);
     }
 
-    public CraftingRecipe? GetCraftingRecipeById(Guid id) => CraftingRecipes.GetById(id);
+    public CraftingRecipe? GetCraftingRecipeById(Guid id) => _craftingRecipes.GetById(id);
 
     public Character? GetNearestEnemy(Character character)
     {
-        var result = GameObjects.GameObjects
+        var result = _gameObjects.GameObjects
             .Select(obj => obj as Character)
             .Where(maybeCharacter => maybeCharacter != null)
             .Select(character => character!)
@@ -116,47 +118,36 @@ public class World : IArea
         return result;
     }
 
-    public Coordinates GetRandomFloorTile() => Map.GetRandomFloorTile();
+    public Coordinates GetRandomFloorTile() => _map.GetRandomFloorTile();
 
-    public AreaInitJson GetAreaInitJsonFor(PlayerCharacter player)
-    {
-        var result = new AreaInitJson(
-            player.Id,
-            Map.ToJson(),
-            ItemTypes.ToJson(),
-            CraftingRecipes.ToJson()
-        );
-        return result;
-    }
+    public AreaInitJson GetAreaInitJsonFor(PlayerCharacter player) => new(
+        player.Id,
+        _map.ToJson(),
+        _itemTypes.ToJson(),
+        _craftingRecipes.ToJson()
+    );
 
-    public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player)
-    {
-        var result = new AreaUpdateJson(
-            GameObjects.ToJson(),
-            player.GetChanges()
-        );
-        return result;
-    }
+    public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player) => new(_gameObjects.ToJson(), player.GetChanges());
 
     public void Update()
     {
         _timers.ForEach(t => t.Update());
-        GameObjects.Update();
-        foreach (var obj in GameObjects.GameObjects)
+        _gameObjects.Update();
+        foreach (var obj in _gameObjects.GameObjects)
         {
             // todo move Projectiles to their own list
             if (obj is Projectile projectile)
             {
-                Map.CheckForCollisions(projectile);
+                _map.CheckForCollisions(projectile);
             } else if (obj.Body != null)
             {
-                Map.CheckForCollisions(obj.Body);
+                _map.CheckForCollisions(obj.Body);
             }
 
             var body = obj.Body;
             if (body is not null)
             {
-                GameObjects.CheckForCollisions(body);
+                _gameObjects.CheckForCollisions(body);
             }
         }
         foreach (var lootChest in _lootChests.AsEnumerable())
@@ -168,36 +159,5 @@ public class World : IArea
         }
         _lootChests.ApplyChanges();
         _players.ApplyChanges();
-    }
-    #endregion
-    
-    public bool ContainsPlayer(PlayerCharacter player)
-    {
-        return _players.Contains(player);
-    }
-    
-    public void AddTimer(GameTimer timer)
-    {
-        _timers.Add(timer);
-    }
-
-    public void SpawnLootChest()
-    {
-        var inventory = _loot.GetRandomItems();
-        var location = Map.GetRandomFloorTile();
-        var lootChest = new LootChest(location.CenteredOnTile(), inventory);
-        _lootChests.Add(lootChest);
-        GameObjects.AddGameObject(lootChest);
-    }
-
-    public override bool Equals(object? other)
-    {
-        var otherWorld = other as World;
-        return Id.Equals(otherWorld?.Id);
-    }
-
-    public override int GetHashCode()
-    {
-        return Id.GetHashCode();
     }
 }
