@@ -26,20 +26,6 @@ where T : IGameObject
         _gameObjects.Remove(obj);
     }
 
-    public void CheckForCollisions(BodyBehavior body)
-    {
-        // only check for collisions with Characters for now
-        var collidingCharacters = _gameObjects.AsEnumerable()
-            .Select(obj => obj as Character)
-            .Where(obj => obj != null)
-            .Select(obj => obj!)
-            .Where(obj => obj?.Body != null && obj.Body.CollidesWith(body) && obj.Body != body);
-        foreach (var character in collidingCharacters)
-        {
-            body.OnCollided(new CollideEventArgs(character));
-        }
-    }
-
     public void Update()
     {
         _gameObjects.ApplyChanges();

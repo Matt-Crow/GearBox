@@ -19,6 +19,7 @@ namespace GearBox.Core.Model;
 public class World : IArea
 {
     private readonly GameObjectCollection<IGameObject> _gameObjects = new();
+    private readonly GameObjectCollection<Character> _characters = new();
     private readonly List<GameTimer> _timers = [];
     private readonly SafeList<LootChest> _lootChests = new(); 
     private readonly SafeList<PlayerCharacter> _players = new();
@@ -28,25 +29,25 @@ public class World : IArea
     private readonly IItemTypeRepository _itemTypes;
     private readonly CraftingRecipeRepository _craftingRecipes;
     private readonly LootTable _loot;
-    private readonly List<Func<Character>> _enemies;
+    private readonly List<Func<Character>> _enemyMakers;
 
     public World(
         Map? map = null, 
         IItemTypeRepository? itemTypes = null, 
         CraftingRecipeRepository? craftingRecipes = null,
         LootTable? loot = null,
-        List<Func<Character>>? enemies = null
+        List<Func<Character>>? enemyMakers = null
     )
     {
         _map = map ?? new();
         _itemTypes = itemTypes ?? ItemTypeRepository.Empty();
         _craftingRecipes = craftingRecipes ?? CraftingRecipeRepository.Empty();
         _loot = loot ?? new LootTable();
-        _enemies = enemies ?? [];
+        _enemyMakers = enemyMakers ?? [];
 
-        if (_enemies.Count == 0)
+        if (_enemyMakers.Count == 0)
         {
-            _enemies.Add(() => new Character("Default enemy", 1));
+            _enemyMakers.Add(() => new Character("Default enemy", 1));
         }
     }
 
@@ -59,14 +60,14 @@ public class World : IArea
         player.HealPercent(100.0);
         player.SetArea(this);
         player.Team = _playerTeam;
-        _gameObjects.AddGameObject(player);
+        _characters.AddGameObject(player);
         _players.Add(player);
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
     }
 
     public Character SpawnEnemy()
     {
-        var enemyFactory = _enemies[Random.Shared.Next(_enemies.Count)];
+        var enemyFactory = _enemyMakers[Random.Shared.Next(_enemyMakers.Count)];
         var enemy = enemyFactory.Invoke();
         enemy.AiBehavior = new WanderAiBehavior(enemy);
         enemy.SetArea(this);
@@ -75,7 +76,7 @@ public class World : IArea
         var tile = _map.GetRandomFloorTile();
         enemy.Coordinates = tile.CenteredOnTile();
 
-        _gameObjects.AddGameObject(enemy);
+        _characters.AddGameObject(enemy);
         return enemy;
     }
 
@@ -99,7 +100,7 @@ public class World : IArea
         }
 
         player.SetArea(null); // might change when moving player to new area
-        _gameObjects.RemoveGameObject(player);
+        _characters.RemoveGameObject(player);
         _players.Remove(player);
     }
 
@@ -107,11 +108,7 @@ public class World : IArea
 
     public Character? GetNearestEnemy(Character character)
     {
-        var result = _gameObjects.GameObjects
-            .Select(obj => obj as Character)
-            .Where(maybeCharacter => maybeCharacter != null)
-            .Select(character => character!)
-            .Where(other => other != character) // not the same
+        var result = _characters.GameObjects
             .Where(other => other.Team != character.Team)
             .OrderBy(enemy => enemy.Coordinates.DistanceFrom(character.Coordinates).InPixels)
             .FirstOrDefault();
@@ -127,12 +124,19 @@ public class World : IArea
         _craftingRecipes.ToJson()
     );
 
-    public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player) => new(_gameObjects.ToJson(), player.GetChanges());
+    public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player)
+    {
+        var allGameObjects = _gameObjects.ToJson()
+            .Concat(_characters.ToJson())
+            .ToList();
+        return new(allGameObjects, player.GetChanges());
+    }
 
     public void Update()
     {
         _timers.ForEach(t => t.Update());
         _gameObjects.Update();
+        _characters.Update();
         foreach (var obj in _gameObjects.GameObjects)
         {
             // todo move Projectiles to their own list
@@ -147,8 +151,12 @@ public class World : IArea
             var body = obj.Body;
             if (body is not null)
             {
-                _gameObjects.CheckForCollisions(body);
+                CheckForCollisionsWithCharacters(body);
             }
+        }
+        foreach (var character in _characters.GameObjects)
+        {
+            _map.CheckForCollisions(character.Body);
         }
         foreach (var lootChest in _lootChests.AsEnumerable())
         {
@@ -159,5 +167,15 @@ public class World : IArea
         }
         _lootChests.ApplyChanges();
         _players.ApplyChanges();
+    }
+
+    private void CheckForCollisionsWithCharacters(BodyBehavior body)
+    {
+        var collidingCharacters = _characters.GameObjects
+            .Where(obj => obj.Body.CollidesWith(body));
+        foreach (var character in collidingCharacters)
+        {
+            body.OnCollided(new CollideEventArgs(character));
+        }
     }
 }

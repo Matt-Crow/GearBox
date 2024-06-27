@@ -55,6 +55,11 @@ public class BodyBehavior
 
     public bool CollidesWith(BodyBehavior other)
     {
+        if (other == this)
+        {
+            return false; // cannot collide with self
+        }
+        
         var withinX = RightInPixels >= other.LeftInPixels && LeftInPixels <= other.RightInPixels;
         var withinY = BottomInPixels >= other.TopInPixels && TopInPixels <= other.BottomInPixels;
         return withinX && withinY;
