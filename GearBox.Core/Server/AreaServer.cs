@@ -107,6 +107,7 @@ public class AreaServer
 
     public async Task Update()
     {
+        var tasks = new List<Task>();
         lock (connectionLock)
         {
             var executeThese = _pendingCommands
@@ -119,9 +120,12 @@ public class AreaServer
             }
 
             Area.Update();
+            tasks = _connections.Keys
+                .Select(SendAreaUpdateTo)
+                .ToList();
         }
         // notify everyone of the update
-        await Task.WhenAll(_connections.Keys.Select(SendAreaUpdateTo));
+        await Task.WhenAll(tasks);
     }
 
     private Task SendAreaUpdateTo(string playerId)

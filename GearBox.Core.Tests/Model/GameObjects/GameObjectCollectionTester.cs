@@ -13,7 +13,7 @@ public class GameObjectCollectionTester
         
         sut.Update();
 
-        Assert.Equal(2, sut.GameObjects.Count());
+        Assert.Equal(2, sut.AsEnumerable.Count());
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class GameObjectCollectionTester
         sut.AddGameObject(anObject);
         sut.Update();
 
-        Assert.Single(sut.GameObjects);
+        Assert.Single(sut.AsEnumerable);
     }
 
     [Fact]
@@ -39,6 +39,6 @@ public class GameObjectCollectionTester
         anObject.IsTerminated = true;
         sut.Update();
 
-        Assert.Empty(sut.GameObjects);
+        Assert.Empty(sut.AsEnumerable);
     }
 }

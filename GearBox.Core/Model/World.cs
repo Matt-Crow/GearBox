@@ -9,6 +9,7 @@ using GearBox.Core.Model.Static;
 using GearBox.Core.Utils;
 using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
+using GearBox.Core.Model.Json;
 
 namespace GearBox.Core.Model;
 
@@ -18,11 +19,11 @@ namespace GearBox.Core.Model;
 /// </summary>
 public class World : IArea
 {
-    private readonly GameObjectCollection<IGameObject> _gameObjects = new();
     private readonly GameObjectCollection<Character> _characters = new();
-    private readonly List<GameTimer> _timers = [];
-    private readonly SafeList<LootChest> _lootChests = new(); 
+    private readonly GameObjectCollection<Projectile> _projectiles = new();
+    private readonly GameObjectCollection<LootChest> _lootChests = new(); 
     private readonly SafeList<PlayerCharacter> _players = new();
+    private readonly List<GameTimer> _timers = [];
     private readonly Team _playerTeam = new("Players");
     private readonly Team _enemyTeam = new("Enemies");
     private readonly Map _map;
@@ -85,11 +86,10 @@ public class World : IArea
         var inventory = _loot.GetRandomItems();
         var location = _map.GetRandomFloorTile();
         var lootChest = new LootChest(location.CenteredOnTile(), inventory);
-        _lootChests.Add(lootChest);
-        _gameObjects.AddGameObject(lootChest);
+        _lootChests.AddGameObject(lootChest);
     }
     
-    public void AddProjectile(Projectile projectile) => _gameObjects.AddGameObject(projectile);
+    public void AddProjectile(Projectile projectile) => _projectiles.AddGameObject(projectile);
     public void AddTimer(GameTimer timer) => _timers.Add(timer);
 
     public void RemovePlayer(PlayerCharacter player)
@@ -108,7 +108,7 @@ public class World : IArea
 
     public Character? GetNearestEnemy(Character character)
     {
-        var result = _characters.GameObjects
+        var result = _characters.AsEnumerable
             .Where(other => other.Team != character.Team)
             .OrderBy(enemy => enemy.Coordinates.DistanceFrom(character.Coordinates).InPixels)
             .FirstOrDefault();
@@ -126,8 +126,10 @@ public class World : IArea
 
     public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player)
     {
-        var allGameObjects = _gameObjects.ToJson()
+        var allGameObjects = Array.Empty<GameObjectJson>()
             .Concat(_characters.ToJson())
+            .Concat(_projectiles.ToJson())
+            .Concat(_lootChests.ToJson())
             .ToList();
         return new(allGameObjects, player.GetChanges());
     }
@@ -135,43 +137,31 @@ public class World : IArea
     public void Update()
     {
         _timers.ForEach(t => t.Update());
-        _gameObjects.Update();
         _characters.Update();
-        foreach (var obj in _gameObjects.GameObjects)
-        {
-            // todo move Projectiles to their own list
-            if (obj is Projectile projectile)
-            {
-                _map.CheckForCollisions(projectile);
-            } else if (obj.Body != null)
-            {
-                _map.CheckForCollisions(obj.Body);
-            }
-
-            var body = obj.Body;
-            if (body is not null)
-            {
-                CheckForCollisionsWithCharacters(body);
-            }
-        }
-        foreach (var character in _characters.GameObjects)
+        _projectiles.Update();
+        _lootChests.Update();
+        foreach (var character in _characters.AsEnumerable)
         {
             _map.CheckForCollisions(character.Body);
         }
-        foreach (var lootChest in _lootChests.AsEnumerable())
+        foreach (var projectile in _projectiles.AsEnumerable)
+        {
+            _map.CheckForCollisions(projectile);
+            CheckForCollisionsWithCharacters(projectile.Body);
+        }
+        foreach (var lootChest in _lootChests.AsEnumerable)
         {
             foreach (var player in _players.AsEnumerable())
             {
                 lootChest.CheckForCollisions(player);
             }
         }
-        _lootChests.ApplyChanges();
         _players.ApplyChanges();
     }
 
     private void CheckForCollisionsWithCharacters(BodyBehavior body)
     {
-        var collidingCharacters = _characters.GameObjects
+        var collidingCharacters = _characters.AsEnumerable
             .Where(obj => obj.Body.CollidesWith(body));
         foreach (var character in collidingCharacters)
         {

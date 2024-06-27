@@ -11,7 +11,7 @@ where T : IGameObject
 {
     private readonly SafeList<T> _gameObjects = new();
 
-    public IEnumerable<T> GameObjects => _gameObjects.AsEnumerable();
+    public IEnumerable<T> AsEnumerable => _gameObjects.AsEnumerable();
 
     public void AddGameObject(T obj)
     {
