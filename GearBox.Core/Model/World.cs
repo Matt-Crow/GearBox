@@ -18,7 +18,7 @@ namespace GearBox.Core.Model;
 /// </summary>
 public class World : IArea
 {
-    private readonly GameObjectCollection _gameObjects = new();
+    private readonly GameObjectCollection<IGameObject> _gameObjects = new();
     private readonly List<GameTimer> _timers = [];
     private readonly SafeList<LootChest> _lootChests = new(); 
     private readonly SafeList<PlayerCharacter> _players = new();

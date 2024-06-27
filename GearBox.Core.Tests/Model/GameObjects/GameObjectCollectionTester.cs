@@ -8,7 +8,7 @@ public class GameObjectCollectionTester
     [Fact]
     public void ObjectsCanAddOtherObjects()
     {
-        var sut = new GameObjectCollection();
+        var sut = new GameObjectCollection<DuplicatingGameObject>();
         sut.AddGameObject(new DuplicatingGameObject(sut));
         
         sut.Update();
@@ -19,7 +19,7 @@ public class GameObjectCollectionTester
     [Fact]
     public void ObjectCannotBeAddedToSameCollectionTwice()
     {
-        var sut = new GameObjectCollection();
+        var sut = new GameObjectCollection<GameObjectSpy>();
         var anObject = new GameObjectSpy();
 
         sut.AddGameObject(anObject);
@@ -32,7 +32,7 @@ public class GameObjectCollectionTester
     [Fact]
     public void Object_AfterTerminating_IsRemoved()
     {
-        var sut = new GameObjectCollection();
+        var sut = new GameObjectCollection<TerminatingGameObject>();
         var anObject = new TerminatingGameObject();
 
         sut.AddGameObject(anObject);

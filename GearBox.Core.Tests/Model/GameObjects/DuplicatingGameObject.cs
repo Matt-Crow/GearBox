@@ -5,9 +5,9 @@ namespace GearBox.Core.Tests.Model.GameObjects;
 
 public class DuplicatingGameObject : IGameObject
 {
-    private readonly GameObjectCollection _content;
+    private readonly GameObjectCollection<DuplicatingGameObject> _content;
 
-    public DuplicatingGameObject(GameObjectCollection content) => _content = content;
+    public DuplicatingGameObject(GameObjectCollection<DuplicatingGameObject> content) => _content = content;
 
     public Serializer? Serializer => null;
     public BodyBehavior? Body => null;

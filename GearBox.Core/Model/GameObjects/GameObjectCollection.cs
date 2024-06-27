@@ -6,13 +6,14 @@ namespace GearBox.Core.Model.GameObjects;
 /// <summary>
 /// GameObjects in an area
 /// </summary>
-public class GameObjectCollection
+public class GameObjectCollection<T>
+where T : IGameObject
 {
-    private readonly SafeList<IGameObject> _gameObjects = new();
+    private readonly SafeList<T> _gameObjects = new();
 
-    public IEnumerable<IGameObject> GameObjects => _gameObjects.AsEnumerable();
+    public IEnumerable<T> GameObjects => _gameObjects.AsEnumerable();
 
-    public void AddGameObject(IGameObject obj)
+    public void AddGameObject(T obj)
     {
         if (!_gameObjects.Contains(obj))
         {
@@ -20,7 +21,7 @@ public class GameObjectCollection
         }
     }
 
-    public void RemoveGameObject(IGameObject obj)
+    public void RemoveGameObject(T obj)
     {
         _gameObjects.Remove(obj);
     }
@@ -54,7 +55,7 @@ public class GameObjectCollection
         _gameObjects.ApplyChanges();
     }
 
-    private static bool IsTerminated(IGameObject obj)
+    private static bool IsTerminated(T obj)
     {
         return obj.Termination != null && obj.Termination.IsTerminated;
     }
