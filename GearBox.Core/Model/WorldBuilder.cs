@@ -197,13 +197,17 @@ public class WorldBuilder
         {
             throw new Exception();
         }
-        var result = new World(
-            _map,
+        var game = new Game(
             ItemTypeRepository.Of(_itemTypes),
-            CraftingRecipeRepository.Of(_craftingRecipes),
+            CraftingRecipeRepository.Of(_craftingRecipes)
+        );
+        var result = new World(
+            game,
+            _map,
             _loot,
             _enemies
         );
+        game.AddArea(result);
         return result;
     }
 }

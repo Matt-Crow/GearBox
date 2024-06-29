@@ -13,12 +13,9 @@ using GearBox.Core.Model.Json;
 
 namespace GearBox.Core.Model;
 
-/// <summary>
-/// For now, a World is the topmost container for game objects.
-/// Future versions will need separate containers for the different game areas.
-/// </summary>
 public class World : IArea
 {
+    private readonly IGame _game;
     private readonly GameObjectCollection<Character> _characters = new();
     private readonly GameObjectCollection<Projectile> _projectiles = new();
     private readonly GameObjectCollection<LootChest> _lootChests = new(); 
@@ -27,22 +24,18 @@ public class World : IArea
     private readonly Team _playerTeam = new("Players");
     private readonly Team _enemyTeam = new("Enemies");
     private readonly Map _map;
-    private readonly IItemTypeRepository _itemTypes;
-    private readonly CraftingRecipeRepository _craftingRecipes;
     private readonly LootTable _loot;
     private readonly List<Func<Character>> _enemyMakers;
 
     public World(
+        IGame? game = null,
         Map? map = null, 
-        IItemTypeRepository? itemTypes = null, 
-        CraftingRecipeRepository? craftingRecipes = null,
         LootTable? loot = null,
         List<Func<Character>>? enemyMakers = null
     )
     {
+        _game = game ?? new Game();
         _map = map ?? new();
-        _itemTypes = itemTypes ?? ItemTypeRepository.Empty();
-        _craftingRecipes = craftingRecipes ?? CraftingRecipeRepository.Empty();
         _loot = loot ?? new LootTable();
         _enemyMakers = enemyMakers ?? [];
 
@@ -104,7 +97,10 @@ public class World : IArea
         _players.Remove(player);
     }
 
-    public CraftingRecipe? GetCraftingRecipeById(Guid id) => _craftingRecipes.GetById(id);
+    /// <summary>
+    /// might be able to remove this once commands operate on the game instead of area
+    /// </summary>
+    public CraftingRecipe? GetCraftingRecipeById(Guid id) => _game.GetCraftingRecipeById(id);
 
     public Character? GetNearestEnemy(Character character)
     {
@@ -120,8 +116,8 @@ public class World : IArea
     public AreaInitJson GetAreaInitJsonFor(PlayerCharacter player) => new(
         player.Id,
         _map.ToJson(),
-        _itemTypes.ToJson(),
-        _craftingRecipes.ToJson()
+        _game.GetItemTypeJsons(), // todo move to GameInit
+        _game.GetCraftingRecipeJsons() // todo move to GameInit
     );
 
     public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player)
