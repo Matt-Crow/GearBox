@@ -29,4 +29,10 @@ public class Game : IGame
     {
         _areas.Add(area);
     }
+
+    public IArea GetDefaultArea()
+    {
+        // todo some other way of signifying default area
+        return _areas.FirstOrDefault() ?? throw new Exception("Game has no area");
+    }
 }

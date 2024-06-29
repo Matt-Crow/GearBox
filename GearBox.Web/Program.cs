@@ -4,32 +4,35 @@ using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 
-var builder = WebApplication.CreateBuilder(args);
+var webAppBuilder = WebApplication.CreateBuilder(args);
 
-var world = new WorldBuilder()
-    .AddMiningSkill()
-    .AddStarterEquipment()
-    .AddDefaultEnemies()
-    .WithDesertMap()
+var game = new GameBuilder()
+    .WithArea(area => area
+        .AddMiningSkill()
+        .AddStarterEquipment()
+        .AddDefaultEnemies()
+        .WithDesertMap()
+    )
     .Build();
+var area = game.GetDefaultArea();
 
 // testing LootChests
-world.AddTimer(new GameTimer(world.SpawnLootChest, 50));
+area.AddTimer(new GameTimer(area.SpawnLootChest, 50));
 
 // testing EnemySpawner
-var spawner = new EnemySpawner(world, new EnemySpawnerOptions()
+var spawner = new EnemySpawner(area, new EnemySpawnerOptions()
 {
     WaveSize = 3,
     MaxChildren = 10
 });
-world.AddTimer(new GameTimer(spawner.SpawnWave, Duration.FromSeconds(10).InFrames));
+area.AddTimer(new GameTimer(spawner.SpawnWave, Duration.FromSeconds(10).InFrames));
 
 // Add services to the container.
-builder.Services.AddRazorPages();
-builder.Services.AddSignalR();
-builder.Services.AddSingleton(new AreaServer(world)); // todo AreaRepository
+webAppBuilder.Services.AddRazorPages();
+webAppBuilder.Services.AddSignalR();
+webAppBuilder.Services.AddSingleton(new AreaServer(area)); // todo AreaRepository
 
-var app = builder.Build();
+var app = webAppBuilder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

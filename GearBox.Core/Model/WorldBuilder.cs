@@ -9,23 +9,26 @@ namespace GearBox.Core.Model;
 
 public class WorldBuilder
 {
+    private readonly IGameBuilder _gameBuilder;
     private Map? _map;
-    private readonly HashSet<ItemType> _itemTypes = [];
-    private readonly HashSet<CraftingRecipe> _craftingRecipes = [];
     private readonly LootTable _loot = new();
     private readonly List<Func<Character>> _enemies = [];
 
+    public WorldBuilder(IGameBuilder gameBuilder)
+    {
+        _gameBuilder = gameBuilder;
+    }
 
     public WorldBuilder DefineMaterial(Material material)
     {
-        _itemTypes.Add(material.Type);
+        _gameBuilder.WithItemType(material.Type);
         _loot.AddMaterial(material); // all materials are loot for now
         return this;
     }
 
     public WorldBuilder DefineWeapon(EquipmentBuilder<Weapon> builder, bool isLoot)
     {
-        _itemTypes.Add(builder.ItemType);
+        _gameBuilder.WithItemType(builder.ItemType);
         if (isLoot)
         {
             _loot.AddWeapon(builder.Build(1)); // todo use area level
@@ -35,7 +38,7 @@ public class WorldBuilder
 
     public WorldBuilder DefineArmor(EquipmentBuilder<Armor> builder, bool isLoot)
     {
-        _itemTypes.Add(builder.ItemType);
+        _gameBuilder.WithItemType(builder.ItemType);
         if (isLoot)
         {
             _loot.AddArmor(builder.Build(1)); // todo use area level
@@ -73,7 +76,7 @@ public class WorldBuilder
         var khopeshRecipe = new CraftingRecipeBuilder()
             .And(bronze, 25)
             .Makes(() => ItemUnion.Of(khopeshBuilder.Build(1))); // craft at level 1 so players don't just grind lv 20 weapons in lv 1 area
-        _craftingRecipes.Add(khopeshRecipe);
+        _gameBuilder.WithCraftingRecipe(khopeshRecipe);
 
         var bronzeArmorBuilder = new ArmorBuilder(new ItemType("Bronze Armor", Grade.UNCOMMON))
             .WithArmorClass(ArmorClass.HEAVY)
@@ -88,7 +91,7 @@ public class WorldBuilder
         var bronzeArmorRecipe = new CraftingRecipeBuilder()
             .And(bronze, 25)
             .Makes(() => ItemUnion.Of(bronzeArmorBuilder.Build(1)));
-        _craftingRecipes.Add(bronzeArmorRecipe);
+        _gameBuilder.WithCraftingRecipe(bronzeArmorRecipe);
 
         return result;
     }
@@ -191,23 +194,18 @@ public class WorldBuilder
         return this;
     }
 
-    public World Build()
+    public World Build(IGame game)
     {
         if (_map == null)
         {
             throw new Exception();
         }
-        var game = new Game(
-            ItemTypeRepository.Of(_itemTypes),
-            CraftingRecipeRepository.Of(_craftingRecipes)
-        );
         var result = new World(
             game,
             _map,
             _loot,
             _enemies
         );
-        game.AddArea(result);
         return result;
     }
 }

@@ -24,4 +24,6 @@ public interface IGame
     CraftingRecipe? GetCraftingRecipeById(Guid id);
 
     void AddArea(IArea area);
+
+    IArea GetDefaultArea();
 }
