@@ -19,6 +19,7 @@ async function main() {
     const gameOverScreen = new GameOverScreen(findElement("#playerAlive"), findElement("#playerDead"), findElement("#respawnButton"), client);
     const game = new Game(canvas, inventoryModal, hud, gameOverScreen);
     
+    connection.on("GameInit", handle(json => game.handleGameInit(json)));
     connection.on("AreaInit", handle(json => game.handleAreaInit(json)));
     connection.on("AreaUpdate", handle(json => game.handleAreaUpdate(json)));
     

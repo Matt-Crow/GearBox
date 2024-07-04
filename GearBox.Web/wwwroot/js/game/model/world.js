@@ -1,30 +1,23 @@
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
-import { CraftingRecipe, CraftingRecipeDeserializer, CraftingRecipeRepository } from "./crafting.js";
-import { InventoryDeserializer, ItemDeserializer, ItemTypeRepository, deserializeItemTypeJson } from "./item.js";
+import { GameData } from "../messageHandlers/gameInitHandler.js";
+import { InventoryDeserializer, ItemDeserializer } from "./item.js";
 import { TileMap } from "./map.js";
 import { Player, PlayerStatSummary } from "./player.js";
 
 export class World {
-    #playerId; // need reference to changing player
+    #gameData;
     #map;
     #gameObjects;
-    #itemTypes;
-    #craftingRecipes;
 
     /**
-     * 
-     * @param {string} playerId 
+     * @param {GameData} gameData 
      * @param {TileMap} map 
-     * @param {ItemType[]} itemTypes 
-     * @param {CraftingRecipe[]} craftingRecipes 
      */
-    constructor(playerId, map, itemTypes, craftingRecipes) {
-        this.#playerId = playerId;
+    constructor(gameData, map) {
+        this.#gameData = gameData;
         this.#map = map;
         this.#gameObjects = [];
-        this.#itemTypes = new ItemTypeRepository(itemTypes);
-        this.#craftingRecipes = new CraftingRecipeRepository(craftingRecipes);
     }
 
     /**
@@ -32,17 +25,14 @@ export class World {
      */
     set gameObjects(value) { this.#gameObjects = value; }
 
-    get playerId() { return this.#playerId; }
     get widthInPixels() { return this.#map.widthInPixels; }
     get heightInPixels() { return this.#map.heightInPixels; }
-    get itemTypes() { return this.#itemTypes; }
-    get craftingRecipes() { return this.#craftingRecipes; }
 
     /**
      * @returns {Player} the player the client controls
      */
     get player() {
-        return this.#gameObjects.find(obj => obj.id == this.#playerId);
+        return this.#gameObjects.find(obj => obj.id == this.#gameData.playerId);
     }
 
     /**
@@ -56,22 +46,24 @@ export class World {
 }
 
 export class AreaInitHandler {
+    #gameData;
 
     /**
-     * @param {object} obj 
+     * @param {GameData} gameData 
+     */
+    constructor(gameData) {
+        this.#gameData = gameData;
+    }
+
+    /**
+     * @param {object} json 
      * @returns {World}
      */
-    handleAreaInit(obj) {
-        const map = TileMap.fromJson(obj.map);
-        const itemTypes = obj.itemTypes.map(deserializeItemTypeJson);
-
-        // need item types to resolve crafting recipes, dependency injection won't work
-        const itemTypeRepository = new ItemTypeRepository(itemTypes);
-        const itemDeserializer = new ItemDeserializer(itemTypeRepository);
-        const craftingRecipeDeserializer = new CraftingRecipeDeserializer(itemDeserializer);
-
-        const craftingRecipes = obj.craftingRecipes.map(x => craftingRecipeDeserializer.deserialize(x));
-        const deserialized = new World(obj.playerId, map, itemTypes, craftingRecipes);
+    handleAreaInit(json) {
+        const deserialized = new World(
+            this.#gameData,
+            TileMap.fromJson(json.map)
+        );
         return deserialized;
     }
 }

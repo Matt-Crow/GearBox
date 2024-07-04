@@ -113,12 +113,7 @@ public class World : IArea
 
     public Coordinates GetRandomFloorTile() => _map.GetRandomFloorTile();
 
-    public AreaInitJson GetAreaInitJsonFor(PlayerCharacter player) => new(
-        player.Id,
-        _map.ToJson(),
-        _game.GetItemTypeJsons(), // todo move to GameInit
-        _game.GetCraftingRecipeJsons() // todo move to GameInit
-    );
+    public AreaInitJson GetAreaInitJson() => new(_map.ToJson());
 
     public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player)
     {

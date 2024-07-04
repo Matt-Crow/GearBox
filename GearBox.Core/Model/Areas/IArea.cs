@@ -33,7 +33,7 @@ public interface IArea
 
     Coordinates GetRandomFloorTile();
 
-    AreaInitJson GetAreaInitJsonFor(PlayerCharacter player);
+    AreaInitJson GetAreaInitJson();
 
     AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player);
     

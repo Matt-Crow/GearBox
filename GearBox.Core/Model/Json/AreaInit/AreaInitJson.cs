@@ -7,28 +7,10 @@ namespace GearBox.Core.Model.Json.AreaInit;
 /// </summary>
 public readonly struct AreaInitJson : IJson
 {
-    public AreaInitJson(Guid playerId, MapJson map, List<ItemTypeJson> itemTypes, List<CraftingRecipeJson> craftingRecipes)
+    public AreaInitJson(MapJson map)
     {
-        PlayerId = playerId;
         Map = map;
-        ItemTypes = itemTypes;
-        CraftingRecipes = craftingRecipes;
     }
 
-    /// <summary>
-    /// The Id of the character spawned into the area for the user.
-    /// </summary>
-    public Guid PlayerId { get; init; }
-
     public MapJson Map { get; init; }
-
-    /// <summary>
-    /// All the possible item types which can exist in the area.
-    /// </summary>
-    public List<ItemTypeJson> ItemTypes { get; init; }
-
-    /// <summary>
-    /// All the possible recipes players can craft
-    /// </summary>
-    public List<CraftingRecipeJson> CraftingRecipes { get; init; }
 }

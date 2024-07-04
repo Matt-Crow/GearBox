@@ -1,8 +1,8 @@
 using GearBox.Core.Model.Areas;
+using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
-using GearBox.Core.Model.Json;
-using GearBox.Core.Model.Json.AreaInit;
+using GearBox.Core.Model.Json.GameInit;
 
 namespace GearBox.Core.Model;
 
@@ -20,8 +20,6 @@ public class Game : IGame
         _craftingRecipes = craftingRecipes ?? CraftingRecipeRepository.Empty();
     }
 
-    public List<ItemTypeJson> GetItemTypeJsons() => _itemTypes.ToJson();
-    public List<CraftingRecipeJson> GetCraftingRecipeJsons() => _craftingRecipes.ToJson();
     public CraftingRecipe? GetCraftingRecipeById(Guid id) => _craftingRecipes.GetById(id);
 
     // cannot create game & area at the same time due to circular dependency
@@ -34,6 +32,16 @@ public class Game : IGame
     {
         // todo some other way of signifying default area
         return _areas.FirstOrDefault() ?? throw new Exception("Game has no area");
+    }
+
+    public GameInitJson GetGameInitJsonFor(PlayerCharacter player)
+    {
+        var result = new GameInitJson(
+            player.Id,
+            _itemTypes.ToJson(),
+            _craftingRecipes.ToJson()
+        );
+        return result;
     }
 
     public void Update()

@@ -63,9 +63,10 @@ public class GameServer
         _connections.Add(id, connection);
         _players.Add(id, player);
 
-        // client needs to know both the area init and current state of stable objects
-        await SendAreaInitTo(area, id);
-        await SendAreaUpdateTo(id);
+        // client needs to know 3 things:
+        await SendGameInitTo(id);       // 1. initial state of the game
+        await SendAreaInitTo(area, id); // 2. initial state of the area
+        await SendAreaUpdateTo(id);     // 3. current state of the area
 
         if (!_timer.Enabled)
         {
@@ -73,9 +74,15 @@ public class GameServer
         }
     }
 
+    private Task SendGameInitTo(string id)
+    {
+        var json = _game.GetGameInitJsonFor(_players[id]);
+        return _connections[id].Send("GameInit", json);
+    }
+
     private Task SendAreaInitTo(IArea area, string id)
     {
-        var json = area.GetAreaInitJsonFor(_players[id]);
+        var json = area.GetAreaInitJson();
         return _connections[id].Send("AreaInit", json);
     }
 

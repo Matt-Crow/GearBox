@@ -2,6 +2,7 @@ import { Canvas } from "./components/canvas.js";
 import { GameOverScreen } from "./components/gameOverScreen.js";
 import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
+import { handleGameInit } from "./messageHandlers/gameInitHandler.js";
 import { characterDeserializer } from "./model/character.js";
 import { ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
@@ -30,6 +31,8 @@ export class Game {
 
     #areaUpdateHandler = () => {throw new Error("Cannot handle area update until after area init")};
 
+    #gameData = null;
+
     #world; // required for getting mouse cursor position relative to player :(
 
     /**
@@ -51,17 +54,25 @@ export class Game {
         return [player?.x, player?.y];
     }
 
-    handleAreaInit(json) {
-        const world = new AreaInitHandler()
-            .handleAreaInit(json);
-        this.#inventoryModal.setCraftingRecipes(world.craftingRecipes.recipes);
+    handleGameInit(json) {
+        this.#gameData = handleGameInit(json);
+        this.#inventoryModal.setCraftingRecipes(this.#gameData.craftingRecipes.recipes);
+    }
 
-        const itemDeserializer = new ItemDeserializer(world.itemTypes);
+    handleAreaInit(json) {
+        if (!this.#gameData) {
+            throw new Error("Cannot accept area init until after game init");
+        }
+
+        const world = new AreaInitHandler(this.#gameData)
+            .handleAreaInit(json);
+
+        const itemDeserializer = new ItemDeserializer(this.#gameData.itemTypes);
         const updateHandler = new AreaUpdateHandler(world, itemDeserializer)
             .addGameObjectType(characterDeserializer)
-            .addGameObjectType(new PlayerChangeHandler(world.playerId, this.#playerHud.playerUpdateListener))
+            .addGameObjectType(new PlayerChangeHandler(this.#gameData.playerId, this.#playerHud.playerUpdateListener))
             .addGameObjectType(projectileDeserializer)
-            .addGameObjectType(new LootChestJsonDeserializer(world.playerId))
+            .addGameObjectType(new LootChestJsonDeserializer(this.#gameData.playerId))
             .addUpdateListener(w => this.#gameOverScreen.update(w))
             .addInventoryChangeListener(inv => this.#inventoryModal.setInventory(inv))
             .addWeaponChangeListener(wea => this.#inventoryModal.setWeapon(wea))
