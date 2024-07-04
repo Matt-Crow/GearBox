@@ -50,4 +50,21 @@ public class ItemUnion
         }
         throw new Exception("ItemUnion has no item");
     }
+
+    public ItemUnion ToOwned()
+    {
+        if (Material != null)
+        {
+            return Of(Material.ToOwned());
+        }
+        if (Weapon != null)
+        {
+            return Of(Weapon.ToOwned());
+        }
+        if (Armor != null)
+        {
+            return Of(Armor.ToOwned());
+        }
+        throw new Exception("Forgot to add clause in ItemUnion.ToOwned");
+    }
 }

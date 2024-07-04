@@ -45,6 +45,17 @@ public class Inventory : IMightChange<InventoryJson>
         }
     }
 
+    public void Add(ItemUnion? item)
+    {
+        if (item == null)
+        {
+            return;
+        }
+        Weapons.Add(item.Weapon);
+        Armors.Add(item.Armor);
+        Materials.Add(item.Material);
+    }
+
     public bool Any()
     {
         return Weapons.Any() || Armors.Any() || Materials.Any();
@@ -66,11 +77,8 @@ public class Inventory : IMightChange<InventoryJson>
             Craft the item at level 1.
             This prevents players from getting overleveled items in low level areas
         */
-        var crafted = recipe.Maker.Invoke();
-        
-        Weapons.Add(crafted.Weapon);
-        Armors.Add(crafted.Armor);
-        Materials.Add(crafted.Material);
+        var item = recipe.Maker.Invoke();
+        Add(item);
     }
 
     private bool CanCraft(CraftingRecipe recipe)

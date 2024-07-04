@@ -12,7 +12,6 @@ public readonly struct Grade
     public static readonly Grade RARE = new (3, "Rare", 15, 0.7);
     public static readonly Grade EPIC = new (4, "Epic", 3, 0.8);
     public static readonly Grade LEGENDARY = new (5, "Legendary", 1, 1.0);
-    public static readonly ImmutableList<Grade> ALL = [COMMON, UNCOMMON, RARE, EPIC, LEGENDARY];
 
     private Grade(int order, string name, int weight, double pointMultiplier)
     {
