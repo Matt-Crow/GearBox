@@ -1,16 +1,14 @@
-using GearBox.Core.Model;
-using GearBox.Core.Model.GameObjects.Player;
-using GearBox.Core.Tests.Model.GameObjects;
+using GearBox.Core.Model.Areas;
 using Xunit;
 
-namespace GearBox.Core.Tests.Model;
+namespace GearBox.Core.Tests.Model.Areas;
 
-public class WorldTester
+public class AreaTester
 {
     [Fact]
     public void SpawnLootChest_GivenDefaultLootTable_Throws()
     {
-        var sut = new World();
+        var sut = new Area();
 
         Assert.Throws<InvalidOperationException>(sut.SpawnLootChest);
     }
@@ -18,7 +16,7 @@ public class WorldTester
     [Fact]
     public void SpawnEnemy_GivenDefaultEnemies_DoesNotThrow()
     {
-        var sut = new World();
+        var sut = new Area();
         var actual = sut.SpawnEnemy();
         Assert.NotNull(actual);
     }

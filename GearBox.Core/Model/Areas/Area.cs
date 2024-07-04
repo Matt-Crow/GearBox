@@ -1,4 +1,3 @@
-using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Ai;
 using GearBox.Core.Model.GameObjects.Player;
@@ -11,9 +10,9 @@ using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Model.Json;
 
-namespace GearBox.Core.Model;
+namespace GearBox.Core.Model.Areas;
 
-public class World : IArea
+public class Area : IArea
 {
     private readonly IGame _game;
     private readonly GameObjectCollection<Character> _characters = new();
@@ -27,7 +26,7 @@ public class World : IArea
     private readonly LootTable _loot;
     private readonly List<Func<Character>> _enemyMakers;
 
-    public World(
+    public Area(
         IGame? game = null,
         Map? map = null, 
         LootTable? loot = null,

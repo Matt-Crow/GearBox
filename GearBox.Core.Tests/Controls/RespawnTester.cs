@@ -1,5 +1,5 @@
 using GearBox.Core.Controls;
-using GearBox.Core.Model;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
 using Xunit;
 
@@ -10,7 +10,7 @@ public class RespawnTester
     [Fact]
     public void ExecuteOn_GivenNotInArea_Heals()
     {
-        var area = new World();
+        var area = new Area();
         var sut = new Respawn();
         var player = new PlayerCharacter("foo");
         area.SpawnPlayer(player);
@@ -29,7 +29,7 @@ public class RespawnTester
     [Fact]
     public void ExecuteOn_GivenAlreadyInArea_DoesNotHeal()
     {
-        var area = new World();
+        var area = new Area();
         var sut = new Respawn();
         var player = new PlayerCharacter("foo");
         area.SpawnPlayer(player);
@@ -43,7 +43,7 @@ public class RespawnTester
     [Fact]
     public void ExecuteOn_PlayerNeverInArea_DoesNothing()
     {
-        var area = new World();
+        var area = new Area();
         var sut = new Respawn();
         var player = new PlayerCharacter("foo");
         player.TakeDamage(42);

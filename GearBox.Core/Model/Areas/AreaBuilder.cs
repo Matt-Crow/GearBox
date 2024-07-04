@@ -194,13 +194,13 @@ public class AreaBuilder
         return this;
     }
 
-    public World Build(IGame game)
+    public Area Build(IGame game)
     {
         if (_map == null)
         {
             throw new Exception("map is required");
         }
-        var result = new World(
+        var result = new Area(
             game,
             _map,
             _loot,
