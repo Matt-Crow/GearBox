@@ -1,3 +1,4 @@
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 
@@ -7,6 +8,6 @@ public interface IGameBuilder
 {
     IGameBuilder WithItemType(ItemType itemType);
     IGameBuilder WithCraftingRecipe(CraftingRecipe recipe);
-    IGameBuilder WithArea(Func<WorldBuilder, WorldBuilder> defineArea);
+    IGameBuilder WithArea(Func<AreaBuilder, AreaBuilder> defineArea);
     IGame Build();
 }

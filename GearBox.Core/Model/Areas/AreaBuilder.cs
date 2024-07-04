@@ -5,28 +5,28 @@ using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model;
+namespace GearBox.Core.Model.Areas;
 
-public class WorldBuilder
+public class AreaBuilder
 {
     private readonly IGameBuilder _gameBuilder;
     private Map? _map;
     private readonly LootTable _loot = new();
     private readonly List<Func<Character>> _enemies = [];
 
-    public WorldBuilder(IGameBuilder gameBuilder)
+    public AreaBuilder(IGameBuilder gameBuilder)
     {
         _gameBuilder = gameBuilder;
     }
 
-    public WorldBuilder DefineMaterial(Material material)
+    public AreaBuilder DefineMaterial(Material material)
     {
         _gameBuilder.WithItemType(material.Type);
         _loot.AddMaterial(material); // all materials are loot for now
         return this;
     }
 
-    public WorldBuilder DefineWeapon(EquipmentBuilder<Weapon> builder, bool isLoot)
+    public AreaBuilder DefineWeapon(EquipmentBuilder<Weapon> builder, bool isLoot)
     {
         _gameBuilder.WithItemType(builder.ItemType);
         if (isLoot)
@@ -36,7 +36,7 @@ public class WorldBuilder
         return this;
     }
 
-    public WorldBuilder DefineArmor(EquipmentBuilder<Armor> builder, bool isLoot)
+    public AreaBuilder DefineArmor(EquipmentBuilder<Armor> builder, bool isLoot)
     {
         _gameBuilder.WithItemType(builder.ItemType);
         if (isLoot)
@@ -46,14 +46,14 @@ public class WorldBuilder
         return this;
     }
 
-    public WorldBuilder DefineEnemy(Func<Character> definition)
+    public AreaBuilder DefineEnemy(Func<Character> definition)
     {
         _enemies.Add(definition);
         return this;
     }
 
     // todo move to extension method once skills are added
-    public WorldBuilder AddMiningSkill()
+    public AreaBuilder AddMiningSkill()
     {
         var bronze = new Material(new ItemType("Bronze", Grade.UNCOMMON), "Used to craft low-level melee equipment");
         var result = this
@@ -96,7 +96,7 @@ public class WorldBuilder
         return result;
     }
 
-    public WorldBuilder AddStarterEquipment()
+    public AreaBuilder AddStarterEquipment()
     {
         var result = this 
             .DefineWeapon(new WeaponBuilder(new ItemType("Training Sword", Grade.COMMON))
@@ -150,7 +150,7 @@ public class WorldBuilder
         return result;
     }
 
-    public WorldBuilder AddDefaultEnemies()
+    public AreaBuilder AddDefaultEnemies()
     {
         var result = this
             .DefineEnemy(() => new Character("Snake", 1, Color.LIGHT_GREEN))
@@ -159,7 +159,7 @@ public class WorldBuilder
         return result;
     }
 
-    public WorldBuilder WithDesertMap()
+    public AreaBuilder WithDesertMap()
     {
         // for now, I won't read from a CSV file, as it is difficult to ensure subprojects can find the right file
         int[,] csv = {

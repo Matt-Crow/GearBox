@@ -1,3 +1,4 @@
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 
@@ -7,7 +8,7 @@ public class GameBuilder : IGameBuilder
 {
     private readonly HashSet<ItemType> _itemTypes = [];
     private readonly HashSet<CraftingRecipe> _craftingRecipes = [];
-    private readonly List<WorldBuilder> _areas = [];
+    private readonly List<AreaBuilder> _areas = [];
 
     public IGameBuilder WithItemType(ItemType itemType)
     {
@@ -21,9 +22,9 @@ public class GameBuilder : IGameBuilder
         return this;
     }
 
-    public IGameBuilder WithArea(Func<WorldBuilder, WorldBuilder> defineArea)
+    public IGameBuilder WithArea(Func<AreaBuilder, AreaBuilder> defineArea)
     {
-        _areas.Add(defineArea(new WorldBuilder(this)));
+        _areas.Add(defineArea(new AreaBuilder(this)));
         return this;
     }
 
