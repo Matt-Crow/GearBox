@@ -39,16 +39,3 @@ export class CraftingRecipeDeserializer {
         return result;
     }
 }
-
-export class CraftingRecipeRepository {
-    #recipes;
-
-    /**
-     * @param {CraftingRecipe[]} recipes 
-     */
-    constructor(recipes=[]) {
-        this.#recipes = recipes;
-    }
-
-    get recipes() { return this.#recipes; }
-}

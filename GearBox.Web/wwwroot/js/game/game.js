@@ -56,7 +56,7 @@ export class Game {
 
     handleGameInit(json) {
         this.#gameData = handleGameInit(json);
-        this.#inventoryModal.setCraftingRecipes(this.#gameData.craftingRecipes.recipes);
+        this.#inventoryModal.setCraftingRecipes(this.#gameData.craftingRecipes);
     }
 
     handleAreaInit(json) {
