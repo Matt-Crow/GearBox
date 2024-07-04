@@ -5,7 +5,7 @@ import { InventoryDeserializer, ItemDeserializer } from "./item.js";
 import { TileMap } from "./map.js";
 import { Player, PlayerStatSummary } from "./player.js";
 
-export class World {
+export class Area {
     #gameData;
     #map;
     #gameObjects;
@@ -57,10 +57,10 @@ export class AreaInitHandler {
 
     /**
      * @param {object} json 
-     * @returns {World}
+     * @returns {Area}
      */
     handleAreaInit(json) {
-        const deserialized = new World(
+        const deserialized = new Area(
             this.#gameData,
             TileMap.fromJson(json.map)
         );
@@ -69,7 +69,7 @@ export class AreaInitHandler {
 }
 
 export class AreaUpdateHandler {
-    #world;
+    #area;
     #inventoryDeserializer;
     #itemDeserializer;
     #deserializers = new JsonDeserializers();
@@ -80,11 +80,11 @@ export class AreaUpdateHandler {
     #statSummaryChangeListeners = [];
 
     /**
-     * @param {World} world 
+     * @param {Area} area 
      * @param {ItemDeserializer} itemDeserializer 
      */
-    constructor(world, itemDeserializer) {
-        this.#world = world;
+    constructor(area, itemDeserializer) {
+        this.#area = area;
         this.#inventoryDeserializer = new InventoryDeserializer(itemDeserializer);
         this.#itemDeserializer = itemDeserializer;
     }
@@ -99,7 +99,7 @@ export class AreaUpdateHandler {
     }
 
     /**
-     * @param {(World) => any} updateListener 
+     * @param {(Area) => any} updateListener 
      * @returns {AreaUpdateHandler}
      */
     addUpdateListener(updateListener) {
@@ -147,9 +147,9 @@ export class AreaUpdateHandler {
         const newGameObject = json.gameObjects
             .map(gameObjectJson => this.#deserialize(gameObjectJson))
             .filter(obj => obj !== null);
-        this.#world.gameObjects = newGameObject;
+        this.#area.gameObjects = newGameObject;
         
-        this.#updateListeners.forEach(listener => listener(this.#world));
+        this.#updateListeners.forEach(listener => listener(this.#area));
 
         this.#handleChanges(json.changes.inventory, v => this.#inventoryDeserializer.deserialize(v), this.#inventoryChangeListeners);
         this.#handleChanges(json.changes.weapon, v => this.#itemDeserializer.deserialize(v), this.#weaponChangeListeners);

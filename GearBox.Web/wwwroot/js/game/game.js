@@ -8,7 +8,7 @@ import { ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
 import { PlayerChangeHandler } from "./model/player.js";
 import { projectileDeserializer } from "./model/projectile.js";
-import { AreaInitHandler, AreaUpdateHandler } from "./model/world.js";
+import { AreaInitHandler, AreaUpdateHandler } from "./model/area.js";
 
 export class Game {
 
@@ -33,7 +33,7 @@ export class Game {
 
     #gameData = null;
 
-    #world; // required for getting mouse cursor position relative to player :(
+    #area; // required for getting mouse cursor position relative to player :(
 
     /**
      * @param {Canvas} canvas the custom canvas component to draw on.
@@ -46,11 +46,11 @@ export class Game {
         this.#inventoryModal = inventoryModal;
         this.#playerHud = playerHud;
         this.#gameOverScreen = gameOverScreen;
-        this.#world = null;
+        this.#area = null;
     }
 
     getPlayerCoords() {
-        const player = this.#world?.player;
+        const player = this.#area?.player;
         return [player?.x, player?.y];
     }
 
@@ -64,11 +64,11 @@ export class Game {
             throw new Error("Cannot accept area init until after game init");
         }
 
-        const world = new AreaInitHandler(this.#gameData)
+        const area = new AreaInitHandler(this.#gameData)
             .handleAreaInit(json);
 
         const itemDeserializer = new ItemDeserializer(this.#gameData.itemTypes);
-        const updateHandler = new AreaUpdateHandler(world, itemDeserializer)
+        const updateHandler = new AreaUpdateHandler(area, itemDeserializer)
             .addGameObjectType(characterDeserializer)
             .addGameObjectType(new PlayerChangeHandler(this.#gameData.playerId, this.#playerHud.playerUpdateListener))
             .addGameObjectType(projectileDeserializer)
@@ -82,9 +82,9 @@ export class Game {
 
         this.#areaUpdateHandler = json => updateHandler.handleAreaUpdate(json);
         
-        setInterval(() => this.#canvas.draw(world), 1000 / 24);
+        setInterval(() => this.#canvas.draw(area), 1000 / 24);
 
-        this.#world = world;
+        this.#area = area;
     }
 
     handleAreaUpdate(json) {

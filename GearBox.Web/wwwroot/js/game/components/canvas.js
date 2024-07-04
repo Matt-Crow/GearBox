@@ -1,4 +1,4 @@
-import { World } from "../model/world.js";
+import { Area } from "../model/area.js";
 
 export class Canvas {
     #element;
@@ -16,12 +16,12 @@ export class Canvas {
     }
 
     /**
-     * the X-coordinate of the mouse cursor on the world this is drawing
+     * the X-coordinate of the mouse cursor on the area this is drawing
      */
     get translatedMouseX() { return this.#mouseX - this.#translateX; }
 
     /**
-     * the Y-coordinate of the mouse cursor on the world this is drawing
+     * the Y-coordinate of the mouse cursor on the area this is drawing
      */
     get translatedMouseY() { return this.#mouseY - this.#translateY; }
 
@@ -45,24 +45,24 @@ export class Canvas {
     }
 
     /**
-     * @param {World} world 
+     * @param {Area} area 
      */
-    draw(world) {
-        const player = world.player;
+    draw(area) {
+        const player = area.player;
         const w = this.#element.width;
         const h = this.#element.height;
         if (player) {
             // don't translate if player is dead
             // that way, the camera doesn't reset to [0, 0]
             this.translate(
-                clamp(w - world.widthInPixels, w/2 - player.x, 0), 
-                clamp(h - world.heightInPixels, h/2 - player.y, 0)
+                clamp(w - area.widthInPixels, w/2 - player.x, 0), 
+                clamp(h - area.heightInPixels, h/2 - player.y, 0)
             );
         }
         const ctx = this.#element.getContext("2d");
         ctx.clearRect(0, 0, w, h);
         ctx.translate(this.#translateX, this.#translateY);
-        world.draw(ctx);
+        area.draw(ctx);
         ctx.resetTransform();
     }
 }
