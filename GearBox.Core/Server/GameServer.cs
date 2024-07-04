@@ -15,12 +15,9 @@ public class GameServer
     private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
 
-    public GameServer(IGame? game = null)
+    public GameServer(IGame game)
     {
-        // todo make game required
-        _game = game ?? new GameBuilder()
-            .WithArea(area => area.WithDesertMap())
-            .Build();
+        _game = game;
 
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages

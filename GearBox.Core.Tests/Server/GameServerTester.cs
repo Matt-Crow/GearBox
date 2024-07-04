@@ -1,3 +1,4 @@
+using GearBox.Core.Model;
 using GearBox.Core.Server;
 using Xunit;
 
@@ -9,7 +10,7 @@ public class GameServerTester
     public async Task CannotConnectTwice()
     {
         var spy = new SpyConnection();
-        var sut = new GameServer();
+        var sut = new GameServer(MakeGame());
 
         await sut.AddConnection("foo", spy);
         await sut.AddConnection("foo", spy);
@@ -21,7 +22,7 @@ public class GameServerTester
     public async Task AddThenRemoveBehaveAsExpected()
     {
         var spy = new SpyConnection();
-        var sut = new GameServer();
+        var sut = new GameServer(MakeGame());
         Assert.Equal(0, sut.TotalConnections);
 
         await sut.AddConnection("foo", spy);
@@ -35,7 +36,7 @@ public class GameServerTester
     public async Task ClientReceivesAreaUponConnecting()
     {
         var spy = new SpyConnection();
-        var sut = new GameServer();
+        var sut = new GameServer(MakeGame());
 
         await sut.AddConnection("foo", spy);
 
@@ -47,7 +48,7 @@ public class GameServerTester
     {
         var client1 = new SpyConnection();
         var client2 = new SpyConnection();
-        var sut = new GameServer();
+        var sut = new GameServer(MakeGame());
         await sut.AddConnection("foo", client1);
         await sut.AddConnection("bar", client2);
 
@@ -60,7 +61,7 @@ public class GameServerTester
     [Fact]
     public async Task EnqueueCommand_GivenCommand_DoesNotExecuteImmediately()
     {
-        var sut = new GameServer();
+        var sut = new GameServer(MakeGame());
         await sut.AddConnection("foo", new SpyConnection());
         var command = new SpyControlCommand();
 
@@ -72,7 +73,7 @@ public class GameServerTester
     [Fact]
     public async Task EnqueueCommand_GivenCommand_ExecutesAfterUpdate()
     {
-        var sut = new GameServer();
+        var sut = new GameServer(MakeGame());
         await sut.AddConnection("foo", new SpyConnection());
         var command = new SpyControlCommand();
 
@@ -80,5 +81,13 @@ public class GameServerTester
         await sut.Update();
 
         Assert.True(command.HasBeenExecuted);
+    }
+
+    public static IGame MakeGame()
+    {
+        var result = new GameBuilder()
+            .WithArea(area => area.WithDesertMap())
+            .Build();
+        return result;
     }
 }
