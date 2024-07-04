@@ -3,13 +3,13 @@ using Xunit;
 
 namespace GearBox.Core.Tests.Server;
 
-public class AreaServerTester
+public class GameServerTester
 {
     [Fact]
     public async Task CannotConnectTwice()
     {
         var spy = new SpyConnection();
-        var sut = new AreaServer();
+        var sut = new GameServer();
 
         await sut.AddConnection("foo", spy);
         await sut.AddConnection("foo", spy);
@@ -21,7 +21,7 @@ public class AreaServerTester
     public async Task AddThenRemoveBehaveAsExpected()
     {
         var spy = new SpyConnection();
-        var sut = new AreaServer();
+        var sut = new GameServer();
         Assert.Equal(0, sut.TotalConnections);
 
         await sut.AddConnection("foo", spy);
@@ -35,7 +35,7 @@ public class AreaServerTester
     public async Task ClientReceivesAreaUponConnecting()
     {
         var spy = new SpyConnection();
-        var sut = new AreaServer();
+        var sut = new GameServer();
 
         await sut.AddConnection("foo", spy);
 
@@ -47,7 +47,7 @@ public class AreaServerTester
     {
         var client1 = new SpyConnection();
         var client2 = new SpyConnection();
-        var sut = new AreaServer();
+        var sut = new GameServer();
         await sut.AddConnection("foo", client1);
         await sut.AddConnection("bar", client2);
 
@@ -60,7 +60,7 @@ public class AreaServerTester
     [Fact]
     public async Task EnqueueCommand_GivenCommand_DoesNotExecuteImmediately()
     {
-        var sut = new AreaServer();
+        var sut = new GameServer();
         await sut.AddConnection("foo", new SpyConnection());
         var command = new SpyControlCommand();
 
@@ -72,7 +72,7 @@ public class AreaServerTester
     [Fact]
     public async Task EnqueueCommand_GivenCommand_ExecutesAfterUpdate()
     {
-        var sut = new AreaServer();
+        var sut = new GameServer();
         await sut.AddConnection("foo", new SpyConnection());
         var command = new SpyControlCommand();
 

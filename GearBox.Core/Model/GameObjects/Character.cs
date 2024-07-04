@@ -47,6 +47,7 @@ public class Character : IGameObject
     public ArmorClass ArmorClass { get; protected set; } = ArmorClass.NONE;
     public BasicAttack BasicAttack { get; init; }
     public IArea? CurrentArea { get; private set; }
+    public IArea? LastArea { get; private set; }
     public Team Team { get; set; } = new(); // default to each on their own team
 
     public void SetLevel(int level)
@@ -59,6 +60,10 @@ public class Character : IGameObject
 
     public virtual void SetArea(IArea? newArea)
     {
+        if (CurrentArea != null)
+        {
+            LastArea = CurrentArea;
+        }
         CurrentArea = newArea;
     }
 

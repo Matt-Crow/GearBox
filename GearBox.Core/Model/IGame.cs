@@ -26,4 +26,6 @@ public interface IGame
     void AddArea(IArea area);
 
     IArea GetDefaultArea();
+
+    void Update();
 }

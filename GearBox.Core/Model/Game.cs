@@ -24,7 +24,7 @@ public class Game : IGame
     public List<CraftingRecipeJson> GetCraftingRecipeJsons() => _craftingRecipes.ToJson();
     public CraftingRecipe? GetCraftingRecipeById(Guid id) => _craftingRecipes.GetById(id);
 
-    // cannot create game & area at the same time do to circular dependency
+    // cannot create game & area at the same time due to circular dependency
     public void AddArea(IArea area)
     {
         _areas.Add(area);
@@ -34,5 +34,13 @@ public class Game : IGame
     {
         // todo some other way of signifying default area
         return _areas.FirstOrDefault() ?? throw new Exception("Game has no area");
+    }
+
+    public void Update()
+    {
+        foreach (var area in _areas)
+        {
+            area.Update();
+        }
     }
 }

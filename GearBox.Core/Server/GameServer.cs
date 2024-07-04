@@ -6,17 +6,21 @@ using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Server;
 
-public class AreaServer
+public class GameServer
 {
+    private readonly IGame _game;
     private readonly Dictionary<string, IConnection> _connections = [];
     private readonly Dictionary<string, PlayerCharacter> _players = [];
     private readonly List<PendingCommand> _pendingCommands = [];
     private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
 
-    public AreaServer(IArea? area = null)
+    public GameServer(IGame? game = null)
     {
-        Area = area ?? new World();
+        // todo make game required
+        _game = game ?? new GameBuilder()
+            .WithArea(area => area.WithDesertMap())
+            .Build();
 
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
@@ -30,7 +34,6 @@ public class AreaServer
         _timer.Elapsed += async (sender, e) => await Update();
     }
 
-    public IArea Area { get; init; }
     public int TotalConnections => _connections.Count;
 
     /// <summary>
@@ -54,15 +57,17 @@ public class AreaServer
         }
 
         var player = new PlayerCharacter("The Player"); // will eventually read from repo
-        var spawnLocation = Area.GetRandomFloorTile();
+        var area = _game.GetDefaultArea();
+
+        var spawnLocation = area.GetRandomFloorTile();
         player.Coordinates = spawnLocation.CenteredOnTile();
 
-        Area.SpawnPlayer(player);
+        area.SpawnPlayer(player);
         _connections.Add(id, connection);
         _players.Add(id, player);
 
         // client needs to know both the area init and current state of stable objects
-        await SendAreaInitTo(id);
+        await SendAreaInitTo(area, id);
         await SendAreaUpdateTo(id);
 
         if (!_timer.Enabled)
@@ -71,9 +76,9 @@ public class AreaServer
         }
     }
 
-    private Task SendAreaInitTo(string id)
+    private Task SendAreaInitTo(IArea area, string id)
     {
-        var json = Area.GetAreaInitJsonFor(_players[id]);
+        var json = area.GetAreaInitJsonFor(_players[id]);
         return _connections[id].Send("AreaInit", json);
     }
 
@@ -86,7 +91,8 @@ public class AreaServer
                 return;
             }
 
-            Area.RemovePlayer(_players[id]);
+            var player = _players[id];
+            player.CurrentArea?.RemovePlayer(player);
             _players.Remove(id);
             _connections.Remove(id);
 
@@ -119,7 +125,7 @@ public class AreaServer
                 command.Command.ExecuteOn(_players[command.ConnectionId]);
             }
 
-            Area.Update();
+            _game.Update();
             tasks = _connections.Keys
                 .Select(SendAreaUpdateTo)
                 .ToList();
@@ -130,7 +136,13 @@ public class AreaServer
 
     private Task SendAreaUpdateTo(string playerId)
     {
-        var json = Area.GetAreaUpdateJsonFor(_players[playerId]);
+        var player = _players[playerId];
+        var area = player.CurrentArea ?? player.LastArea; // last area in case they died
+        if (area == null)
+        {
+            return Task.CompletedTask;
+        }
+        var json = area.GetAreaUpdateJsonFor(_players[playerId]);
         return _connections[playerId].Send("AreaUpdate", json);
     }
 }

@@ -11,7 +11,7 @@ public class RespawnTester
     public void ExecuteOn_GivenNotInArea_Heals()
     {
         var area = new World();
-        var sut = new Respawn(area);
+        var sut = new Respawn();
         var player = new PlayerCharacter("foo");
         area.SpawnPlayer(player);
 
@@ -30,7 +30,7 @@ public class RespawnTester
     public void ExecuteOn_GivenAlreadyInArea_DoesNotHeal()
     {
         var area = new World();
-        var sut = new Respawn(area);
+        var sut = new Respawn();
         var player = new PlayerCharacter("foo");
         area.SpawnPlayer(player);
         player.TakeDamage(42);
@@ -38,5 +38,19 @@ public class RespawnTester
         sut.ExecuteOn(player);
 
         Assert.Equal(42, player.DamageTaken);
+    }
+
+    [Fact]
+    public void ExecuteOn_PlayerNeverInArea_DoesNothing()
+    {
+        var area = new World();
+        var sut = new Respawn();
+        var player = new PlayerCharacter("foo");
+        player.TakeDamage(42);
+
+        sut.ExecuteOn(player);
+
+        Assert.Equal(42, player.DamageTaken);
+        Assert.Null(player.CurrentArea);
     }
 }

@@ -198,7 +198,7 @@ public class WorldBuilder
     {
         if (_map == null)
         {
-            throw new Exception();
+            throw new Exception("map is required");
         }
         var result = new World(
             game,

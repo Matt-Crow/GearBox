@@ -30,7 +30,7 @@ area.AddTimer(new GameTimer(spawner.SpawnWave, Duration.FromSeconds(10).InFrames
 // Add services to the container.
 webAppBuilder.Services.AddRazorPages();
 webAppBuilder.Services.AddSignalR();
-webAppBuilder.Services.AddSingleton(new AreaServer(area)); // todo AreaRepository
+webAppBuilder.Services.AddSingleton(new GameServer(game)); // todo Repository
 
 var app = webAppBuilder.Build();
 
@@ -62,6 +62,6 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
-app.MapHub<AreaHub>("/area-hub");
+app.MapHub<GameHub>("/area-hub");
 
 app.Run();
