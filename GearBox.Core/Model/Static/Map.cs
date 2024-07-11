@@ -34,11 +34,15 @@ public class Map : ISerializable<MapJson>
         }
         _tileMap = new int[height, width]; // initializes all to 0
         _tileTypes[0] = new TileType(Color.BLUE, TileHeight.FLOOR);
+        Width = Distance.FromTiles(_tileMap.GetLength(1));
+        Height = Distance.FromTiles(_tileMap.GetLength(0));
+        Bounds = new Dimensions(Width, Height);
     }
 
 
-    public Distance Width => Distance.FromTiles(_tileMap.GetLength(1));
-    public Distance Height => Distance.FromTiles(_tileMap.GetLength(0));
+    public Distance Width { get; init; }
+    public Distance Height { get; init; }
+    public Dimensions Bounds { get; init; }
 
 
     public Map SetTileTypeForKey(int key, TileType value)
@@ -119,38 +123,23 @@ public class Map : ISerializable<MapJson>
     /// <param name="body">the object to check for collisions with</param>
     public void CheckForCollisions(BodyBehavior body)
     {
-        KeepInBounds(body);
+        if (!body.IsWithin(Bounds))
+        {
+            body.OnCollidedWithMapEdge(new CollideWithMapEdgeEventArgs(Bounds));
+        }
+
         ForEachCollidingWallTile(body, h => h != TileHeight.FLOOR, t => t.ShoveOut(body));
     }
 
+    // todo merge with CheckForCollisions(BodyBehavior)
     public void CheckForCollisions(Projectile projectile)
     {
-        if (!projectile.Body.IsWithin(new Dimensions(Width, Height)))
+        if (!projectile.Body.IsWithin(Bounds))
         {
-            projectile.Terminate();
-            return;
+            projectile.Body.OnCollidedWithMapEdge(new CollideWithMapEdgeEventArgs(Bounds));
         }
-        ForEachCollidingWallTile(projectile.Body, h => h == TileHeight.WALL, _ => projectile.Terminate());
-    }
 
-    private void KeepInBounds(BodyBehavior body)
-    {
-        if (body.LeftInPixels < 0)
-        {
-            body.LeftInPixels = 0;
-        }
-        if (body.RightInPixels > Width.InPixels)
-        {
-            body.RightInPixels = Width.InPixels;
-        }
-        if (body.TopInPixels < 0)
-        {
-            body.TopInPixels = 0;
-        }
-        if (body.BottomInPixels > Height.InPixels)
-        {
-            body.BottomInPixels = Height.InPixels;
-        }
+        ForEachCollidingWallTile(projectile.Body, h => h == TileHeight.WALL, _ => projectile.Terminate());
     }
 
     private void ForEachCollidingWallTile(BodyBehavior body, Predicate<TileHeight> filter,  Action<Tile> doThis)

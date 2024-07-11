@@ -21,8 +21,9 @@ public class Projectile : IGameObject
         {
             Location = coordinates
         };
-        _attack = attack;
         Body.Collided += HandleCollision;
+        Body.CollideWithMapEdge += HandleCollideWithMapEdge;
+        _attack = attack;
         _mobility = new(Body, velocity);
         _mobility.StartMovingIn(velocity.Angle); // MobileBehavior defaults to not moving
         _range = range;
@@ -30,7 +31,6 @@ public class Projectile : IGameObject
         Termination = new(this, () => _terminating || _range.InPixels <= _distanceTraveledInPixels);
         Color = color;
     }
-
 
     public Serializer Serializer { get; init; }
     public BodyBehavior Body { get; init; }
@@ -45,6 +45,11 @@ public class Projectile : IGameObject
             _attack.HandleCollision(sender, e);
             _terminating = true;
         }
+    }
+
+    private void HandleCollideWithMapEdge(object? sender, CollideWithMapEdgeEventArgs e)
+    {
+        _terminating = true;
     }
 
     public void Terminate()

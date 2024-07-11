@@ -52,6 +52,7 @@ public class BodyBehavior
     }
 
     public event EventHandler<CollideEventArgs>? Collided;
+    public event EventHandler<CollideWithMapEdgeEventArgs>? CollideWithMapEdge;
 
     public bool CollidesWith(BodyBehavior other)
     {
@@ -75,5 +76,28 @@ public class BodyBehavior
     public void OnCollided(CollideEventArgs args)
     {
         Collided?.Invoke(this, args);
+    }
+
+    public void OnCollidedWithMapEdge(CollideWithMapEdgeEventArgs args)
+    {
+        // by default, keep in bounds
+        if (LeftInPixels < 0)
+        {
+            LeftInPixels = 0;
+        }
+        else if (RightInPixels >= args.MapDimensions.WidthInPixels)
+        {
+            RightInPixels = args.MapDimensions.WidthInPixels;
+        }
+        if (TopInPixels < 0)
+        {
+            TopInPixels = 0;
+        }
+        else if (BottomInPixels >= args.MapDimensions.HeightInPixels)
+        {
+            BottomInPixels = args.MapDimensions.HeightInPixels;
+        }
+        
+        CollideWithMapEdge?.Invoke(this, args);
     }
 }
