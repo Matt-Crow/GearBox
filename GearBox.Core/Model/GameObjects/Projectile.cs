@@ -1,6 +1,7 @@
-using System.Text.Json;
 using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
+using System.Text.Json;
 
 namespace GearBox.Core.Model.GameObjects;
 
@@ -17,12 +18,13 @@ public class Projectile : IGameObject
 
     public Projectile(Coordinates coordinates, Velocity velocity, Distance range, Attack attack, Color color)
     {
-        Body = new(Distance.FromTiles(0.25))
+        Body = new(Distance.FromTiles(0.25), th => th == TileHeight.WALL)
         {
             Location = coordinates
         };
         Body.Collided += HandleCollision;
-        Body.CollideWithMapEdge += HandleCollideWithMapEdge;
+        Body.CollideWithMapEdge += (_, _) => _terminating = true;
+        Body.CollideWithTile += (_, _) => _terminating = true;
         _attack = attack;
         _mobility = new(Body, velocity);
         _mobility.StartMovingIn(velocity.Angle); // MobileBehavior defaults to not moving
@@ -47,16 +49,6 @@ public class Projectile : IGameObject
         }
     }
 
-    private void HandleCollideWithMapEdge(object? sender, CollideWithMapEdgeEventArgs e)
-    {
-        _terminating = true;
-    }
-
-    public void Terminate()
-    {
-        _terminating = true;
-    }
-    
     public void Update()
     {
         _mobility.UpdateMovement();

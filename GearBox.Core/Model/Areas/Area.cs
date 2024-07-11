@@ -136,7 +136,7 @@ public class Area : IArea
         }
         foreach (var projectile in _projectiles.AsEnumerable)
         {
-            _map.CheckForCollisions(projectile);
+            _map.CheckForCollisions(projectile.Body);
             CheckForCollisionsWithCharacters(projectile.Body);
         }
         foreach (var lootChest in _lootChests.AsEnumerable)

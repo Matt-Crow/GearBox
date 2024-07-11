@@ -123,34 +123,17 @@ public class Map : ISerializable<MapJson>
     /// <param name="body">the object to check for collisions with</param>
     public void CheckForCollisions(BodyBehavior body)
     {
-        if (!body.IsWithin(Bounds))
-        {
-            body.OnCollidedWithMapEdge(new CollideWithMapEdgeEventArgs(Bounds));
-        }
-
-        ForEachCollidingWallTile(body, h => h != TileHeight.FLOOR, t => t.ShoveOut(body));
-    }
-
-    // todo merge with CheckForCollisions(BodyBehavior)
-    public void CheckForCollisions(Projectile projectile)
-    {
-        if (!projectile.Body.IsWithin(Bounds))
-        {
-            projectile.Body.OnCollidedWithMapEdge(new CollideWithMapEdgeEventArgs(Bounds));
-        }
-
-        ForEachCollidingWallTile(projectile.Body, h => h == TileHeight.WALL, _ => projectile.Terminate());
-    }
-
-    private void ForEachCollidingWallTile(BodyBehavior body, Predicate<TileHeight> filter,  Action<Tile> doThis)
-    {
+        // For now, we're only dealing with bodies with radius of 1/2 tile or less.
+        // That makes the math a lot easier.
         if (body.Radius.InPixels * 2 > Distance.FromTiles(1).InPixels)
         {
             throw new Exception("Objects with large radius are not supported yet");
         }
-
-        // For now, we're only dealing with bodies with radius of 1/2 tile or less.
-        // That makes the math a lot easier.
+        
+        if (!body.IsWithin(Bounds))
+        {
+            body.OnCollidedWithMapEdge(new CollideWithMapEdgeEventArgs(Bounds));
+        }
 
         /*
             Since this body is 1x1 tiles at most, it can occupy at most 4 times,
@@ -171,9 +154,9 @@ public class Map : ISerializable<MapJson>
         for (var iter = new TileIterator(this, upperLeftTile, Dimensions.InTiles(2)); !iter.Done; iter.Next())
         {
             var tile = iter.Current;
-            if (filter(tile.TileType.Height) && tile.IsCollidingWith(body))
+            if (body.CanCollideWith(tile.TileType.Height) && tile.IsCollidingWith(body))
             {
-                doThis(tile);
+                body.OnCollidedWithTile(new CollideWithTileEventArgs(tile));
             }
         }
     }

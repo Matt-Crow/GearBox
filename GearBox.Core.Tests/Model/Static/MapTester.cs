@@ -77,7 +77,7 @@ public class MapTester
         var sut = new Map();
         var projectile = new Projectile(Coordinates.FromTiles(-1, -1), Velocity.ZERO, Distance.FromTiles(5), new Attack(new Character("foo", 1), 1), Color.BLACK);
 
-        sut.CheckForCollisions(projectile);
+        sut.CheckForCollisions(projectile.Body);
 
         Assert.True(projectile.Termination.IsTerminated);
     }
@@ -90,7 +90,7 @@ public class MapTester
             .SetTileAt(Coordinates.ORIGIN, 1);
         var projectile = new Projectile(Coordinates.ORIGIN.CenteredOnTile(), Velocity.ZERO, Distance.FromTiles(5), new Attack(new Character("foo", 1), 1), Color.BLACK);
     
-        sut.CheckForCollisions(projectile);
+        sut.CheckForCollisions(projectile.Body);
 
         Assert.True(projectile.Termination.IsTerminated);
     }

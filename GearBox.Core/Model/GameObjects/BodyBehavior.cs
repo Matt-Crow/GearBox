@@ -1,3 +1,4 @@
+using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.GameObjects;
@@ -7,14 +8,15 @@ namespace GearBox.Core.Model.GameObjects;
 /// </summary>
 public class BodyBehavior
 {
-    public BodyBehavior() : this(Distance.FromTiles(0.5))
+    public BodyBehavior() : this(Distance.FromTiles(0.5), th => th != TileHeight.FLOOR)
     {
 
     }
 
-    public BodyBehavior(Distance radius)
+    public BodyBehavior(Distance radius, Predicate<TileHeight> canCollideWith)
     {
         Radius = radius;
+        CanCollideWith = canCollideWith;
     }
 
     /// <summary>
@@ -27,6 +29,8 @@ public class BodyBehavior
     /// </summary>
     public Coordinates Location { get; set; } = Coordinates.ORIGIN.CenteredOnTile();
 
+    public Predicate<TileHeight> CanCollideWith { get; init; }
+    
     public int LeftInPixels
     {
         get => Location.XInPixels - Radius.InPixels;
@@ -53,6 +57,7 @@ public class BodyBehavior
 
     public event EventHandler<CollideEventArgs>? Collided;
     public event EventHandler<CollideWithMapEdgeEventArgs>? CollideWithMapEdge;
+    public event EventHandler<CollideWithTileEventArgs>? CollideWithTile;
 
     public bool CollidesWith(BodyBehavior other)
     {
@@ -99,5 +104,13 @@ public class BodyBehavior
         }
         
         CollideWithMapEdge?.Invoke(this, args);
+    }
+
+    public void OnCollidedWithTile(CollideWithTileEventArgs args)
+    {
+        // default to shoving out
+        args.Tile.ShoveOut(this);
+        
+        CollideWithTile?.Invoke(this, args);
     }
 }
