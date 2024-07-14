@@ -4,12 +4,14 @@ using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
 using System.Text.Json;
 using GearBox.Core.Model.Json.AreaUpdate;
+using GearBox.Core.Model.Json.AreaInit;
 
 namespace GearBox.Core.Model.GameObjects.Player;
 
 public class PlayerCharacter : Character
 {
     private int _frameCount = 0; // used for regeneration
+    private bool _hasAreaChanged = false;
     private readonly PlayerStatSummary _statSummary;
 
     public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp), Color.BLUE)
@@ -39,6 +41,7 @@ public class PlayerCharacter : Character
     public override void SetArea(IArea? newArea)
     {
         AreaChanged?.Invoke(this, new AreaChangedEventArgs(this, CurrentArea, newArea));
+        _hasAreaChanged = true;
         base.SetArea(newArea);
     }
 
@@ -138,11 +141,15 @@ public class PlayerCharacter : Character
     public ChangesJson GetChanges()
     {
         var result = new ChangesJson(
+            _hasAreaChanged && CurrentArea != null
+                ? MaybeChangeJson<MapJson>.Changed(CurrentArea.GetMapJson()) 
+                : MaybeChangeJson<MapJson>.NoChanges(),
             Inventory.GetChanges(),
             WeaponSlot.GetChanges(),
             ArmorSlot.GetChanges(), 
             _statSummary.GetChanges()
         );
+        _hasAreaChanged = false; // hacky for now
         return result;
     }
 

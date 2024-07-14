@@ -1,6 +1,5 @@
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
-using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Units;
 
@@ -63,10 +62,8 @@ public class GameServer
         _connections.Add(id, connection);
         _players.Add(id, player);
 
-        // client needs to know 3 things:
-        await SendGameInitTo(id);       // 1. initial state of the game
-        await SendAreaInitTo(area, id); // 2. initial state of the area
-        await SendAreaUpdateTo(id);     // 3. current state of the area
+        await SendGameInitTo(id);
+        await SendAreaUpdateTo(id);
 
         if (!_timer.Enabled)
         {
@@ -78,12 +75,6 @@ public class GameServer
     {
         var json = _game.GetGameInitJsonFor(_players[id]);
         return _connections[id].Send("GameInit", json);
-    }
-
-    private Task SendAreaInitTo(IArea area, string id)
-    {
-        var json = area.GetAreaInitJson();
-        return _connections[id].Send("AreaInit", json);
     }
 
     public void RemoveConnection(string id)

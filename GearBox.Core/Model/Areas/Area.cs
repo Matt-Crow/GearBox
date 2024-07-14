@@ -112,7 +112,7 @@ public class Area : IArea
 
     public Coordinates GetRandomFloorTile() => _map.GetRandomFloorTile();
 
-    public AreaInitJson GetAreaInitJson() => new(_map.ToJson());
+    public MapJson GetMapJson() => _map.ToJson();
 
     public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player)
     {

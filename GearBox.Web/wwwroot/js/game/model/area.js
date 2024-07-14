@@ -45,29 +45,6 @@ export class Area {
     }
 }
 
-export class AreaInitHandler {
-    #gameData;
-
-    /**
-     * @param {GameData} gameData 
-     */
-    constructor(gameData) {
-        this.#gameData = gameData;
-    }
-
-    /**
-     * @param {object} json 
-     * @returns {Area}
-     */
-    handleAreaInit(json) {
-        const deserialized = new Area(
-            this.#gameData,
-            TileMap.fromJson(json.map)
-        );
-        return deserialized;
-    }
-}
-
 export class AreaUpdateHandler {
     #area;
     #inventoryDeserializer;

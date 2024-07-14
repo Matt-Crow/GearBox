@@ -8,7 +8,8 @@ import { ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
 import { PlayerChangeHandler } from "./model/player.js";
 import { projectileDeserializer } from "./model/projectile.js";
-import { AreaInitHandler, AreaUpdateHandler } from "./model/area.js";
+import { Area, AreaUpdateHandler } from "./model/area.js";
+import { TileMap } from "./model/map.js";
 
 export class Game {
 
@@ -47,6 +48,7 @@ export class Game {
         this.#playerHud = playerHud;
         this.#gameOverScreen = gameOverScreen;
         this.#area = null;
+        setInterval(() => this.#draw(), 1000 / 24);
     }
 
     getPlayerCoords() {
@@ -59,14 +61,13 @@ export class Game {
         this.#inventoryModal.setCraftingRecipes(this.#gameData.craftingRecipes);
     }
 
-    handleAreaInit(json) {
+    // todo rework this
+    #handleAreaInit(json) {
         if (!this.#gameData) {
             throw new Error("Cannot accept area init until after game init");
         }
 
-        const area = new AreaInitHandler(this.#gameData)
-            .handleAreaInit(json);
-
+        const area = new Area(this.#gameData, TileMap.fromJson(json));
         const itemDeserializer = new ItemDeserializer(this.#gameData.itemTypes);
         const updateHandler = new AreaUpdateHandler(area, itemDeserializer)
             .addGameObjectType(characterDeserializer)
@@ -82,12 +83,19 @@ export class Game {
 
         this.#areaUpdateHandler = json => updateHandler.handleAreaUpdate(json);
         
-        setInterval(() => this.#canvas.draw(area), 1000 / 24);
-
         this.#area = area;
     }
 
     handleAreaUpdate(json) {
+        if (json.changes.map.hasChanged) {
+            this.#handleAreaInit(json.changes.map.value);
+        }
         this.#areaUpdateHandler(json);
+    }
+
+    #draw() {
+        if (this.#area) {
+            this.#canvas.draw(this.#area);
+        }
     }
 }
