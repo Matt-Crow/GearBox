@@ -8,6 +8,11 @@ public interface IGameBuilder
 {
     IGameBuilder WithItemType(ItemType itemType);
     IGameBuilder WithCraftingRecipe(CraftingRecipe recipe);
-    IGameBuilder WithArea(Func<AreaBuilder, AreaBuilder> defineArea);
+
+    /// <summary>
+    /// Defines an area in the game. The name must be unique within the game.
+    /// </summary>
+    IGameBuilder WithArea(string name, Func<AreaBuilder, AreaBuilder> defineArea);
+    
     IGame Build();
 }

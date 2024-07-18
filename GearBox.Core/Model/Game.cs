@@ -34,6 +34,9 @@ public class Game : IGame
         return _areas.FirstOrDefault() ?? throw new Exception("Game has no area");
     }
 
+    public IArea? GetAreaByName(string name) => _areas.Find(a => a.Name == name);
+
+
     public GameInitJson GetGameInitJsonFor(PlayerCharacter player)
     {
         var result = new GameInitJson(

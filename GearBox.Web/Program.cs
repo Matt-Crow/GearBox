@@ -7,7 +7,7 @@ using GearBox.Web.Infrastructure;
 var webAppBuilder = WebApplication.CreateBuilder(args);
 
 var game = new GameBuilder()
-    .WithArea(area => area
+    .WithArea("desert", area => area
         .AddMiningSkill()
         .AddStarterEquipment()
         .AddDefaultEnemies()

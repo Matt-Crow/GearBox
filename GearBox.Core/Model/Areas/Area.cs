@@ -27,12 +27,14 @@ public class Area : IArea
     private readonly List<Func<Character>> _enemyMakers;
 
     public Area(
+        string? name = null,
         IGame? game = null,
         Map? map = null, 
         LootTable? loot = null,
         List<Func<Character>>? enemyMakers = null
     )
     {
+        Name = name ?? "an area";
         _game = game ?? new Game();
         _map = map ?? new();
         _loot = loot ?? new LootTable();
@@ -43,6 +45,8 @@ public class Area : IArea
             _enemyMakers.Add(() => new Character("Default enemy", 1));
         }
     }
+
+    public string Name { get; init; }
 
     public void SpawnPlayer(PlayerCharacter player)
     {

@@ -16,6 +16,8 @@ public interface IGame
 
     IArea GetDefaultArea();
 
+    IArea? GetAreaByName(string name);
+
     GameInitJson GetGameInitJsonFor(PlayerCharacter player);
 
     void Update();

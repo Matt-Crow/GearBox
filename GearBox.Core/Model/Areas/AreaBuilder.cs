@@ -14,10 +14,16 @@ public class AreaBuilder
     private readonly LootTable _loot = new();
     private readonly List<Func<Character>> _enemies = [];
 
-    public AreaBuilder(IGameBuilder gameBuilder)
+    public AreaBuilder(string name, IGameBuilder gameBuilder)
     {
+        Name = name;
         _gameBuilder = gameBuilder;
     }
+
+    /// <summary>
+    /// The name of the area this is building
+    /// </summary>
+    public string Name { get; init; }
 
     public AreaBuilder DefineMaterial(Material material)
     {
@@ -201,6 +207,7 @@ public class AreaBuilder
             throw new Exception("map is required");
         }
         var result = new Area(
+            Name,
             game,
             _map,
             _loot,

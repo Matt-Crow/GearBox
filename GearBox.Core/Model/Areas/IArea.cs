@@ -14,6 +14,11 @@ namespace GearBox.Core.Model.Areas;
 public interface IArea
 {
     /// <summary>
+    /// An identifier for this area, unique to the game it occupies
+    /// </summary>
+    string Name { get; }
+
+    /// <summary>
     /// Spawns a player into the area an heals them back to full,
     /// if they are not already in the area
     /// </summary>
