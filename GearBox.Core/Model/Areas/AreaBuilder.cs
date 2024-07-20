@@ -58,6 +58,12 @@ public class AreaBuilder
         return this;
     }
 
+    public AreaBuilder WithMap(Map map)
+    {
+        _map = map;
+        return this;
+    }
+
     // todo move to extension method once skills are added
     public AreaBuilder AddMiningSkill()
     {
@@ -163,41 +169,6 @@ public class AreaBuilder
             .DefineEnemy(() => new Character("Scorpion", 1, Color.BLACK))
             .DefineEnemy(() => new Character("Jackal", 2, Color.TAN));
         return result;
-    }
-
-    public AreaBuilder WithDesertMap()
-    {
-        // for now, I won't read from a CSV file, as it is difficult to ensure subprojects can find the right file
-        int[,] csv = {
-        //   0              5              10             15
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3}, // 0
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2, 2, 2, 2, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2, 2, 2, 2, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0},
-            {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0}, // 5
-            {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0}, // 10
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 3, 3, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 2}, // 15
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 2, 2},
-            {0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 2, 0, 0, 2, 2, 2},
-            {3, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-            {3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2}
-        };
-        _map = new Map(Dimensions.InTiles(20))
-            .SetTileTypeForKey(0, new(Color.TAN, TileHeight.FLOOR))
-            .SetTileTypeForKey(1, new(Color.GRAY, TileHeight.WALL))
-            .SetTileTypeForKey(2, new(Color.BLUE, TileHeight.PIT)) // water
-            .SetTileTypeForKey(3, new(Color.LIGHT_GREEN, TileHeight.FLOOR)) // plants
-            .SetTilesFrom(csv);
-        return this;
     }
 
     public Area Build(IGame game)

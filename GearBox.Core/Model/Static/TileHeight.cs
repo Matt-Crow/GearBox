@@ -20,11 +20,15 @@ public class TileHeight
     /// </summary>
     public static readonly TileHeight PIT = new("Pit", -1);
 
+    public static readonly IEnumerable<TileHeight> ALL = [WALL, FLOOR, PIT];
+
     private TileHeight(string name, int height)
     {
         Name = name;
         Height = height;
     }
+
+    public static TileHeight? FromName(string name) => ALL.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// String representation of this height

@@ -64,13 +64,13 @@ public class Map : ISerializable<MapJson>
         return this;
     }
 
-    public Map SetTilesFrom(int[,] csv)
+    public Map SetTilesFrom(List<List<int>> csv)
     {
-        for (var y = 0; y < csv.GetLength(0); y++)
+        for (var y = 0; y < csv.Count; y++)
         {
-            for (var x = 0; x < csv.GetLength(1); x++)
+            for (var x = 0; x < csv[y].Count; x++)
             {
-                SetTileAt(Coordinates.FromTiles(x, y), csv[y,x]);
+                SetTileAt(Coordinates.FromTiles(x, y), csv[y][x]);
             }
         }
         return this;

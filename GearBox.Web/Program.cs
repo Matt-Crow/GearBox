@@ -3,6 +3,13 @@ using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
+using GearBox.Web.Model.Json;
+using System.Text.Json;
+
+// load map json
+var mapAsText = await File.ReadAllTextAsync("maps/map-1.json");
+var mapAsJson = JsonSerializer.Deserialize<MapResourceJson>(mapAsText) ?? throw new Exception("Failed to deserialize map-1");
+var map = mapAsJson.ToMap();
 
 var webAppBuilder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +18,7 @@ var game = new GameBuilder()
         .AddMiningSkill()
         .AddStarterEquipment()
         .AddDefaultEnemies()
-        .WithDesertMap()
+        .WithMap(map)
     )
     .Build();
 var area = game.GetDefaultArea();
