@@ -1,10 +1,9 @@
 using GearBox.Core.Model;
-using GearBox.Core.Model.GameObjects;
-using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 
-var map = await GameResourceLoader.LoadMapByName("map-1");
+var desertMap = await GameResourceLoader.LoadMapByName("desert");
+var canyonMap = await GameResourceLoader.LoadMapByName("canyon");
 
 var webAppBuilder = WebApplication.CreateBuilder(args);
 
@@ -13,26 +12,19 @@ var game = new GameBuilder()
         .AddMiningSkill()
         .AddStarterEquipment()
         .AddDefaultEnemies()
-        .WithMap(map)
+        .WithMap(desertMap)
+    )
+    .WithArea("canyon", area => area
+        .AddMiningSkill()
+        .AddDefaultEnemies()
+        .WithMap(canyonMap)
     )
     .Build();
-var area = game.GetDefaultArea();
-
-// testing LootChests
-area.AddTimer(new GameTimer(area.SpawnLootChest, 50));
-
-// testing EnemySpawner
-var spawner = new EnemySpawner(area, new EnemySpawnerOptions()
-{
-    WaveSize = 3,
-    MaxChildren = 10
-});
-area.AddTimer(new GameTimer(spawner.SpawnWave, Duration.FromSeconds(10).InFrames));
 
 // Add services to the container.
 webAppBuilder.Services.AddRazorPages();
 webAppBuilder.Services.AddSignalR();
-webAppBuilder.Services.AddSingleton(new GameServer(game)); // todo Repository
+webAppBuilder.Services.AddSingleton(new GameServer(game)); 
 
 var app = webAppBuilder.Build();
 

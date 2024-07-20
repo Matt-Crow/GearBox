@@ -184,6 +184,14 @@ public class AreaBuilder
             _loot,
             _enemies
         );
+        result.AddTimer(new GameTimer(result.SpawnLootChest, Duration.FromSeconds(10).InFrames));
+        var spawner = new EnemySpawner(result, new EnemySpawnerOptions()
+        {
+            WaveSize = 3,
+            MaxChildren = 10
+        });
+        result.AddTimer(new GameTimer(spawner.SpawnWave, Duration.FromSeconds(10).InFrames));
+
         return result;
     }
 }
