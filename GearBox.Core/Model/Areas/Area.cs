@@ -135,8 +135,6 @@ public class Area : IArea
 
     public void Update()
     {
-        // todo do stuff with exits here
-
         _timers.ForEach(t => t.Update());
         _characters.Update();
         _projectiles.Update();
@@ -149,7 +147,7 @@ public class Area : IArea
             if (firstExit != null)
             {
                 var newArea = _game.GetAreaByName(firstExit.DestinationName) ?? throw new Exception($"Invalid destination name: {firstExit.DestinationName}");
-                _players.Remove(player);
+                RemovePlayer(player);
                 newArea.SpawnPlayer(player);
                 firstExit.OnExit(player, newArea);
             }
