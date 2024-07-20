@@ -13,6 +13,7 @@ public class AreaBuilder
     private Map? _map;
     private readonly LootTable _loot = new();
     private readonly List<Func<Character>> _enemies = [];
+    private readonly List<IExit> _exits = [];
 
     public AreaBuilder(string name, IGameBuilder gameBuilder)
     {
@@ -61,6 +62,12 @@ public class AreaBuilder
     public AreaBuilder WithMap(Map map)
     {
         _map = map;
+        return this;
+    }
+
+    public AreaBuilder WithExit(IExit exit)
+    {
+        _exits.Add(exit);
         return this;
     }
 
@@ -182,7 +189,8 @@ public class AreaBuilder
             game,
             _map,
             _loot,
-            _enemies
+            _enemies,
+            _exits
         );
         result.AddTimer(new GameTimer(result.SpawnLootChest, Duration.FromSeconds(10).InFrames));
         var spawner = new EnemySpawner(result, new EnemySpawnerOptions()

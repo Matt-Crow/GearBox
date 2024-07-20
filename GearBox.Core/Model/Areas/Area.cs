@@ -25,13 +25,15 @@ public class Area : IArea
     private readonly Map _map;
     private readonly LootTable _loot;
     private readonly List<Func<Character>> _enemyMakers;
+    private readonly List<IExit> _exits = [];
 
     public Area(
         string? name = null,
         IGame? game = null,
         Map? map = null, 
         LootTable? loot = null,
-        List<Func<Character>>? enemyMakers = null
+        List<Func<Character>>? enemyMakers = null,
+        List<IExit>? exits = null 
     )
     {
         Name = name ?? "an area";
@@ -39,6 +41,7 @@ public class Area : IArea
         _map = map ?? new();
         _loot = loot ?? new LootTable();
         _enemyMakers = enemyMakers ?? [];
+        _exits = exits ?? [];
 
         if (_enemyMakers.Count == 0)
         {
@@ -47,6 +50,8 @@ public class Area : IArea
     }
 
     public string Name { get; init; }
+
+    public Dimensions Bounds => _map.Bounds;
 
     public void SpawnPlayer(PlayerCharacter player)
     {
@@ -130,10 +135,26 @@ public class Area : IArea
 
     public void Update()
     {
+        // todo do stuff with exits here
+
         _timers.ForEach(t => t.Update());
         _characters.Update();
         _projectiles.Update();
         _lootChests.Update();
+
+        // need to check for exit before map collisions, as players would get shoved out of exit
+        foreach (var player in _players.AsEnumerable())
+        {
+            var firstExit = _exits.FirstOrDefault(x => x.ShouldExit(player, this));
+            if (firstExit != null)
+            {
+                var newArea = _game.GetAreaByName(firstExit.DestinationName) ?? throw new Exception($"Invalid destination name: {firstExit.DestinationName}");
+                _players.Remove(player);
+                newArea.SpawnPlayer(player);
+                firstExit.OnExit(player, newArea);
+            }
+        }
+
         foreach (var character in _characters.AsEnumerable)
         {
             _map.CheckForCollisions(character.Body);

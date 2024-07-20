@@ -18,6 +18,8 @@ public interface IArea
     /// </summary>
     string Name { get; }
 
+    Dimensions Bounds { get; }
+
     /// <summary>
     /// Spawns a player into the area an heals them back to full,
     /// if they are not already in the area
