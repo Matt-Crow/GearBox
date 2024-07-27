@@ -1,4 +1,5 @@
 using GearBox.Core.Model;
+using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
@@ -12,12 +13,19 @@ var game = new GameBuilder()
     .WithArea("desert", area => area
         .AddMiningSkill()
         .AddStarterEquipment()
+        .AddLoot(loot => loot
+            .AddGold(Grade.COMMON, new Gold(5))
+            .AddGold(Grade.UNCOMMON, new Gold(10))
+        )
         .AddDefaultEnemies()
         .WithMap(desertMap)
         .WithExit(BorderExit.Right("canyon"))
     )
     .WithArea("canyon", area => area
         .AddMiningSkill()
+        .AddLoot(loot => loot
+            .AddGold(Grade.RARE, new Gold(25))
+        )
         .AddDefaultEnemies()
         .WithMap(canyonMap)
         .WithExit(BorderExit.Left("desert"))

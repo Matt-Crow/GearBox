@@ -26,6 +26,12 @@ public class AreaBuilder
     /// </summary>
     public string Name { get; init; }
 
+    public AreaBuilder AddLoot(Action<LootTable> withLoot)
+    {
+        withLoot(_loot);
+        return this;
+    }
+
     public AreaBuilder DefineMaterial(Material material)
     {
         _gameBuilder.WithItemType(material.Type);

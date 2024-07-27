@@ -61,9 +61,13 @@ public class Inventory : IMightChange<InventoryJson>
         // gold is not part of an ItemUnion; no need to add here
     }
 
-    public void Add(Gold gold)
+    public void Add(Gold? gold)
     {
-        Gold = Gold.Plus(gold);
+        if (gold == null)
+        {
+            return;
+        }
+        Gold = Gold.Plus(gold.Value);
     }
 
     public void Craft(CraftingRecipe recipe)
