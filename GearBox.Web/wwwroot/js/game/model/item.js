@@ -4,21 +4,25 @@ export class Inventory {
     #weapons;
     #armors;
     #materials;
+    #gold;
 
     /**
      * @param {Item[]} weapons 
      * @param {Item[]} armors 
      * @param {Item[]} materials 
+     * @param {number} gold
      */
-    constructor(weapons=[], armors=[], materials=[]) {
+    constructor(weapons=[], armors=[], materials=[], gold=0) {
         this.#weapons = weapons;
         this.#armors = armors;
         this.#materials = materials;
+        this.#gold = gold;
     }
 
     get weapons() { return this.#weapons; }
     get armors() { return this.#armors; }
     get materials() { return this.#materials; }
+    get gold() { return this.#gold; }
 }
 
 export class InventoryDeserializer {
@@ -35,7 +39,7 @@ export class InventoryDeserializer {
         const weapons = json.weapons.items.map(x => this.#itemDeserializer.deserialize(x));
         const armors = json.armors.items.map(x => this.#itemDeserializer.deserialize(x));
         const materials = json.materials.items.map(x => this.#itemDeserializer.deserialize(x));
-        return new Inventory(weapons, armors, materials);
+        return new Inventory(weapons, armors, materials, json.gold);
     }
 }
 

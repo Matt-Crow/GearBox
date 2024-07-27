@@ -19,10 +19,12 @@ public class Inventory : IMightChange<InventoryJson>
     public InventoryTab<Weapon> Weapons { get; init; } = new();
     public InventoryTab<Armor> Armors { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
+    public Gold Gold { get; private set; } = Gold.NONE;
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
         .Concat(Weapons.DynamicValues)
         .Concat(Armors.DynamicValues)
-        .Concat(Materials.DynamicValues);
+        .Concat(Materials.DynamicValues)
+        .Append(Gold.Quantity);
 
     /// <summary>
     /// Adds all items from the other inventory to this one
@@ -43,6 +45,8 @@ public class Inventory : IMightChange<InventoryJson>
         {
             Materials.Add(materialStack.Item.ToOwned(), materialStack.Quantity);
         }
+
+        Gold = Gold.Plus(other.Gold);
     }
 
     public void Add(ItemUnion? item)
@@ -54,11 +58,12 @@ public class Inventory : IMightChange<InventoryJson>
         Weapons.Add(item.Weapon);
         Armors.Add(item.Armor);
         Materials.Add(item.Material);
+        // gold is not part of an ItemUnion; no need to add here
     }
 
-    public bool Any()
+    public void Add(Gold gold)
     {
-        return Weapons.Any() || Armors.Any() || Materials.Any();
+        Gold = Gold.Plus(gold);
     }
 
     public void Craft(CraftingRecipe recipe)
@@ -89,5 +94,5 @@ public class Inventory : IMightChange<InventoryJson>
 
     public void Update() => _changeTracker.Update();
     public MaybeChangeJson<InventoryJson> GetChanges() => _changeTracker.ToJson();
-    public InventoryJson ToJson() => new(Weapons.ToJson(), Armors.ToJson(), Materials.ToJson());
+    public InventoryJson ToJson() => new(Weapons.ToJson(), Armors.ToJson(), Materials.ToJson(), Gold.Quantity);
 }

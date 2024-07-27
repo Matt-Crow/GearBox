@@ -13,21 +13,22 @@ public class LootTable
 
     public void AddMaterial(Material itemDefinition) => _weightedItems.Add(new(itemDefinition.Type.Grade.Weight, ItemUnion.Of(itemDefinition)));
 
-    public Inventory GetRandomItems()
+    public Inventory GetRandomLoot()
     {
-        if (!_weightedItems.Any())
-        {
-            throw new InvalidOperationException($"LootTable has no items");
-        }
-
         var result = new Inventory();
-        var numItems = Random.Shared.Next(0, 3) + 1;
+        var numItems = _weightedItems.Any()
+            ? Random.Shared.Next(0, 3) + 1
+            : 0;
         for (int i = 0; i < numItems; i++)
         {
             var itemToAdd = ChooseRandomWeightedItem();
             result.Add(itemToAdd.Item.ToOwned());
         }
-        
+
+        // todo read from loot pool
+        var goldAmount = Random.Shared.Next(0, 20) + 1;
+        result.Add(new Gold(goldAmount));
+
         return result;
     }
 

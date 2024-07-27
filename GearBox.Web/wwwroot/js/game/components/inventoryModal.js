@@ -60,6 +60,7 @@ export class InventoryModal {
         this.#materialTable.setRecords(inventory.materials);
         this.#weaponTab.bindRows(inventory.weapons);
         this.#armorTab.bindRows(inventory.armors);
+        $("#gold").text(inventory.gold);
     }
 
     /**

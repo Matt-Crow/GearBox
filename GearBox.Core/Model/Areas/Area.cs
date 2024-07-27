@@ -84,7 +84,7 @@ public class Area : IArea
 
     public void SpawnLootChest()
     {
-        var inventory = _loot.GetRandomItems();
+        var inventory = _loot.GetRandomLoot(); 
         var location = _map.GetRandomFloorTile();
         var lootChest = new LootChest(location.CenteredOnTile(), inventory);
         _lootChests.AddGameObject(lootChest);

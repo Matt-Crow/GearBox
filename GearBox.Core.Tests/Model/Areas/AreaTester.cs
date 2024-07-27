@@ -6,11 +6,10 @@ namespace GearBox.Core.Tests.Model.Areas;
 public class AreaTester
 {
     [Fact]
-    public void SpawnLootChest_GivenDefaultLootTable_Throws()
+    public void SpawnLootChest_GivenDefaultLootTable_DoesNotThrow()
     {
         var sut = new Area();
-
-        Assert.Throws<InvalidOperationException>(sut.SpawnLootChest);
+        sut.SpawnLootChest();
     }
 
     [Fact]
