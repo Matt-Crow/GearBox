@@ -11,7 +11,7 @@ public class AreaBuilder
 {
     private readonly IGameBuilder _gameBuilder;
     private Map? _map;
-    private readonly LootTable _loot = new();
+    private readonly LootTableBuilder _lootBuilder = new();
     private readonly List<Func<Character>> _enemies = [];
     private readonly List<IExit> _exits = [];
 
@@ -26,16 +26,17 @@ public class AreaBuilder
     /// </summary>
     public string Name { get; init; }
 
-    public AreaBuilder AddLoot(Action<LootTable> withLoot)
+    public AreaBuilder AddLoot(Action<LootTableBuilder> withLoot)
     {
-        withLoot(_loot);
+        withLoot(_lootBuilder);
         return this;
     }
 
     public AreaBuilder DefineMaterial(Material material)
     {
         _gameBuilder.WithItemType(material.Type);
-        _loot.AddMaterial(material); // all materials are loot for now
+        // all materials are loot for now
+        _lootBuilder.Add(material.Type.Grade, material);
         return this;
     }
 
@@ -44,7 +45,8 @@ public class AreaBuilder
         _gameBuilder.WithItemType(builder.ItemType);
         if (isLoot)
         {
-            _loot.AddWeapon(builder.Build(1)); // todo use area level
+            // todo use area level
+            _lootBuilder.Add(builder.ItemType.Grade, builder, 1);
         }
         return this;
     }
@@ -54,7 +56,8 @@ public class AreaBuilder
         _gameBuilder.WithItemType(builder.ItemType);
         if (isLoot)
         {
-            _loot.AddArmor(builder.Build(1)); // todo use area level
+            // todo use area level
+            _lootBuilder.Add(builder.ItemType.Grade, builder, 1);
         }
         return this;
     }
@@ -194,7 +197,7 @@ public class AreaBuilder
             Name,
             game,
             _map,
-            _loot,
+            _lootBuilder.Build(),
             _enemies,
             _exits
         );

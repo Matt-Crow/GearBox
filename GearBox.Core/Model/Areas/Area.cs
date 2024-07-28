@@ -39,7 +39,7 @@ public class Area : IArea
         Name = name ?? "an area";
         _game = game ?? new Game();
         _map = map ?? new();
-        _loot = loot ?? new LootTable();
+        _loot = loot ?? new LootTable([]);
         _enemyMakers = enemyMakers ?? [];
         _exits = exits ?? [];
 

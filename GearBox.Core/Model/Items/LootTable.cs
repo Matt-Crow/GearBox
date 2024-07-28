@@ -7,15 +7,9 @@ public class LootTable
 {
     private readonly List<LootOption> _lootOptions = [];
 
-    public void AddWeapon(Weapon itemDefinition) => _lootOptions.Add(new(itemDefinition.Type.Grade, ItemUnion.Of(itemDefinition)));
-
-    public void AddArmor(Armor itemDefinition) => _lootOptions.Add(new(itemDefinition.Type.Grade, ItemUnion.Of(itemDefinition)));
-
-    public void AddMaterial(Material itemDefinition) => _lootOptions.Add(new(itemDefinition.Type.Grade, ItemUnion.Of(itemDefinition)));
-    public LootTable AddGold(Grade grade, Gold gold)
+    public LootTable(List<LootOption> options)
     {
-        _lootOptions.Add(new(grade, gold));
-        return this;
+        _lootOptions = options;
     }
 
     public Inventory GetRandomLoot()
@@ -47,24 +41,5 @@ public class LootTable
             randomNumber -= weightedItem.Weight;
         }
         throw new Exception("Something went wrong when chosing a random item");
-    }
-
-    private class LootOption
-    {
-        public LootOption(Grade grade, ItemUnion item)
-        {
-            Weight = grade.Weight;
-            Item = item;
-        }
-
-        public LootOption(Grade grade, Gold gold)
-        {
-            Weight = grade.Weight;
-            Gold = gold;
-        }
-
-        public int Weight { get; init; }
-        public ItemUnion? Item { get; init; }
-        public Gold? Gold { get; init; }
     }
 }
