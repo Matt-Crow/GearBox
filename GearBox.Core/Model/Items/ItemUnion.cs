@@ -51,6 +51,23 @@ public class ItemUnion
         throw new Exception("ItemUnion has no item");
     }
 
+    public ItemType GetItemType()
+    {
+        if (Material != null)
+        {
+            return Material.Type;
+        }
+        if (Weapon != null)
+        {
+            return Weapon.Type;
+        }
+        if (Armor != null)
+        {
+            return Armor.Type;
+        }
+        throw new Exception("Forgot to add clause in ItemUnion.GetItemType");
+    }
+
     public ItemUnion ToOwned()
     {
         if (Material != null)
