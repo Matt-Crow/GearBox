@@ -15,7 +15,7 @@ public class WeaponBuilder(ItemType type) : EquipmentBuilder<Weapon>(type)
 
     public override Weapon DoBuild(int level, Dictionary<PlayerStatType, int> statWeights)
     {
-        var stats = new PlayerStatBoosts(statWeights, WeaponHelper.GetStatPoints(level, ItemType.Grade, _attackRange));
+        var stats = new PlayerStatBoosts(statWeights, Weapon.GetStatPoints(level, ItemType.Grade, _attackRange));
         var result = new Weapon(
             ItemType, 
             level,

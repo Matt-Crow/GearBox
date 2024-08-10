@@ -15,7 +15,7 @@ public class ArmorBuilder(ItemType type) : EquipmentBuilder<Armor>(type)
 
     public override Armor DoBuild(int level, Dictionary<PlayerStatType, int> statWeights)
     {
-        var stats = new PlayerStatBoosts(statWeights, ArmorHelper.GetStatPoints(level, ItemType.Grade, _armorClass));
+        var stats = new PlayerStatBoosts(statWeights, Armor.GetStatPoints(level, ItemType.Grade, _armorClass));
         var result = new Armor(
             ItemType,
             level,

@@ -1,3 +1,4 @@
+using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Player;
 
 namespace GearBox.Core.Model.Items;
@@ -49,4 +50,14 @@ public abstract class Equipment : IItem
     /// Returns this if it is immutable, or a clone otherwise
     /// </summary>
     public abstract Equipment ToOwned(int? level=null);
+
+    public static int GetStatPoints(int level, Grade grade)
+    {
+        var maxPoints = 1000;
+        var minPoints = 100;
+        var maxLevel = Character.MAX_LEVEL;
+        var percentage = ((double)level) / maxLevel;
+        var result = (int)(minPoints + percentage*(maxPoints - minPoints));
+        return (int)(result * grade.PointMultiplier);
+    }
 }
