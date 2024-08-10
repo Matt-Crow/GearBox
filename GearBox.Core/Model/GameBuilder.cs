@@ -25,13 +25,13 @@ public class GameBuilder : IGameBuilder
         return this;
     }
 
-    public IGameBuilder WithArea(string name, Func<AreaBuilder, AreaBuilder> defineArea)
+    public IGameBuilder WithArea(string name, int level, Func<AreaBuilder, AreaBuilder> defineArea)
     {
         if (_areas.Any(b => b.Name == name))
         {
             throw new ArgumentException("Name must be unique within each game", nameof(name));
         }
-        _areas.Add(defineArea(new AreaBuilder(name, this, _itemFactory)));
+        _areas.Add(defineArea(new AreaBuilder(name, level, _itemFactory)));
         return this;
     }
 

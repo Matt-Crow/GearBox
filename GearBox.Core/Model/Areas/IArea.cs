@@ -18,6 +18,11 @@ public interface IArea
     /// </summary>
     string Name { get; }
 
+    /// <summary>
+    /// Determines the level of loot and enemies in this area
+    /// </summary>
+    int Level { get; }
+
     Dimensions Bounds { get; }
 
     /// <summary>

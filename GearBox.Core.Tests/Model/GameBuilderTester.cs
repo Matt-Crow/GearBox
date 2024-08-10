@@ -9,8 +9,8 @@ public class GameBuilderTester
     public void AreaNameMustBeUnique()
     {
         var sut = new GameBuilder()
-            .WithArea("foo", area => area);
+            .WithArea("foo", 1, area => area);
         
-        Assert.Throws<ArgumentException>(() => sut.WithArea("foo", area => area));
+        Assert.Throws<ArgumentException>(() => sut.WithArea("foo", 1, area => area));
     }
 }

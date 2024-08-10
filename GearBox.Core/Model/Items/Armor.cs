@@ -22,8 +22,8 @@ public class Armor : Equipment
     public override IEnumerable<string> Details => ListExtensions.Of($"Class: {ArmorClass}")
         .Concat(StatBoosts.Details);
 
-    public override Armor ToOwned()
+    public override Armor ToOwned(int? level=null)
     {
-        return new Armor(Type, Level, Guid.NewGuid(), ArmorClass, StatBoosts);
+        return new Armor(Type, level ?? Level, Guid.NewGuid(), ArmorClass, StatBoosts);
     }
 }

@@ -24,7 +24,7 @@ var game = new GameBuilder()
             {
                 {PlayerStatType.OFFENSE, 1},
                 {PlayerStatType.MAX_HIT_POINTS, 1}
-            }).Build(1)) // todo use area level
+            }).Build(1)) 
         )
         .Add(ItemUnion.Of(new WeaponBuilder(new ItemType("Training Bow", Grade.COMMON))
             .WithRange(AttackRange.LONG)
@@ -32,7 +32,7 @@ var game = new GameBuilder()
             {
                 {PlayerStatType.OFFENSE, 1},
                 {PlayerStatType.SPEED, 1}
-            }).Build(1)) // todo use area level
+            }).Build(1)) 
         )
         .Add(ItemUnion.Of(new WeaponBuilder(new ItemType("Training Staff", Grade.COMMON))
             .WithRange(AttackRange.MEDIUM)
@@ -40,7 +40,7 @@ var game = new GameBuilder()
             {
                 {PlayerStatType.MAX_HIT_POINTS, 1},
                 {PlayerStatType.MAX_ENERGY, 1}
-            }).Build(1)) // todo use area level
+            }).Build(1))
         )
         .Add(ItemUnion.Of(new ArmorBuilder(new ItemType("Fighter Initiate's Armor", Grade.COMMON))
             .WithArmorClass(ArmorClass.HEAVY)
@@ -48,7 +48,7 @@ var game = new GameBuilder()
             {
                 {PlayerStatType.MAX_HIT_POINTS, 1},
                 {PlayerStatType.OFFENSE, 1}
-            }).Build(1)) // todo use area level
+            }).Build(1))
         )
         .Add(ItemUnion.Of(new ArmorBuilder(new ItemType("Archer Initiate's Armor", Grade.COMMON))
             .WithArmorClass(ArmorClass.MEDIUM)
@@ -56,7 +56,7 @@ var game = new GameBuilder()
             {
                 {PlayerStatType.SPEED, 1},
                 {PlayerStatType.OFFENSE, 1}
-            }).Build(1)) // todo use area level
+            }).Build(1))
         )
         .Add(ItemUnion.Of(new ArmorBuilder(new ItemType("Mage Initiate's Armor", Grade.COMMON))
             .WithArmorClass(ArmorClass.LIGHT)
@@ -64,7 +64,7 @@ var game = new GameBuilder()
             {
                 {PlayerStatType.MAX_ENERGY, 1},
                 {PlayerStatType.OFFENSE, 1}
-            }).Build(1)) // todo use area level
+            }).Build(1))
         )
         .Add(ItemUnion.Of(new WeaponBuilder(new ItemType("Bronze Khopesh", Grade.UNCOMMON))
             .WithRange(AttackRange.MELEE)
@@ -92,7 +92,7 @@ var game = new GameBuilder()
         .And("Bronze", 25)
         .Makes("Bronze Armor")
     )
-    .WithArea("desert", area => area
+    .WithArea("desert", 1, area => area
         .AddLoot(loot => loot
             .AddItem("Training Sword")
             .AddItem("Training Bow")
@@ -109,7 +109,7 @@ var game = new GameBuilder()
         .WithMap(desertMap)
         .WithExit(BorderExit.Right("canyon"))
     )
-    .WithArea("canyon", area => area
+    .WithArea("canyon", 2, area => area
         .AddLoot(loot => loot
             .AddItem("Bronze")
             .AddItem("Silver")

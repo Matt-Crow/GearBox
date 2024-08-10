@@ -8,16 +8,16 @@ namespace GearBox.Core.Model.Areas;
 
 public class AreaBuilder
 {
-    private readonly IGameBuilder _gameBuilder;
+    private readonly int _level;
     private Map? _map;
     private readonly LootTableBuilder _lootBuilder;
     private readonly List<Func<Character>> _enemies = [];
     private readonly List<IExit> _exits = [];
 
-    public AreaBuilder(string name, IGameBuilder gameBuilder, IItemFactory itemFactory)
+    public AreaBuilder(string name, int level, IItemFactory itemFactory)
     {
         Name = name;
-        _gameBuilder = gameBuilder;
+        _level = level;
         _lootBuilder = new(itemFactory);
     }
 
@@ -53,9 +53,9 @@ public class AreaBuilder
     public AreaBuilder AddDefaultEnemies()
     {
         var result = this
-            .DefineEnemy(() => new Character("Snake", 1, Color.LIGHT_GREEN))
-            .DefineEnemy(() => new Character("Scorpion", 1, Color.BLACK))
-            .DefineEnemy(() => new Character("Jackal", 2, Color.TAN));
+            .DefineEnemy(() => new Character("Snake", _level, Color.LIGHT_GREEN))
+            .DefineEnemy(() => new Character("Scorpion", _level, Color.BLACK))
+            .DefineEnemy(() => new Character("Jackal", _level, Color.TAN));
         return result;
     }
 
@@ -67,9 +67,10 @@ public class AreaBuilder
         }
         var result = new Area(
             Name,
+            _level,
             game,
             _map,
-            _lootBuilder.Build(),
+            _lootBuilder.Build(_level),
             _enemies,
             _exits
         );

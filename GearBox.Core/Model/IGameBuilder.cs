@@ -12,7 +12,7 @@ public interface IGameBuilder
     /// <summary>
     /// Defines an area in the game. The name must be unique within the game.
     /// </summary>
-    IGameBuilder WithArea(string name, Func<AreaBuilder, AreaBuilder> defineArea);
+    IGameBuilder WithArea(string name, int level, Func<AreaBuilder, AreaBuilder> defineArea);
     
     IGame Build();
 }

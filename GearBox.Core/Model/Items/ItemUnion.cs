@@ -68,7 +68,7 @@ public class ItemUnion
         throw new Exception("Forgot to add clause in ItemUnion.GetItemType");
     }
 
-    public ItemUnion ToOwned()
+    public ItemUnion ToOwned(int? level=null)
     {
         if (Material != null)
         {
@@ -76,11 +76,11 @@ public class ItemUnion
         }
         if (Weapon != null)
         {
-            return Of(Weapon.ToOwned());
+            return Of(Weapon.ToOwned(level));
         }
         if (Armor != null)
         {
-            return Of(Armor.ToOwned());
+            return Of(Armor.ToOwned(level));
         }
         throw new Exception("Forgot to add clause in ItemUnion.ToOwned");
     }

@@ -48,5 +48,5 @@ public abstract class Equipment : IItem
     /// <summary>
     /// Returns this if it is immutable, or a clone otherwise
     /// </summary>
-    public abstract Equipment ToOwned();
+    public abstract Equipment ToOwned(int? level=null);
 }

@@ -86,7 +86,7 @@ public class GameServerTester
     public static IGame MakeGame()
     {
         var result = new GameBuilder()
-            .WithArea("foo", area => area.WithMap(new()))
+            .WithArea("foo", 1, area => area.WithMap(new()))
             .Build();
         return result;
     }

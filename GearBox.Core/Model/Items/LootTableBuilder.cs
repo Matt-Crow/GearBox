@@ -24,10 +24,10 @@ public class LootTableBuilder
         return this;
     }
 
-    public LootTable Build()
+    public LootTable Build(int level)
     {
         var lootOptions = _lootOptions
-            .Select(x => x.BuildUsing(_itemFactory))
+            .Select(x => x.BuildUsing(_itemFactory, level))
             .ToList();
         var result = new LootTable(lootOptions);
         return result;
@@ -50,7 +50,7 @@ public class LootTableBuilder
         public Gold? Gold { get; init; }
         public string? ItemName { get; init; }
 
-        public LootOption BuildUsing(IItemFactory itemFactory)
+        public LootOption BuildUsing(IItemFactory itemFactory, int level)
         {
             if (Grade != null && Gold != null)
             {
@@ -59,9 +59,9 @@ public class LootTableBuilder
             if (ItemName != null)
             {
                 var item = itemFactory.Make(ItemName) ?? throw new Exception($"Bad item name: '{ItemName}'");
-                return new LootOption(item.GetItemType().Grade.Weight, item);
+                return new LootOption(item.GetItemType().Grade.Weight, item.ToOwned(level));
             }
-            throw new Exception("Missing case in LootOptionBuilder.BuildUsion(IItemFactory)");
+            throw new Exception("Missing case in LootOptionBuilder.BuildUsing(IItemFactory)");
         }
     }
 }

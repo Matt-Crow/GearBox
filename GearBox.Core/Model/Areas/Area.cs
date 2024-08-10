@@ -29,6 +29,7 @@ public class Area : IArea
 
     public Area(
         string? name = null,
+        int level = 1,
         IGame? game = null,
         Map? map = null, 
         LootTable? loot = null,
@@ -37,6 +38,7 @@ public class Area : IArea
     )
     {
         Name = name ?? "an area";
+        Level = level;
         _game = game ?? new Game();
         _map = map ?? new();
         _loot = loot ?? new LootTable([]);
@@ -50,7 +52,7 @@ public class Area : IArea
     }
 
     public string Name { get; init; }
-
+    public int Level { get; init; }
     public Dimensions Bounds => _map.Bounds;
 
     public void SpawnPlayer(PlayerCharacter player)
