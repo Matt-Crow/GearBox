@@ -13,19 +13,15 @@ public class WeaponBuilder(ItemType type) : EquipmentBuilder<Weapon>(type)
         return this;
     }
 
-    protected override int ModifyPoints(int points)
+    public override Weapon DoBuild(int level, Dictionary<PlayerStatType, int> statWeights)
     {
-        return (int)(points * _attackRange.WeaponStatMultiplier);
-    }
-
-    public override Weapon DoBuild(int level, PlayerStatBoosts statBoosts)
-    {
+        var stats = new PlayerStatBoosts(statWeights, WeaponHelper.GetStatPoints(level, ItemType.Grade, _attackRange));
         var result = new Weapon(
             ItemType, 
             level,
             null, // id is null
             _attackRange,
-            statBoosts
+            stats
         );
         return result;
     }

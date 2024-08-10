@@ -24,6 +24,8 @@ public class Armor : Equipment
 
     public override Armor ToOwned(int? level=null)
     {
-        return new Armor(Type, level ?? Level, Guid.NewGuid(), ArmorClass, StatBoosts);
+        var newLevel = level ?? Level;
+        var newStats = StatBoosts.WithTotalPoints(ArmorHelper.GetStatPoints(newLevel, Type.Grade, ArmorClass));
+        return new Armor(Type, newLevel, Guid.NewGuid(), ArmorClass, newStats);
     }
 }

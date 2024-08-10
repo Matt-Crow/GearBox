@@ -13,19 +13,15 @@ public class ArmorBuilder(ItemType type) : EquipmentBuilder<Armor>(type)
         return this;
     }
 
-    protected override int ModifyPoints(int points)
+    public override Armor DoBuild(int level, Dictionary<PlayerStatType, int> statWeights)
     {
-        return (int)(points * _armorClass.ArmorStatMultiplier);
-    }
-
-    public override Armor DoBuild(int level, PlayerStatBoosts statBoosts)
-    {
+        var stats = new PlayerStatBoosts(statWeights, ArmorHelper.GetStatPoints(level, ItemType.Grade, _armorClass));
         var result = new Armor(
             ItemType,
             level,
             null, // id is null
             _armorClass,
-            statBoosts
+            stats
         );
         return result;
     }

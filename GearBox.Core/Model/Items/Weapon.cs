@@ -23,6 +23,8 @@ public class Weapon : Equipment
 
     public override Weapon ToOwned(int? level=null)
     {
-        return new Weapon(Type, level ?? Level, Guid.NewGuid(), AttackRange, StatBoosts);
+        var newLevel = level ?? Level;
+        var newStats = StatBoosts.WithTotalPoints(WeaponHelper.GetStatPoints(newLevel, Type.Grade, AttackRange));
+        return new Weapon(Type, newLevel, Guid.NewGuid(), AttackRange, newStats);
     }
 }
