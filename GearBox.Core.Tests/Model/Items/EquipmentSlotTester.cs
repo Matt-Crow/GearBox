@@ -10,10 +10,10 @@ public class EquipmentSlotTester
     [Fact]
     public void DynamicValues_AfterEquipping_Change()
     {
-        var sut = new EquipmentSlot<Weapon>("");
+        var sut = new EquipmentSlot<Equipment<WeaponStats>, WeaponStats>("");
         var tracker = new ChangeTracker<ItemJson?>(sut);
         
-        sut.Value = new Weapon(new ItemType("foo"));
+        sut.Value = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats());
         
         Assert.True(tracker.HasChanged);
     }
@@ -21,13 +21,13 @@ public class EquipmentSlotTester
     [Fact]
     public void DynamicValues_AfterSwitching_Change()
     {
-        var sut = new EquipmentSlot<Weapon>("")
+        var sut = new EquipmentSlot<Equipment<WeaponStats>, WeaponStats>("")
         {
-            Value = new Weapon(new ItemType("foo"))
+            Value = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats())
         };
         var tracker = new ChangeTracker<ItemJson?>(sut);
 
-        sut.Value = new Weapon(new ItemType("foo"));
+        sut.Value = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats());
 
         Assert.True(tracker.HasChanged);
     }

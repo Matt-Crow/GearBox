@@ -35,8 +35,8 @@ public class PlayerCharacter : Character
     public int EnergyRemaining => MaxEnergy - EnergyExpended;
     public PlayerStats Stats { get; init; } = new();
     public Inventory Inventory { get; init; }
-    public EquipmentSlot<Weapon> WeaponSlot { get; init; }
-    public EquipmentSlot<Armor> ArmorSlot { get; init; }
+    public EquipmentSlot<Equipment<WeaponStats>, WeaponStats> WeaponSlot { get; init; }
+    public EquipmentSlot<Equipment<ArmorStats>, ArmorStats> ArmorSlot { get; init; }
 
     public override void SetArea(IArea? newArea)
     {
@@ -75,7 +75,7 @@ public class PlayerCharacter : Character
 
         WeaponSlot.Value = weapon;
         Inventory.Weapons.Remove(weapon);
-        BasicAttack.Range = weapon.AttackRange;
+        BasicAttack.Range = weapon.Inner.AttackRange;
 
         UpdateStats();
     }
@@ -92,7 +92,7 @@ public class PlayerCharacter : Character
 
         ArmorSlot.Value = armor;
         Inventory.Armors.Remove(armor);
-        ArmorClass = armor.ArmorClass;
+        ArmorClass = armor.Inner.ArmorClass;
 
         UpdateStats();
     }

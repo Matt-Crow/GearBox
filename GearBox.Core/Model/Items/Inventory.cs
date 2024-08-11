@@ -16,8 +16,8 @@ public class Inventory : IMightChange<InventoryJson>
         _changeTracker = new(this);
     }
 
-    public InventoryTab<Weapon> Weapons { get; init; } = new();
-    public InventoryTab<Armor> Armors { get; init; } = new();
+    public InventoryTab<Equipment<WeaponStats>> Weapons { get; init; } = new();
+    public InventoryTab<Equipment<ArmorStats>> Armors { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
     public Gold Gold { get; private set; } = Gold.NONE;
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 

@@ -2,17 +2,20 @@ using GearBox.Core.Model.GameObjects.Player;
 
 namespace GearBox.Core.Model.Items;
 
-public abstract class EquipmentBuilder<T>
-where T : Equipment
+// todo not needed?
+public class EquipmentBuilder<T>
+where T : IEquipmentStats
 {
     private Dictionary<PlayerStatType, int>? _statWeights;
     
-    public EquipmentBuilder(ItemType type)
+    public EquipmentBuilder(ItemType type, T inner)
     {
         ItemType = type;
+        Inner = inner;
     }
 
     public ItemType ItemType { get; init; }
+    protected T Inner { get; set;}
 
     public EquipmentBuilder<T> WithStatWeights(Dictionary<PlayerStatType, int> statWeights)
     {
@@ -20,10 +23,16 @@ where T : Equipment
         return this;
     }
 
-    /// <summary>
-    /// Builds the equipment at the given level
-    /// </summary>
-    public abstract T DoBuild(int level, Dictionary<PlayerStatType, int> statWeights);
-
-    public T Build(int level) => DoBuild(level, _statWeights ?? []);
+    public virtual Equipment<T> Build(int level)
+    {
+        var stats = new PlayerStatBoosts(_statWeights, Inner.GetStatPoints(level, ItemType.Grade));
+        var result = new Equipment<T>(
+            ItemType, 
+            Inner,
+            level,
+            stats,
+            null // id is null
+        );
+        return result;
+    }
 }

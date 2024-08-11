@@ -4,8 +4,9 @@ using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model.Items;
 
-public class EquipmentSlot<T> : IMightChange<ItemJson?>
-where T : Equipment
+public class EquipmentSlot<T, U> : IMightChange<ItemJson?>
+where T : Equipment<U>
+where U : IEquipmentStats // todo not 2 generics
 {
     private readonly ChangeTracker<ItemJson?> _changeTracker;
 

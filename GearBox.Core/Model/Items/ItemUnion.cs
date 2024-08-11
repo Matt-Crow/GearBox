@@ -8,7 +8,7 @@ namespace GearBox.Core.Model.Items;
 /// </summary>
 public class ItemUnion
 {
-    private ItemUnion(Material? material, Weapon? weapon, Armor? armor)
+    private ItemUnion(Material? material, Equipment<WeaponStats>? weapon, Equipment<ArmorStats>? armor)
     {
         Material = material;
         Weapon = weapon;
@@ -20,19 +20,19 @@ public class ItemUnion
         return new ItemUnion(material, null, null);
     }
 
-    public static ItemUnion Of(Weapon weapon)
+    public static ItemUnion Of(Equipment<WeaponStats> weapon)
     {
         return new ItemUnion(null, weapon, null);
     }
 
-    public static ItemUnion Of(Armor armor)
+    public static ItemUnion Of(Equipment<ArmorStats> armor)
     {
         return new ItemUnion(null, null, armor);
     }
 
     public Material? Material { get; init; }
-    public Weapon? Weapon { get; init; }
-    public Armor? Armor { get; init; }
+    public Equipment<WeaponStats>? Weapon { get; init; }
+    public Equipment<ArmorStats>? Armor { get; init; }
 
     public ItemJson ToJson()
     {
@@ -42,11 +42,11 @@ public class ItemUnion
         }
         if (Weapon != null)
         {
-            return new ItemStack<Weapon>(Weapon).ToJson();
+            return new ItemStack<Equipment<WeaponStats>>(Weapon).ToJson();
         }
         if (Armor != null)
         {
-            return new ItemStack<Armor>(Armor).ToJson();
+            return new ItemStack<Equipment<ArmorStats>>(Armor).ToJson();
         }
         throw new Exception("ItemUnion has no item");
     }
