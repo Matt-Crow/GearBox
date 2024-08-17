@@ -18,62 +18,54 @@ var game = new GameBuilder()
         .Add(ItemUnion.Of(new Material(new ItemType("Silver", Grade.RARE), "Used to craft enhancements for your equipment.")))
         .Add(ItemUnion.Of(new Material(new ItemType("Gold", Grade.EPIC), "Used to craft powerful magical artifacts.")))
         .Add(ItemUnion.Of(new Material(new ItemType("Titanium", Grade.LEGENDARY), "A high-grade mining material for crafting powerful melee equipment.")))
-        .Add(ItemUnion.Of(new EquipmentBuilder<WeaponStats>(new ItemType("Training Sword", Grade.COMMON), new WeaponStats(AttackRange.MELEE))
-            .WithStatWeights(new Dictionary<PlayerStatType, int>()
+        .Add(ItemUnion.Of(new Equipment<WeaponStats>(new ItemType("Training Sword", Grade.COMMON), new WeaponStats(AttackRange.MELEE), 1, new()
             {
                 {PlayerStatType.OFFENSE, 1},
                 {PlayerStatType.MAX_HIT_POINTS, 1}
-            }).Build(1)) 
+            }))
         )
-        .Add(ItemUnion.Of(new EquipmentBuilder<WeaponStats>(new ItemType("Training Bow", Grade.COMMON), new WeaponStats(AttackRange.LONG))
-            .WithStatWeights(new Dictionary<PlayerStatType, int>()
+        .Add(ItemUnion.Of(new Equipment<WeaponStats>(new ItemType("Training Bow", Grade.COMMON), new WeaponStats(AttackRange.LONG), 1, new()
             {
                 {PlayerStatType.OFFENSE, 1},
                 {PlayerStatType.SPEED, 1}
-            }).Build(1)) 
+            })) 
         )
-        .Add(ItemUnion.Of(new EquipmentBuilder<WeaponStats>(new ItemType("Training Staff", Grade.COMMON), new WeaponStats(AttackRange.MEDIUM))
-            .WithStatWeights(new Dictionary<PlayerStatType, int>()
+        .Add(ItemUnion.Of(new Equipment<WeaponStats>(new ItemType("Training Staff", Grade.COMMON), new WeaponStats(AttackRange.MEDIUM), 1, new()
             {
                 {PlayerStatType.MAX_HIT_POINTS, 1},
                 {PlayerStatType.MAX_ENERGY, 1}
-            }).Build(1))
+            }))
         )
-        .Add(ItemUnion.Of(new EquipmentBuilder<ArmorStats>(new ItemType("Fighter Initiate's Armor", Grade.COMMON), new ArmorStats(ArmorClass.HEAVY))
-            .WithStatWeights(new Dictionary<PlayerStatType, int>()
+        .Add(ItemUnion.Of(new Equipment<ArmorStats>(new ItemType("Fighter Initiate's Armor", Grade.COMMON), new ArmorStats(ArmorClass.HEAVY), 1, new()
             {
                 {PlayerStatType.MAX_HIT_POINTS, 1},
                 {PlayerStatType.OFFENSE, 1}
-            }).Build(1))
+            }))
         )
-        .Add(ItemUnion.Of(new EquipmentBuilder<ArmorStats>(new ItemType("Archer Initiate's Armor", Grade.COMMON), new ArmorStats(ArmorClass.MEDIUM))
-            .WithStatWeights(new Dictionary<PlayerStatType, int>()
+        .Add(ItemUnion.Of(new Equipment<ArmorStats>(new ItemType("Archer Initiate's Armor", Grade.COMMON), new ArmorStats(ArmorClass.MEDIUM), 1, new()
             {
                 {PlayerStatType.SPEED, 1},
                 {PlayerStatType.OFFENSE, 1}
-            }).Build(1))
+            }))
         )
-        .Add(ItemUnion.Of(new EquipmentBuilder<ArmorStats>(new ItemType("Mage Initiate's Armor", Grade.COMMON), new ArmorStats(ArmorClass.LIGHT))
-            .WithStatWeights(new Dictionary<PlayerStatType, int>()
+        .Add(ItemUnion.Of(new Equipment<ArmorStats>(new ItemType("Mage Initiate's Armor", Grade.COMMON), new ArmorStats(ArmorClass.LIGHT), 1, new()
             {
                 {PlayerStatType.MAX_ENERGY, 1},
                 {PlayerStatType.OFFENSE, 1}
-            }).Build(1))
+            }))
         )
-        .Add(ItemUnion.Of(new EquipmentBuilder<WeaponStats>(new ItemType("Bronze Khopesh", Grade.UNCOMMON), new WeaponStats(AttackRange.MELEE))
-            .WithStatWeights(new Dictionary<PlayerStatType, int>()
+        .Add(ItemUnion.Of(new Equipment<WeaponStats>(new ItemType("Bronze Khopesh", Grade.UNCOMMON), new WeaponStats(AttackRange.MELEE), 1, new()
             {
                 {PlayerStatType.OFFENSE, 2},
                 {PlayerStatType.MAX_HIT_POINTS, 1}
-            }).Build(1)) // craft at level 1 so players don't just grind lv 20 weapons in lv 1 area
+            })) // craft at level 1 so players don't just grind lv 20 weapons in lv 1 area
         )
-        .Add(ItemUnion.Of(new EquipmentBuilder<ArmorStats>(new ItemType("Bronze Armor", Grade.UNCOMMON), new ArmorStats(ArmorClass.HEAVY))
-            .WithStatWeights(new Dictionary<PlayerStatType, int>()
+        .Add(ItemUnion.Of(new Equipment<ArmorStats>(new ItemType("Bronze Armor", Grade.UNCOMMON), new ArmorStats(ArmorClass.HEAVY), 1, new()
             {
                 {PlayerStatType.OFFENSE, 1},
                 {PlayerStatType.MAX_HIT_POINTS, 2},
                 {PlayerStatType.MAX_ENERGY, 1}
-            }).Build(1)) // craft at level 1 so players don't just grind lv 20 weapons in lv 1 area
+            })) // craft at level 1 so players don't just grind lv 20 weapons in lv 1 area
         )
     )
     .AddCraftingRecipe(recipe => recipe
