@@ -14,22 +14,22 @@ where T : IEquipmentStats
     public Equipment(
         ItemType type, 
         T inner,
-        int? level = null,
-        Dictionary<PlayerStatType, int>? statWeights = null
+        Dictionary<PlayerStatType, int>? statWeights = null,
+        int? level = null
     )
     {
         Type = type;
         Inner = inner;
-        Level = level ?? 0;
+        Level = level ?? 1;
         _statWeights = statWeights ?? [];
         StatBoosts = new PlayerStatBoosts(_statWeights, Inner.GetStatPoints(Level, Type.Grade));
     }
     
     public Guid? Id { get; init; } = Guid.NewGuid();
     public ItemType Type { get; init; }
-    public string Description => ""; // equipment doesn't need a description
-    public int Level { get; init; }
     public T Inner { get;}
+    public int Level { get; init; }
+    public string Description => ""; // equipment doesn't need a description
     
     public IEnumerable<string> Details => Inner.Details.Concat(StatBoosts.Details);
     
@@ -44,7 +44,7 @@ where T : IEquipmentStats
     public Equipment<T> ToOwned(int? level=null)
     {
         var newLevel = level ?? Level;
-        var result = new Equipment<T>(Type, Inner, newLevel, _statWeights);
+        var result = new Equipment<T>(Type, Inner, _statWeights, newLevel);
         return result;
     }
 

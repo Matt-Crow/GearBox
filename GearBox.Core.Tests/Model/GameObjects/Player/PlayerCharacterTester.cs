@@ -58,7 +58,7 @@ public class PlayerCharacterTester
     {
         var sut = new PlayerCharacter("foo");
         sut.SetLevel(1);
-        var weapon = new Equipment<WeaponStats>(new ItemType("bar"), new WeaponStats(), 20);
+        var weapon = new Equipment<WeaponStats>(new ItemType("bar"), new WeaponStats(), level: 20);
         sut.Inventory.Weapons.Add(weapon);
 
         sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID should not be null"));
