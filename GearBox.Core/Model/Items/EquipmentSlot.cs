@@ -4,18 +4,17 @@ using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model.Items;
 
-public class EquipmentSlot<T, U> : IMightChange<ItemJson?>
-where T : Equipment<U>
-where U : IEquipmentStats // todo not 2 generics
+public class EquipmentSlot<T> : IMightChange<ItemJson?>
+where T : IEquipmentStats
 {
     private readonly ChangeTracker<ItemJson?> _changeTracker;
 
-    public EquipmentSlot(string type)
+    public EquipmentSlot()
     {
         _changeTracker = new(this);
     }
 
-    public T? Value { get; set; }
+    public Equipment<T>? Value { get; set; }
 
     public IEnumerable<object?> DynamicValues => Value == null
         ? [false]

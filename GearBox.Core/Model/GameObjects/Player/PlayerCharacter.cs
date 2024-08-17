@@ -16,9 +16,6 @@ public class PlayerCharacter : Character
 
     public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp), Color.BLUE)
     {
-        Inventory = new();
-        WeaponSlot = new("equippedWeapon");
-        ArmorSlot = new("equippedArmor");
         Xp = xp;
         XpToNextLevel = GetXpByLevel(Level + 1);
         _statSummary = new PlayerStatSummary(this);
@@ -34,9 +31,9 @@ public class PlayerCharacter : Character
     public int EnergyExpended { get; private set; } = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     public int EnergyRemaining => MaxEnergy - EnergyExpended;
     public PlayerStats Stats { get; init; } = new();
-    public Inventory Inventory { get; init; }
-    public EquipmentSlot<Equipment<WeaponStats>, WeaponStats> WeaponSlot { get; init; }
-    public EquipmentSlot<Equipment<ArmorStats>, ArmorStats> ArmorSlot { get; init; }
+    public Inventory Inventory { get; init; } = new();
+    public EquipmentSlot<WeaponStats> WeaponSlot { get; init; } = new();
+    public EquipmentSlot<ArmorStats> ArmorSlot { get; init; } = new();
 
     public override void SetArea(IArea? newArea)
     {

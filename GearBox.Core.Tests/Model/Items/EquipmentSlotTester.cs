@@ -10,7 +10,7 @@ public class EquipmentSlotTester
     [Fact]
     public void DynamicValues_AfterEquipping_Change()
     {
-        var sut = new EquipmentSlot<Equipment<WeaponStats>, WeaponStats>("");
+        var sut = new EquipmentSlot<WeaponStats>();
         var tracker = new ChangeTracker<ItemJson?>(sut);
         
         sut.Value = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats());
@@ -21,7 +21,7 @@ public class EquipmentSlotTester
     [Fact]
     public void DynamicValues_AfterSwitching_Change()
     {
-        var sut = new EquipmentSlot<Equipment<WeaponStats>, WeaponStats>("")
+        var sut = new EquipmentSlot<WeaponStats>()
         {
             Value = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats())
         };
