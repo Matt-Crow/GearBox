@@ -23,15 +23,13 @@ where T : IEquipmentStats
         return this;
     }
 
-    public virtual Equipment<T> Build(int level)
+    public Equipment<T> Build(int level)
     {
-        var stats = new PlayerStatBoosts(_statWeights, Inner.GetStatPoints(level, ItemType.Grade));
         var result = new Equipment<T>(
             ItemType, 
             Inner,
             level,
-            stats,
-            null // id is null
+            _statWeights
         );
         return result;
     }

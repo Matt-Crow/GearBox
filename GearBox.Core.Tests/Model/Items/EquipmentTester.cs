@@ -10,11 +10,11 @@ public class EquipmentTester
     public void ToOwned_GivenHigherLevel_HasHigherStats()
     {
         var stat = PlayerStatType.MAX_HIT_POINTS;
-        var boosts = new PlayerStatBoosts(new Dictionary<PlayerStatType, int>()
+        var weights = new Dictionary<PlayerStatType, int>()
         {
             {stat, 1}
-        });
-        var sut = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats(), level: 1, statBoosts: boosts);
+        };
+        var sut = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats(), statWeights: weights, level: 1);
 
         var other = sut.ToOwned(2);
 

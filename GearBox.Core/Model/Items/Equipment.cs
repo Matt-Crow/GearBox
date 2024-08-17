@@ -9,25 +9,24 @@ namespace GearBox.Core.Model.Items;
 public class Equipment<T> : IItem
 where T : IEquipmentStats
 {
+    private readonly Dictionary<PlayerStatType, int> _statWeights;
+
     public Equipment(
         ItemType type, 
         T inner,
         int? level = null,
-        PlayerStatBoosts? statBoosts = null, 
-        Guid? id = null
+        Dictionary<PlayerStatType, int>? statWeights = null
     )
     {
         Type = type;
         Inner = inner;
         Level = level ?? 0;
-        StatBoosts = statBoosts ?? PlayerStatBoosts.Empty();
-        Id = id ?? Guid.NewGuid();
+        _statWeights = statWeights ?? [];
+        StatBoosts = new PlayerStatBoosts(_statWeights, Inner.GetStatPoints(Level, Type.Grade));
     }
     
-    public Guid? Id { get; init; }
-    
+    public Guid? Id { get; init; } = Guid.NewGuid();
     public ItemType Type { get; init; }
-
     public string Description => ""; // equipment doesn't need a description
     public int Level { get; init; }
     public T Inner { get;}
@@ -45,8 +44,8 @@ where T : IEquipmentStats
     public Equipment<T> ToOwned(int? level=null)
     {
         var newLevel = level ?? Level;
-        var newStats = StatBoosts.WithTotalPoints(Inner.GetStatPoints(newLevel, Type.Grade));
-        return new Equipment<T>(Type, Inner, newLevel, newStats, Guid.NewGuid());
+        var result = new Equipment<T>(Type, Inner, newLevel, _statWeights);
+        return result;
     }
 
     public override bool Equals(object? obj)
