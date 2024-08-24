@@ -11,14 +11,15 @@ public class AreaBuilder
     private readonly int _level;
     private Map? _map;
     private readonly LootTableBuilder _lootBuilder;
-    private readonly List<Func<int, EnemyCharacter>> _enemies = [];
+    private readonly IEnemyFactory _enemies;
     private readonly List<IExit> _exits = [];
 
-    public AreaBuilder(string name, int level, IItemFactory itemFactory)
+    public AreaBuilder(string name, int level, IItemFactory itemFactory, IEnemyRepository enemies)
     {
         Name = name;
         _level = level;
         _lootBuilder = new(itemFactory);
+        _enemies = new EnemyFactory(enemies);
     }
 
     /// <summary>
@@ -32,9 +33,9 @@ public class AreaBuilder
         return this;
     }
 
-    public AreaBuilder DefineEnemy(Func<int, EnemyCharacter> definition)
+    public AreaBuilder AddEnemies(Action<IEnemyFactory> withEnemies)
     {
-        _enemies.Add(definition);
+        withEnemies(_enemies);
         return this;
     }
 
@@ -48,15 +49,6 @@ public class AreaBuilder
     {
         _exits.Add(exit);
         return this;
-    }
-
-    public AreaBuilder AddDefaultEnemies()
-    {
-        var result = this
-            .DefineEnemy(lv => new EnemyCharacter("Snake", lv, Color.LIGHT_GREEN))
-            .DefineEnemy(lv => new EnemyCharacter("Scorpion", lv, Color.BLACK))
-            .DefineEnemy(lv => new EnemyCharacter("Jackal", lv, Color.TAN));
-        return result;
     }
 
     public Area Build(IGame game)

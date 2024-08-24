@@ -1,4 +1,5 @@
 using GearBox.Core.Model;
+using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Static;
@@ -76,6 +77,11 @@ var game = new GameBuilder()
         .And("Bronze", 25)
         .Makes("Bronze Armor")
     )
+    .DefineEnemies(enemies => enemies
+        .Add(new EnemyCharacter("Snake", 1, Color.LIGHT_GREEN))
+        .Add(new EnemyCharacter("Scorpion", 1, Color.BLACK))
+        .Add(new EnemyCharacter("Jackal", 1, Color.TAN))
+    )
     .WithArea("desert", 1, area => area
         .AddLoot(loot => loot
             .AddItem("Training Sword")
@@ -89,7 +95,10 @@ var game = new GameBuilder()
             .Add(Grade.COMMON, new Gold(5))
             .Add(Grade.UNCOMMON, new Gold(10))
         )
-        .AddDefaultEnemies()
+        .AddEnemies(enemies => enemies
+            .Add("Snake")
+            .Add("Scorpion")
+        )
         .WithMap(desertMap)
         .WithExit(BorderExit.Right("canyon"))
     )
@@ -99,7 +108,10 @@ var game = new GameBuilder()
             .AddItem("Silver")
             .Add(Grade.RARE, new Gold(25))
         )
-        .AddDefaultEnemies()
+        .AddEnemies(enemies => enemies
+            .Add("Snake")
+            .Add("Jackal")
+        )
         .WithMap(canyonMap)
         .WithExit(BorderExit.Left("desert"))
     )

@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Areas;
+using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
 
@@ -7,6 +8,7 @@ namespace GearBox.Core.Model;
 public interface IGameBuilder
 {
     IGameBuilder DefineItems(Func<IItemFactory, IItemFactory> defineItems);
+    IGameBuilder DefineEnemies(Func<IEnemyRepository, IEnemyRepository> defineEnemies);
     IGameBuilder AddCraftingRecipe(Func<CraftingRecipeBuilder, CraftingRecipe> recipe);
 
     /// <summary>

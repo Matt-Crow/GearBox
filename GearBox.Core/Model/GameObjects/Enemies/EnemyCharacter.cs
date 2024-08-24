@@ -4,7 +4,7 @@ namespace GearBox.Core.Model.GameObjects.Enemies;
 
 public class EnemyCharacter : Character
 {
-    public EnemyCharacter(string name, int level, Color? color = null) : base(name, level, color)
+    public EnemyCharacter(string name, int level = 1, Color? color = null) : base(name, level, color)
     {
         AiBehavior = new WanderAiBehavior(this);
     }
@@ -15,5 +15,11 @@ public class EnemyCharacter : Character
     {
         AiBehavior.Update();
         base.Update();
+    }
+
+    public EnemyCharacter ToOwned(int? level = null)
+    {
+        var newLevel = level ?? Level;
+        return new EnemyCharacter(Name, newLevel, Color);
     }
 }
