@@ -1,5 +1,5 @@
 using GearBox.Core.Model.GameObjects;
-using GearBox.Core.Model.GameObjects.Ai;
+using GearBox.Core.Model.GameObjects.Enemies.Ai;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Json.AreaInit;
 using GearBox.Core.Model.Items;

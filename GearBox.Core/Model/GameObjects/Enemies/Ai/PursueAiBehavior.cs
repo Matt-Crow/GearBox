@@ -2,17 +2,17 @@ using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model.GameObjects.Ai;
+namespace GearBox.Core.Model.GameObjects.Enemies.Ai;
 
-public class AttackAiBehavior : IAiBehavior
+public class PursueAiBehavior : IAiBehavior
 {
     private readonly Character _controlling;
-    private readonly Character _attacking;
+    private readonly Character _pursuing;
 
-    public AttackAiBehavior(Character controlling, Character attacking)
+    public PursueAiBehavior(Character controlling, Character pursuing)
     {
         _controlling = controlling;
-        _attacking = attacking;
+        _pursuing = pursuing;
 
         /* 
             While I don't like this cast, it's required so I can uphold a few rules:
@@ -20,7 +20,7 @@ public class AttackAiBehavior : IAiBehavior
             2. characters controlled by AI can attack other characters controlled by AI (cannot pull attacking to subclass)
             3. AttackAiBehavior is instantiated by PursueAiBehavior, which also targets characters (cannot overload ctor)
         */
-        if (attacking is PlayerCharacter player)
+        if (pursuing is PlayerCharacter player)
         {
             player.AreaChanged += HandleAreaChangedEvent;
         }
@@ -34,20 +34,14 @@ public class AttackAiBehavior : IAiBehavior
 
     public void Update()
     {
-        if (_attacking.Termination.IsTerminated)
+        // turn to them
+        var newDirection = Direction.FromAToB(_controlling.Coordinates, _pursuing.Coordinates);
+        _controlling.StartMovingIn(newDirection);
+
+        // check if close enough to attack
+        if (_controlling.BasicAttack.CanReach(_pursuing))
         {
-            _controlling.AiBehavior = new WanderAiBehavior(_controlling);
-        }
-        else if (_controlling.BasicAttack.CanReach(_attacking))
-        {
-            // turn and attack
-            _controlling.StopMoving();
-            var angle = Direction.FromAToB(_controlling.Coordinates, _attacking.Coordinates);
-            _controlling.UseBasicAttack(angle);
-        }
-        else
-        {
-            _controlling.AiBehavior = new PursueAiBehavior(_controlling, _attacking);
+            _controlling.AiBehavior = new AttackAiBehavior(_controlling, _pursuing);
         }
     }
 }

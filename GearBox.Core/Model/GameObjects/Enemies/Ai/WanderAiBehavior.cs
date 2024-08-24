@@ -1,7 +1,7 @@
 
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model.GameObjects.Ai;
+namespace GearBox.Core.Model.GameObjects.Enemies.Ai;
 
 public class WanderAiBehavior : IAiBehavior
 {

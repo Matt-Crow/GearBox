@@ -1,4 +1,5 @@
 using GearBox.Core.Model.GameObjects;
+using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Model.Static;

@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.GameObjects.Ai;
+namespace GearBox.Core.Model.GameObjects.Enemies.Ai;
 
 /// <summary>
 /// Controls a character
