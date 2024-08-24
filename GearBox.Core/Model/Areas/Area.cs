@@ -24,7 +24,7 @@ public class Area : IArea
     private readonly Team _enemyTeam = new("Enemies");
     private readonly Map _map;
     private readonly LootTable _loot;
-    private readonly List<Func<EnemyCharacter>> _enemyMakers;
+    private readonly List<Func<int, EnemyCharacter>> _enemyMakers;
     private readonly List<IExit> _exits = [];
 
     public Area(
@@ -33,7 +33,7 @@ public class Area : IArea
         IGame? game = null,
         Map? map = null, 
         LootTable? loot = null,
-        List<Func<EnemyCharacter>>? enemyMakers = null,
+        List<Func<int, EnemyCharacter>>? enemyMakers = null,
         List<IExit>? exits = null 
     )
     {
@@ -47,7 +47,7 @@ public class Area : IArea
 
         if (_enemyMakers.Count == 0)
         {
-            _enemyMakers.Add(() => new EnemyCharacter("Default enemy", 1));
+            _enemyMakers.Add(lv => new EnemyCharacter("Default enemy", lv));
         }
     }
 
@@ -72,7 +72,7 @@ public class Area : IArea
     public EnemyCharacter SpawnEnemy()
     {
         var enemyFactory = _enemyMakers[Random.Shared.Next(_enemyMakers.Count)];
-        var enemy = enemyFactory.Invoke();
+        var enemy = enemyFactory.Invoke(Level);
         enemy.SetArea(this);
         enemy.Team = _enemyTeam;
         

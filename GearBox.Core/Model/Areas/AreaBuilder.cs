@@ -1,4 +1,3 @@
-using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Infrastructure;
@@ -12,7 +11,7 @@ public class AreaBuilder
     private readonly int _level;
     private Map? _map;
     private readonly LootTableBuilder _lootBuilder;
-    private readonly List<Func<EnemyCharacter>> _enemies = [];
+    private readonly List<Func<int, EnemyCharacter>> _enemies = [];
     private readonly List<IExit> _exits = [];
 
     public AreaBuilder(string name, int level, IItemFactory itemFactory)
@@ -33,7 +32,7 @@ public class AreaBuilder
         return this;
     }
 
-    public AreaBuilder DefineEnemy(Func<EnemyCharacter> definition)
+    public AreaBuilder DefineEnemy(Func<int, EnemyCharacter> definition)
     {
         _enemies.Add(definition);
         return this;
@@ -54,9 +53,9 @@ public class AreaBuilder
     public AreaBuilder AddDefaultEnemies()
     {
         var result = this
-            .DefineEnemy(() => new EnemyCharacter("Snake", _level, Color.LIGHT_GREEN))
-            .DefineEnemy(() => new EnemyCharacter("Scorpion", _level, Color.BLACK))
-            .DefineEnemy(() => new EnemyCharacter("Jackal", _level, Color.TAN));
+            .DefineEnemy(lv => new EnemyCharacter("Snake", lv, Color.LIGHT_GREEN))
+            .DefineEnemy(lv => new EnemyCharacter("Scorpion", lv, Color.BLACK))
+            .DefineEnemy(lv => new EnemyCharacter("Jackal", lv, Color.TAN));
         return result;
     }
 
