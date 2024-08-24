@@ -1,4 +1,5 @@
 using GearBox.Core.Model.GameObjects;
+using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Json.AreaInit;
@@ -31,7 +32,7 @@ public interface IArea
     /// </summary>
     void SpawnPlayer(PlayerCharacter player);
 
-    Character SpawnEnemy();
+    EnemyCharacter SpawnEnemy();
     void SpawnLootChest();
     
     void AddProjectile(Projectile projectile);
@@ -41,7 +42,7 @@ public interface IArea
 
     CraftingRecipe? GetCraftingRecipeById(Guid id);
 
-    Character? GetNearestEnemy(Character character);
+    PlayerCharacter? GetNearestPlayerTo(EnemyCharacter enemy);
 
     Coordinates GetRandomFloorTile();
 

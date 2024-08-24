@@ -1,5 +1,4 @@
 using GearBox.Core.Model.GameObjects;
-using GearBox.Core.Model.GameObjects.Enemies.Ai;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Json.AreaInit;
 using GearBox.Core.Model.Items;
@@ -9,6 +8,7 @@ using GearBox.Core.Utils;
 using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Model.Json;
+using GearBox.Core.Model.GameObjects.Enemies;
 
 namespace GearBox.Core.Model.Areas;
 
@@ -24,7 +24,7 @@ public class Area : IArea
     private readonly Team _enemyTeam = new("Enemies");
     private readonly Map _map;
     private readonly LootTable _loot;
-    private readonly List<Func<Character>> _enemyMakers;
+    private readonly List<Func<EnemyCharacter>> _enemyMakers;
     private readonly List<IExit> _exits = [];
 
     public Area(
@@ -33,7 +33,7 @@ public class Area : IArea
         IGame? game = null,
         Map? map = null, 
         LootTable? loot = null,
-        List<Func<Character>>? enemyMakers = null,
+        List<Func<EnemyCharacter>>? enemyMakers = null,
         List<IExit>? exits = null 
     )
     {
@@ -47,7 +47,7 @@ public class Area : IArea
 
         if (_enemyMakers.Count == 0)
         {
-            _enemyMakers.Add(() => new Character("Default enemy", 1));
+            _enemyMakers.Add(() => new EnemyCharacter("Default enemy", 1));
         }
     }
 
@@ -69,11 +69,10 @@ public class Area : IArea
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
     }
 
-    public Character SpawnEnemy()
+    public EnemyCharacter SpawnEnemy()
     {
         var enemyFactory = _enemyMakers[Random.Shared.Next(_enemyMakers.Count)];
         var enemy = enemyFactory.Invoke();
-        enemy.AiBehavior = new WanderAiBehavior(enemy);
         enemy.SetArea(this);
         enemy.Team = _enemyTeam;
         
@@ -112,11 +111,10 @@ public class Area : IArea
     /// </summary>
     public CraftingRecipe? GetCraftingRecipeById(Guid id) => _game.GetCraftingRecipeById(id);
 
-    public Character? GetNearestEnemy(Character character)
+    public PlayerCharacter? GetNearestPlayerTo(EnemyCharacter enemy)
     {
-        var result = _characters.AsEnumerable
-            .Where(other => other.Team != character.Team)
-            .OrderBy(enemy => enemy.Coordinates.DistanceFrom(character.Coordinates).InPixels)
+        var result = _players.AsEnumerable()
+            .OrderBy(p => p.Coordinates.DistanceFrom(enemy.Coordinates).InPixels)
             .FirstOrDefault();
         return result;
     }

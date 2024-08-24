@@ -1,7 +1,6 @@
 using System.Text.Json;
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Areas;
-using GearBox.Core.Model.GameObjects.Enemies.Ai;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 
@@ -10,7 +9,7 @@ namespace GearBox.Core.Model.GameObjects;
 /// <summary>
 /// A Character is something sentient in the game.
 /// </summary>
-public class Character : IGameObject
+public abstract class Character : IGameObject
 {
     public static readonly int MAX_LEVEL = 20;
     protected static readonly Speed BASE_SPEED = Speed.FromTilesPerSecond(3);
@@ -34,7 +33,6 @@ public class Character : IGameObject
     public string Name { get; init; }
     protected Color Color { get; init; }
     public Serializer Serializer { get; init; }
-    public IAiBehavior AiBehavior { get; set; } = new NullAiBehavior();
     public BodyBehavior Body { get; init; } = new();
     public TerminateBehavior Termination { get; init; }
     public Coordinates Coordinates { get => Body.Location; set => Body.Location = value; }
@@ -122,7 +120,6 @@ public class Character : IGameObject
 
     public virtual void Update()
     {
-        AiBehavior.Update();
         _mobility.UpdateMovement();
         BasicAttack.Update();
     }

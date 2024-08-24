@@ -1,14 +1,15 @@
 
+using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.GameObjects.Enemies.Ai;
 
 public class WanderAiBehavior : IAiBehavior
 {
-    private readonly Character _target;
+    private readonly EnemyCharacter _target;
     private int _framesLeftToWander;
 
-    public WanderAiBehavior(Character target)
+    public WanderAiBehavior(EnemyCharacter target)
     {
         _target = target;
         ChooseNewDirection();
@@ -32,16 +33,16 @@ public class WanderAiBehavior : IAiBehavior
             ChooseNewDirection();
         }
 
-        var nearestEnemy = _target.CurrentArea?.GetNearestEnemy(_target);
+        var nearestEnemy = _target.CurrentArea?.GetNearestPlayerTo(_target);
         if (nearestEnemy != null && IsCloseEnoughToSee(nearestEnemy))
         {
             _target.AiBehavior = new PursueAiBehavior(_target, nearestEnemy);
         }
     }
 
-    private bool IsCloseEnoughToSee(Character enemy)
+    private bool IsCloseEnoughToSee(PlayerCharacter player)
     {
-        var distance = _target.Coordinates.DistanceFrom(enemy.Coordinates);
+        var distance = _target.Coordinates.DistanceFrom(player.Coordinates);
         return distance.InTiles <= 5;
     }
 }

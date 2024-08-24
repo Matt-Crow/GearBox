@@ -6,24 +6,14 @@ namespace GearBox.Core.Model.GameObjects.Enemies.Ai;
 
 public class AttackAiBehavior : IAiBehavior
 {
-    private readonly Character _controlling;
-    private readonly Character _attacking;
+    private readonly EnemyCharacter _controlling;
+    private readonly PlayerCharacter _attacking;
 
-    public AttackAiBehavior(Character controlling, Character attacking)
+    public AttackAiBehavior(EnemyCharacter controlling, PlayerCharacter attacking)
     {
         _controlling = controlling;
         _attacking = attacking;
-
-        /* 
-            While I don't like this cast, it's required so I can uphold a few rules:
-            1. players can change areas, but characters cannot (cannot push AreaChanged to superclass)
-            2. characters controlled by AI can attack other characters controlled by AI (cannot pull attacking to subclass)
-            3. AttackAiBehavior is instantiated by PursueAiBehavior, which also targets characters (cannot overload ctor)
-        */
-        if (attacking is PlayerCharacter player)
-        {
-            player.AreaChanged += HandleAreaChangedEvent;
-        }
+        attacking.AreaChanged += HandleAreaChangedEvent;
     }
 
     private void HandleAreaChangedEvent(object? sender, AreaChangedEventArgs e)

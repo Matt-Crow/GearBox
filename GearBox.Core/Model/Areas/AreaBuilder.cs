@@ -12,7 +12,7 @@ public class AreaBuilder
     private readonly int _level;
     private Map? _map;
     private readonly LootTableBuilder _lootBuilder;
-    private readonly List<Func<Character>> _enemies = [];
+    private readonly List<Func<EnemyCharacter>> _enemies = [];
     private readonly List<IExit> _exits = [];
 
     public AreaBuilder(string name, int level, IItemFactory itemFactory)
@@ -33,7 +33,7 @@ public class AreaBuilder
         return this;
     }
 
-    public AreaBuilder DefineEnemy(Func<Character> definition)
+    public AreaBuilder DefineEnemy(Func<EnemyCharacter> definition)
     {
         _enemies.Add(definition);
         return this;
@@ -54,9 +54,9 @@ public class AreaBuilder
     public AreaBuilder AddDefaultEnemies()
     {
         var result = this
-            .DefineEnemy(() => new Character("Snake", _level, Color.LIGHT_GREEN))
-            .DefineEnemy(() => new Character("Scorpion", _level, Color.BLACK))
-            .DefineEnemy(() => new Character("Jackal", _level, Color.TAN));
+            .DefineEnemy(() => new EnemyCharacter("Snake", _level, Color.LIGHT_GREEN))
+            .DefineEnemy(() => new EnemyCharacter("Scorpion", _level, Color.BLACK))
+            .DefineEnemy(() => new EnemyCharacter("Jackal", _level, Color.TAN));
         return result;
     }
 
