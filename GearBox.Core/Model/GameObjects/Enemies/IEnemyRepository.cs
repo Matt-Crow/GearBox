@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Items;
+
 namespace GearBox.Core.Model.GameObjects.Enemies;
 
 /// <summary>
@@ -5,6 +7,7 @@ namespace GearBox.Core.Model.GameObjects.Enemies;
 /// </summary>
 public interface IEnemyRepository
 {
-    IEnemyRepository Add(EnemyCharacter enemy);
-    EnemyCharacter? GetEnemyByName(string name);
+    IEnemyRepository Add(string name, Color color, Func<LootTableBuilder, LootTableBuilder> loot);
+    
+    EnemyCharacter? GetEnemyByName(string name, int level);
 }

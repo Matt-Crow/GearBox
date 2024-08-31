@@ -11,7 +11,12 @@ public class GameBuilder : IGameBuilder
     private readonly HashSet<CraftingRecipe> _craftingRecipes = [];
     private readonly List<AreaBuilder> _areas = []; // must be ordered so the first area added is the default area
     private readonly IItemFactory _itemFactory = new ItemFactory();
-    private readonly IEnemyRepository _enemies = new EnemyRepository();
+    private readonly IEnemyRepository _enemies;
+
+    public GameBuilder()
+    {
+        _enemies = new EnemyRepository(_itemFactory);
+    }
 
     public IGameBuilder DefineItems(Func<IItemFactory, IItemFactory> defineItems)
     {

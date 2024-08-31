@@ -1,20 +1,32 @@
+using GearBox.Core.Model.Items;
+using GearBox.Core.Model.Items.Infrastructure;
+
 namespace GearBox.Core.Model.GameObjects.Enemies;
 
 public class EnemyRepository : IEnemyRepository
 {
-    private readonly Dictionary<string, EnemyCharacter> _enemies = [];
+    private readonly IItemFactory _itemFactory;
+    private readonly Dictionary<string, EnemyCharacterBuilder> _enemyBuilders = [];
 
-    public IEnemyRepository Add(EnemyCharacter enemy)
+    public EnemyRepository(IItemFactory itemFactory)
     {
-        _enemies[enemy.Name] = enemy;
+        _itemFactory = itemFactory;
+    }
+
+    public IEnemyRepository Add(string name, Color color, Func<LootTableBuilder, LootTableBuilder> loot)
+    {
+        var lootTableBuilder = new LootTableBuilder(_itemFactory);
+        var enemyBuilder = new EnemyCharacterBuilder(name, color, loot(lootTableBuilder));
+        _enemyBuilders[name] = enemyBuilder;
         return this;
     }
 
-    public EnemyCharacter? GetEnemyByName(string name)
+
+    public EnemyCharacter? GetEnemyByName(string name, int level)
     {
-        if (_enemies.TryGetValue(name, out EnemyCharacter? value))
+        if (_enemyBuilders.TryGetValue(name, out EnemyCharacterBuilder? value))
         {
-            return value;
+            return value.Build(level);
         }
         return null;
     }

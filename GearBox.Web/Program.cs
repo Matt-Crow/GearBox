@@ -1,5 +1,4 @@
 using GearBox.Core.Model;
-using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Static;
@@ -59,14 +58,20 @@ var game = new GameBuilder()
             {
                 {PlayerStatType.OFFENSE, 2},
                 {PlayerStatType.MAX_HIT_POINTS, 1}
-            })) // craft at level 1 so players don't just grind lv 20 weapons in lv 1 area
+            }))
         )
         .Add(ItemUnion.Of(new Equipment<ArmorStats>(new("Bronze Armor", Grade.UNCOMMON), new ArmorStats(ArmorClass.HEAVY), new()
             {
                 {PlayerStatType.OFFENSE, 1},
                 {PlayerStatType.MAX_HIT_POINTS, 2},
                 {PlayerStatType.MAX_ENERGY, 1}
-            })) // craft at level 1 so players don't just grind lv 20 weapons in lv 1 area
+            }))
+        )
+        .Add(ItemUnion.Of(new Equipment<WeaponStats>(new("Fang", Grade.COMMON), new WeaponStats(AttackRange.MELEE), new()
+            {
+                {PlayerStatType.OFFENSE, 2},
+                {PlayerStatType.SPEED, 1}
+            }))
         )
     )
     .AddCraftingRecipe(recipe => recipe
@@ -78,9 +83,20 @@ var game = new GameBuilder()
         .Makes("Bronze Armor")
     )
     .DefineEnemies(enemies => enemies
-        .Add(new EnemyCharacter("Snake", 1, Color.LIGHT_GREEN))
-        .Add(new EnemyCharacter("Scorpion", 1, Color.BLACK))
-        .Add(new EnemyCharacter("Jackal", 1, Color.TAN))
+        .Add("Snake", Color.LIGHT_GREEN, loot => loot
+            .AddItem("Fang")
+            .AddItem("Bronze")
+            .Add(Grade.COMMON, new Gold(5))
+        )
+        .Add("Scorpion", Color.BLACK, loot => loot
+            .AddItem("Fighter Initiate's Armor")
+            .AddItem("Bronze")
+            .Add(Grade.UNCOMMON, new Gold(10))
+        )
+        .Add("Jackal", Color.TAN, loot => loot
+            .AddItem("Fang")
+            .Add(Grade.RARE, new Gold(25))
+        )
     )
     .WithArea("desert", 1, area => area
         .AddLoot(loot => loot

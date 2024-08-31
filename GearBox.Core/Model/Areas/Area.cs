@@ -9,6 +9,7 @@ using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.GameObjects.Enemies;
+using GearBox.Core.Model.Items.Infrastructure;
 
 namespace GearBox.Core.Model.Areas;
 
@@ -42,7 +43,7 @@ public class Area : IArea
         _game = game ?? new Game();
         _map = map ?? new();
         _loot = loot ?? new LootTable([]);
-        _enemyFactory = enemyFactory ?? new EnemyFactory(new EnemyRepository());
+        _enemyFactory = enemyFactory ?? new EnemyFactory(new EnemyRepository(new ItemFactory()));
         _exits = exits ?? [];
     }
 

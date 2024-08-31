@@ -12,7 +12,7 @@ public class EnemyFactory : IEnemyFactory
 
     public IEnemyFactory Add(string name)
     {
-        var _ = _allEnemies.GetEnemyByName(name) ?? throw new ArgumentException($"Bad enemy name: {name}", nameof(name));
+        var _ = _allEnemies.GetEnemyByName(name, 1) ?? throw new ArgumentException($"Bad enemy name: {name}", nameof(name));
         _names.Add(name);
         return this;
     }
@@ -24,7 +24,7 @@ public class EnemyFactory : IEnemyFactory
             return null;
         }
         var name = _names[Random.Shared.Next(_names.Count)];
-        var result = _allEnemies.GetEnemyByName(name) ?? throw new Exception($"Bad enemy name: {name}");
-        return result.ToOwned(level);
+        var result = _allEnemies.GetEnemyByName(name, level) ?? throw new Exception($"Bad enemy name: {name}");
+        return result;
     }
 }
