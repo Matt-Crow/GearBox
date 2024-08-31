@@ -48,6 +48,9 @@ public abstract class Character : IGameObject
     public IArea? LastArea { get; private set; }
     public Team Team { get; set; } = new(); // default to each on their own team
 
+    public event EventHandler<AttackedEventArgs>? Attacked;
+    public event EventHandler<KilledEventArgs>? Killed;
+
     public void SetLevel(int level)
     {
         Level = level;
@@ -115,6 +118,24 @@ public abstract class Character : IGameObject
         if (DamageTaken < 0)
         {
             DamageTaken = 0;
+        }
+    }
+
+    public void HandleAttacked(AttackedEventArgs attackEvent)
+    {
+        if (Termination.IsTerminated)
+        {
+            // do not resolve the event if dead
+            return;
+        }
+
+        TakeDamage(attackEvent.AttackUsed.Damage);
+        Attacked?.Invoke(this, attackEvent);
+
+        if (Termination.IsTerminated)
+        {
+            var killedEvent = new KilledEventArgs(attackEvent);
+            Killed?.Invoke(this, killedEvent);
         }
     }
 

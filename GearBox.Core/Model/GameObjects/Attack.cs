@@ -2,19 +2,20 @@ namespace GearBox.Core.Model.GameObjects;
 
 public class Attack
 {
-    private readonly Character _usedBy;
     private readonly HashSet<Character> _collidedWith = [];
-    private readonly int _damage;
 
     public Attack(Character usedBy, int damage)
     {
-        _usedBy = usedBy;
-        _damage = damage;
+        UsedBy = usedBy;
+        Damage = damage;
     }
+
+    public Character UsedBy { get; init; }
+    public int Damage { get; init; }
 
     public bool CanResolveAgainst(Character target)
     {
-        return target != _usedBy && !_collidedWith.Contains(target) && target.Team != _usedBy.Team;
+        return target != UsedBy && !_collidedWith.Contains(target) && target.Team != UsedBy.Team;
     }
 
     public void HandleCollision(object? sender, CollideEventArgs args)
@@ -23,8 +24,9 @@ public class Attack
 
         if (CanResolveAgainst(target))
         {
-            target.TakeDamage(_damage);
             _collidedWith.Add(target);
+            var attackEvent = new AttackedEventArgs(this, target);
+            target.HandleAttacked(attackEvent);
         }
     }
 }
