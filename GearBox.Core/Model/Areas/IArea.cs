@@ -47,6 +47,7 @@ public interface IArea
     Coordinates GetRandomFloorTile();
 
     MapJson GetMapJson();
+    List<ShopInitJson> GetShopInitJsons();
 
     AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player);
     

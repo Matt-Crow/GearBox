@@ -1,6 +1,7 @@
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Model.Items.Shops;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 
@@ -10,6 +11,8 @@ public class AreaBuilder
 {
     private readonly int _level;
     private Map? _map;
+    private readonly List<ItemShopBuilder> _shopBuilders = [];
+    private readonly IItemFactory _itemFactory;
     private readonly LootTableBuilder _lootBuilder;
     private readonly IEnemyFactory _enemies;
     private readonly List<IExit> _exits = [];
@@ -18,6 +21,7 @@ public class AreaBuilder
     {
         Name = name;
         _level = level;
+        _itemFactory = itemFactory;
         _lootBuilder = new(itemFactory);
         _enemies = new EnemyFactory(enemies);
     }
@@ -45,6 +49,14 @@ public class AreaBuilder
         return this;
     }
 
+    public AreaBuilder AddShop(string name, Coordinates coordinates, Color color, Func<ItemShopBuilder, ItemShopBuilder> withShopBuilder)
+    {
+        var sb = new ItemShopBuilder(name, coordinates, color, _itemFactory);
+        withShopBuilder(sb);
+        _shopBuilders.Add(sb);
+        return this;
+    }
+
     public AreaBuilder WithExit(IExit exit)
     {
         _exits.Add(exit);
@@ -62,6 +74,7 @@ public class AreaBuilder
             _level,
             game,
             _map,
+            _shopBuilders.Select(sb => sb.Build()).ToList(),
             _lootBuilder.Build(_level),
             _enemies,
             _exits

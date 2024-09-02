@@ -4,20 +4,23 @@ import { GameData } from "../messageHandlers/gameInitHandler.js";
 import { InventoryDeserializer, ItemDeserializer } from "./item.js";
 import { TileMap } from "./map.js";
 import { Player, PlayerStatSummary } from "./player.js";
+import { Shop } from "./shop.js";
 
 export class Area {
     #gameData;
     #map;
-    #gameObjects;
+    #gameObjects = [];
+    #shops = [];
 
     /**
      * @param {GameData} gameData 
      * @param {TileMap} map 
+     * @param {Shop[]} shops 
      */
-    constructor(gameData, map) {
+    constructor(gameData, map, shops) {
         this.#gameData = gameData;
         this.#map = map;
-        this.#gameObjects = [];
+        this.#shops = shops;
     }
 
     /**
@@ -41,6 +44,7 @@ export class Area {
     draw(context) {
         this.#map.drawPitsAndFloor(context);
         this.#gameObjects.forEach(obj => obj.draw(context));
+        this.#shops.forEach(shop => shop.draw(context));
         this.#map.drawWalls(context);
     }
 }

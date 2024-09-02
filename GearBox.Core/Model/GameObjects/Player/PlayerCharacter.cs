@@ -141,6 +141,9 @@ public class PlayerCharacter : Character
             _hasAreaChanged && CurrentArea != null
                 ? MaybeChangeJson<MapJson>.Changed(CurrentArea.GetMapJson()) 
                 : MaybeChangeJson<MapJson>.NoChanges(),
+            _hasAreaChanged && CurrentArea != null
+                ? MaybeChangeJson<List<ShopInitJson>>.Changed(CurrentArea.GetShopInitJsons())   
+                : MaybeChangeJson<List<ShopInitJson>>.NoChanges(),
             Inventory.GetChanges(),
             WeaponSlot.GetChanges(),
             ArmorSlot.GetChanges(), 

@@ -10,6 +10,7 @@ using GearBox.Core.Model.Units;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Model.Items.Shops;
 
 namespace GearBox.Core.Model.Areas;
 
@@ -24,6 +25,7 @@ public class Area : IArea
     private readonly Team _playerTeam = new("Players");
     private readonly Team _enemyTeam = new("Enemies");
     private readonly Map _map;
+    private readonly List<ItemShop> _shops;
     private readonly LootTable _loot;
     private readonly IEnemyFactory _enemyFactory;
     private readonly List<IExit> _exits = [];
@@ -33,6 +35,7 @@ public class Area : IArea
         int level = 1,
         IGame? game = null,
         Map? map = null, 
+        List<ItemShop>? shops = null,
         LootTable? loot = null,
         IEnemyFactory? enemyFactory = null,
         List<IExit>? exits = null 
@@ -42,6 +45,7 @@ public class Area : IArea
         Level = level;
         _game = game ?? new Game();
         _map = map ?? new();
+        _shops = shops ?? [];
         _loot = loot ?? new LootTable([]);
         _enemyFactory = enemyFactory ?? new EnemyFactory(new EnemyRepository(new ItemFactory()));
         _exits = exits ?? [];
@@ -117,6 +121,7 @@ public class Area : IArea
     public Coordinates GetRandomFloorTile() => _map.GetRandomFloorTile();
 
     public MapJson GetMapJson() => _map.ToJson();
+    public List<ShopInitJson> GetShopInitJsons() => _shops.Select(s => s.ToJson()).ToList();
 
     public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player)
     {

@@ -4,12 +4,13 @@ import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
 import { handleGameInit } from "./messageHandlers/gameInitHandler.js";
 import { characterDeserializer } from "./model/character.js";
-import { ItemDeserializer } from "./model/item.js";
+import { InventoryDeserializer, ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
 import { PlayerChangeHandler } from "./model/player.js";
 import { projectileDeserializer } from "./model/projectile.js";
 import { Area, AreaUpdateHandler } from "./model/area.js";
 import { TileMap } from "./model/map.js";
+import { ShopInitDeserializer } from "./model/shop.js";
 
 export class Game {
 
@@ -67,8 +68,13 @@ export class Game {
             throw new Error("Cannot accept area init until after game init");
         }
 
-        const area = new Area(this.#gameData, TileMap.fromJson(json));
         const itemDeserializer = new ItemDeserializer(this.#gameData.itemTypes);
+        const shopInitDeserializer = new ShopInitDeserializer(new InventoryDeserializer(itemDeserializer));
+        const area = new Area(
+            this.#gameData, 
+            TileMap.fromJson(json.changes.map.value),
+            json.changes.shops.value.map(j => shopInitDeserializer.deserialize(j))
+        );
         const updateHandler = new AreaUpdateHandler(area, itemDeserializer)
             .addGameObjectType(characterDeserializer)
             .addGameObjectType(new PlayerChangeHandler(this.#gameData.playerId, this.#playerHud.playerUpdateListener))
@@ -87,8 +93,8 @@ export class Game {
     }
 
     handleAreaUpdate(json) {
-        if (json.changes.map.hasChanged) {
-            this.#handleAreaInit(json.changes.map.value);
+        if (json.changes.map.hasChanged || json.changes.shops.hasChanged) {
+            this.#handleAreaInit(json);
         }
         this.#areaUpdateHandler(json);
     }
