@@ -84,4 +84,21 @@ public class ItemUnion
         }
         throw new Exception("Forgot to add clause in ItemUnion.ToOwned");
     }
+
+    public Gold BuyValue()
+    {
+        if (Material != null)
+        {
+            return Material.BuyValue;
+        }
+        if (Weapon != null)
+        {
+            return Weapon.BuyValue;
+        }
+        if (Armor != null)
+        {
+            return Armor.BuyValue;
+        }
+        throw new Exception($"Missing case in {nameof(BuyValue)}");
+    }
 }

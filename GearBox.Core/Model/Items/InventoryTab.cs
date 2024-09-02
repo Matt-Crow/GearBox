@@ -52,8 +52,13 @@ where T : IItem
         return result;
     }
 
-    public void Remove(T item, int quantity=1)
+    public void Remove(T? item, int quantity=1)
     {
+        if (item == null)
+        {
+            return;
+        }
+        
         var stackToRemoveFrom = _content.AsEnumerable()
             .Where(stack => stack.Item.Equals(item))
             .FirstOrDefault();

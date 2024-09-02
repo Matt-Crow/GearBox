@@ -25,6 +25,11 @@ public interface IItem
     /// </summary>
     IEnumerable<string> Details { get; }
 
+    /// <summary>
+    /// The base value this item can be bought for from a shop
+    /// </summary>
+    Gold BuyValue { get; }
+
     /*
     // can't do "IItem ToOwned()" https://stackoverflow.com/a/5709191
     //IItem ToOwned();

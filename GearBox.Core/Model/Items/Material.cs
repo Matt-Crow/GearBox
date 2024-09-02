@@ -9,6 +9,7 @@ public class Material : IItem
     {
         Type = type;
         Description = description ?? "no description provided";
+        BuyValue = new Gold(type.Grade.BuyValueBase);
     }
 
     public Guid? Id => null;
@@ -16,6 +17,7 @@ public class Material : IItem
     public string Description { get; init; }
     public int Level => 0; // players of any level can use any material
     public IEnumerable<string> Details => []; // materials have no details for now
+    public Gold BuyValue { get; init; }
 
     public override bool Equals(object? obj)
     {

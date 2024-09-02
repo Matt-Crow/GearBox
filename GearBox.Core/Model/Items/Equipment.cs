@@ -21,6 +21,7 @@ where T : IEquipmentStats
         Type = type;
         Inner = inner;
         Level = level ?? 1;
+        BuyValue = new Gold(type.Grade.BuyValueBase * (Level + Character.MAX_LEVEL / 2));
         _statWeights = statWeights ?? [];
         StatBoosts = new PlayerStatBoosts(_statWeights, Inner.GetStatPoints(Level, Type.Grade));
     }
@@ -30,6 +31,7 @@ where T : IEquipmentStats
     public T Inner { get;}
     public int Level { get; init; }
     public string Description => ""; // equipment doesn't need a description
+    public Gold BuyValue { get; init; }
     
     public IEnumerable<string> Details => Inner.Details.Concat(StatBoosts.Details);
     

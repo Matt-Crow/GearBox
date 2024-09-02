@@ -70,6 +70,44 @@ public class Inventory : IMightChange<InventoryJson>
         Gold = Gold.Plus(gold.Value);
     }
 
+    public void Remove(ItemUnion? item)
+    {
+        if (item == null)
+        {
+            return;
+        }
+        Weapons.Remove(item.Weapon);
+        Armors.Remove(item.Armor);
+        Materials.Remove(item.Material);
+        // gold is not part of an ItemUnion; no need to remove here
+    }
+
+    public void Remove(Gold? gold)
+    {
+        if (gold == null)
+        {
+            return;
+        }
+        Gold = new Gold(Gold.Quantity - gold.Value.Quantity);
+    }
+
+    public bool Contains(ItemUnion item)
+    {
+        if (item.Weapon != null)
+        {
+            return Weapons.Contains(item.Weapon);
+        }
+        if (item.Armor != null)
+        {
+            return Armors.Contains(item.Armor);
+        }
+        if (item.Material != null)
+        {
+            return Materials.Contains(item.Material);
+        }
+        throw new Exception($"Missing case in {nameof(Contains)}");
+    }
+
     public void Craft(CraftingRecipe recipe)
     {
         if (!CanCraft(recipe))
