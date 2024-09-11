@@ -20,6 +20,7 @@ public class Inventory : IMightChange<InventoryJson>
     public InventoryTab<Equipment<ArmorStats>> Armors { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
     public Gold Gold { get; private set; } = Gold.NONE;
+    public bool IsEmpty => Weapons.IsEmpty && Armors.IsEmpty && Materials.IsEmpty && Gold.Quantity == 0;
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
         .Concat(Weapons.DynamicValues)
         .Concat(Armors.DynamicValues)
@@ -106,6 +107,26 @@ public class Inventory : IMightChange<InventoryJson>
             return Materials.Contains(item.Material);
         }
         throw new Exception($"Missing case in {nameof(Contains)}");
+    }
+
+    public ItemUnion? GetBySpecifier(ItemSpecifier specifier)
+    {
+        var weapon = Weapons.GetBySpecifier(specifier);
+        var armor = Armors.GetBySpecifier(specifier);
+        var material = Materials.GetBySpecifier(specifier);
+        if (weapon != null)
+        {
+            return ItemUnion.Of(weapon);
+        }
+        if (armor != null)
+        {
+            return ItemUnion.Of(armor);
+        }
+        if (material != null)
+        {
+            return ItemUnion.Of(material);
+        }
+        return null;
     }
 
     public void Craft(CraftingRecipe recipe)

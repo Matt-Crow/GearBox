@@ -1,4 +1,5 @@
 using GearBox.Core.Controls;
+using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using Microsoft.AspNetCore.SignalR;
@@ -41,6 +42,10 @@ public class GameHub : Hub
     public Task StopMovingRight() => Receive(StopMoving.RIGHT);
     public Task Respawn() => Receive(new Respawn());
     public Task Craft(Guid recipeId) => Receive(new Craft(recipeId));
+    public Task OpenShop() => Receive(new OpenShop());
+    public Task CloseShop() => Receive(new CloseShop());
+    public Task ShopBuy(Guid shopId, Guid? itemId, string? itemName) => Receive(new ShopBuy(shopId, new ItemSpecifier(itemId, itemName)));
+    public Task ShopSell(Guid shopId, Guid? itemId, string? itemName) => Receive(new ShopSell(shopId, new ItemSpecifier(itemId, itemName)));
 
     /// <summary>
     /// Note the parameter is the bearing in degrees, so 0 means up, 90 means to the right, etc.

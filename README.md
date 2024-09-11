@@ -8,4 +8,4 @@ A C# MMORPG-like game.
 
 - **WASD** to move 
 - **Q** to use basic attack
-- **I** to toggle inventory
+- **E** to toggle inventory or open shop

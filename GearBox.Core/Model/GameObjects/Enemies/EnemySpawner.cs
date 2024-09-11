@@ -29,6 +29,11 @@ public class EnemySpawner
         }
 
         var enemy = _area.SpawnEnemy();
+        if (enemy == null)
+        {
+            return;
+        }
+        
         if (enemy.Termination != null)
         {
             enemy.Termination.Terminated += ChildTerminated;

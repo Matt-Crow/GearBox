@@ -3,7 +3,7 @@ namespace GearBox.Core.Model.Json;
 /// <summary>
 /// Combines together data from ItemStack, IItem, and ItemType
 /// </summary>
-public readonly struct ItemJson : IJson
+public readonly struct ItemJson : IChange, IJson
 {
     public ItemJson(
         Guid? id, 
@@ -37,4 +37,6 @@ public readonly struct ItemJson : IJson
     /// The number of items in this stack
     /// </summary>
     public int Quantity { get; init; }
+
+    public IEnumerable<object?> DynamicValues => [Id, Name, Description, Level, ..Details, Quantity];
 }

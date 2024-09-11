@@ -1,9 +1,9 @@
 import { Game } from "../js/game/game.js";
-import { InventoryModal } from "../js/game/components/inventoryModal.js";
 import { PlayerHud } from "../js/game/components/playerHud.js";
 import { Client } from "../js/game/infrastructure/client.js";
 import { Canvas } from "../js/game/components/canvas.js";
 import { GameOverScreen } from "../js/game/components/gameOverScreen.js";
+import { MainModal } from "../js/game/components/mainModal.js";
 
 $(async () => await main());
 
@@ -14,10 +14,10 @@ async function main() {
     const client = new Client(connection);
     
     const canvas = new Canvas(findElement("#canvas"));
-    const inventoryModal = new InventoryModal(findElement("#inventoryModal"), client);
+    const mainModal = new MainModal("#main-modal", client);
     const hud = new PlayerHud(findElement("#playerHud"));
     const gameOverScreen = new GameOverScreen(findElement("#playerAlive"), findElement("#playerDead"), findElement("#respawnButton"), client);
-    const game = new Game(canvas, inventoryModal, hud, gameOverScreen);
+    const game = new Game(canvas, mainModal, hud, gameOverScreen);
     
     connection.on("GameInit", handle(json => game.handleGameInit(json)));
     connection.on("AreaUpdate", handle(json => game.handleAreaUpdate(json)));
@@ -50,10 +50,13 @@ async function main() {
             const bearing = 90 - angleInDegrees;
             client.useBasicAttack(bearing);
         }
-        if (e.code == "KeyI") {
-            inventoryModal.toggle();
+        if (e.code == "KeyE") { 
+            mainModal.toggle();
+            client.openShop();
         }
     });
+
+    findElement("#main-modal .shop").addEventListener("close", () => client.closeShop());
 }
 
 function handle(handler) {

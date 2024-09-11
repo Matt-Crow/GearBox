@@ -4,7 +4,7 @@ namespace GearBox.Core.Model.Json.AreaUpdate;
 /// Notifies clients of changes to the area they're connected to.
 /// Each instance is intended for a single recipient.
 /// </summary>
-public readonly struct AreaUpdateJson : IJson
+public struct AreaUpdateJson : IJson
 {
     public AreaUpdateJson(List<GameObjectJson> gameObjects, ChangesJson changes)
     {
@@ -18,4 +18,6 @@ public readonly struct AreaUpdateJson : IJson
     public List<GameObjectJson> GameObjects { get; init; }
 
     public ChangesJson Changes { get; init; }
+
+    public UiStateChangesJson? UiStateChanges { get; set; }
 }

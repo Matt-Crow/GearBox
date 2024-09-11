@@ -1,13 +1,12 @@
 import { getColorStringFromJson } from "./color.js";
 import { PIXELS_PER_TILE } from "./constants.js";
-import { Inventory, InventoryDeserializer } from "./item.js";
+import { Item, ItemDeserializer } from "./item.js";
 
 export class Shop {
     #name;
     #xInPixels;
     #yInPixels;
     #color;
-    #options;
 
     /**
      * 
@@ -15,17 +14,13 @@ export class Shop {
      * @param {number} xInPixels 
      * @param {number} yInPixels 
      * @param {string} color 
-     * @param {Inventory} options 
      */
-    constructor(name, xInPixels, yInPixels, color, options) {
+    constructor(name, xInPixels, yInPixels, color) {
         this.#name = name;
         this.#xInPixels = xInPixels;
         this.#yInPixels = yInPixels;
         this.#color = color;
-        this.#options = options;
     }
-
-    get options() { return this.#options; }
 
     /**
      * @param {CanvasRenderingContext2D} context the canvas to draw on
@@ -37,26 +32,91 @@ export class Shop {
         context.fillStyle = "black";
         context.fillText(this.#name, this.#xInPixels, this.#yInPixels - PIXELS_PER_TILE / 4);
     }
-}
 
-export class ShopInitDeserializer {
-    #inventoryDeserializer;
-
-    /**
-     * @param {InventoryDeserializer} inventoryDeserializer 
-     */
-    constructor(inventoryDeserializer) {
-        this.#inventoryDeserializer = inventoryDeserializer;
-    }
-
-    deserialize(json) {
+    static fromJson(json) {
         const result = new Shop(
             json.name,
             json.xInPixels,
             json.yInPixels,
-            getColorStringFromJson(json.color),
-            this.#inventoryDeserializer.deserialize(json.options)
+            getColorStringFromJson(json.color)
         );
         return result;
+    }
+}
+
+export class OpenShop {
+    #id;
+    #name;
+    #buyOptions;
+    #sellOptions;
+    #buybackOptions;
+
+    constructor(id, name, buyOptions, sellOptions, buybackOptions) {
+        this.#id = id;
+        this.#name = name;
+        this.#buyOptions = buyOptions;
+        this.#sellOptions = sellOptions;
+        this.#buybackOptions = buybackOptions;
+    }
+
+    get id() { return this.#id; }
+    get name() { return this.#name; }
+    get buyOptions() { return this.#buyOptions; }
+    get sellOptions() { return this.#sellOptions; }
+    get buybackOptions() { return this.#buybackOptions; }
+}
+
+export class OpenShopOption {
+    #item;
+    #price;
+    #canAfford;
+
+    /**
+     * @param {Item} item 
+     * @param {number} price 
+     * @param {boolean} canAfford 
+     */
+    constructor(item, price, canAfford) {
+        this.#item = item;
+        this.#price = price;
+        this.#canAfford = canAfford;
+    }
+
+    get item() { return this.#item; }
+    get price() { return this.#price; }
+    get canAfford() { return this.#canAfford; }
+}
+
+export class OpenShopDeserializer {
+    #itemDeserializer;
+
+    /**
+     * @param {ItemDeserializer} itemDeserializer 
+     */
+    constructor(itemDeserializer) {
+        this.#itemDeserializer = itemDeserializer;
+    }
+
+    deserialize(json) {
+        if (!json) {
+            return null;
+        }
+        const result = new OpenShop(
+            json.id,
+            json.name,
+            this.#deserializeOptions(json.buyOptions),
+            this.#deserializeOptions(json.sellOptions),
+            this.#deserializeOptions(json.buybackOptions)
+        );
+        return result;
+    }
+
+    #deserializeOptions(json) {
+        return json.map(option => this.#deserializeOption(option));
+    }
+
+    #deserializeOption(option) {
+        const item = this.#itemDeserializer.deserialize(option.item);
+        return new OpenShopOption(item, option.buyPrice, option.canAfford);
     }
 }

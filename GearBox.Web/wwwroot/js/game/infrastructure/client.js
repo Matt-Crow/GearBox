@@ -49,6 +49,22 @@ export class Client {
         this.#signalr.invoke("Craft", recipeId);
     }
 
+    openShop() {
+        this.#signalr.invoke("OpenShop");
+    }
+
+    closeShop() {
+        this.#signalr.invoke("CloseShop");
+    }
+
+    shopBuy(shopId, itemId, itemName) {
+        this.#signalr.invoke("ShopBuy", shopId, itemId, itemName);
+    }
+
+    shopSell(shopId, itemId, itemName) {
+        this.#signalr.invoke("ShopSell", shopId, itemId, itemName);
+    }
+
     useBasicAttack(bearingInDegrees) {
         this.#signalr.invoke("UseBasicAttack", bearingInDegrees);
     }

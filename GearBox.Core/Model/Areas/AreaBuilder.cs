@@ -79,7 +79,7 @@ public class AreaBuilder
             _enemies,
             _exits
         );
-        result.AddTimer(new GameTimer(result.SpawnLootChest, Duration.FromSeconds(10).InFrames));
+        result.AddTimer(new GameTimer(() => result.SpawnLootChest(), Duration.FromSeconds(10).InFrames));
         var spawner = new EnemySpawner(result, new EnemySpawnerOptions()
         {
             WaveSize = 3,

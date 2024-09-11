@@ -25,7 +25,6 @@ public class Area : IArea
     private readonly Team _playerTeam = new("Players");
     private readonly Team _enemyTeam = new("Enemies");
     private readonly Map _map;
-    private readonly List<ItemShop> _shops;
     private readonly LootTable _loot;
     private readonly IEnemyFactory _enemyFactory;
     private readonly List<IExit> _exits = [];
@@ -45,7 +44,7 @@ public class Area : IArea
         Level = level;
         _game = game ?? new Game();
         _map = map ?? new();
-        _shops = shops ?? [];
+        Shops = shops ?? [];
         _loot = loot ?? new LootTable([]);
         _enemyFactory = enemyFactory ?? new EnemyFactory(new EnemyRepository(new ItemFactory()));
         _exits = exits ?? [];
@@ -54,6 +53,7 @@ public class Area : IArea
     public string Name { get; init; }
     public int Level { get; init; }
     public Dimensions Bounds => _map.Bounds;
+    public List<ItemShop> Shops { get; private init; }
 
     public void SpawnPlayer(PlayerCharacter player)
     {
@@ -69,9 +69,14 @@ public class Area : IArea
         player.Termination.Terminated += (sender, args) => RemovePlayer(player);
     }
 
-    public EnemyCharacter SpawnEnemy()
+    public EnemyCharacter? SpawnEnemy()
     {
-        var enemy = _enemyFactory.MakeRandom(Level) ?? new EnemyCharacter("Default Enemy", Level);
+        var enemy = _enemyFactory.MakeRandom(Level);
+        if (enemy == null)
+        {
+            return null;
+        }
+        
         enemy.SetArea(this);
         enemy.Team = _enemyTeam;
         
@@ -82,12 +87,18 @@ public class Area : IArea
         return enemy;
     }
 
-    public void SpawnLootChest()
+    public LootChest? SpawnLootChest()
     {
         var inventory = _loot.GetRandomLoot(); 
+        if (inventory.IsEmpty)
+        {
+            return null; // don't bother spawning chest with no loot
+        }
+
         var location = _map.GetRandomFloorTile();
         var lootChest = new LootChest(location.CenteredOnTile(), inventory);
         _lootChests.AddGameObject(lootChest);
+        return lootChest;
     }
     
     public void AddProjectile(Projectile projectile) => _projectiles.AddGameObject(projectile);
@@ -121,7 +132,7 @@ public class Area : IArea
     public Coordinates GetRandomFloorTile() => _map.GetRandomFloorTile();
 
     public MapJson GetMapJson() => _map.ToJson();
-    public List<ShopInitJson> GetShopInitJsons() => _shops.Select(s => s.ToJson()).ToList();
+    public List<ShopInitJson> GetShopInitJsons() => Shops.Select(s => s.ToJson()).ToList();
 
     public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player)
     {

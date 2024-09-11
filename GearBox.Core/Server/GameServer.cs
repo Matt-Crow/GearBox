@@ -1,6 +1,7 @@
 using GearBox.Core.Controls;
 using GearBox.Core.Model;
 using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Server;
@@ -10,6 +11,7 @@ public class GameServer
     private readonly IGame _game;
     private readonly Dictionary<string, IConnection> _connections = [];
     private readonly Dictionary<string, PlayerCharacter> _players = [];
+    private readonly Dictionary<string, UiState> _uiStates = [];
     private readonly List<PendingCommand> _pendingCommands = [];
     private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
@@ -61,6 +63,7 @@ public class GameServer
         area.SpawnPlayer(player);
         _connections.Add(id, connection);
         _players.Add(id, player);
+        _uiStates.Add(id, new UiState(player));
 
         await SendGameInitTo(id);
         await SendAreaUpdateTo(id);
@@ -117,7 +120,14 @@ public class GameServer
             _pendingCommands.Clear();
             foreach (var command in executeThese)
             {
-                command.Command.ExecuteOn(_players[command.ConnectionId]);
+                try
+                {
+                    command.Command.ExecuteOn(_players[command.ConnectionId]);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex);
+                }
             }
 
             _game.Update();
@@ -137,7 +147,11 @@ public class GameServer
         {
             return Task.CompletedTask;
         }
-        var json = area.GetAreaUpdateJsonFor(_players[playerId]);
+        var json = area.GetAreaUpdateJsonFor(player);
+        var newUiState = new UiState(player);
+        var uiStateChanges = _uiStates[playerId].GetChanges(newUiState);
+        _uiStates[playerId] = newUiState; // must come after computing changes
+        json.UiStateChanges = uiStateChanges;
         return _connections[playerId].Send("AreaUpdate", json);
     }
 }

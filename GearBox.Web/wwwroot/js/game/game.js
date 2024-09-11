@@ -1,16 +1,16 @@
 import { Canvas } from "./components/canvas.js";
 import { GameOverScreen } from "./components/gameOverScreen.js";
-import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
 import { handleGameInit } from "./messageHandlers/gameInitHandler.js";
 import { characterDeserializer } from "./model/character.js";
-import { InventoryDeserializer, ItemDeserializer } from "./model/item.js";
+import { ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
 import { PlayerChangeHandler } from "./model/player.js";
 import { projectileDeserializer } from "./model/projectile.js";
 import { Area, AreaUpdateHandler } from "./model/area.js";
 import { TileMap } from "./model/map.js";
-import { ShopInitDeserializer } from "./model/shop.js";
+import { Shop } from "./model/shop.js";
+import { MainModal } from "./components/mainModal.js";
 
 export class Game {
 
@@ -19,15 +19,13 @@ export class Game {
      */
     #canvas;
 
-    /**
-     * The InventoryModal for the current player.
-     */
-    #inventoryModal;
+    #mainModal;
 
     /**
      * The PlayerHud for the current player.
      */
     #playerHud;
+
 
     #gameOverScreen;
 
@@ -39,13 +37,13 @@ export class Game {
 
     /**
      * @param {Canvas} canvas the custom canvas component to draw on.
-     * @param {InventoryModal} inventoryModal the modal for the current player's inventory.
+     * @param {MainModal} mainModal 
      * @param {PlayerHud} playerHud the player HUD for the current player
      * @param {GameOverScreen} gameOverScreen 
      */
-    constructor(canvas, inventoryModal, playerHud, gameOverScreen) {
+    constructor(canvas, mainModal, playerHud, gameOverScreen) {
         this.#canvas = canvas
-        this.#inventoryModal = inventoryModal;
+        this.#mainModal = mainModal;
         this.#playerHud = playerHud;
         this.#gameOverScreen = gameOverScreen;
         this.#area = null;
@@ -59,7 +57,7 @@ export class Game {
 
     handleGameInit(json) {
         this.#gameData = handleGameInit(json);
-        this.#inventoryModal.setCraftingRecipes(this.#gameData.craftingRecipes);
+        this.#mainModal.setCraftingRecipes(this.#gameData.craftingRecipes);
     }
 
     // todo rework this
@@ -68,23 +66,23 @@ export class Game {
             throw new Error("Cannot accept area init until after game init");
         }
 
-        const itemDeserializer = new ItemDeserializer(this.#gameData.itemTypes);
-        const shopInitDeserializer = new ShopInitDeserializer(new InventoryDeserializer(itemDeserializer));
         const area = new Area(
             this.#gameData, 
             TileMap.fromJson(json.changes.map.value),
-            json.changes.shops.value.map(j => shopInitDeserializer.deserialize(j))
+            json.changes.shops.value.map(j => Shop.fromJson(j))
         );
+        const itemDeserializer = new ItemDeserializer(this.#gameData.itemTypes);
         const updateHandler = new AreaUpdateHandler(area, itemDeserializer)
             .addGameObjectType(characterDeserializer)
             .addGameObjectType(new PlayerChangeHandler(this.#gameData.playerId, this.#playerHud.playerUpdateListener))
             .addGameObjectType(projectileDeserializer)
             .addGameObjectType(new LootChestJsonDeserializer(this.#gameData.playerId))
             .addUpdateListener(w => this.#gameOverScreen.update(w))
-            .addInventoryChangeListener(inv => this.#inventoryModal.setInventory(inv))
-            .addWeaponChangeListener(wea => this.#inventoryModal.setWeapon(wea))
-            .addArmorChangeListener(arm => this.#inventoryModal.setArmor(arm))
-            .addStatSummaryChangeListener(summary => this.#inventoryModal.setStatSummary(summary))
+            .addInventoryChangeListener(inv => this.#mainModal.setInventory(inv))
+            .addWeaponChangeListener(wea => this.#mainModal.setWeapon(wea))
+            .addArmorChangeListener(arm => this.#mainModal.setArmor(arm))
+            .addStatSummaryChangeListener(summary => this.#mainModal.setStatSummary(summary))
+            .addOpenShopChangeListener(openShop => this.#mainModal.setShop(openShop))
             ;
 
         this.#areaUpdateHandler = json => updateHandler.handleAreaUpdate(json);

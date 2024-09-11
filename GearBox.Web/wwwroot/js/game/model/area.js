@@ -4,7 +4,7 @@ import { GameData } from "../messageHandlers/gameInitHandler.js";
 import { InventoryDeserializer, ItemDeserializer } from "./item.js";
 import { TileMap } from "./map.js";
 import { Player, PlayerStatSummary } from "./player.js";
-import { Shop } from "./shop.js";
+import { OpenShop, OpenShopDeserializer, Shop } from "./shop.js";
 
 export class Area {
     #gameData;
@@ -53,12 +53,14 @@ export class AreaUpdateHandler {
     #area;
     #inventoryDeserializer;
     #itemDeserializer;
+    #openShopDeserializer;
     #deserializers = new JsonDeserializers();
     #updateListeners = [];
     #inventoryChangeListeners = [];
     #weaponChangeListeners = [];
     #armorChangeListeners = [];
     #statSummaryChangeListeners = [];
+    #openShopChangeListeners = [];
 
     /**
      * @param {Area} area 
@@ -68,6 +70,7 @@ export class AreaUpdateHandler {
         this.#area = area;
         this.#inventoryDeserializer = new InventoryDeserializer(itemDeserializer);
         this.#itemDeserializer = itemDeserializer;
+        this.#openShopDeserializer = new OpenShopDeserializer(itemDeserializer);
     }
 
     /**
@@ -124,6 +127,15 @@ export class AreaUpdateHandler {
         return this;
     }
 
+    /**
+     * @param {(OpenShop) => any} changeListener 
+     * @returns {AreaUpdateHandler}
+     */
+    addOpenShopChangeListener(changeListener) {
+        this.#openShopChangeListeners.push(changeListener);
+        return this;
+    }
+
     handleAreaUpdate(json) {
         const newGameObject = json.gameObjects
             .map(gameObjectJson => this.#deserialize(gameObjectJson))
@@ -136,6 +148,7 @@ export class AreaUpdateHandler {
         this.#handleChanges(json.changes.weapon, v => this.#itemDeserializer.deserialize(v), this.#weaponChangeListeners);
         this.#handleChanges(json.changes.armor, v => this.#itemDeserializer.deserialize(v), this.#armorChangeListeners);
         this.#handleChanges(json.changes.summary, PlayerStatSummary.fromJson, this.#statSummaryChangeListeners);
+        this.#handleChanges(json.uiStateChanges.openShop, v => this.#openShopDeserializer.deserialize(v), this.#openShopChangeListeners);
     }
 
     #handleChanges(maybeChange, deserialize, listeners) {

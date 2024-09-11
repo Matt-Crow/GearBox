@@ -6,6 +6,7 @@ using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 
+var bazaarMap = await GameResourceLoader.LoadMapByName("bazaar");
 var desertMap = await GameResourceLoader.LoadMapByName("desert");
 var canyonMap = await GameResourceLoader.LoadMapByName("canyon");
 
@@ -109,7 +110,13 @@ var game = new GameBuilder()
             .Add("Snake")
             .Add("Scorpion")
         )
-        .AddShop("Starter Weapon Shop", Coordinates.FromTiles(2, 2), Color.BLUE, shop => shop
+        .WithMap(desertMap)
+        .WithExit(BorderExit.Bottom("bazaar"))
+        .WithExit(BorderExit.Right("canyon"))
+    )
+    .WithArea("bazaar", 1, area => area
+        .WithMap(bazaarMap)
+        .AddShop("Starter Weapon Shop", Coordinates.FromTiles(2, 7), Color.BLUE, shop => shop
             .AddItem("Training Sword")
             .AddItem("Training Bow")
             .AddItem("Training Staff")
@@ -117,8 +124,7 @@ var game = new GameBuilder()
             .AddItem("Archer Initiate's Armor")
             .AddItem("Mage Initiate's Armor")
         )
-        .WithMap(desertMap)
-        .WithExit(BorderExit.Right("canyon"))
+        .WithExit(BorderExit.Top("desert"))
     )
     .WithArea("canyon", 2, area => area
         .AddLoot(loot => loot

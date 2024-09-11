@@ -20,6 +20,8 @@ where T : IItem
         .AsEnumerable()
         .Where(stack => stack.Quantity > 0);
 
+    public bool IsEmpty => _content.Count == 0;
+
     public IEnumerable<object?> DynamicValues => Content.SelectMany(stack => stack.DynamicValues);
 
     public void Add(T? item, int quantity=1)
@@ -72,10 +74,10 @@ where T : IItem
         return result;
     }
 
-    public T? GetItemById(Guid id)
+    public T? GetBySpecifier(ItemSpecifier specifier)
     {
         var result = _content.AsEnumerable()
-            .Where(stack => stack.Item.Id == id && stack.Quantity > 0)
+            .Where(stack => stack.Quantity > 0 && specifier.Matches(stack.Item))
             .Select(stack => stack.Item)
             .FirstOrDefault();
         return result;

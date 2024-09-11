@@ -5,6 +5,7 @@ using GearBox.Core.Model.Units;
 using System.Text.Json;
 using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Json.AreaInit;
+using GearBox.Core.Model.Items.Shops;
 
 namespace GearBox.Core.Model.GameObjects.Player;
 
@@ -34,12 +35,23 @@ public class PlayerCharacter : Character
     public Inventory Inventory { get; init; } = new();
     public EquipmentSlot<WeaponStats> WeaponSlot { get; init; } = new();
     public EquipmentSlot<ArmorStats> ArmorSlot { get; init; } = new();
+    
+    /// <summary>
+    /// The shop the player currently has open
+    /// </summary>
+    public ItemShop? OpenShop { get; private set; }
 
     public override void SetArea(IArea? newArea)
     {
+        SetOpenShop(null);
         AreaChanged?.Invoke(this, new AreaChangedEventArgs(this, CurrentArea, newArea));
         _hasAreaChanged = true;
         base.SetArea(newArea);
+    }
+
+    public void SetOpenShop(ItemShop? shop)
+    {
+        OpenShop = shop;
     }
 
     public override void UpdateStats()
@@ -62,7 +74,7 @@ public class PlayerCharacter : Character
 
     public void EquipWeaponById(Guid id)
     {
-        var weapon = Inventory.Weapons.GetItemById(id);
+        var weapon = Inventory.Weapons.GetBySpecifier(ItemSpecifier.ById(id));
         if (weapon == null || weapon.Level > Level)
         {
             return;
@@ -79,7 +91,7 @@ public class PlayerCharacter : Character
 
     public void EquipArmorById(Guid id)
     {
-        var armor = Inventory.Armors.GetItemById(id);
+        var armor = Inventory.Armors.GetBySpecifier(ItemSpecifier.ById(id));
         if (armor == null || armor.Level > Level)
         {
             return;

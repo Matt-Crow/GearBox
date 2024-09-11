@@ -1,12 +1,27 @@
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Model.Units;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model.Items;
 
 public class InventoryTester
 {
+    [Fact]
+    public void GetBySpecifier_FindsByIdFirst()
+    {
+        var sut = new Inventory();
+        var weapon1 = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats(AttackRange.MELEE));
+        var weapon2 = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats(AttackRange.MELEE));
+        sut.Weapons.Add(weapon1);
+        sut.Weapons.Add(weapon2);
+
+        var actual = sut.GetBySpecifier(new ItemSpecifier(weapon2.Id, weapon1.Type.Name));
+
+        Assert.Equal(weapon2, actual?.Weapon);
+    }
+
     [Fact]
     public void Craft_GivenCannotCraft_DoesNothing()
     {
