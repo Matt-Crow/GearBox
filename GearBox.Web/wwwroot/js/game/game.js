@@ -3,7 +3,6 @@ import { GameOverScreen } from "./components/gameOverScreen.js";
 import { PlayerHud } from "./components/playerHud.js";
 import { handleGameInit } from "./messageHandlers/gameInitHandler.js";
 import { characterDeserializer } from "./model/character.js";
-import { ItemDeserializer } from "./model/item.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
 import { PlayerChangeHandler } from "./model/player.js";
 import { projectileDeserializer } from "./model/projectile.js";
@@ -71,8 +70,7 @@ export class Game {
             TileMap.fromJson(json.changes.map.value),
             json.changes.shops.value.map(j => Shop.fromJson(j))
         );
-        const itemDeserializer = new ItemDeserializer(this.#gameData.itemTypes);
-        const updateHandler = new AreaUpdateHandler(area, itemDeserializer)
+        const updateHandler = new AreaUpdateHandler(area)
             .addGameObjectType(characterDeserializer)
             .addGameObjectType(new PlayerChangeHandler(this.#gameData.playerId, this.#playerHud.playerUpdateListener))
             .addGameObjectType(projectileDeserializer)

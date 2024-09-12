@@ -1,6 +1,5 @@
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
-using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
 
@@ -50,10 +49,7 @@ public class GameBuilder : IGameBuilder
 
     public IGame Build()
     {
-        var result = new Game(
-            ItemTypeRepository.Of(_itemFactory.AvailableTypes),
-            CraftingRecipeRepository.Of(_craftingRecipes)
-        );
+        var result = new Game(CraftingRecipeRepository.Of(_craftingRecipes));
         foreach (var area in _areas)
         {
             result.AddArea(area.Build(result));

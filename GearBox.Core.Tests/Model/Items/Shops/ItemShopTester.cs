@@ -70,7 +70,7 @@ public class ItemShopTester
     [Fact]
     public void SellTo_HasInfiniteStock()
     {
-        var item = ItemUnion.Of(new Material(new ItemType("foo")));
+        var item = ItemUnion.Of(new Material("foo"));
         var player = MakePlayer();
         player.Inventory.Add(new Gold(item.BuyValue().Quantity * 10));
         var sut = MakeItemShop(item);
@@ -133,7 +133,7 @@ public class ItemShopTester
     [Fact]
     public void CannotBuybackMultipleTimes()
     {
-        var item = ItemUnion.Of(new Material(new ItemType("foo material")));
+        var item = ItemUnion.Of(new Material("foo material"));
         var player = MakePlayer(item);
         player.Inventory.Add(new Gold(item.BuyValue().Quantity * 2));
         var sut = MakeItemShop();
@@ -148,7 +148,7 @@ public class ItemShopTester
     [Fact]
     public void SellTo_GivenInStockAndBuyback_TakesFromBuybackFirst()
     {
-        var item = ItemUnion.Of(new Material(new ItemType("foo material")));
+        var item = ItemUnion.Of(new Material("foo material"));
         var player = MakePlayer(item);
         var sut = MakeItemShop(item);
 
@@ -173,7 +173,7 @@ public class ItemShopTester
         return result;
     }
 
-    private static ItemUnion MakeItem(string? name = null) => ItemUnion.Of(new Material(new ItemType(name ?? "a material")));
+    private static ItemUnion MakeItem(string? name = null) => ItemUnion.Of(new Material(name ?? "a material"));
 
     private static void AssertInventoryContains(ItemUnion item, PlayerCharacter player)
     {

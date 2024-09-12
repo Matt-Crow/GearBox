@@ -34,6 +34,11 @@ public class ItemUnion
     public Equipment<WeaponStats>? Weapon { get; init; }
     public Equipment<ArmorStats>? Armor { get; init; }
 
+    public string Name => Unwrap().Name;
+    public Grade Grade => Unwrap().Grade;
+
+    public IItem Unwrap() => Select<IItem>(m => m, w => w, a => a);
+
     public ItemJson ToJson()
     {
         if (Material != null)
@@ -49,23 +54,6 @@ public class ItemUnion
             return new ItemStack<Equipment<ArmorStats>>(Armor).ToJson();
         }
         throw new Exception("ItemUnion has no item");
-    }
-
-    public ItemType GetItemType()
-    {
-        if (Material != null)
-        {
-            return Material.Type;
-        }
-        if (Weapon != null)
-        {
-            return Weapon.Type;
-        }
-        if (Armor != null)
-        {
-            return Armor.Type;
-        }
-        throw new Exception("Forgot to add clause in ItemUnion.GetItemType");
     }
 
     public ItemUnion ToOwned(int? level=null)
@@ -100,5 +88,22 @@ public class ItemUnion
             return Armor.BuyValue;
         }
         throw new Exception($"Missing case in {nameof(BuyValue)}");
+    }
+
+    private T Select<T>(Func<Material, T> fromMaterial, Func<Equipment<WeaponStats>, T> fromWeapon, Func<Equipment<ArmorStats>, T> fromArmor)
+    {
+        if (Material != null)
+        {
+            return fromMaterial(Material);
+        }
+        if (Weapon != null)
+        {
+            return fromWeapon(Weapon);
+        }
+        if (Armor != null)
+        {
+            return fromArmor(Armor);
+        }
+        throw new Exception($"Missing case in {nameof(Select)}");
     }
 }

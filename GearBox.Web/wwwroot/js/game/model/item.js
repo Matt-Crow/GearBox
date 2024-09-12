@@ -1,5 +1,3 @@
-import { TestCase, TestSuite } from "../testing/tests.js";
-
 export class Inventory {
     #weapons;
     #armors;
@@ -26,95 +24,68 @@ export class Inventory {
 }
 
 export class InventoryDeserializer {
-    #itemDeserializer;
-
-    /**
-     * @param {ItemDeserializer} itemDeserializer 
-     */
-    constructor(itemDeserializer) {
-        this.#itemDeserializer = itemDeserializer;
-    }
-
     deserialize(json) {
-        const weapons = json.weapons.items.map(x => this.#itemDeserializer.deserialize(x));
-        const armors = json.armors.items.map(x => this.#itemDeserializer.deserialize(x));
-        const materials = json.materials.items.map(x => this.#itemDeserializer.deserialize(x));
+        const weapons = json.weapons.items.map(x => Item.fromJson(x));
+        const armors = json.armors.items.map(x => Item.fromJson(x));
+        const materials = json.materials.items.map(x => Item.fromJson(x));
         return new Inventory(weapons, armors, materials, json.gold);
     }
 }
 
 export class Item {
     #id;
-    #type;
+    #name;
+    #gradeName;
+    #gradeOrder;
     #description;
     #level;
     #details;
     #quantity;
 
     /**
-     * @param {string?} id 
-     * @param {ItemType} type 
+     * @param {string?} id
+     * @param {string} name 
+     * @param {string} gradeName 
+     * @param {number} gradeOrder  
      * @param {string} description 
      * @param {number} level
      * @param {string[]} details 
      * @param {number} quantity 
      */
-    constructor(id, type, description, level, details, quantity) {
+    constructor(id, name, gradeName, gradeOrder, description, level, details, quantity) {
         this.#id = id;
-        this.#type = type;
+        this.#name = name;
+        this.#gradeName = gradeName;
+        this.#gradeOrder = gradeOrder;
         this.#description = description;
         this.#level = level;
         this.#details = details;
         this.#quantity = quantity;
     }
 
-    get id() {
-        return this.#id;
-    }
-
-    get type() {
-        return this.#type;
-    }
-
-    get description() {
-        return this.#description;
-    }
-
-    get level() {
-        return this.#level;
-    }
-
-    get details() {
-        return this.#details;
-    }
-
-    get quantity() {
-        return this.#quantity;
-    }
-}
-
-export class ItemDeserializer {
-    #itemTypes;
+    get id() { return this.#id; }
+    get name() { return this.#name; }
+    get gradeName() { return this.#gradeName; }
+    get gradeOrder() { return this.#gradeOrder; }
+    get description() { return this.#description; }
+    get level() { return this.#level; }
+    get details() { return this.#details; }
+    get quantity() { return this.#quantity; }
 
     /**
-     * @param {ItemTypeRepository} itemTypes 
+     * @param {object} json 
+     * @returns {Item|null}
      */
-    constructor(itemTypes) {
-        this.#itemTypes = itemTypes;
-    }
-
-    deserialize(json) {
+    static fromJson(json) {
         if (!json) {
             return null;
-        }
-        const type = this.#itemTypes.getItemTypeByName(json.name);
-        if (type === null) {
-            throw new Error(`Bad item type name: "${json.name}"`);
         }
 
         const result = new Item(
             json.id,
-            type,
+            json.name,
+            json.gradeName,
+            json.gradeOrder,
             json.description,
             json.level,
             json.details.slice(),
@@ -123,69 +94,3 @@ export class ItemDeserializer {
         return result;
     }
 }
-
-export class ItemType {
-    #name;
-    #gradeOrder;
-    #gradeName;
-
-    constructor(name, gradeOrder, gradeName) {
-        this.#name = name;
-        this.#gradeOrder = gradeOrder;
-        this.#gradeName = gradeName;
-    }
-
-    get name() {
-        return this.#name;
-    }
-
-    get gradeOrder() {
-        return this.#gradeOrder;
-    }
-
-    get gradeName() {
-        return this.#gradeName;
-    }
-}
-
-export function deserializeItemTypeJson(obj) {
-    const result = new ItemType(obj.name, obj.gradeOrder, obj.gradeName);
-    return result;
-}
-
-export class ItemTypeRepository {
-    #itemTypes = new Map();
-
-    /**
-     * @param {ItemType[]} itemTypes
-     */
-    constructor(itemTypes=[]) {
-        itemTypes.forEach(x => this.#itemTypes.set(x.name, x));
-    }
-
-    /**
-     * @param {string} name 
-     * @returns {ItemType}
-     */
-    getItemTypeByName(name) {
-        const result = this.#itemTypes.has(name)
-            ? this.#itemTypes.get(name)
-            : null;
-        return result;
-    }
-}
-
-export const itemTests = new TestSuite("item.js", [
-    new TestCase("getItemTypeByName_givenNotFound_returnsNull", (assert) => {
-        var sut = new ItemTypeRepository();
-        assert.isNull(sut.getItemTypeByName("foo"));
-    }),
-    new TestCase("getItemTypeByName_givenFound_returnsIt", (assert) => {
-        var expected = new ItemType("foo", true);
-        var sut = new ItemTypeRepository([expected]);
-
-        var actual = sut.getItemTypeByName(expected.name);
-
-        assert.equal(expected, actual);
-    })
-]);

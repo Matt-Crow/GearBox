@@ -8,10 +8,9 @@ public interface IItem
     /// </summary>
     Guid? Id { get; }
 
-    /// <summary>
-    /// Items of the same type can stack together in a player's inventory
-    /// </summary>
-    ItemType Type { get; }
+    string Name { get; }
+
+    Grade Grade { get; }
 
     string Description { get; }
 

@@ -1,6 +1,6 @@
 import { getColorStringFromJson } from "./color.js";
 import { PIXELS_PER_TILE } from "./constants.js";
-import { Item, ItemDeserializer } from "./item.js";
+import { Item } from "./item.js";
 
 export class Shop {
     #name;
@@ -88,15 +88,6 @@ export class OpenShopOption {
 }
 
 export class OpenShopDeserializer {
-    #itemDeserializer;
-
-    /**
-     * @param {ItemDeserializer} itemDeserializer 
-     */
-    constructor(itemDeserializer) {
-        this.#itemDeserializer = itemDeserializer;
-    }
-
     deserialize(json) {
         if (!json) {
             return null;
@@ -116,7 +107,7 @@ export class OpenShopDeserializer {
     }
 
     #deserializeOption(option) {
-        const item = this.#itemDeserializer.deserialize(option.item);
+        const item = Item.fromJson(option.item);
         return new OpenShopOption(item, option.buyPrice, option.canAfford);
     }
 }

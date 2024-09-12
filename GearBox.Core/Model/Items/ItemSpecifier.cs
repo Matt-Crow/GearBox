@@ -19,7 +19,7 @@ public class ItemSpecifier
     public bool Matches(IItem item)
     {
         var idMatches = Id == null || item.Id == Id;
-        var nameMatches = Name == null || item.Type.Name == Name;
+        var nameMatches = Name == null || item.Name == Name;
         return idMatches && nameMatches;
     }
 }

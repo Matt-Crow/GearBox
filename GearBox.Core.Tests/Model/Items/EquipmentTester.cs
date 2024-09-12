@@ -14,7 +14,7 @@ public class EquipmentTester
         {
             {stat, 1}
         };
-        var sut = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats(), statWeights: weights, level: 1);
+        var sut = new Equipment<WeaponStats>("foo", new WeaponStats(), statWeights: weights, level: 1);
 
         var other = sut.ToOwned(2);
 

@@ -29,7 +29,9 @@ where T : IEquipmentStats
         
         var result = new ItemJson(
             Value.Id,
-            Value.Type.Name,
+            Value.Name,
+            Value.Grade.Name,
+            Value.Grade.Order,
             Value.Description,
             Value.Level,
             Value.Details,

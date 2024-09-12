@@ -8,7 +8,7 @@ public class LootTableTester
     [Fact]
     public void GetRandomItem_GivenMaterial_ReturnsIt()
     {
-        var expected = new Material(new ItemType("foo"));
+        var expected = new Material("foo");
         var sut = new LootTable([
             new LootOption(1, ItemUnion.Of(expected))
         ]);
@@ -23,7 +23,7 @@ public class LootTableTester
     [Fact]
     public void GetRandomItem_GivenWeapon_ReturnsCopyOfIt()
     {
-        var expected = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats());
+        var expected = new Equipment<WeaponStats>("foo", new WeaponStats());
         var sut = new LootTable([
             new LootOption(1, ItemUnion.Of(expected))
         ]);

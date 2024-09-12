@@ -1,10 +1,10 @@
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
 import { GameData } from "../messageHandlers/gameInitHandler.js";
-import { InventoryDeserializer, ItemDeserializer } from "./item.js";
+import { InventoryDeserializer, Item } from "./item.js";
 import { TileMap } from "./map.js";
 import { Player, PlayerStatSummary } from "./player.js";
-import { OpenShop, OpenShopDeserializer, Shop } from "./shop.js";
+import { OpenShopDeserializer, Shop } from "./shop.js";
 
 export class Area {
     #gameData;
@@ -52,7 +52,6 @@ export class Area {
 export class AreaUpdateHandler {
     #area;
     #inventoryDeserializer;
-    #itemDeserializer;
     #openShopDeserializer;
     #deserializers = new JsonDeserializers();
     #updateListeners = [];
@@ -64,13 +63,11 @@ export class AreaUpdateHandler {
 
     /**
      * @param {Area} area 
-     * @param {ItemDeserializer} itemDeserializer 
      */
-    constructor(area, itemDeserializer) {
+    constructor(area) {
         this.#area = area;
-        this.#inventoryDeserializer = new InventoryDeserializer(itemDeserializer);
-        this.#itemDeserializer = itemDeserializer;
-        this.#openShopDeserializer = new OpenShopDeserializer(itemDeserializer);
+        this.#inventoryDeserializer = new InventoryDeserializer();
+        this.#openShopDeserializer = new OpenShopDeserializer();
     }
 
     /**
@@ -145,8 +142,8 @@ export class AreaUpdateHandler {
         this.#updateListeners.forEach(listener => listener(this.#area));
 
         this.#handleChanges(json.changes.inventory, v => this.#inventoryDeserializer.deserialize(v), this.#inventoryChangeListeners);
-        this.#handleChanges(json.changes.weapon, v => this.#itemDeserializer.deserialize(v), this.#weaponChangeListeners);
-        this.#handleChanges(json.changes.armor, v => this.#itemDeserializer.deserialize(v), this.#armorChangeListeners);
+        this.#handleChanges(json.changes.weapon, v => Item.fromJson(v), this.#weaponChangeListeners);
+        this.#handleChanges(json.changes.armor, v => Item.fromJson(v), this.#armorChangeListeners);
         this.#handleChanges(json.changes.summary, PlayerStatSummary.fromJson, this.#statSummaryChangeListeners);
         this.#handleChanges(json.uiStateChanges.openShop, v => this.#openShopDeserializer.deserialize(v), this.#openShopChangeListeners);
     }

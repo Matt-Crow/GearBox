@@ -8,6 +8,8 @@ public readonly struct ItemJson : IChange, IJson
     public ItemJson(
         Guid? id, 
         string name, 
+        string gradeName,
+        int gradeOrder,
         string description, 
         int level,
         IEnumerable<string> details, 
@@ -16,6 +18,8 @@ public readonly struct ItemJson : IChange, IJson
     {
         Id = id;
         Name = name;
+        GradeName = gradeName;
+        GradeOrder = gradeOrder;
         Description = description;
         Level = level;
         Details = details;
@@ -23,12 +27,9 @@ public readonly struct ItemJson : IChange, IJson
     }
 
     public Guid? Id { get; init; }
-
-    /// <summary>
-    /// The front end uses this to lookup the item type in a repository
-    /// </summary>
     public string Name { get; init; }
-
+    public string GradeName { get; init; }
+    public int GradeOrder { get; init; }
     public string Description { get; init; }
     public int Level { get; init; }
     public IEnumerable<string> Details { get; init; }

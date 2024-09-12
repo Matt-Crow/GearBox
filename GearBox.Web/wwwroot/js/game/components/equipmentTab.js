@@ -18,8 +18,8 @@ export class EquipmentTab {
         this.#selector = selector;
         this.#onEquip = onEquip;
         this.#table = new Table(`${this.#selector} .equipmentTable`, [
-            new DataColumn("Name", e => e.type.name),
-            new DataColumn("Grade", e => e.type.gradeName),
+            new DataColumn("Name", e => e.name),
+            new DataColumn("Grade", e => e.gradeName),
             new DataColumn("Level", e => e.level),
             new DataColumn("Description", e => e.description),
             new ActionColumn("Action", "Equip", e => this.#onEquip(e.id))

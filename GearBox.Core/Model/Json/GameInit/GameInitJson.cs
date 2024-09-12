@@ -1,5 +1,3 @@
-using GearBox.Core.Model.Json.AreaInit;
-
 namespace GearBox.Core.Model.Json.GameInit;
 
 /// <summary>
@@ -8,14 +6,12 @@ namespace GearBox.Core.Model.Json.GameInit;
 /// </summary>
 public readonly struct GameInitJson : IJson
 {
-    public GameInitJson(Guid playerId, List<ItemTypeJson> itemTypes, List<CraftingRecipeJson> craftingRecipes)
+    public GameInitJson(Guid playerId, List<CraftingRecipeJson> craftingRecipes)
     {
         PlayerId = playerId;
-        ItemTypes = itemTypes;
         CraftingRecipes = craftingRecipes;
     }
 
     public Guid PlayerId { get; init; }
-    public List<ItemTypeJson> ItemTypes { get; init; }
     public List<CraftingRecipeJson> CraftingRecipes { get; init; }
 }

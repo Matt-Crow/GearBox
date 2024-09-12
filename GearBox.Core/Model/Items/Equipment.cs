@@ -12,23 +12,26 @@ where T : IEquipmentStats
     private readonly Dictionary<PlayerStatType, int> _statWeights;
 
     public Equipment(
-        ItemType type, 
+        string name, 
         T inner,
+        Grade? grade = null,
         Dictionary<PlayerStatType, int>? statWeights = null,
         int? level = null
     )
     {
-        Type = type;
+        Name = name;
         Inner = inner;
+        Grade = grade ?? Grade.COMMON;
         Level = level ?? 1;
-        BuyValue = new Gold(type.Grade.BuyValueBase * (Level + Character.MAX_LEVEL / 2));
+        BuyValue = new Gold(Grade.BuyValueBase * (Level + Character.MAX_LEVEL / 2));
         _statWeights = statWeights ?? [];
-        StatBoosts = new PlayerStatBoosts(_statWeights, Inner.GetStatPoints(Level, Type.Grade));
+        StatBoosts = new PlayerStatBoosts(_statWeights, Inner.GetStatPoints(Level, Grade));
     }
     
     public Guid? Id { get; init; } = Guid.NewGuid();
-    public ItemType Type { get; init; }
+    public string Name { get; init; }
     public T Inner { get;}
+    public Grade Grade { get; init; }
     public int Level { get; init; }
     public string Description => ""; // equipment doesn't need a description
     public Gold BuyValue { get; init; }
@@ -46,7 +49,7 @@ where T : IEquipmentStats
     public Equipment<T> ToOwned(int? level=null)
     {
         var newLevel = level ?? Level;
-        var result = new Equipment<T>(Type, Inner, _statWeights, newLevel);
+        var result = new Equipment<T>(Name, Inner, Grade, _statWeights, newLevel);
         return result;
     }
 

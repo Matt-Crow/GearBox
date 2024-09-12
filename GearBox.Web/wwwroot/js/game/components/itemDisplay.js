@@ -50,7 +50,7 @@ export class ItemDisplay {
 
         $this
             .find(".itemName")
-            .text(`${item.type.name} LV ${item.level} ${stars(item.type.gradeOrder)}`);
+            .text(`${item.name} LV ${item.level} ${stars(item.gradeOrder)}`);
         
         $this
             .find(".itemDescription")

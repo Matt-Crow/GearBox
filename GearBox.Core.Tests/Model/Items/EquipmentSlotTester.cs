@@ -13,7 +13,7 @@ public class EquipmentSlotTester
         var sut = new EquipmentSlot<WeaponStats>();
         var tracker = new ChangeTracker<ItemJson?>(sut);
         
-        sut.Value = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats());
+        sut.Value = new Equipment<WeaponStats>("foo", new WeaponStats());
         
         Assert.True(tracker.HasChanged);
     }
@@ -23,11 +23,11 @@ public class EquipmentSlotTester
     {
         var sut = new EquipmentSlot<WeaponStats>()
         {
-            Value = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats())
+            Value = new Equipment<WeaponStats>("foo", new WeaponStats())
         };
         var tracker = new ChangeTracker<ItemJson?>(sut);
 
-        sut.Value = new Equipment<WeaponStats>(new ItemType("foo"), new WeaponStats());
+        sut.Value = new Equipment<WeaponStats>("foo", new WeaponStats());
 
         Assert.True(tracker.HasChanged);
     }

@@ -46,7 +46,9 @@ where T : IItem
     {
         var result = new ItemJson(
             Item.Id,
-            Item.Type.Name,
+            Item.Name,
+            Item.Grade.Name,
+            Item.Grade.Order,
             Item.Description,
             Item.Level,
             Item.Details,

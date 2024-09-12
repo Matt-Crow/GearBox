@@ -11,8 +11,8 @@ public class CraftingRecipeBuilderTester
     public void And_GivenDuplicate_CombinesStacks()
     {
         var items = new ItemFactory()
-            .Add(ItemUnion.Of(new Material(new ItemType("foo"))))
-            .Add(ItemUnion.Of(new Equipment<WeaponStats>(new ItemType("bar"), new WeaponStats())))
+            .Add(ItemUnion.Of(new Material("foo")))
+            .Add(ItemUnion.Of(new Equipment<WeaponStats>("bar", new WeaponStats())))
             ;
         var sut = new CraftingRecipeBuilder(items);
 

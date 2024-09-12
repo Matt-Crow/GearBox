@@ -43,15 +43,15 @@ export class MainModal {
         this.#client = client;
 
         this.#materialTable = new Table("#materials", [
-            new DataColumn("Type", m => m.type.name),
+            new DataColumn("Type", m => m.name),
             new DataColumn("Description", m => m.description),
             new DataColumn("Quantity", m => m.quantity)
         ], _ => null); // do nothing on hover
         this.#materialTable.spawnHtml();
 
         this.#recipeTable = new Table("#recipes", [
-            new DataColumn("Recipe", r => r.makes.type.name),
-            new DataColumn("Ingredients", r => r.ingredients.map(i => `${i.type.name} x${i.quantity}`).join(", ")),
+            new DataColumn("Recipe", r => r.makes.name),
+            new DataColumn("Ingredients", r => r.ingredients.map(i => `${i.name} x${i.quantity}`).join(", ")),
             new ActionColumn("Action", "craft", r => this.#client.craft(r.id))
         ], r => this.#setCraftPreview(r?.makes));
         this.#recipeTable.spawnHtml();
@@ -62,9 +62,9 @@ export class MainModal {
         this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equipWeapon(id));
         this.#armorTab = new EquipmentTab("#armorTab", id => client.equipArmor(id));
 
-        this.#shopBuyTable = this.#makeShopTable(".shop-buy", "buy", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.type.name));
-        this.#shopSellTable = this.#makeShopTable(".shop-sell", "sell", opt => client.shopSell(this.#currentShop?.id, opt.item.id, opt.item.type.name));
-        this.#shopBuybackTable = this.#makeShopTable(".shop-buyback", "buy back", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.type.name));
+        this.#shopBuyTable = this.#makeShopTable(".shop-buy", "buy", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
+        this.#shopSellTable = this.#makeShopTable(".shop-sell", "sell", opt => client.shopSell(this.#currentShop?.id, opt.item.id, opt.item.name));
+        this.#shopBuybackTable = this.#makeShopTable(".shop-buyback", "buy back", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopHoverInfo = new ItemDisplay(`${selector} .shop-hover-info`, "Item Preview", "Hover over an item to preview it");
         this.#shopHoverInfo.spawnHtml();
     
@@ -80,7 +80,7 @@ export class MainModal {
      */
     #makeShopTable(subselector, buttonText, onButtonClick) {
         const result = new Table(`${this.#selector} ${subselector}`, [
-            new DataColumn("Item", x => x.item.type.name),
+            new DataColumn("Item", x => x.item.name),
             new DataColumn("Price", x => x.price),
             new ActionColumn("Action", buttonText, onButtonClick)
         ], shopOption => this.#shopHoverInfo.bind(shopOption?.item));

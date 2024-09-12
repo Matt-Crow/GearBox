@@ -6,11 +6,6 @@ namespace GearBox.Core.Model.Items.Infrastructure;
 public interface IItemFactory
 {
     /// <summary>
-    /// All different types of items this can make
-    /// </summary>
-    IEnumerable<ItemType> AvailableTypes { get; }
-
-    /// <summary>
     /// Allows this to make the given item.
     /// </summary>
     IItemFactory Add(ItemUnion value);

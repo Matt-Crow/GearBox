@@ -14,61 +14,61 @@ var webAppBuilder = WebApplication.CreateBuilder(args);
 
 var game = new GameBuilder()
     .DefineItems(items => items
-        .Add(ItemUnion.Of(new Material(new ItemType("Stone", Grade.COMMON), "A low-grade mining material, but it's better than nothing.")))
-        .Add(ItemUnion.Of(new Material(new ItemType("Bronze", Grade.UNCOMMON), "Used to craft low-level melee equipment")))
-        .Add(ItemUnion.Of(new Material(new ItemType("Silver", Grade.RARE), "Used to craft enhancements for your equipment.")))
-        .Add(ItemUnion.Of(new Material(new ItemType("Gold", Grade.EPIC), "Used to craft powerful magical artifacts.")))
-        .Add(ItemUnion.Of(new Material(new ItemType("Titanium", Grade.LEGENDARY), "A high-grade mining material for crafting powerful melee equipment.")))
-        .Add(ItemUnion.Of(new Equipment<WeaponStats>(new("Training Sword", Grade.COMMON), new WeaponStats(AttackRange.MELEE), new()
+        .Add(ItemUnion.Of(new Material("Stone", Grade.COMMON, "A low-grade mining material, but it's better than nothing.")))
+        .Add(ItemUnion.Of(new Material("Bronze", Grade.UNCOMMON, "Used to craft low-level melee equipment")))
+        .Add(ItemUnion.Of(new Material("Silver", Grade.RARE, "Used to craft enhancements for your equipment.")))
+        .Add(ItemUnion.Of(new Material("Gold", Grade.EPIC, "Used to craft powerful magical artifacts.")))
+        .Add(ItemUnion.Of(new Material("Titanium", Grade.LEGENDARY, "A high-grade mining material for crafting powerful melee equipment.")))
+        .Add(ItemUnion.Of(new Equipment<WeaponStats>("Training Sword", new WeaponStats(AttackRange.MELEE), Grade.COMMON, new()
             {
                 {PlayerStatType.OFFENSE, 1},
                 {PlayerStatType.MAX_HIT_POINTS, 1}
             }))
         )
-        .Add(ItemUnion.Of(new Equipment<WeaponStats>(new("Training Bow", Grade.COMMON), new WeaponStats(AttackRange.LONG), new()
+        .Add(ItemUnion.Of(new Equipment<WeaponStats>("Training Bow", new WeaponStats(AttackRange.LONG), Grade.COMMON, new()
             {
                 {PlayerStatType.OFFENSE, 1},
                 {PlayerStatType.SPEED, 1}
             })) 
         )
-        .Add(ItemUnion.Of(new Equipment<WeaponStats>(new("Training Staff", Grade.COMMON), new WeaponStats(AttackRange.MEDIUM), new()
+        .Add(ItemUnion.Of(new Equipment<WeaponStats>("Training Staff", new WeaponStats(AttackRange.MEDIUM), Grade.COMMON, new()
             {
                 {PlayerStatType.MAX_HIT_POINTS, 1},
                 {PlayerStatType.MAX_ENERGY, 1}
             }))
         )
-        .Add(ItemUnion.Of(new Equipment<ArmorStats>(new("Fighter Initiate's Armor", Grade.COMMON), new ArmorStats(ArmorClass.HEAVY), new()
+        .Add(ItemUnion.Of(new Equipment<ArmorStats>("Fighter Initiate's Armor", new ArmorStats(ArmorClass.HEAVY), Grade.COMMON, new()
             {
                 {PlayerStatType.MAX_HIT_POINTS, 1},
                 {PlayerStatType.OFFENSE, 1}
             }))
         )
-        .Add(ItemUnion.Of(new Equipment<ArmorStats>(new("Archer Initiate's Armor", Grade.COMMON), new ArmorStats(ArmorClass.MEDIUM), new()
+        .Add(ItemUnion.Of(new Equipment<ArmorStats>("Archer Initiate's Armor", new ArmorStats(ArmorClass.MEDIUM), Grade.COMMON, new()
             {
                 {PlayerStatType.SPEED, 1},
                 {PlayerStatType.OFFENSE, 1}
             }))
         )
-        .Add(ItemUnion.Of(new Equipment<ArmorStats>(new("Mage Initiate's Armor", Grade.COMMON), new ArmorStats(ArmorClass.LIGHT), new()
+        .Add(ItemUnion.Of(new Equipment<ArmorStats>("Mage Initiate's Armor", new ArmorStats(ArmorClass.LIGHT), Grade.COMMON, new()
             {
                 {PlayerStatType.MAX_ENERGY, 1},
                 {PlayerStatType.OFFENSE, 1}
             }))
         )
-        .Add(ItemUnion.Of(new Equipment<WeaponStats>(new("Bronze Khopesh", Grade.UNCOMMON), new WeaponStats(AttackRange.MELEE), new()
+        .Add(ItemUnion.Of(new Equipment<WeaponStats>("Bronze Khopesh", new WeaponStats(AttackRange.MELEE), Grade.UNCOMMON, new()
             {
                 {PlayerStatType.OFFENSE, 2},
                 {PlayerStatType.MAX_HIT_POINTS, 1}
             }))
         )
-        .Add(ItemUnion.Of(new Equipment<ArmorStats>(new("Bronze Armor", Grade.UNCOMMON), new ArmorStats(ArmorClass.HEAVY), new()
+        .Add(ItemUnion.Of(new Equipment<ArmorStats>("Bronze Armor", new ArmorStats(ArmorClass.HEAVY), Grade.UNCOMMON, new()
             {
                 {PlayerStatType.OFFENSE, 1},
                 {PlayerStatType.MAX_HIT_POINTS, 2},
                 {PlayerStatType.MAX_ENERGY, 1}
             }))
         )
-        .Add(ItemUnion.Of(new Equipment<WeaponStats>(new("Fang", Grade.COMMON), new WeaponStats(AttackRange.MELEE), new()
+        .Add(ItemUnion.Of(new Equipment<WeaponStats>("Fang", new WeaponStats(AttackRange.MELEE), Grade.COMMON, new()
             {
                 {PlayerStatType.OFFENSE, 2},
                 {PlayerStatType.SPEED, 1}

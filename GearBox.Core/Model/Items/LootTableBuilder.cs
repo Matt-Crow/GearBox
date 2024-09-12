@@ -59,7 +59,7 @@ public class LootTableBuilder
             if (ItemName != null)
             {
                 var item = itemFactory.Make(ItemName) ?? throw new Exception($"Bad item name: '{ItemName}'");
-                return new LootOption(item.GetItemType().Grade.Weight, item.ToOwned(level));
+                return new LootOption(item.Grade.Weight, item.ToOwned(level));
             }
             throw new Exception("Missing case in LootOptionBuilder.BuildUsing(IItemFactory)");
         }

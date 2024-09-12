@@ -2,7 +2,6 @@
  * use this to export all the "real" tests used by the program
  */
 import { TestCase, TestSuite } from "./tests.js";
-import { itemTests } from "../model/item.js";
 
 /**
  * @returns TestSuite[]
@@ -14,8 +13,7 @@ export function getAllTestSuites() {
                 // https://stackoverflow.com/a/39914235
                 await new Promise(resolve => setTimeout(resolve, 1000));
             })
-        ]),
-        itemTests
+        ])
     ];
     return allTestSuites;
 }

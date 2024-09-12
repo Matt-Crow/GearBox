@@ -19,7 +19,7 @@ public class UiStateTester
         player.SetOpenShop(shop);
         var before = new UiState(player);
 
-        player.Inventory.Materials.Add(new Material(new ItemType("foo")));
+        player.Inventory.Materials.Add(new Material("foo"));
         var after = new UiState(player);
         var diff = before.GetChanges(after);
 

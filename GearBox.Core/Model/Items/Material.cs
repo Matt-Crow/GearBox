@@ -5,15 +5,17 @@ namespace GearBox.Core.Model.Items;
 /// </summary>
 public class Material : IItem
 {
-    public Material(ItemType type, string? description = null)
+    public Material(string name, Grade? grade = null, string? description = null)
     {
-        Type = type;
+        Name = name;
+        Grade = grade ?? Grade.COMMON;
         Description = description ?? "no description provided";
-        BuyValue = new Gold(type.Grade.BuyValueBase);
+        BuyValue = new Gold(Grade.BuyValueBase);
     }
 
     public Guid? Id => null;
-    public ItemType Type { get; init; }
+    public string Name { get; init; }
+    public Grade Grade { get; init; }
     public string Description { get; init; }
     public int Level => 0; // players of any level can use any material
     public IEnumerable<string> Details => []; // materials have no details for now
@@ -21,14 +23,12 @@ public class Material : IItem
 
     public override bool Equals(object? obj)
     {
-        var other = obj as Material;
-        return other != null
-            && other.Type.Equals(Type);
+        return obj is Material other && other.Name.Equals(Name);
     }
     
     public override int GetHashCode()
     {
-        return Type.GetHashCode();
+        return Name.GetHashCode();
     }
 
     public Material ToOwned()
