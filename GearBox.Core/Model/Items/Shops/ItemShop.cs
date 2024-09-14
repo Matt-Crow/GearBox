@@ -121,6 +121,7 @@ public class ItemShop
         var result = new OpenShopJson(
             Id,
             _name,
+            player.Inventory.Gold.Quantity,
             GetOptionsFrom(_stock, player.Inventory.Gold), 
             GetOptionsFrom(player.Inventory, null), // don't check whether player can afford to sell
             GetOptionsFrom(GetBuybackOptionsFor(player), player.Inventory.Gold)

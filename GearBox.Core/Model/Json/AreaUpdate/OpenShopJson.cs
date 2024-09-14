@@ -8,6 +8,7 @@ public readonly struct OpenShopJson : IChange
     public OpenShopJson(
         Guid id,
         string name,
+        int playerGold,
         List<OpenShopOptionJson> buyOptions,
         List<OpenShopOptionJson> sellOptions,
         List<OpenShopOptionJson> buybackOptions
@@ -15,6 +16,7 @@ public readonly struct OpenShopJson : IChange
     {
         Id = id;
         Name = name;
+        PlayerGold = playerGold;
         BuyOptions = buyOptions;
         SellOptions = sellOptions;
         BuybackOptions = buybackOptions;
@@ -23,6 +25,8 @@ public readonly struct OpenShopJson : IChange
     public Guid Id { get; init; }
 
     public string Name { get; init; }
+
+    public int PlayerGold { get; init; }
 
     /// <summary>
     /// Things the player can buy
@@ -39,7 +43,7 @@ public readonly struct OpenShopJson : IChange
     /// </summary>
     public List<OpenShopOptionJson> BuybackOptions { get; init; }
 
-    public IEnumerable<object?> DynamicValues => [Id, Name, ..GetDynamicValues(BuyOptions), ..GetDynamicValues(SellOptions), ..GetDynamicValues(BuybackOptions)];
+    public IEnumerable<object?> DynamicValues => [Id, Name, PlayerGold, ..GetDynamicValues(BuyOptions), ..GetDynamicValues(SellOptions), ..GetDynamicValues(BuybackOptions)];
 
     private static IEnumerable<object?> GetDynamicValues(List<OpenShopOptionJson> options)
     {

@@ -47,13 +47,15 @@ export class Shop {
 export class OpenShop {
     #id;
     #name;
+    #playerGold;
     #buyOptions;
     #sellOptions;
     #buybackOptions;
 
-    constructor(id, name, buyOptions, sellOptions, buybackOptions) {
+    constructor(id, name, playerGold, buyOptions, sellOptions, buybackOptions) {
         this.#id = id;
         this.#name = name;
+        this.#playerGold = playerGold;
         this.#buyOptions = buyOptions;
         this.#sellOptions = sellOptions;
         this.#buybackOptions = buybackOptions;
@@ -61,6 +63,7 @@ export class OpenShop {
 
     get id() { return this.#id; }
     get name() { return this.#name; }
+    get playerGold() { return this.#playerGold; }
     get buyOptions() { return this.#buyOptions; }
     get sellOptions() { return this.#sellOptions; }
     get buybackOptions() { return this.#buybackOptions; }
@@ -95,6 +98,7 @@ export class OpenShopDeserializer {
         const result = new OpenShop(
             json.id,
             json.name,
+            json.playerGold,
             this.#deserializeOptions(json.buyOptions),
             this.#deserializeOptions(json.sellOptions),
             this.#deserializeOptions(json.buybackOptions)

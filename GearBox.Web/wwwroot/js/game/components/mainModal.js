@@ -10,7 +10,7 @@ import { OpenShop } from "../model/shop.js";
 import { EquipmentTab } from "./equipmentTab.js";
 import { ItemDisplay } from "./itemDisplay.js";
 import { Switcher } from "./switcher.js";
-import { ActionColumn, DataColumn, Table } from "./table.js";
+import { ActionColumn, ConditionalActionColumn, DataColumn, Table } from "./table.js";
 
 /**
  * Shows the player's inventory or current shop
@@ -82,7 +82,7 @@ export class MainModal {
         const result = new Table(`${this.#selector} ${subselector}`, [
             new DataColumn("Item", x => x.item.name),
             new DataColumn("Price", x => x.price),
-            new ActionColumn("Action", buttonText, onButtonClick)
+            new ConditionalActionColumn("Action", buttonText, onButtonClick, i => i.canAfford)
         ], shopOption => this.#shopHoverInfo.bind(shopOption?.item));
         result.spawnHtml();
         return result;
@@ -161,6 +161,10 @@ export class MainModal {
         $(this.#element)
             .find(".shop-name")
             .text(shop.name);
+        
+        $(this.#element)
+            .find(".player-gold")
+            .text(shop.playerGold);
         
         this.#shopBuyTable.setRecords(shop.buyOptions);
         this.#shopSellTable.setRecords(shop.sellOptions);
