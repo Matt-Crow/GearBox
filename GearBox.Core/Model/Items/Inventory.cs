@@ -1,4 +1,3 @@
-using GearBox.Core.Model.GameObjects.ChangeTracking;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Json.AreaUpdate;
 
