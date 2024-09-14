@@ -52,14 +52,11 @@ public class Inventory : IMightChange<InventoryJson>
 
     public void Add(ItemUnion? item)
     {
-        if (item == null)
-        {
-            return;
-        }
-        Weapons.Add(item.Weapon);
-        Armors.Add(item.Armor);
-        Materials.Add(item.Material);
-        // gold is not part of an ItemUnion; no need to add here
+        item?.Match(
+            m => Materials.Add(m),
+            w => Weapons.Add(w),
+            a => Armors.Add(a)
+        );
     }
 
     public void Add(Gold? gold)
@@ -73,14 +70,11 @@ public class Inventory : IMightChange<InventoryJson>
 
     public void Remove(ItemUnion? item)
     {
-        if (item == null)
-        {
-            return;
-        }
-        Weapons.Remove(item.Weapon);
-        Armors.Remove(item.Armor);
-        Materials.Remove(item.Material);
-        // gold is not part of an ItemUnion; no need to remove here
+        item?.Match(
+            m => Materials.Remove(m),
+            w => Weapons.Remove(w),
+            a => Armors.Remove(a)
+        );
     }
 
     public void Remove(Gold? gold)
@@ -94,19 +88,12 @@ public class Inventory : IMightChange<InventoryJson>
 
     public bool Contains(ItemUnion item)
     {
-        if (item.Weapon != null)
-        {
-            return Weapons.Contains(item.Weapon);
-        }
-        if (item.Armor != null)
-        {
-            return Armors.Contains(item.Armor);
-        }
-        if (item.Material != null)
-        {
-            return Materials.Contains(item.Material);
-        }
-        throw new Exception($"Missing case in {nameof(Contains)}");
+        var result = item.Select(
+            m => Materials.Contains(m),
+            w => Weapons.Contains(w),
+            a => Armors.Contains(a)
+        );
+        return result;
     }
 
     public ItemUnion? GetBySpecifier(ItemSpecifier specifier)

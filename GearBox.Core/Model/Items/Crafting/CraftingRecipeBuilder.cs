@@ -14,7 +14,17 @@ public class CraftingRecipeBuilder
 
     public CraftingRecipeBuilder And(string materialName, int quantity=1)
     {
-        var material = _itemFactory.Make(materialName)?.Material ?? throw new ArgumentException($"Bad material name: '{materialName}'");
+        Material? material = null;
+        _itemFactory.Make(materialName)?.Match(
+            m => material = m,
+            _ => {},
+            _ => {}
+        );
+        if (material == null)
+        {
+            throw new ArgumentException($"Bad material name: '{materialName}'");
+        }
+
         if (!_ingredients.ContainsKey(material))
         {
             _ingredients[material] = 0;

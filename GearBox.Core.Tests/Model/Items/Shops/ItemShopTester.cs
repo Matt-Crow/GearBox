@@ -72,7 +72,7 @@ public class ItemShopTester
     {
         var item = ItemUnion.Of(new Material("foo"));
         var player = MakePlayer();
-        player.Inventory.Add(new Gold(item.BuyValue().Quantity * 10));
+        player.Inventory.Add(new Gold(item.BuyValue.Quantity * 10));
         var sut = MakeItemShop(item);
 
         sut.SellTo(player, item);
@@ -87,7 +87,7 @@ public class ItemShopTester
     {
         var player = MakePlayer();
         var item = MakeItem();
-        player.Inventory.Add(item.BuyValue());
+        player.Inventory.Add(item.BuyValue);
         var sut = MakeItemShop(item);
 
         sut.SellTo(player, item);
@@ -135,7 +135,7 @@ public class ItemShopTester
     {
         var item = ItemUnion.Of(new Material("foo material"));
         var player = MakePlayer(item);
-        player.Inventory.Add(new Gold(item.BuyValue().Quantity * 2));
+        player.Inventory.Add(new Gold(item.BuyValue.Quantity * 2));
         var sut = MakeItemShop();
         sut.BuyFrom(player, item);
 

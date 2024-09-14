@@ -19,7 +19,7 @@ public class InventoryTester
 
         var actual = sut.GetBySpecifier(new ItemSpecifier(weapon2.Id, weapon1.Name));
 
-        Assert.Equal(weapon2, actual?.Weapon);
+        Assert.Equal(weapon2, actual?.Unwrapped);
     }
 
     [Fact]

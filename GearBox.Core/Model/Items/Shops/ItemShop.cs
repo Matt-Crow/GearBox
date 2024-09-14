@@ -49,7 +49,7 @@ public class ItemShop
         {
             return;
         }
-        if (player.Inventory.Gold.Quantity < item.BuyValue().Quantity)
+        if (player.Inventory.Gold.Quantity < item.BuyValue.Quantity)
         {
             return; // insufficient funds
         }
@@ -57,14 +57,14 @@ public class ItemShop
         if (GetBuybackOptionsFor(player).Contains(item))
         {
             player.Inventory.Add(item.ToOwned());
-            player.Inventory.Remove(item.BuyValue());
+            player.Inventory.Remove(item.BuyValue);
             GetBuybackOptionsFor(player).Remove(item);
         }
 
         if (_stock.Contains(item))
         {
             player.Inventory.Add(item.ToOwned());
-            player.Inventory.Remove(item.BuyValue());
+            player.Inventory.Remove(item.BuyValue);
         }
     }
 
@@ -84,7 +84,7 @@ public class ItemShop
         }
 
         player.Inventory.Remove(item);
-        player.Inventory.Add(item.BuyValue());
+        player.Inventory.Add(item.BuyValue);
 
         if (!_buyback.ContainsKey(player.Id))
         {
