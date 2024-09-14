@@ -141,10 +141,10 @@ export class AreaUpdateHandler {
         
         this.#updateListeners.forEach(listener => listener(this.#area));
 
-        this.#handleChanges(json.changes.inventory, v => this.#inventoryDeserializer.deserialize(v), this.#inventoryChangeListeners);
-        this.#handleChanges(json.changes.weapon, v => Item.fromJson(v), this.#weaponChangeListeners);
-        this.#handleChanges(json.changes.armor, v => Item.fromJson(v), this.#armorChangeListeners);
-        this.#handleChanges(json.changes.summary, PlayerStatSummary.fromJson, this.#statSummaryChangeListeners);
+        this.#handleChanges(json.uiStateChanges.inventory, v => this.#inventoryDeserializer.deserialize(v), this.#inventoryChangeListeners);
+        this.#handleChanges(json.uiStateChanges.weapon, v => Item.fromJson(v), this.#weaponChangeListeners);
+        this.#handleChanges(json.uiStateChanges.armor, v => Item.fromJson(v), this.#armorChangeListeners);
+        this.#handleChanges(json.uiStateChanges.summary, PlayerStatSummary.fromJson, this.#statSummaryChangeListeners);
         this.#handleChanges(json.uiStateChanges.openShop, v => this.#openShopDeserializer.deserialize(v), this.#openShopChangeListeners);
     }
 

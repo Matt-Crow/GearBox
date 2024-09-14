@@ -1,4 +1,3 @@
-using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Utils;
 
@@ -7,7 +6,7 @@ namespace GearBox.Core.Model.Items;
 /// <summary>
 /// Each Inventory is broken down into multiple tabs, which each hold a different category of item.
 /// </summary>
-public class InventoryTab<T> : ISerializable<InventoryTabJson>
+public class InventoryTab<T>
 where T : IItem
 {
     /*
@@ -21,8 +20,6 @@ where T : IItem
         .Where(stack => stack.Quantity > 0);
 
     public bool IsEmpty => _content.Count == 0;
-
-    public IEnumerable<object?> DynamicValues => Content.SelectMany(stack => stack.DynamicValues);
 
     public void Add(T? item, int quantity=1)
     {

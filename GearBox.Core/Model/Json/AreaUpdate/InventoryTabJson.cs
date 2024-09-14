@@ -1,6 +1,7 @@
+
 namespace GearBox.Core.Model.Json.AreaUpdate;
 
-public readonly struct InventoryTabJson : IJson
+public class InventoryTabJson : IJson
 {
     public InventoryTabJson(List<ItemJson> items)
     {
@@ -8,4 +9,6 @@ public readonly struct InventoryTabJson : IJson
     }
 
     public List<ItemJson> Items { get; init; }
+
+    public IEnumerable<object?> DynamicValues => Items.SelectMany(i => i.DynamicValues);
 }

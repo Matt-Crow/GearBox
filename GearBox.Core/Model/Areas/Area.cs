@@ -131,8 +131,17 @@ public class Area : IArea
 
     public Coordinates GetRandomFloorTile() => _map.GetRandomFloorTile();
 
-    public MapJson GetMapJson() => _map.ToJson();
-    public List<ShopInitJson> GetShopInitJsons() => Shops.Select(s => s.ToJson()).ToList();
+    public AreaJson ToJson()
+    {
+        var result = new AreaJson(
+            Name, 
+            _map.ToJson(), 
+            Shops
+                .Select(s => s.ToJson())
+                .ToList()
+        );
+        return result;
+    }
 
     public AreaUpdateJson GetAreaUpdateJsonFor(PlayerCharacter player)
     {
@@ -141,7 +150,7 @@ public class Area : IArea
             .Concat(_projectiles.ToJson())
             .Concat(_lootChests.ToJson())
             .ToList();
-        return new(allGameObjects, player.GetChanges());
+        return new(allGameObjects);
     }
 
     public void Update()

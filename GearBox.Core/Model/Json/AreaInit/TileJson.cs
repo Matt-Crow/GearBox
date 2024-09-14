@@ -1,6 +1,6 @@
 namespace GearBox.Core.Model.Json.AreaInit;
 
-public readonly struct TileJson
+public class TileJson
 {
     public TileJson(ColorJson color, int x, int y)
     {

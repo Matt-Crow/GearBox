@@ -21,7 +21,7 @@ public class UiStateTester
 
         player.Inventory.Materials.Add(new Material("foo"));
         var after = new UiState(player);
-        var diff = before.GetChanges(after);
+        var diff = UiState.GetChanges(before, after);
 
         Assert.True(diff.OpenShop.HasChanged);
     }

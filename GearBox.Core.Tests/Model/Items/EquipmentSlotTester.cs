@@ -1,4 +1,5 @@
 using GearBox.Core.Model.GameObjects.ChangeTracking;
+using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Json;
 using Xunit;
@@ -10,25 +11,27 @@ public class EquipmentSlotTester
     [Fact]
     public void DynamicValues_AfterEquipping_Change()
     {
-        var sut = new EquipmentSlot<WeaponStats>();
-        var tracker = new ChangeTracker<ItemJson?>(sut);
+        var player = new PlayerCharacter("foo");
+        var before = new UiState(player);
         
-        sut.Value = new Equipment<WeaponStats>("foo", new WeaponStats());
+        player.WeaponSlot.Value = new Equipment<WeaponStats>("foo", new WeaponStats());
+        var after = new UiState(player);
+        var compared = UiState.GetChanges(before, after);
         
-        Assert.True(tracker.HasChanged);
+        Assert.True(compared.Weapon.HasChanged);
     }
 
     [Fact]
     public void DynamicValues_AfterSwitching_Change()
     {
-        var sut = new EquipmentSlot<WeaponStats>()
-        {
-            Value = new Equipment<WeaponStats>("foo", new WeaponStats())
-        };
-        var tracker = new ChangeTracker<ItemJson?>(sut);
+        var player = new PlayerCharacter("foo");
+        player.WeaponSlot.Value = new Equipment<WeaponStats>("foo", new WeaponStats());
+        var before = new UiState(player);
 
-        sut.Value = new Equipment<WeaponStats>("foo", new WeaponStats());
-
-        Assert.True(tracker.HasChanged);
+        player.WeaponSlot.Value = new Equipment<WeaponStats>("foo", new WeaponStats());
+        var after = new UiState(player);
+        var compared = UiState.GetChanges(before, after);
+        
+        Assert.True(compared.Weapon.HasChanged);
     }
 }

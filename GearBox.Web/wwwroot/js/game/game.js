@@ -67,8 +67,8 @@ export class Game {
 
         const area = new Area(
             this.#gameData, 
-            TileMap.fromJson(json.changes.map.value),
-            json.changes.shops.value.map(j => Shop.fromJson(j))
+            TileMap.fromJson(json.uiStateChanges.area.value.map),
+            json.uiStateChanges.area.value.shops.map(j => Shop.fromJson(j))
         );
         const updateHandler = new AreaUpdateHandler(area)
             .addGameObjectType(characterDeserializer)
@@ -89,7 +89,7 @@ export class Game {
     }
 
     handleAreaUpdate(json) {
-        if (json.changes.map.hasChanged || json.changes.shops.hasChanged) {
+        if (json.uiStateChanges.area.hasChanged) {
             this.#handleAreaInit(json);
         }
         this.#areaUpdateHandler(json);

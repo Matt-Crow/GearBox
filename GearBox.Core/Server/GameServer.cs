@@ -11,7 +11,7 @@ public class GameServer
     private readonly IGame _game;
     private readonly Dictionary<string, IConnection> _connections = [];
     private readonly Dictionary<string, PlayerCharacter> _players = [];
-    private readonly Dictionary<string, UiState> _uiStates = [];
+    private readonly Dictionary<string, UiState?> _uiStates = [];
     private readonly List<PendingCommand> _pendingCommands = [];
     private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
@@ -63,7 +63,7 @@ public class GameServer
         area.SpawnPlayer(player);
         _connections.Add(id, connection);
         _players.Add(id, player);
-        _uiStates.Add(id, new UiState(player));
+        _uiStates.Add(id, null); // start with null UI state so it detects changes
 
         await SendGameInitTo(id);
         await SendAreaUpdateTo(id);
@@ -149,7 +149,7 @@ public class GameServer
         }
         var json = area.GetAreaUpdateJsonFor(player);
         var newUiState = new UiState(player);
-        var uiStateChanges = _uiStates[playerId].GetChanges(newUiState);
+        var uiStateChanges = UiState.GetChanges(_uiStates[playerId], newUiState);
         _uiStates[playerId] = newUiState; // must come after computing changes
         json.UiStateChanges = uiStateChanges;
         return _connections[playerId].Send("AreaUpdate", json);

@@ -7,25 +7,13 @@ namespace GearBox.Core.Model.Items;
 /// <summary>
 /// Contains items a player has picked up.
 /// </summary>
-public class Inventory : IMightChange<InventoryJson>
+public class Inventory 
 {
-    private readonly ChangeTracker<InventoryJson> _changeTracker;
-
-    public Inventory()
-    {
-        _changeTracker = new(this);
-    }
-
     public InventoryTab<Equipment<WeaponStats>> Weapons { get; init; } = new();
     public InventoryTab<Equipment<ArmorStats>> Armors { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
     public Gold Gold { get; private set; } = Gold.NONE;
     public bool IsEmpty => Weapons.IsEmpty && Armors.IsEmpty && Materials.IsEmpty && Gold.Quantity == 0;
-    public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
-        .Concat(Weapons.DynamicValues)
-        .Concat(Armors.DynamicValues)
-        .Concat(Materials.DynamicValues)
-        .Append(Gold.Quantity);
 
     /// <summary>
     /// Adds all items from the other inventory to this one
@@ -142,7 +130,5 @@ public class Inventory : IMightChange<InventoryJson>
         return result;
     }
 
-    public void Update() => _changeTracker.Update();
-    public MaybeChangeJson<InventoryJson> GetChanges() => _changeTracker.ToJson();
     public InventoryJson ToJson() => new(Weapons.ToJson(), Armors.ToJson(), Materials.ToJson(), Gold.Quantity);
 }

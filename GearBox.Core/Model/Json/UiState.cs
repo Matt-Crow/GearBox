@@ -10,21 +10,76 @@ public readonly struct UiState
 {
     public UiState(PlayerCharacter player)
     {
+        var area = player.CurrentArea ?? player.LastArea;
+        Area = area?.ToJson();
+        Inventory = player.Inventory.ToJson();
+        Weapon = player.WeaponSlot.ToJson();
+        Armor = player.ArmorSlot.ToJson();
+        Summary = player.StatSummary.ToJson();
         OpenShop = player.OpenShop?.GetOpenShopJsonFor(player);
     }
 
+    public AreaJson? Area { get; init; }
+    public InventoryJson Inventory { get; init; }
+    public ItemJson? Weapon { get; init;}
+    public ItemJson? Armor { get; init;}
+    public PlayerStatSummaryJson Summary { get; init; }
     public OpenShopJson? OpenShop { get; init; }
 
-    public UiStateChangesJson GetChanges(UiState other)
+    /// <summary>
+    /// Returns the changes from the old state to the new state
+    /// </summary>
+    public static UiStateChangesJson GetChanges(UiState? oldState, UiState newState)
     {
         var result = new UiStateChangesJson()
         {
-            OpenShop = CompareNullable(OpenShop, other.OpenShop)
+            Area = CompareNullable(oldState?.Area, newState.Area),
+            Inventory = Compare(oldState?.Inventory, newState.Inventory),
+            Weapon = CompareNullable(oldState?.Weapon, newState.Weapon),
+            Armor = CompareNullable(oldState?.Armor, newState.Armor),
+            Summary = Compare(oldState?.Summary, newState.Summary),
+            OpenShop = CompareNullable(oldState?.OpenShop, newState.OpenShop)
         };
         return result;
     }
 
     // making this generic is pain - don't try it!
+    private static MaybeChangeJson<AreaJson?> CompareNullable(AreaJson? oldValue, AreaJson? newValue)
+    {
+        if (oldValue == null && newValue == null)
+        {
+            return MaybeChangeJson<AreaJson?>.NoChanges();
+        }
+        if (oldValue == null || newValue == null)
+        {
+            return MaybeChangeJson<AreaJson?>.Changed(newValue);
+        }
+        // generics are pain, so I can't delegate to Compare
+        if (Hash(oldValue) == Hash(newValue))
+        {
+            return MaybeChangeJson<AreaJson?>.NoChanges();
+        }
+        return MaybeChangeJson<AreaJson?>.Changed(newValue);
+    }
+
+    private static MaybeChangeJson<ItemJson?> CompareNullable(ItemJson? oldValue, ItemJson? newValue)
+    {
+        if (oldValue == null && newValue == null)
+        {
+            return MaybeChangeJson<ItemJson?>.NoChanges();
+        }
+        if (oldValue == null || newValue == null)
+        {
+            return MaybeChangeJson<ItemJson?>.Changed(newValue);
+        }
+        // generics are pain, so I can't delegate to Compare
+        if (Hash(oldValue) == Hash(newValue))
+        {
+            return MaybeChangeJson<ItemJson?>.NoChanges();
+        }
+        return MaybeChangeJson<ItemJson?>.Changed(newValue);
+    }
+
     private static MaybeChangeJson<OpenShopJson?> CompareNullable(OpenShopJson? oldValue, OpenShopJson? newValue)
     {
         if (oldValue == null && newValue == null)
@@ -43,9 +98,13 @@ public readonly struct UiState
         return MaybeChangeJson<OpenShopJson?>.Changed(newValue);
     }
 
-    private static MaybeChangeJson<T> Compare<T>(T oldValue, T newValue)
+    private static MaybeChangeJson<T> Compare<T>(T? oldValue, T newValue)
     where T : IChange
     {
+        if (oldValue == null)
+        {
+            return MaybeChangeJson<T>.Changed(newValue);
+        }
         if (Hash(oldValue) == Hash(newValue))
         {
             return MaybeChangeJson<T>.NoChanges();

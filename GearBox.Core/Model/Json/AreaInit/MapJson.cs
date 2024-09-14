@@ -1,6 +1,7 @@
+
 namespace GearBox.Core.Model.Json.AreaInit;
 
-public readonly struct MapJson : IJson
+public class MapJson : IJson
 {
     public MapJson(
         int width,

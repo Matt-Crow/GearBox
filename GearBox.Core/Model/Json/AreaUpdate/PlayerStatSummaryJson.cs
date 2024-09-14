@@ -1,6 +1,7 @@
+
 namespace GearBox.Core.Model.Json.AreaUpdate;
 
-public readonly struct PlayerStatSummaryJson
+public class PlayerStatSummaryJson : IChange
 {
     public PlayerStatSummaryJson(List<string> lines)
     {
@@ -8,4 +9,6 @@ public readonly struct PlayerStatSummaryJson
     }
     
     public List<string> Lines { get; init; }
+
+    public IEnumerable<object?> DynamicValues => Lines;
 }

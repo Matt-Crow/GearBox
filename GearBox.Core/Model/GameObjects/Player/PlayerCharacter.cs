@@ -12,14 +12,12 @@ namespace GearBox.Core.Model.GameObjects.Player;
 public class PlayerCharacter : Character
 {
     private int _frameCount = 0; // used for regeneration
-    private bool _hasAreaChanged = false;
-    private readonly PlayerStatSummary _statSummary;
 
     public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp), Color.BLUE)
     {
         Xp = xp;
         XpToNextLevel = GetXpByLevel(Level + 1);
-        _statSummary = new PlayerStatSummary(this);
+        StatSummary = new PlayerStatSummary(this);
         UpdateStats();
     }
 
@@ -32,6 +30,7 @@ public class PlayerCharacter : Character
     public int EnergyExpended { get; private set; } = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     public int EnergyRemaining => MaxEnergy - EnergyExpended;
     public PlayerStats Stats { get; init; } = new();
+    public PlayerStatSummary StatSummary { get; init; }
     public Inventory Inventory { get; init; } = new();
     public EquipmentSlot<WeaponStats> WeaponSlot { get; init; } = new();
     public EquipmentSlot<ArmorStats> ArmorSlot { get; init; } = new();
@@ -45,7 +44,6 @@ public class PlayerCharacter : Character
     {
         SetOpenShop(null);
         AreaChanged?.Invoke(this, new AreaChangedEventArgs(this, CurrentArea, newArea));
-        _hasAreaChanged = true;
         base.SetArea(newArea);
     }
 
@@ -131,10 +129,6 @@ public class PlayerCharacter : Character
     {
         base.Update();
 
-        Inventory.Update();
-        WeaponSlot.Update();
-        ArmorSlot.Update();
-
         // restore 5% HP & energy per second
         _frameCount++;
         if (_frameCount >= Duration.FromSeconds(5).InFrames)
@@ -143,26 +137,6 @@ public class PlayerCharacter : Character
             RechargePercent(0.05);
             _frameCount = 0;
         }
-
-        _statSummary.Update();
-    }
-
-    public ChangesJson GetChanges()
-    {
-        var result = new ChangesJson(
-            _hasAreaChanged && CurrentArea != null
-                ? MaybeChangeJson<MapJson>.Changed(CurrentArea.GetMapJson()) 
-                : MaybeChangeJson<MapJson>.NoChanges(),
-            _hasAreaChanged && CurrentArea != null
-                ? MaybeChangeJson<List<ShopInitJson>>.Changed(CurrentArea.GetShopInitJsons())   
-                : MaybeChangeJson<List<ShopInitJson>>.NoChanges(),
-            Inventory.GetChanges(),
-            WeaponSlot.GetChanges(),
-            ArmorSlot.GetChanges(), 
-            _statSummary.GetChanges()
-        );
-        _hasAreaChanged = false; // hacky for now
-        return result;
     }
 
     protected override string Serialize(SerializationOptions options)

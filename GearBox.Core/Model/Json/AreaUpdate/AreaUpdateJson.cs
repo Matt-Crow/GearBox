@@ -6,18 +6,15 @@ namespace GearBox.Core.Model.Json.AreaUpdate;
 /// </summary>
 public struct AreaUpdateJson : IJson
 {
-    public AreaUpdateJson(List<GameObjectJson> gameObjects, ChangesJson changes)
+    public AreaUpdateJson(List<GameObjectJson> gameObjects)
     {
         GameObjects = gameObjects;
-        Changes = changes;
     }
 
     /// <summary>
     /// All the game objects currently in the area
     /// </summary>
     public List<GameObjectJson> GameObjects { get; init; }
-
-    public ChangesJson Changes { get; init; }
 
     public UiStateChangesJson? UiStateChanges { get; set; }
 }
