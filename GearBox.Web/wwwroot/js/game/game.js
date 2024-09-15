@@ -1,13 +1,15 @@
 import { Canvas } from "./components/canvas.js";
 import { GameOverScreen } from "./components/gameOverScreen.js";
-import { InventoryModal } from "./components/inventoryModal.js";
 import { PlayerHud } from "./components/playerHud.js";
-import { CharacterJsonDeserializer } from "./model/character.js";
-import { ItemDeserializer } from "./model/item.js";
+import { handleGameInit } from "./messageHandlers/gameInitHandler.js";
+import { characterDeserializer } from "./model/character.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
 import { PlayerChangeHandler } from "./model/player.js";
-import { ProjectileJsonDeserializer } from "./model/projectile.js";
-import { WorldInitHandler, WorldUpdateHandler } from "./model/world.js";
+import { projectileDeserializer } from "./model/projectile.js";
+import { Area, AreaUpdateHandler } from "./model/area.js";
+import { TileMap } from "./model/map.js";
+import { Shop } from "./model/shop.js";
+import { MainModal } from "./components/mainModal.js";
 
 export class Game {
 
@@ -16,79 +18,86 @@ export class Game {
      */
     #canvas;
 
-    /**
-     * The InventoryModal for the current player.
-     */
-    #inventoryModal;
+    #mainModal;
 
     /**
      * The PlayerHud for the current player.
      */
     #playerHud;
 
+
     #gameOverScreen;
 
-    /**
-     * The current function for handling messages from the server.
-     * Currently, this assumes the server will always start by sending WorldInitJson,
-     * followed by an number of WorldUpdates,
-     * and no other message types.
-     */
-    #handleMessage;
+    #areaUpdateHandler = () => {throw new Error("Cannot handle area update until after area init")};
 
-    #world; // required for getting mouse cursor position relative to player :(
+    #gameData = null;
+
+    #area; // required for getting mouse cursor position relative to player :(
 
     /**
      * @param {Canvas} canvas the custom canvas component to draw on.
-     * @param {InventoryModal} inventoryModal the modal for the current player's inventory.
+     * @param {MainModal} mainModal 
      * @param {PlayerHud} playerHud the player HUD for the current player
      * @param {GameOverScreen} gameOverScreen 
      */
-    constructor(canvas, inventoryModal, playerHud, gameOverScreen) {
+    constructor(canvas, mainModal, playerHud, gameOverScreen) {
         this.#canvas = canvas
-        this.#inventoryModal = inventoryModal;
+        this.#mainModal = mainModal;
         this.#playerHud = playerHud;
         this.#gameOverScreen = gameOverScreen;
-        this.#handleMessage = (message) => this.#handleInit(message);
-        this.#world = null;
-    }
-
-    /**
-     * Called by SignalR to process messages.
-     * @param {object} message a JSON message received through SignalR
-     */
-    handle(message) {
-        this.#handleMessage(message); 
+        this.#area = null;
+        setInterval(() => this.#draw(), 1000 / 24);
     }
 
     getPlayerCoords() {
-        const player = this.#world?.player;
+        const player = this.#area?.player;
         return [player?.x, player?.y];
     }
 
-    #handleInit(initMessage) {
-        const world = new WorldInitHandler()
-            .handleWorldInit(initMessage);
-        this.#inventoryModal.setCraftingRecipes(world.craftingRecipes.recipes);
+    handleGameInit(json) {
+        this.#gameData = handleGameInit(json);
+        this.#mainModal.setCraftingRecipes(this.#gameData.craftingRecipes);
+    }
 
-        const itemDeserializer = new ItemDeserializer(world.itemTypes);
-        const updateHandler = new WorldUpdateHandler(world, itemDeserializer)
-            .addGameObjectType(new CharacterJsonDeserializer())
-            .addGameObjectType(new PlayerChangeHandler(world.playerId, this.#playerHud.playerUpdateListener))
-            .addGameObjectType(new ProjectileJsonDeserializer())
-            .addGameObjectType(new LootChestJsonDeserializer(world.playerId))
+    // todo rework this
+    #handleAreaInit(json) {
+        if (!this.#gameData) {
+            throw new Error("Cannot accept area init until after game init");
+        }
+
+        const area = new Area(
+            this.#gameData, 
+            TileMap.fromJson(json.uiStateChanges.area.value.map),
+            json.uiStateChanges.area.value.shops.map(j => Shop.fromJson(j))
+        );
+        const updateHandler = new AreaUpdateHandler(area)
+            .addGameObjectType(characterDeserializer)
+            .addGameObjectType(new PlayerChangeHandler(this.#gameData.playerId, this.#playerHud.playerUpdateListener))
+            .addGameObjectType(projectileDeserializer)
+            .addGameObjectType(new LootChestJsonDeserializer(this.#gameData.playerId))
             .addUpdateListener(w => this.#gameOverScreen.update(w))
-            .addInventoryChangeListener(inv => this.#inventoryModal.setInventory(inv))
-            .addWeaponChangeListener(wea => this.#inventoryModal.setWeapon(wea))
-            .addArmorChangeListener(arm => this.#inventoryModal.setArmor(arm))
-            .addStatSummaryChangeListener(summary => this.#inventoryModal.setStatSummary(summary))
+            .addInventoryChangeListener(inv => this.#mainModal.setInventory(inv))
+            .addWeaponChangeListener(wea => this.#mainModal.setWeapon(wea))
+            .addArmorChangeListener(arm => this.#mainModal.setArmor(arm))
+            .addStatSummaryChangeListener(summary => this.#mainModal.setStatSummary(summary))
+            .addOpenShopChangeListener(openShop => this.#mainModal.setShop(openShop))
             ;
 
-        // unregisters handleInit, switches to handling updates instead
-        this.#handleMessage = (updateMessage) => updateHandler.handleWorldUpdate(updateMessage);
+        this.#areaUpdateHandler = json => updateHandler.handleAreaUpdate(json);
         
-        setInterval(() => this.#canvas.draw(world), 1000 / 24);
+        this.#area = area;
+    }
 
-        this.#world = world;
+    handleAreaUpdate(json) {
+        if (json.uiStateChanges.area.hasChanged) {
+            this.#handleAreaInit(json);
+        }
+        this.#areaUpdateHandler(json);
+    }
+
+    #draw() {
+        if (this.#area) {
+            this.#canvas.draw(this.#area);
+        }
     }
 }

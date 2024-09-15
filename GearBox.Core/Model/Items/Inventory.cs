@@ -1,29 +1,18 @@
-using GearBox.Core.Model.Json;
-using GearBox.Core.Model.GameObjects.ChangeTracking;
-using System.Text.Json;
 using GearBox.Core.Model.Items.Crafting;
+using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model.Items;
 
 /// <summary>
 /// Contains items a player has picked up.
 /// </summary>
-public class Inventory : IDynamic
+public class Inventory 
 {
-    private readonly ChangeTracker _changeTracker;
-
-    public Inventory()
-    {
-        _changeTracker = new(this);
-    }
-
-    public InventoryTab<Weapon> Weapons { get; init; } = new();
-    public InventoryTab<Armor> Armors { get; init; } = new();
+    public InventoryTab<Equipment<WeaponStats>> Weapons { get; init; } = new();
+    public InventoryTab<Equipment<ArmorStats>> Armors { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
-    public IEnumerable<object?> DynamicValues => Array.Empty<object?>() 
-        .Concat(Weapons.DynamicValues)
-        .Concat(Armors.DynamicValues)
-        .Concat(Materials.DynamicValues);
+    public Gold Gold { get; private set; } = Gold.NONE;
+    public bool IsEmpty => Weapons.IsEmpty && Armors.IsEmpty && Materials.IsEmpty && Gold.Quantity == 0;
 
     /// <summary>
     /// Adds all items from the other inventory to this one
@@ -44,11 +33,74 @@ public class Inventory : IDynamic
         {
             Materials.Add(materialStack.Item.ToOwned(), materialStack.Quantity);
         }
+
+        Gold = Gold.Plus(other.Gold);
     }
 
-    public bool Any()
+    public void Add(ItemUnion? item)
     {
-        return Weapons.Any() || Armors.Any() || Materials.Any();
+        item?.Match(
+            m => Materials.Add(m),
+            w => Weapons.Add(w),
+            a => Armors.Add(a)
+        );
+    }
+
+    public void Add(Gold? gold)
+    {
+        if (gold == null)
+        {
+            return;
+        }
+        Gold = Gold.Plus(gold.Value);
+    }
+
+    public void Remove(ItemUnion? item)
+    {
+        item?.Match(
+            m => Materials.Remove(m),
+            w => Weapons.Remove(w),
+            a => Armors.Remove(a)
+        );
+    }
+
+    public void Remove(Gold? gold)
+    {
+        if (gold == null)
+        {
+            return;
+        }
+        Gold = new Gold(Gold.Quantity - gold.Value.Quantity);
+    }
+
+    public bool Contains(ItemUnion item)
+    {
+        var result = item.Select(
+            m => Materials.Contains(m),
+            w => Weapons.Contains(w),
+            a => Armors.Contains(a)
+        );
+        return result;
+    }
+
+    public ItemUnion? GetBySpecifier(ItemSpecifier specifier)
+    {
+        var weapon = Weapons.GetBySpecifier(specifier);
+        var armor = Armors.GetBySpecifier(specifier);
+        var material = Materials.GetBySpecifier(specifier);
+        if (weapon != null)
+        {
+            return ItemUnion.Of(weapon);
+        }
+        if (armor != null)
+        {
+            return ItemUnion.Of(armor);
+        }
+        if (material != null)
+        {
+            return ItemUnion.Of(material);
+        }
+        return null;
     }
 
     public void Craft(CraftingRecipe recipe)
@@ -67,11 +119,8 @@ public class Inventory : IDynamic
             Craft the item at level 1.
             This prevents players from getting overleveled items in low level areas
         */
-        var crafted = recipe.Maker.Invoke();
-        
-        Weapons.Add(crafted.Weapon);
-        Armors.Add(crafted.Armor);
-        Materials.Add(crafted.Material);
+        var item = recipe.Maker.Invoke();
+        Add(item);
     }
 
     private bool CanCraft(CraftingRecipe recipe)
@@ -80,12 +129,5 @@ public class Inventory : IDynamic
         return result;
     }
 
-    public string Serialize(SerializationOptions options)
-    {
-        var json = new InventoryJson(Weapons.ToJson(), Armors.ToJson(), Materials.ToJson());
-        return JsonSerializer.Serialize(json, options.JsonSerializerOptions);
-    }
-
-    public void Update() => _changeTracker.Update();
-    public StableJson ToJson() => _changeTracker.ToJson();
+    public InventoryJson ToJson() => new(Weapons.ToJson(), Armors.ToJson(), Materials.ToJson(), Gold.Quantity);
 }

@@ -1,7 +1,7 @@
 
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Json;
-using GearBox.Core.Model.Json.WorldInit;
+using GearBox.Core.Model.Json.AreaInit;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.Static;
@@ -34,11 +34,15 @@ public class Map : ISerializable<MapJson>
         }
         _tileMap = new int[height, width]; // initializes all to 0
         _tileTypes[0] = new TileType(Color.BLUE, TileHeight.FLOOR);
+        Width = Distance.FromTiles(_tileMap.GetLength(1));
+        Height = Distance.FromTiles(_tileMap.GetLength(0));
+        Bounds = new Dimensions(Width, Height);
     }
 
 
-    public Distance Width => Distance.FromTiles(_tileMap.GetLength(1));
-    public Distance Height => Distance.FromTiles(_tileMap.GetLength(0));
+    public Distance Width { get; init; }
+    public Distance Height { get; init; }
+    public Dimensions Bounds { get; init; }
 
 
     public Map SetTileTypeForKey(int key, TileType value)
@@ -60,13 +64,13 @@ public class Map : ISerializable<MapJson>
         return this;
     }
 
-    public Map SetTilesFrom(int[,] csv)
+    public Map SetTilesFrom(List<List<int>> csv)
     {
-        for (var y = 0; y < csv.GetLength(0); y++)
+        for (var y = 0; y < csv.Count; y++)
         {
-            for (var x = 0; x < csv.GetLength(1); x++)
+            for (var x = 0; x < csv[y].Count; x++)
             {
-                SetTileAt(Coordinates.FromTiles(x, y), csv[y,x]);
+                SetTileAt(Coordinates.FromTiles(x, y), csv[y][x]);
             }
         }
         return this;
@@ -119,49 +123,17 @@ public class Map : ISerializable<MapJson>
     /// <param name="body">the object to check for collisions with</param>
     public void CheckForCollisions(BodyBehavior body)
     {
-        KeepInBounds(body);
-        ForEachCollidingWallTile(body, h => h != TileHeight.FLOOR, t => t.ShoveOut(body));
-    }
-
-    public void CheckForCollisions(Projectile projectile)
-    {
-        if (!projectile.Body.IsWithin(new Dimensions(Width, Height)))
-        {
-            projectile.Terminate();
-            return;
-        }
-        ForEachCollidingWallTile(projectile.Body, h => h == TileHeight.WALL, _ => projectile.Terminate());
-    }
-
-    private void KeepInBounds(BodyBehavior body)
-    {
-        if (body.LeftInPixels < 0)
-        {
-            body.LeftInPixels = 0;
-        }
-        if (body.RightInPixels > Width.InPixels)
-        {
-            body.RightInPixels = Width.InPixels;
-        }
-        if (body.TopInPixels < 0)
-        {
-            body.TopInPixels = 0;
-        }
-        if (body.BottomInPixels > Height.InPixels)
-        {
-            body.BottomInPixels = Height.InPixels;
-        }
-    }
-
-    private void ForEachCollidingWallTile(BodyBehavior body, Predicate<TileHeight> filter,  Action<Tile> doThis)
-    {
+        // For now, we're only dealing with bodies with radius of 1/2 tile or less.
+        // That makes the math a lot easier.
         if (body.Radius.InPixels * 2 > Distance.FromTiles(1).InPixels)
         {
             throw new Exception("Objects with large radius are not supported yet");
         }
-
-        // For now, we're only dealing with bodies with radius of 1/2 tile or less.
-        // That makes the math a lot easier.
+        
+        if (!body.IsWithin(Bounds))
+        {
+            body.OnCollidedWithMapEdge(new CollideWithMapEdgeEventArgs(Bounds));
+        }
 
         /*
             Since this body is 1x1 tiles at most, it can occupy at most 4 times,
@@ -182,20 +154,20 @@ public class Map : ISerializable<MapJson>
         for (var iter = new TileIterator(this, upperLeftTile, Dimensions.InTiles(2)); !iter.Done; iter.Next())
         {
             var tile = iter.Current;
-            if (filter(tile.TileType.Height) && tile.IsCollidingWith(body))
+            if (body.CanCollideWith(tile.TileType.Height) && tile.IsCollidingWith(body))
             {
-                doThis(tile);
+                body.OnCollidedWithTile(new CollideWithTileEventArgs(tile));
             }
         }
     }
 
-    public Coordinates? FindRandomFloorTile()
+    public Coordinates GetRandomFloorTile()
     {
         var random = new Random();
         var x = random.Next(Width.InTiles);
         var y = random.Next(Height.InTiles);
         var source = Coordinates.FromTiles(x, y);
-        return FindFloorTileAround(source);
+        return FindFloorTileAround(source) ?? throw new Exception("No floor tiles");
     }
 
     private Coordinates? FindFloorTileAround(Coordinates source, int searchRadius=0)

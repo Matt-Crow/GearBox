@@ -40,14 +40,10 @@ export class Projectile {
     }
 }
 
-export class ProjectileJsonDeserializer extends JsonDeserializer {
-    constructor() {
-        super("projectile", obj => new Projectile(
-            obj.x, 
-            obj.y, 
-            obj.radius, 
-            obj.bearingInDegrees, 
-            getColorStringFromJson(obj.color)
-        ));
-    }
-}
+export const projectileDeserializer = new JsonDeserializer("projectile", json => new Projectile(
+    json.x, 
+    json.y, 
+    json.radius, 
+    json.bearingInDegrees, 
+    getColorStringFromJson(json.color)
+));

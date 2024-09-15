@@ -11,7 +11,7 @@ public class LootChestTester
     public void CheckForCollisions_GivenPlayerCollides_AddsToInventory()
     {
         var inventory = new Inventory();
-        var item = new Material(new ItemType("foo"));
+        var item = new Material("foo");
         inventory.Materials.Add(item);
         var sut = new LootChest(Coordinates.ORIGIN, inventory);
         var player = new PlayerCharacter("bar")

@@ -115,3 +115,23 @@ export class ActionColumn extends Column {
         return $cell;
     }
 }
+
+/**
+ * button is only enabled when a condition is met
+ */
+export class ConditionalActionColumn extends ActionColumn {
+    #checkCondition;
+
+    constructor(headerText, buttonText, onClick, checkCondition) {
+        super(headerText, buttonText, onClick);
+        this.#checkCondition = checkCondition;
+    }
+
+    makeCellData(data) {
+        const result = super.makeCellData(data);
+        if (!this.#checkCondition(data)) {
+            result.prop("disabled", true);
+        }
+        return result;
+    }
+}

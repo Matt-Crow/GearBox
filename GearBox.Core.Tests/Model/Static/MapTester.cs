@@ -2,6 +2,7 @@ namespace GearBox.Core.Tests.Model.Static;
 
 using GearBox.Core.Model;
 using GearBox.Core.Model.GameObjects;
+using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 using Xunit;
@@ -75,9 +76,9 @@ public class MapTester
     public void TerminateProjectilesOutOfBounds()
     {
         var sut = new Map();
-        var projectile = new Projectile(Coordinates.FromTiles(-1, -1), Velocity.ZERO, Distance.FromTiles(5), new Attack(new Character("foo", 1), 1), Color.BLACK);
+        var projectile = new Projectile(Coordinates.FromTiles(-1, -1), Velocity.ZERO, Distance.FromTiles(5), new Attack(new EnemyCharacter("foo", 1), 1), Color.BLACK);
 
-        sut.CheckForCollisions(projectile);
+        sut.CheckForCollisions(projectile.Body);
 
         Assert.True(projectile.Termination.IsTerminated);
     }
@@ -88,9 +89,9 @@ public class MapTester
         var sut = new Map()
             .SetTileTypeForKey(1, AWall())
             .SetTileAt(Coordinates.ORIGIN, 1);
-        var projectile = new Projectile(Coordinates.ORIGIN.CenteredOnTile(), Velocity.ZERO, Distance.FromTiles(5), new Attack(new Character("foo", 1), 1), Color.BLACK);
+        var projectile = new Projectile(Coordinates.ORIGIN.CenteredOnTile(), Velocity.ZERO, Distance.FromTiles(5), new Attack(new EnemyCharacter("foo", 1), 1), Color.BLACK);
     
-        sut.CheckForCollisions(projectile);
+        sut.CheckForCollisions(projectile.Body);
 
         Assert.True(projectile.Termination.IsTerminated);
     }

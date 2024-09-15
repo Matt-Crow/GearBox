@@ -21,12 +21,13 @@ public class BasicAttack
         return distance.InPixels <= Range.Range.InPixels;
     }
 
-    public void Use(World inWorld, Direction inDirection)
+    public void Use(Direction inDirection)
     {
         if (_cooldownInFrames != 0)
         {
             return;
         }
+        var inArea = _user.CurrentArea ?? throw new Exception("Cannot use basic attack when not in an area");
 
         var damage = GetDamagePerHitByLevel(_user.Level) * (1.0 + _user.DamageModifier);
         var attack = new Attack(_user, (int)damage);
@@ -37,7 +38,7 @@ public class BasicAttack
             attack,
             Range.ProjectileColor
         );
-        inWorld.GameObjects.AddGameObject(projectile);
+        inArea.AddProjectile(projectile);
         _cooldownInFrames = Duration.FromSeconds(0.5).InFrames;
     }
 

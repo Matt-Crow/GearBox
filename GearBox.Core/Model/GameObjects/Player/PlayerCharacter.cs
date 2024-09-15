@@ -1,25 +1,27 @@
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
 using System.Text.Json;
+using GearBox.Core.Model.Json.AreaUpdate;
+using GearBox.Core.Model.Json.AreaInit;
+using GearBox.Core.Model.Items.Shops;
 
 namespace GearBox.Core.Model.GameObjects.Player;
 
 public class PlayerCharacter : Character
 {
     private int _frameCount = 0; // used for regeneration
-    private readonly PlayerStatSummary _statSummary;
 
     public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp), Color.BLUE)
     {
-        Inventory = new();
-        WeaponSlot = new("equippedWeapon");
-        ArmorSlot = new("equippedArmor");
         Xp = xp;
         XpToNextLevel = GetXpByLevel(Level + 1);
-        _statSummary = new PlayerStatSummary(this);
+        StatSummary = new PlayerStatSummary(this);
         UpdateStats();
     }
+
+    public event EventHandler<AreaChangedEventArgs>? AreaChanged;
 
     protected override string Type => "playerCharacter";
     public int Xp { get; private set; } // experience points
@@ -28,9 +30,27 @@ public class PlayerCharacter : Character
     public int EnergyExpended { get; private set; } = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
     public int EnergyRemaining => MaxEnergy - EnergyExpended;
     public PlayerStats Stats { get; init; } = new();
-    public Inventory Inventory { get; init; }
-    public EquipmentSlot<Weapon> WeaponSlot { get; init; }
-    public EquipmentSlot<Armor> ArmorSlot { get; init; }
+    public PlayerStatSummary StatSummary { get; init; }
+    public Inventory Inventory { get; init; } = new();
+    public EquipmentSlot<WeaponStats> WeaponSlot { get; init; } = new();
+    public EquipmentSlot<ArmorStats> ArmorSlot { get; init; } = new();
+    
+    /// <summary>
+    /// The shop the player currently has open
+    /// </summary>
+    public ItemShop? OpenShop { get; private set; }
+
+    public override void SetArea(IArea? newArea)
+    {
+        SetOpenShop(null);
+        AreaChanged?.Invoke(this, new AreaChangedEventArgs(this, CurrentArea, newArea));
+        base.SetArea(newArea);
+    }
+
+    public void SetOpenShop(ItemShop? shop)
+    {
+        OpenShop = shop;
+    }
 
     public override void UpdateStats()
     {
@@ -52,7 +72,7 @@ public class PlayerCharacter : Character
 
     public void EquipWeaponById(Guid id)
     {
-        var weapon = Inventory.Weapons.GetItemById(id);
+        var weapon = Inventory.Weapons.GetBySpecifier(ItemSpecifier.ById(id));
         if (weapon == null || weapon.Level > Level)
         {
             return;
@@ -62,14 +82,14 @@ public class PlayerCharacter : Character
 
         WeaponSlot.Value = weapon;
         Inventory.Weapons.Remove(weapon);
-        BasicAttack.Range = weapon.AttackRange;
+        BasicAttack.Range = weapon.Inner.AttackRange;
 
         UpdateStats();
     }
 
     public void EquipArmorById(Guid id)
     {
-        var armor = Inventory.Armors.GetItemById(id);
+        var armor = Inventory.Armors.GetBySpecifier(ItemSpecifier.ById(id));
         if (armor == null || armor.Level > Level)
         {
             return;
@@ -79,7 +99,7 @@ public class PlayerCharacter : Character
 
         ArmorSlot.Value = armor;
         Inventory.Armors.Remove(armor);
-        ArmorClass = armor.ArmorClass;
+        ArmorClass = armor.Inner.ArmorClass;
 
         UpdateStats();
     }
@@ -109,10 +129,6 @@ public class PlayerCharacter : Character
     {
         base.Update();
 
-        Inventory.Update();
-        WeaponSlot.Update();
-        ArmorSlot.Update();
-
         // restore 5% HP & energy per second
         _frameCount++;
         if (_frameCount >= Duration.FromSeconds(5).InFrames)
@@ -121,13 +137,6 @@ public class PlayerCharacter : Character
             RechargePercent(0.05);
             _frameCount = 0;
         }
-
-        _statSummary.Update();
-    }
-
-    public StableJson GetStatSummaryJson()
-    {
-        return _statSummary.ToJson();
     }
 
     protected override string Serialize(SerializationOptions options)

@@ -1,26 +1,11 @@
-using System.Text.Json;
 using GearBox.Core.Model.Json;
-using GearBox.Core.Model.GameObjects.ChangeTracking;
 
 namespace GearBox.Core.Model.Items;
 
-public class EquipmentSlot<T> : IDynamic
-where T : Equipment
+public class EquipmentSlot<T>
+where T : IEquipmentStats
 {
-    private readonly ChangeTracker _changeTracker;
-
-    public EquipmentSlot(string type)
-    {
-        _changeTracker = new(this);
-    }
-
-    public string Serialize(SerializationOptions options) => JsonSerializer.Serialize(ValueJson(), options.JsonSerializerOptions);
-
-    public T? Value { get; set; }
-
-    public IEnumerable<object?> DynamicValues => Value == null
-        ? [false]
-        : [true, Value.Id];
+    public Equipment<T>? Value { get; set; }
 
     private ItemJson? ValueJson()
     {
@@ -31,7 +16,9 @@ where T : Equipment
         
         var result = new ItemJson(
             Value.Id,
-            Value.Type.Name,
+            Value.Name,
+            Value.Grade.Name,
+            Value.Grade.Order,
             Value.Description,
             Value.Level,
             Value.Details,
@@ -40,6 +27,5 @@ where T : Equipment
         return result;
     }
 
-    public void Update() => _changeTracker.Update();
-    public StableJson ToJson() => _changeTracker.ToJson();
+    public ItemJson? ToJson() => ValueJson();
 }

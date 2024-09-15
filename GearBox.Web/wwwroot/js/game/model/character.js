@@ -86,16 +86,12 @@ export class Fraction {
     }
 }
 
-export class CharacterJsonDeserializer extends JsonDeserializer {
-    constructor() {
-        super("character", (obj) => new Character(
-            obj.id, 
-            obj.name,
-            obj.level,
-            getColorStringFromJson(obj.color),
-            obj.x, 
-            obj.y, 
-            new Fraction(obj.hitPoints.current, obj.hitPoints.max)
-        ));
-    }
-}
+export const characterDeserializer = new JsonDeserializer("character", (json) => new Character(
+    json.id, 
+    json.name,
+    json.level,
+    getColorStringFromJson(json.color),
+    json.x, 
+    json.y, 
+    new Fraction(json.hitPoints.current, json.hitPoints.max)
+));

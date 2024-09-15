@@ -1,27 +1,42 @@
+using GearBox.Core.Model.Items.Infrastructure;
+
 namespace GearBox.Core.Model.Items.Crafting;
 
 public class CraftingRecipeBuilder
 {
     private readonly Dictionary<Material, int> _ingredients = [];
+    private readonly IItemFactory _itemFactory;
 
-    public CraftingRecipeBuilder And(Material ingredient, int quantity=1)
+    public CraftingRecipeBuilder(IItemFactory itemFactory)
     {
-        return And(new ItemStack<Material>(ingredient, quantity));
+        _itemFactory = itemFactory;
     }
 
-    public CraftingRecipeBuilder And(ItemStack<Material> ingredient)
+    public CraftingRecipeBuilder And(string materialName, int quantity=1)
     {
-        if (!_ingredients.ContainsKey(ingredient.Item))
+        Material? material = null;
+        _itemFactory.Make(materialName)?.Match(
+            m => material = m,
+            _ => {},
+            _ => {}
+        );
+        if (material == null)
         {
-            _ingredients[ingredient.Item] = 0;
+            throw new ArgumentException($"Bad material name: '{materialName}'");
         }
-        _ingredients[ingredient.Item] += ingredient.Quantity;
+
+        if (!_ingredients.ContainsKey(material))
+        {
+            _ingredients[material] = 0;
+        }
+        _ingredients[material] += quantity;
         return this;
     }
 
-    public CraftingRecipe Makes(Func<ItemUnion> anItem)
+    public CraftingRecipe Makes(string itemName)
     {
-        var result = new CraftingRecipe(_ingredients.Select(kv => new ItemStack<Material>(kv.Key, kv.Value)), anItem);
-        return result;
+        var ingredients = _ingredients.Select(kv => new ItemStack<Material>(kv.Key, kv.Value));
+        var anItem = _itemFactory.Make(itemName) ?? throw new ArgumentException($"Bad item name: '{itemName}'");
+        return new CraftingRecipe(ingredients, () => anItem);
     }
 }

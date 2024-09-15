@@ -8,10 +8,9 @@ public interface IItem
     /// </summary>
     Guid? Id { get; }
 
-    /// <summary>
-    /// Items of the same type can stack together in a player's inventory
-    /// </summary>
-    ItemType Type { get; }
+    string Name { get; }
+
+    Grade Grade { get; }
 
     string Description { get; }
 
@@ -24,6 +23,11 @@ public interface IItem
     /// Details to display in the GUI
     /// </summary>
     IEnumerable<string> Details { get; }
+
+    /// <summary>
+    /// The base value this item can be bought for from a shop
+    /// </summary>
+    Gold BuyValue { get; }
 
     /*
     // can't do "IItem ToOwned()" https://stackoverflow.com/a/5709191

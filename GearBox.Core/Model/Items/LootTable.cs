@@ -5,137 +5,41 @@ namespace GearBox.Core.Model.Items;
 /// </summary>
 public class LootTable
 {
-    private readonly Dictionary<Grade, Inventory> _values = Grade.ALL.ToDictionary(x => x, _ => new Inventory());
+    private readonly List<LootOption> _lootOptions = [];
 
-    public void AddWeapon(Weapon itemDefinition)
+    public LootTable(List<LootOption> options)
     {
-        _values[itemDefinition.Type.Grade].Weapons.Add(itemDefinition);
+        _lootOptions = options;
     }
 
-    public void AddArmor(Armor itemDefinition)
-    {
-        _values[itemDefinition.Type.Grade].Armors.Add(itemDefinition);
-    }
-
-    public void AddMaterial(Material itemDefinition)
-    {
-        _values[itemDefinition.Type.Grade].Materials.Add(itemDefinition);
-    }
-
-    public Inventory GetRandomItems()
+    public Inventory GetRandomLoot()
     {
         var result = new Inventory();
-        var numItems = Random.Shared.Next(0, 3) + 1;
+        var numItems = _lootOptions.Any()
+            ? Random.Shared.Next(0, 3) + 1
+            : 0;
         for (int i = 0; i < numItems; i++)
         {
-            AddRandomItemTo(result);
+            var itemToAdd = ChooseRandomWeightedItem();
+            result.Add(itemToAdd.Item?.ToOwned());
+            result.Add(itemToAdd.Gold);
         }
+
         return result;
     }
 
-    private void AddRandomItemTo(Inventory inventory)
+    private LootOption ChooseRandomWeightedItem()
     {
-        var grade = ChooseRandomGrade();
-        AddRandomItemFromGrade(grade, inventory);
-    }
-
-    private Grade ChooseRandomGrade()
-    {
-        var options = _values
-            .Where(x => x.Value.Any())
-            .Select(x => x.Key)
-            .OrderBy(k => k.Order)
-            .ToList();
-        
-        if (options.Count == 0)
-        {
-            throw new InvalidOperationException($"LootTable has no items");
-        }
-
-        /*
-            Suppose we have 3 grades with weights 10, 20, and 40.
-            Probabilities of being chosen should be 10/70, 20/70, and 40/70
-            So choose a number between 0-69.
-             0-10 => 10
-            10-30 => 20
-            30-70 => 40
-            suppose i = 25, then it should select the grade with a weight of 20
-        */
-        var totalWeight = options.Sum(grade => grade.Weight);
+        var totalWeight = _lootOptions.Sum(x => x.Weight);
         var randomNumber = Random.Shared.Next(totalWeight);
-        foreach (var grade in options)
+        foreach (var weightedItem in _lootOptions)
         {
-            if (grade.Weight > randomNumber)
+            if (weightedItem.Weight > randomNumber)
             {
-                return grade;
+                return weightedItem;
             }
-            randomNumber -= grade.Weight;
+            randomNumber -= weightedItem.Weight;
         }
-        throw new Exception("Something went wrong when chosing a random grade");
-    }
-
-    private void AddRandomItemFromGrade(Grade grade, Inventory destination)
-    {
-        var source = _values[grade];
-        var weapon = GetRandomItemFrom(source.Weapons); 
-        var armor = GetRandomItemFrom(source.Armors);
-        var material = GetRandomItemFrom(source.Materials);
-        var options = new List<AddItemCommand>()
-        {
-            new(weapon?.ToOwned(), () => destination.Weapons.Add(weapon?.ToOwned())),
-            new(armor?.ToOwned(), () => destination.Armors.Add(armor?.ToOwned())),
-            new(material?.ToOwned(), () => destination.Materials.Add(material?.ToOwned())),
-        };
-        var possibleOptions = options
-            .Where(option => option.IsPossible())
-            .ToList();
-        
-        if (!possibleOptions.Any())
-        {
-            throw new InvalidOperationException("source inventory has no items");
-        }
-
-        var i = Random.Shared.Next(possibleOptions.Count);
-        possibleOptions[i].ExecuteIfAble();
-    }
-
-    private static T? GetRandomItemFrom<T>(InventoryTab<T> tab)
-    where T : class,IItem
-    {
-        var options = tab.Content.AsEnumerable()
-            .Where(stack => stack.Quantity > 0)
-            .Select(stack => stack.Item)
-            .ToList();
-        if (!options.Any())
-        {
-            return null;
-        }
-        var i = Random.Shared.Next(options.Count);
-        return options[i];
-    }
-
-    private class AddItemCommand
-    {
-        private readonly IItem? _value;
-        private readonly Action _action;
-
-        public AddItemCommand(IItem? value, Action action)
-        {
-            _value = value;
-            _action = action;
-        }
-
-        public bool IsPossible()
-        {
-            return _value != null;
-        } 
-
-        public void ExecuteIfAble()
-        {
-            if (_value != null)
-            {
-                _action.Invoke();
-            }
-        }
+        throw new Exception("Something went wrong when chosing a random item");
     }
 }

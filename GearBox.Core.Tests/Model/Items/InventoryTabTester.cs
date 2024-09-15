@@ -9,7 +9,7 @@ public class InventoryTabTester
     public void Add_GivenEmptyInventory_Works()
     {
         var sut = new InventoryTab<Material>();
-        var expected = new Material(new ItemType("foo"));
+        var expected = new Material("foo");
         
         sut.Add(expected, 42);
         var actual = sut.Content.FirstOrDefault();
@@ -21,13 +21,12 @@ public class InventoryTabTester
     public void Add_GivenStackableDuplicate_Sums()
     {
         var sut = new InventoryTab<Material>();
-        var type = new ItemType("foo");
-        
-        sut.Add(new Material(type), 2);
-        sut.Add(new Material(type), 3);
+
+        sut.Add(new Material("foo"), 2);
+        sut.Add(new Material("foo"), 3);
         var result = sut.Content.FirstOrDefault();
 
-        Assert.Equal(type, result?.Item.Type);
+        Assert.Equal("foo", result?.Item.Name);
         Assert.Equal(5, result?.Quantity);
     }
 
@@ -35,8 +34,8 @@ public class InventoryTabTester
     public void Add_GivenDifferent_DoesNotSum()
     {
         var sut = new InventoryTab<Material>();
-        var item1 = new Material(new ItemType("foo"));
-        var item2 = new Material(new ItemType("bar"));
+        var item1 = new Material("foo");
+        var item2 = new Material("bar");
         
         sut.Add(item1);
         sut.Add(item2);
@@ -49,9 +48,9 @@ public class InventoryTabTester
     [Fact]
     public void Add_GivenEquipment_DoesNotSum()
     {
-        var sut = new InventoryTab<Equipment>();
-        var item1 = new Weapon(new ItemType("foo"));
-        var item2 = new Weapon(new ItemType("foo"));
+        var sut = new InventoryTab<Equipment<WeaponStats>>();
+        var item1 = new Equipment<WeaponStats>("foo", new WeaponStats());
+        var item2 = new Equipment<WeaponStats>("foo", new WeaponStats());
     
         sut.Add(item1);
         sut.Add(item2);

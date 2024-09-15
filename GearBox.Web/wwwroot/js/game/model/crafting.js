@@ -1,4 +1,4 @@
-import { Item, ItemDeserializer } from "./item.js";
+import { Item } from "./item.js";
 
 
 export class CraftingRecipe {
@@ -23,32 +23,10 @@ export class CraftingRecipe {
 }
 
 export class CraftingRecipeDeserializer {
-    #itemDeserializer;
-
-    /**
-     * @param {ItemDeserializer} itemDeserializer 
-     */
-    constructor(itemDeserializer) {
-        this.#itemDeserializer = itemDeserializer;
-    }
-
     deserialize(json) {
-        const ingredients = json.ingredients.map(x => this.#itemDeserializer.deserialize(x));
-        const makes = this.#itemDeserializer.deserialize(json.makes);
+        const ingredients = json.ingredients.map(x => Item.fromJson(x));
+        const makes = Item.fromJson(json.makes);
         const result = new CraftingRecipe(json.id, ingredients, makes);
         return result;
     }
-}
-
-export class CraftingRecipeRepository {
-    #recipes;
-
-    /**
-     * @param {CraftingRecipe[]} recipes 
-     */
-    constructor(recipes=[]) {
-        this.#recipes = recipes;
-    }
-
-    get recipes() { return this.#recipes; }
 }

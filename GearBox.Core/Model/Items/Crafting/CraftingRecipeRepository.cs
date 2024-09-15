@@ -1,5 +1,5 @@
 using System.Collections.Frozen;
-using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.GameInit;
 
 namespace GearBox.Core.Model.Items.Crafting;
 

@@ -1,4 +1,4 @@
-using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Items;
@@ -6,7 +6,7 @@ namespace GearBox.Core.Model.Items;
 /// <summary>
 /// Each Inventory is broken down into multiple tabs, which each hold a different category of item.
 /// </summary>
-public class InventoryTab<T> : ISerializable<InventoryTabJson>
+public class InventoryTab<T>
 where T : IItem
 {
     /*
@@ -19,7 +19,7 @@ where T : IItem
         .AsEnumerable()
         .Where(stack => stack.Quantity > 0);
 
-    public IEnumerable<object?> DynamicValues => Content.SelectMany(stack => stack.DynamicValues);
+    public bool IsEmpty => _content.Count == 0;
 
     public void Add(T? item, int quantity=1)
     {
@@ -51,8 +51,13 @@ where T : IItem
         return result;
     }
 
-    public void Remove(T item, int quantity=1)
+    public void Remove(T? item, int quantity=1)
     {
+        if (item == null)
+        {
+            return;
+        }
+        
         var stackToRemoveFrom = _content.AsEnumerable()
             .Where(stack => stack.Item.Equals(item))
             .FirstOrDefault();
@@ -66,10 +71,10 @@ where T : IItem
         return result;
     }
 
-    public T? GetItemById(Guid id)
+    public T? GetBySpecifier(ItemSpecifier specifier)
     {
         var result = _content.AsEnumerable()
-            .Where(stack => stack.Item.Id == id && stack.Quantity > 0)
+            .Where(stack => stack.Quantity > 0 && specifier.Matches(stack.Item))
             .Select(stack => stack.Item)
             .FirstOrDefault();
         return result;

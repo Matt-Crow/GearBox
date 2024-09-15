@@ -1,7 +1,7 @@
 namespace GearBox.Core.Model.GameObjects;
 
 /// <summary>
-/// An object in a world which updates every game tick
+/// An object in a area which updates every game tick
 /// </summary>
 public interface IGameObject
 {

@@ -1,5 +1,5 @@
 import { Client } from "../infrastructure/client.js";
-import { World } from "../model/world.js";
+import { Area } from "../model/area.js";
 
 export class GameOverScreen {
     #showWhenAlive;
@@ -22,10 +22,10 @@ export class GameOverScreen {
 
     /**
      * 
-     * @param {World} world 
+     * @param {Area} area 
      */
-    update(world) {
-        const aliveNow = !!world.player;
+    update(area) {
+        const aliveNow = !!area.player;
         if (aliveNow === this.#wasAliveLastTime) {
             return; // no changes, so don't flicker the screen
         }

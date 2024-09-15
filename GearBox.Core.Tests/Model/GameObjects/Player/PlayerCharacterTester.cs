@@ -18,7 +18,7 @@ public class PlayerCharacterTester
     public void Equip_GivenWeapon_SetsWeaponSlot()
     {
         var sut = new PlayerCharacter("foo");
-        var weapon = new Weapon(new ItemType("weapon"));
+        var weapon = new Equipment<WeaponStats>("weapon", new WeaponStats());
         sut.Inventory.Weapons.Add(weapon);
 
         sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID shouldn't be null"));
@@ -30,7 +30,7 @@ public class PlayerCharacterTester
     public void Equip_GivenWeapon_RemovesFromInventory()
     {
         var sut = new PlayerCharacter("foo");
-        var weapon = new Weapon(new ItemType("weapon"));
+        var weapon = new Equipment<WeaponStats>("weapon", new WeaponStats());
         sut.Inventory.Weapons.Add(weapon);
 
         sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID shouldn't be null"));
@@ -42,8 +42,8 @@ public class PlayerCharacterTester
     public void Equip_GivenWeaponAlreadyEquipped_AddsToInventory()
     {
         var sut = new PlayerCharacter("foo");
-        var alreadyEquipped = new Weapon(new ItemType("weapon 1"));
-        var notYetEquipped = new Weapon(new ItemType("weapon 2"));
+        var alreadyEquipped = new Equipment<WeaponStats>("weapon 1", new WeaponStats());
+        var notYetEquipped = new Equipment<WeaponStats>("weapon 2", new WeaponStats());
         sut.Inventory.Weapons.Add(alreadyEquipped);
         sut.Inventory.Weapons.Add(notYetEquipped);
         sut.EquipWeaponById(alreadyEquipped.Id ?? throw new Exception("Weapon ID shouldn't be null"));
@@ -58,7 +58,7 @@ public class PlayerCharacterTester
     {
         var sut = new PlayerCharacter("foo");
         sut.SetLevel(1);
-        var weapon = new Weapon(new ItemType("bar"), 20);
+        var weapon = new Equipment<WeaponStats>("bar", new WeaponStats(), level: 20);
         sut.Inventory.Weapons.Add(weapon);
 
         sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID should not be null"));

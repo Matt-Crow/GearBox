@@ -4,15 +4,16 @@ using GearBox.Core.Utils;
 namespace GearBox.Core.Model.GameObjects;
 
 /// <summary>
-/// GameObjects in a world
+/// GameObjects in an area
 /// </summary>
-public class GameObjectCollection
+public class GameObjectCollection<T>
+where T : IGameObject
 {
-    private readonly SafeList<IGameObject> _gameObjects = new();
+    private readonly SafeList<T> _gameObjects = new();
 
-    public IEnumerable<IGameObject> GameObjects => _gameObjects.AsEnumerable();
+    public IEnumerable<T> AsEnumerable => _gameObjects.AsEnumerable();
 
-    public void AddGameObject(IGameObject obj)
+    public void AddGameObject(T obj)
     {
         if (!_gameObjects.Contains(obj))
         {
@@ -20,29 +21,11 @@ public class GameObjectCollection
         }
     }
 
-    public void RemoveGameObject(IGameObject obj)
+    public void RemoveGameObject(T obj)
     {
         _gameObjects.Remove(obj);
     }
 
-    public void CheckForCollisions(BodyBehavior body)
-    {
-        // only check for collisions with Characters for now
-        var collidingCharacters = _gameObjects.AsEnumerable()
-            .Select(obj => obj as Character)
-            .Where(obj => obj != null)
-            .Select(obj => obj!)
-            .Where(obj => obj?.Body != null && obj.Body.CollidesWith(body) && obj.Body != body);
-        foreach (var character in collidingCharacters)
-        {
-            body.OnCollided(new CollideEventArgs(character));
-        }
-    }
-
-    /// <summary>
-    /// Called each game tick.
-    /// Updates the world and everything in it
-    /// </summary>
     public void Update()
     {
         _gameObjects.ApplyChanges();
@@ -58,7 +41,7 @@ public class GameObjectCollection
         _gameObjects.ApplyChanges();
     }
 
-    private static bool IsTerminated(IGameObject obj)
+    private static bool IsTerminated(T obj)
     {
         return obj.Termination != null && obj.Termination.IsTerminated;
     }

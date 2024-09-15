@@ -2,12 +2,14 @@ namespace GearBox.Core.Model.GameObjects.Player;
 
 public class PlayerStatBoosts
 {
+    private readonly Dictionary<PlayerStatType, int> _weights;
     private readonly Dictionary<PlayerStatType, int> _values = [];
     private readonly List<string> _details = [];
 
     public PlayerStatBoosts(Dictionary<PlayerStatType, int>? weights=null, int totalPoints=0)
     {
         weights ??= [];
+        _weights = weights;
         var totalWeights = weights.Values.Sum();
         if (totalWeights == 0)
         {
@@ -56,4 +58,6 @@ public class PlayerStatBoosts
     public int Get(PlayerStatType type) => _values[type];
 
     public IEnumerable<string> Details => _details;
+
+    public PlayerStatBoosts WithTotalPoints(int totalPoints) => new PlayerStatBoosts(_weights, totalPoints);
 }
