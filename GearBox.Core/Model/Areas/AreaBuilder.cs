@@ -17,13 +17,13 @@ public class AreaBuilder
     private readonly IEnemyFactory _enemies;
     private readonly List<IExit> _exits = [];
 
-    public AreaBuilder(string name, int level, IItemFactory itemFactory, IEnemyRepository enemies)
+    public AreaBuilder(string name, int level, IItemFactory itemFactory, IEnemyFactory enemies)
     {
         Name = name;
         _level = level;
         _itemFactory = itemFactory;
         _lootBuilder = new(itemFactory);
-        _enemies = new EnemyFactory(enemies);
+        _enemies = enemies;
     }
 
     /// <summary>

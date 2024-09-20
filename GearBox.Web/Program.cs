@@ -1,3 +1,4 @@
+using GearBox.Core.Config;
 using GearBox.Core.Model;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
@@ -11,8 +12,12 @@ var desertMap = await GameResourceLoader.LoadMapByName("desert");
 var canyonMap = await GameResourceLoader.LoadMapByName("canyon");
 
 var webAppBuilder = WebApplication.CreateBuilder(args);
+var gearboxConfig = new GearBoxConfig();
+webAppBuilder.Configuration
+    .GetSection("GearBox")
+    .Bind(gearboxConfig);
 
-var game = new GameBuilder()
+var game = new GameBuilder(gearboxConfig)
     .DefineItems(items => items
         .Add(ItemUnion.Of(new Material("Stone", Grade.COMMON, "A low-grade mining material, but it's better than nothing.")))
         .Add(ItemUnion.Of(new Material("Bronze", Grade.UNCOMMON, "Used to craft low-level melee equipment")))

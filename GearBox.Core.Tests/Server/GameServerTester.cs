@@ -1,3 +1,4 @@
+using GearBox.Core.Config;
 using GearBox.Core.Model;
 using GearBox.Core.Server;
 using Xunit;
@@ -85,7 +86,7 @@ public class GameServerTester
 
     public static IGame MakeGame()
     {
-        var result = new GameBuilder()
+        var result = new GameBuilder(new GearBoxConfig())
             .WithArea("foo", 1, area => area.WithMap(new()))
             .Build();
         return result;
