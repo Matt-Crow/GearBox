@@ -1,8 +1,8 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies.Ai;
+using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items.Infrastructure;
-using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.GameObjects.Enemies;
 
@@ -43,15 +43,30 @@ public class EnemyFactory : IEnemyFactory
             result.StopMoving();
         }
 
+        result.Killed += (sender, e) => HandleKilled(result, e);
+
         return result;
     }
 
-    public GameTimer MakeSpawnTimer(IArea area)
+    private void HandleKilled(EnemyCharacter enemy, KilledEventArgs e)
     {
-        int periodInFrames = Duration.FromSeconds(_config.EnemySpawning.PeriodInSeconds).InFrames;
-        var result = new GameTimer(() => SpawnWave(area), periodInFrames);
-        return result;
+        if (e.AttackEvent.AttackUsed.UsedBy is not PlayerCharacter player)
+        {
+            return;
+        }
+
+        player.GainXp((int)(enemy.Level * _config.EnemyXpDropMultiplier));
+
+        if (Random.Shared.NextDouble() > _config.EnemyLootDropChance)
+        {
+            return;
+        }
+
+        var loot = enemy.Loot.GetRandomLoot();
+        player.Inventory.Add(loot);
     }
+
+    public GameTimer MakeSpawnTimer(IArea area) => new GameTimer(() => SpawnWave(area), _config.EnemySpawning.PeriodInFrames);
 
     private void SpawnWave(IArea area)
     {

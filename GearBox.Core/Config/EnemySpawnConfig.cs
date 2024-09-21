@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Units;
+
 namespace GearBox.Core.Config;
 
 public class EnemySpawnConfig
@@ -16,4 +18,9 @@ public class EnemySpawnConfig
     /// The number of enemies which spawn each wave
     /// </summary>
     public int WaveSize { get; set; } = 3;
+
+    /// <summary>
+    /// The number of frames between each wave of enemies
+    /// </summary>
+    public int PeriodInFrames => Duration.FromSeconds(PeriodInSeconds).InFrames;
 }
