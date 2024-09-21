@@ -1,6 +1,8 @@
 using GearBox.Core.Config;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies.Ai;
 using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.GameObjects.Enemies;
 
@@ -9,7 +11,7 @@ public class EnemyFactory : IEnemyFactory
     private readonly GearBoxConfig _config;
     private readonly IEnemyRepository _allEnemies;
     private readonly List<string> _names = [];
-
+    private int _childCount = 0;
 
     public EnemyFactory(GearBoxConfig config, IEnemyRepository allEnemies)
     {
@@ -42,5 +44,38 @@ public class EnemyFactory : IEnemyFactory
         }
 
         return result;
+    }
+
+    public GameTimer MakeSpawnTimer(IArea area)
+    {
+        int periodInFrames = Duration.FromSeconds(_config.EnemySpawning.PeriodInSeconds).InFrames;
+        var result = new GameTimer(() => SpawnWave(area), periodInFrames);
+        return result;
+    }
+
+    private void SpawnWave(IArea area)
+    {
+        for (var i = 0; i < _config.EnemySpawning.WaveSize; i++)
+        {
+            Spawn(area);
+        }
+    }
+
+    private void Spawn(IArea area)
+    {
+        if (_childCount >= _config.EnemySpawning.MaxEnemies)
+        {
+            return;
+        }
+
+        var enemy = area.SpawnEnemy();
+        if (enemy == null)
+        {
+            return;
+        }
+        
+        enemy.Termination.Terminated += (sender, e) => _childCount--;
+        
+        _childCount++;
     }
 }

@@ -46,6 +46,8 @@ public class Area : IArea
         _loot = loot ?? new LootTable([]);
         _enemyFactory = enemyFactory ?? EnemyFactory.MakeDefault();
         _exits = exits ?? [];
+
+        AddTimer(_enemyFactory.MakeSpawnTimer(this));
     }
 
     public string Name { get; init; }
