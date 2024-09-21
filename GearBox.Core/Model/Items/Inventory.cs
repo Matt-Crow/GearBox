@@ -52,7 +52,7 @@ public class Inventory
         {
             return;
         }
-        Gold = Gold.Plus(gold.Value);
+        Gold = Gold.Plus(gold);
     }
 
     public void Remove(ItemUnion? item)
@@ -70,7 +70,7 @@ public class Inventory
         {
             return;
         }
-        Gold = new Gold(Gold.Quantity - gold.Value.Quantity);
+        Gold = new Gold(Gold.Quantity - gold.Quantity);
     }
 
     public bool Contains(ItemUnion item)
