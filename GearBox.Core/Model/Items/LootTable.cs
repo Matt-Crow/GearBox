@@ -20,15 +20,16 @@ public class LootTable
             : 0;
         for (int i = 0; i < numItems; i++)
         {
-            var itemToAdd = ChooseRandomWeightedItem();
-            result.Add(itemToAdd.Item?.ToOwned());
-            result.Add(itemToAdd.Gold);
+            ChooseRandomLootOption()
+                .Match(
+                    item => result.Add(item.ToOwned()),
+                    gold => result.Add(gold)
+                );
         }
-
         return result;
     }
 
-    private LootOption ChooseRandomWeightedItem()
+    private LootOption ChooseRandomLootOption()
     {
         var totalWeight = _lootOptions.Sum(x => x.Weight);
         var randomNumber = Random.Shared.Next(totalWeight);

@@ -149,7 +149,7 @@ public class ItemShop
             var opt = new OpenShopOptionJson(
                 item.ToJson(), 
                 item.Item.BuyValue.Quantity,
-                playerGold == null || playerGold.Value.Quantity >= item.Item.BuyValue.Quantity
+                playerGold == null || playerGold.Quantity >= item.Item.BuyValue.Quantity
             );
             result.Add(opt);
         }
