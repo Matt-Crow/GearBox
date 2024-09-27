@@ -9,7 +9,7 @@ import { PlayerStatSummary } from "../model/player.js";
 import { OpenShop } from "../model/shop.js";
 import { EquipmentTab } from "./equipmentTab.js";
 import { ItemDisplay } from "./itemDisplay.js";
-import { Switcher } from "./switcher.js";
+import { Switcher } from "./shared/switcher.js";
 import { ActionColumn, ConditionalActionColumn, DataColumn, Table } from "./table.js";
 
 /**

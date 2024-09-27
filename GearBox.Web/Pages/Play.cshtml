@@ -2,98 +2,112 @@
 @{
     ViewData["Title"] = "Play";
 }
-<div id="playerAlive">
-    <!-- drawing canvas -->
-    <canvas id="canvas" width="800", height="600"></canvas>
-    <!-- player HUD -->
-    <div id="playerHud" class="d-flex justify-content-between">
-        <div>HP: <span class="currentHP">x</span>/<span class="maxHP">100</span></div>
-        <div>Energy: <span class="currentEnergy">x</span>/<span class="maxEnergy">100</span></div>
+<!-- shows different view based upon current player state -->
+<div id="views">
+    <!-- loading view for when game is loading -->
+    <div class="view-loading">
+        <div class="d-flex flex-column align-items-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Loading...</p>
+        </div>
     </div>
-    <!-- main modal -->
-    <dialog id="main-modal" style="width: 90vw; height: 75vh">
-        <!-- inventory -->
-        <div class="inventory">
-            <!-- tab selector -->
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item">
-                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#statsTab" type="button" role="tab" aria-controls="materialsTab" aria-selected="true">Stats</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#materialsTab" type="button" role="tab" aria-controls="materialsTab" aria-selected="true">Materials</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#weaponTab" type="button" role="tab" aria-controls="weaponTab" aria-selected="false">Weapons</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#armorTab" type="button" role="tab" aria-controls="armorTab" aria-selected="false">Armor</button>
-                </li>
-            </ul>
-            <div class="tab-content h-100">
-                <!-- stats -->
-                <div class="tab-pane fade h-100 active show" id="statsTab" role="tabpanel" aria-labelledby="stats-tab">
-                    <div>
-                        <b>Stats</b>
-                        <ul class="stats-list"></ul>
+    <!-- shown when the player is alive -->
+    <div class="view-alive">
+        <!-- drawing canvas -->
+        <canvas id="canvas" width="800", height="600"></canvas>
+        <!-- player HUD -->
+        <div id="playerHud" class="d-flex justify-content-between">
+            <div>HP: <span class="currentHP">x</span>/<span class="maxHP">100</span></div>
+            <div>Energy: <span class="currentEnergy">x</span>/<span class="maxEnergy">100</span></div>
+        </div>
+        <!-- main modal -->
+        <dialog id="main-modal" style="width: 90vw; height: 75vh">
+            <!-- inventory -->
+            <div class="inventory">
+                <!-- tab selector -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#statsTab" type="button" role="tab" aria-controls="materialsTab" aria-selected="true">Stats</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#materialsTab" type="button" role="tab" aria-controls="materialsTab" aria-selected="true">Materials</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#weaponTab" type="button" role="tab" aria-controls="weaponTab" aria-selected="false">Weapons</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#armorTab" type="button" role="tab" aria-controls="armorTab" aria-selected="false">Armor</button>
+                    </li>
+                </ul>
+                <div class="tab-content h-100">
+                    <!-- stats -->
+                    <div class="tab-pane fade h-100 active show" id="statsTab" role="tabpanel" aria-labelledby="stats-tab">
+                        <div>
+                            <b>Stats</b>
+                            <ul class="stats-list"></ul>
+                        </div>
+                        <div class="align-bottom">
+                            <p>
+                                <b>Gold: </b>
+                                <span id="gold">0</span>
+                            </p>
+                        </div>                
                     </div>
-                    <div class="align-bottom">
-                        <p>
-                            <b>Gold: </b>
-                            <span id="gold">0</span>
-                        </p>
-                    </div>                
-                </div>
-                <!-- materials tab -->
-                <div class="tab-pane fade h-100" id="materialsTab" role="tabpanel" aria-labelledby="materials-tab">
-                    <!-- materials -->
-                    <div class="h-50">
-                        <b>Materials</b>
-                        <div id="materials"></div>
-                    </div>
-                    <hr />
-                    <!-- crafting -->
-                    <div class="h-50">
-                        <b>Crafting</b>
-                        <div class="d-flex">
-                            <!-- recipe list -->
-                            <div class="w-50">
-                                <div id="recipes"></div>
-                            </div>
-                            <!-- item preview -->
-                            <div class="w-50">
-                                <div id="craftPreview"></div>
+                    <!-- materials tab -->
+                    <div class="tab-pane fade h-100" id="materialsTab" role="tabpanel" aria-labelledby="materials-tab">
+                        <!-- materials -->
+                        <div class="h-50">
+                            <b>Materials</b>
+                            <div id="materials"></div>
+                        </div>
+                        <hr />
+                        <!-- crafting -->
+                        <div class="h-50">
+                            <b>Crafting</b>
+                            <div class="d-flex">
+                                <!-- recipe list -->
+                                <div class="w-50">
+                                    <div id="recipes"></div>
+                                </div>
+                                <!-- item preview -->
+                                <div class="w-50">
+                                    <div id="craftPreview"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <!-- weapons -->
+                    <div class="tab-pane fade h-100" id="weaponTab" role="tabpanel" aria-labelledby="weapon-tab"></div>
+                    <!-- armors -->
+                    <div class="tab-pane fade h-100" id="armorTab" role="tabpanel" aria-labelledby="armor-tab"></div>
                 </div>
-                <!-- weapons -->
-                <div class="tab-pane fade h-100" id="weaponTab" role="tabpanel" aria-labelledby="weapon-tab"></div>
-                <!-- armors -->
-                <div class="tab-pane fade h-100" id="armorTab" role="tabpanel" aria-labelledby="armor-tab"></div>
             </div>
-        </div>
-        <!-- shop -->
-        <div class="shop">
-            <b class="shop-name"></b>
-            <p>Your gold: <span class="player-gold"></span></p>
-            <div class="container">
-                <div class="row">
-                    <div class="shop-buy col"></div>
-                    <div class="shop-sell col"></div>
-                    <div class="shop-buyback col"></div>
+            <!-- shop -->
+            <div class="shop">
+                <b class="shop-name"></b>
+                <p>Your gold: <span class="player-gold"></span></p>
+                <div class="container">
+                    <div class="row">
+                        <div class="shop-buy col"></div>
+                        <div class="shop-sell col"></div>
+                        <div class="shop-buyback col"></div>
+                    </div>
+                    <div class="shop-hover-info row"></div>
                 </div>
-                <div class="shop-hover-info row"></div>
             </div>
-        </div>
-    </dialog>
-</div>
-<div id="playerDead">
-    <!-- div inside div so d-flex doesn't override jQuery hide for some reason -->
-    <div class="d-flex flex-column">
-        <p>Oops!</p>
-        <p>Looks like you're dead.</p>
-        <div class="d-flex justify-content-center">
-            <button id="respawnButton" class="btn btn-primary">Respawn</button>
+        </dialog>
+    </div>
+    <!-- shown when the player is dead -->
+    <div class="view-dead">
+        <!-- div inside div so d-flex doesn't override jQuery hide for some reason -->
+        <div class="d-flex flex-column">
+            <p>Oops!</p>
+            <p>Looks like you're dead.</p>
+            <div class="d-flex justify-content-center">
+                <button id="respawn-button" class="btn btn-primary">Respawn</button>
+            </div>
         </div>
     </div>
 </div>

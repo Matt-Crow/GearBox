@@ -1,5 +1,4 @@
 import { Canvas } from "./components/canvas.js";
-import { GameOverScreen } from "./components/gameOverScreen.js";
 import { PlayerHud } from "./components/playerHud.js";
 import { handleGameInit } from "./messageHandlers/gameInitHandler.js";
 import { characterDeserializer } from "./model/character.js";
@@ -10,6 +9,7 @@ import { Area, AreaUpdateHandler } from "./model/area.js";
 import { TileMap } from "./model/map.js";
 import { Shop } from "./model/shop.js";
 import { MainModal } from "./components/mainModal.js";
+import { Views } from "./components/views/views.js";
 
 export class Game {
 
@@ -26,7 +26,7 @@ export class Game {
     #playerHud;
 
 
-    #gameOverScreen;
+    #views;
 
     #areaUpdateHandler = () => {throw new Error("Cannot handle area update until after area init")};
 
@@ -38,13 +38,13 @@ export class Game {
      * @param {Canvas} canvas the custom canvas component to draw on.
      * @param {MainModal} mainModal 
      * @param {PlayerHud} playerHud the player HUD for the current player
-     * @param {GameOverScreen} gameOverScreen 
+     * @param {Views} views 
      */
-    constructor(canvas, mainModal, playerHud, gameOverScreen) {
+    constructor(canvas, mainModal, playerHud, views) {
         this.#canvas = canvas
         this.#mainModal = mainModal;
         this.#playerHud = playerHud;
-        this.#gameOverScreen = gameOverScreen;
+        this.#views = views;
         this.#area = null;
         setInterval(() => this.#draw(), 1000 / 24);
     }
@@ -75,7 +75,7 @@ export class Game {
             .addGameObjectType(new PlayerChangeHandler(this.#gameData.playerId, this.#playerHud.playerUpdateListener))
             .addGameObjectType(projectileDeserializer)
             .addGameObjectType(new LootChestJsonDeserializer(this.#gameData.playerId))
-            .addUpdateListener(w => this.#gameOverScreen.update(w))
+            .addUpdateListener(w => this.#views.handleAreaUpdate(w))
             .addInventoryChangeListener(inv => this.#mainModal.setInventory(inv))
             .addWeaponChangeListener(wea => this.#mainModal.setWeapon(wea))
             .addArmorChangeListener(arm => this.#mainModal.setArmor(arm))

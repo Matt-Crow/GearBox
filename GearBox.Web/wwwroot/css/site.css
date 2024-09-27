@@ -21,13 +21,13 @@ body {
   margin-bottom: 60px;
 }
 
-#playerDead {
+#views .view-dead {
   min-height: 100vh;
   min-width: 100vw;
   background-color: black;
 }
 
-#playerDead p {
+#views .view-dead {
   color: yellow;
   text-align: center;
 }
