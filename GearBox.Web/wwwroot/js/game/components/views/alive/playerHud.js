@@ -1,27 +1,20 @@
-import { Player } from "../model/player.js";
+import { Player } from "../../../model/player.js";
 
 export class PlayerHud {
     #element;
     #previous = null;
-    #playerUpdateListener;
 
     /**
      * @param {HTMLDivElement} element 
      */
     constructor(element) {
         this.#element = element;
-        this.#playerUpdateListener = p => this.#bindIfChanged(p);
     }
-
-    /**
-     * @returns {(p: Player) => any}
-     */
-    get playerUpdateListener() { return this.#playerUpdateListener; }
 
     /**
      * @param {Player} player 
      */
-    #bindIfChanged(player) {
+    bindIfChanged(player) {
         // stops flickering in the UI
         if (this.#previous === null || this.#hasPlayerChanged(player)) {
             this.#bind(player);

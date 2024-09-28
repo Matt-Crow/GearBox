@@ -10,11 +10,8 @@ export class Views {
     #viewAlive;
     #wasAliveLastTime = null;
 
-    /**
-     * @param {string} selector 
-     */
-    constructor(selector) {
-        this.#selector = selector;
+    constructor() {
+        this.#selector = "#views";
         this.#switcher = new Switcher(this.#selector);
         this.#viewAlive = new ViewAlive();
         this.#show(".view-loading");
@@ -33,6 +30,8 @@ export class Views {
      * @param {Area} area 
     */
     handleAreaUpdate(area) {
+        this.#viewAlive.handleAreaUpdate(area);
+
         const aliveNow = !!area.player;
         if (aliveNow === this.#wasAliveLastTime) {
            return; // no changes, so don't flicker the screen

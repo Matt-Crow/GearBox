@@ -21,31 +21,8 @@ export class Player extends Character {
     }
 
     get energy() { return this.#energy; }
-}
 
-export class PlayerChangeHandler extends JsonDeserializer {
-    #playerId;
-    #changeListener;
-
-    constructor(playerId, changeListener) {
-        super("playerCharacter", obj => this.#handle(obj));
-        this.#playerId = playerId;
-        this.#changeListener = changeListener;
-    }
-
-    /**
-     * @param {object} json 
-     * @returns {Player}
-     */
-    #handle(json) {
-        const player = this.#deserialize(json);
-        if (player.id === this.#playerId) {
-            this.#changeListener(player);
-        }
-        return player;
-    }
-
-    #deserialize(json) {
+    static fromJson(json) {
         var result = new Player(
             json.id, 
             json.name,
@@ -57,6 +34,12 @@ export class PlayerChangeHandler extends JsonDeserializer {
             new Fraction(json.energy.current, json.energy.max)
         );
         return result;
+    }
+}
+
+export class PlayerJsonDeserializer extends JsonDeserializer {
+    constructor() {
+        super("playerCharacter", json => Player.fromJson(json));
     }
 }
 

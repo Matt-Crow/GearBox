@@ -21,6 +21,20 @@ body {
   margin-bottom: 60px;
 }
 
+#player-hud-hp {
+  border: 5px solid red;
+  border-radius: 100%;
+  background-color: red;
+  color: white;
+}
+
+#player-hud-energy {
+  border: 5px solid blue;
+  border-radius: 100%;
+  background-color: blue;
+  color: white;
+}
+
 #views .view-dead {
   min-height: 100vh;
   min-width: 100vw;

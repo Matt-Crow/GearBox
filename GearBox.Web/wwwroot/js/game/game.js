@@ -1,8 +1,7 @@
-import { PlayerHud } from "./components/playerHud.js";
 import { handleGameInit } from "./messageHandlers/gameInitHandler.js";
 import { characterDeserializer } from "./model/character.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
-import { PlayerChangeHandler } from "./model/player.js";
+import { PlayerJsonDeserializer } from "./model/player.js";
 import { projectileDeserializer } from "./model/projectile.js";
 import { Area, AreaUpdateHandler } from "./model/area.js";
 import { TileMap } from "./model/map.js";
@@ -12,12 +11,6 @@ import { Views } from "./components/views/views.js";
 
 export class Game {
     #mainModal;
-
-    /**
-     * The PlayerHud for the current player.
-     */
-    #playerHud;
-
 
     #views;
 
@@ -29,12 +22,10 @@ export class Game {
 
     /**
      * @param {MainModal} mainModal 
-     * @param {PlayerHud} playerHud the player HUD for the current player
      * @param {Views} views 
      */
-    constructor(mainModal, playerHud, views) {
+    constructor(mainModal, views) {
         this.#mainModal = mainModal;
-        this.#playerHud = playerHud;
         this.#views = views;
         this.#area = null;
         setInterval(() => this.#draw(), 1000 / 24);
@@ -63,7 +54,7 @@ export class Game {
         );
         const updateHandler = new AreaUpdateHandler(area)
             .addGameObjectType(characterDeserializer)
-            .addGameObjectType(new PlayerChangeHandler(this.#gameData.playerId, this.#playerHud.playerUpdateListener))
+            .addGameObjectType(new PlayerJsonDeserializer())
             .addGameObjectType(projectileDeserializer)
             .addGameObjectType(new LootChestJsonDeserializer(this.#gameData.playerId))
             .addUpdateListener(w => this.#views.handleAreaUpdate(w))
