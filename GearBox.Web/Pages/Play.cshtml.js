@@ -1,7 +1,6 @@
 import { Game } from "../js/game/game.js";
 import { PlayerHud } from "../js/game/components/playerHud.js";
 import { Client } from "../js/game/infrastructure/client.js";
-import { Canvas } from "../js/game/components/canvas.js";
 import { MainModal } from "../js/game/components/mainModal.js";
 import { Views } from "../js/game/components/views/views.js";
 
@@ -14,11 +13,11 @@ async function main() {
     const client = new Client(connection);
     $("#respawn-button").on("click", () => client.respawn());
     
-    const canvas = new Canvas(findElement("#canvas"));
     const mainModal = new MainModal("#main-modal", client);
     const hud = new PlayerHud(findElement("#playerHud"));
     const views = new Views("#views"); // todo move more stuff into this
-    const game = new Game(canvas, mainModal, hud, views);
+    const canvas = views.viewAlive.canvas;
+    const game = new Game(mainModal, hud, views);
     
     connection.on("GameInit", handle(json => game.handleGameInit(json)));
     connection.on("AreaUpdate", handle(json => game.handleAreaUpdate(json)));

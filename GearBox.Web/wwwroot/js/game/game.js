@@ -1,4 +1,3 @@
-import { Canvas } from "./components/canvas.js";
 import { PlayerHud } from "./components/playerHud.js";
 import { handleGameInit } from "./messageHandlers/gameInitHandler.js";
 import { characterDeserializer } from "./model/character.js";
@@ -12,12 +11,6 @@ import { MainModal } from "./components/mainModal.js";
 import { Views } from "./components/views/views.js";
 
 export class Game {
-
-    /**
-     * The custom canvas component this draws on.
-     */
-    #canvas;
-
     #mainModal;
 
     /**
@@ -35,13 +28,11 @@ export class Game {
     #area; // required for getting mouse cursor position relative to player :(
 
     /**
-     * @param {Canvas} canvas the custom canvas component to draw on.
      * @param {MainModal} mainModal 
      * @param {PlayerHud} playerHud the player HUD for the current player
      * @param {Views} views 
      */
-    constructor(canvas, mainModal, playerHud, views) {
-        this.#canvas = canvas
+    constructor(mainModal, playerHud, views) {
         this.#mainModal = mainModal;
         this.#playerHud = playerHud;
         this.#views = views;
@@ -97,7 +88,7 @@ export class Game {
 
     #draw() {
         if (this.#area) {
-            this.#canvas.draw(this.#area);
+            this.#views.viewAlive.canvas.draw(this.#area);
         }
     }
 }

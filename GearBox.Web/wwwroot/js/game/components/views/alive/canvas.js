@@ -1,4 +1,4 @@
-import { Area } from "../model/area.js";
+import { Area } from "../../../model/area.js";
 
 export class Canvas {
     #element;

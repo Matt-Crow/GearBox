@@ -1,4 +1,5 @@
 import { Switcher } from "../shared/switcher.js";
+import { ViewAlive } from "./alive/viewAlive.js";
 
 /*
     Manages the main views div
@@ -6,6 +7,7 @@ import { Switcher } from "../shared/switcher.js";
 export class Views {
     #selector;
     #switcher;
+    #viewAlive;
     #wasAliveLastTime = null;
 
     /**
@@ -14,8 +16,14 @@ export class Views {
     constructor(selector) {
         this.#selector = selector;
         this.#switcher = new Switcher(this.#selector);
+        this.#viewAlive = new ViewAlive();
         this.#show(".view-loading");
     }
+
+    /**
+     * @returns {ViewAlive}
+     */
+    get viewAlive() { return this.#viewAlive; }
 
     #show(viewSelector) {
         this.#switcher.show(`${this.#selector} ${viewSelector}`);
