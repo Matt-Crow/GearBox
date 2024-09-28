@@ -13,6 +13,8 @@ export class Canvas {
     constructor(element) {
         this.#element = element;
         element.addEventListener("mousemove", e => this.#mouseMoved(e));
+        window.addEventListener("resize", _ => this.#resize());
+        setTimeout(() => this.#resize(), 500); // hacky, but prevents bug where left = 0
     }
 
     /**
@@ -33,6 +35,12 @@ export class Canvas {
         const box = this.#element.getBoundingClientRect();
         this.#mouseX = e.clientX - box.left;
         this.#mouseY = e.clientY - box.top;
+    }
+
+    #resize() {
+        const left = this.#element.getBoundingClientRect().left;
+        this.#element.width = window.innerWidth - left*2;
+        this.#element.height = window.innerHeight * 0.8;
     }
 
     /**
