@@ -62,6 +62,38 @@ export class ItemDisplay {
             .empty()
             .append(details);
     }
+
+    hide() {
+        $(this.#selector).hide();
+        return this;
+    }
+
+    handleRowCreated(record, row) {
+        row.addEventListener("mouseenter", _ => {
+            this.bind(record);
+            $(this.#selector).show();
+        });
+        row.addEventListener("mouseleave", _ => {
+            this.bind(null);
+            $(this.#selector).hide();
+        });
+        row.addEventListener("mousemove", e => {
+            /*
+                e.client_ is relative to viewport
+                css left is relative to containing block
+                so need to convert e.client_ to relative to containing block
+                https://developer.mozilla.org/en-US/docs/Web/CSS/left#:~:text=for%20absolutely%20positioned%20elements%2C%20the%20distance%20to%20the%20left%20edge%20of%20the%20containing%20block
+            */
+            const containingBlock = $(e.target).offsetParent();
+            const blockCoords = containingBlock[0].getBoundingClientRect();
+            $(this.#selector)
+                .css({
+                    left: e.clientX - blockCoords.left + 25,
+                    top: e.clientY - blockCoords.top + 25
+                })
+                .show();
+        });
+    }
 }
 
 function stars(num) {

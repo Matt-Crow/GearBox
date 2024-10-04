@@ -23,7 +23,10 @@ export class EquipmentTab {
             new DataColumn("Level", e => e.level),
             new DataColumn("Description", e => e.description),
             new ActionColumn("Action", "Equip", e => this.#onEquip(e.id))
-        ], e => this.#setCompare(e));
+        ], (record, row) => {
+            row.addEventListener("mouseenter", _ => this.#setCompare(record));
+            row.addEventListener("mouseleave", _ => this.#setCompare(null));
+        });
         this.#spawnHtml();
         this.#currentEquipment = new ItemDisplay(`${selector} .currentEquipment`, "Current equipment", "Nothing equipped")
             .spawnHtml();

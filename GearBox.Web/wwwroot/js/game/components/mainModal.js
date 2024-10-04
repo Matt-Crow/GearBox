@@ -46,18 +46,19 @@ export class MainModal {
             new DataColumn("Type", m => m.name),
             new DataColumn("Description", m => m.description),
             new DataColumn("Quantity", m => m.quantity)
-        ], _ => null); // do nothing on hover
+        ]);
         this.#materialTable.spawnHtml();
+
+        this.#craftPreview = new ItemDisplay("#craft-preview", "Preview")
+            .spawnHtml()
+            .hide();
 
         this.#recipeTable = new Table("#recipes", [
             new DataColumn("Recipe", r => r.makes.name),
             new DataColumn("Ingredients", r => r.ingredients.map(i => `${i.name} x${i.quantity}`).join(", ")),
             new ActionColumn("Action", "craft", r => this.#client.craft(r.id))
-        ], r => this.#setCraftPreview(r?.makes));
+        ], (record, row) => this.#craftPreview.handleRowCreated(record?.makes, row));
         this.#recipeTable.spawnHtml();
-
-        this.#craftPreview = new ItemDisplay("#craftPreview", "Preview", "Hover over a craft button to preview")
-            .spawnHtml();
         
         this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equipWeapon(id));
         this.#armorTab = new EquipmentTab("#armorTab", id => client.equipArmor(id));
@@ -83,7 +84,10 @@ export class MainModal {
             new DataColumn("Item", x => x.item.name),
             new DataColumn("Price", x => x.price),
             new ConditionalActionColumn("Action", buttonText, onButtonClick, i => i.canAfford)
-        ], shopOption => this.#shopHoverInfo.bind(shopOption?.item));
+        ], (record, row) => {
+            row.addEventListener("mouseenter", _ => this.#shopHoverInfo.bind(record?.item));
+            row.addEventListener("mouseleave", _ => this.#shopHoverInfo.bind(null));
+        });
         result.spawnHtml();
         return result;
     }
@@ -113,13 +117,6 @@ export class MainModal {
      */
     setCraftingRecipes(craftingRecipes) {
         this.#recipeTable.setRecords(craftingRecipes);
-    }
-
-    /**
-     * @param {Item?} item 
-     */
-    #setCraftPreview(item) {
-        this.#craftPreview.bind(item);
     }
 
     /**
