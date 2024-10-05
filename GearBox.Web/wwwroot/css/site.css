@@ -48,6 +48,8 @@ body {
 
 .gb-tooltip {
   background-color: white;
+  border: 5px solid black;
+  padding: 5px;
   position: absolute;
   z-index: 1;
 }

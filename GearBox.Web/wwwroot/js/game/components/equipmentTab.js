@@ -17,20 +17,17 @@ export class EquipmentTab {
     constructor(selector, onEquip) {
         this.#selector = selector;
         this.#onEquip = onEquip;
-        this.#table = new Table(`${this.#selector} .equipmentTable`, [
+        this.#table = new Table(`${this.#selector} .equipment-table`, [
             new DataColumn("Name", e => e.name),
             new DataColumn("Grade", e => e.gradeName),
             new DataColumn("Level", e => e.level),
             new DataColumn("Description", e => e.description),
             new ActionColumn("Action", "Equip", e => this.#onEquip(e.id))
-        ], (record, row) => {
-            row.addEventListener("mouseenter", _ => this.#setCompare(record));
-            row.addEventListener("mouseleave", _ => this.#setCompare(null));
-        });
+        ], (record, row) => this.#compareEquipment.handleRowCreated(record, row));
         this.#spawnHtml();
-        this.#currentEquipment = new ItemDisplay(`${selector} .currentEquipment`, "Current equipment", "Nothing equipped")
+        this.#currentEquipment = new ItemDisplay(`${selector} .current-equipment`, "Current equipment", "Nothing equipped")
             .spawnHtml();
-        this.#compareEquipment = new ItemDisplay(`${selector} .compareEquipment`, "Other equipment", "Hover over a row to compare")
+        this.#compareEquipment = new ItemDisplay(`${selector} .compare-equipment`, "Other equipment")
             .spawnHtml();
         this.#setCompare(null);
     }
@@ -39,12 +36,12 @@ export class EquipmentTab {
         $(this.#selector)
             .empty()
             .append($("<div>").addClass("table-responsive").addClass("h-50")
-                .append($("<div>").addClass("equipmentTable"))
+                .append($("<div>").addClass("equipment-table"))
             )
             .append($("<div>").addClass("h-50").addClass("container")
                 .append($("<div>").addClass("row")
-                    .append($("<div>").addClass("col-6").addClass("currentEquipment"))
-                    .append($("<div>").addClass("col-6").addClass("compareEquipment"))
+                    .append($("<div>").addClass("col-6").addClass("current-equipment"))
+                    .append($("<div>").addClass("col-6").addClass("compare-equipment gb-tooltip"))
                 )
             );
         this.#table.spawnHtml();

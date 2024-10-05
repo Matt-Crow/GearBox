@@ -66,7 +66,7 @@ export class MainModal {
         this.#shopBuyTable = this.#makeShopTable(".shop-buy", "buy", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopSellTable = this.#makeShopTable(".shop-sell", "sell", opt => client.shopSell(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopBuybackTable = this.#makeShopTable(".shop-buyback", "buy back", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
-        this.#shopHoverInfo = new ItemDisplay(`${selector} .shop-hover-info`, "Item Preview", "Hover over an item to preview it");
+        this.#shopHoverInfo = new ItemDisplay(`${selector} .shop-preview`, "Item Preview");
         this.#shopHoverInfo.spawnHtml();
     
         this.setWeapon(null);
@@ -84,10 +84,7 @@ export class MainModal {
             new DataColumn("Item", x => x.item.name),
             new DataColumn("Price", x => x.price),
             new ConditionalActionColumn("Action", buttonText, onButtonClick, i => i.canAfford)
-        ], (record, row) => {
-            row.addEventListener("mouseenter", _ => this.#shopHoverInfo.bind(record?.item));
-            row.addEventListener("mouseleave", _ => this.#shopHoverInfo.bind(null));
-        });
+        ], (record, row) => this.#shopHoverInfo.handleRowCreated(record?.item, row));
         result.spawnHtml();
         return result;
     }
