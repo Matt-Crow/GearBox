@@ -24,7 +24,7 @@ export class ItemDisplay {
             .empty()
             .append($("<div>").addClass("itemYes")
                 .append($("<h2>").text(this.#title))
-                .append($("<p>").append($("<b>").addClass("itemName")))
+                .append($("<p>").append($("<b>").addClass("itemName text-nowrap")))
                 .append($("<p>").append($("<i>").addClass("itemDescription")))
                 .append($("<ul>").addClass("itemDetails"))
             )
@@ -61,6 +61,11 @@ export class ItemDisplay {
             .find(".itemDetails")
             .empty()
             .append(details);
+    }
+
+    show() {
+        $(this.#selector).show();
+        return this;
     }
 
     hide() {

@@ -67,9 +67,12 @@ export class MainModal {
         this.#shopSellTable = this.#makeShopTable(".shop-sell", "sell", opt => client.shopSell(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopBuybackTable = this.#makeShopTable(".shop-buyback", "buy back", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopHoverInfo = new ItemDisplay(`${selector} .shop-preview`, "Item Preview");
-        this.#shopHoverInfo.spawnHtml();
+        this.#shopHoverInfo
+            .spawnHtml()
+            .hide();
     
         this.setWeapon(null);
+        this.setArmor(null);
         this.setShop(null);
     }
 
