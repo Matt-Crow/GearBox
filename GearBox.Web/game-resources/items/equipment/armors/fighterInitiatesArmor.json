@@ -1,0 +1,9 @@
+{
+    "Name": "Fighter Initiate's Armor",
+    "GradeName": "Common",
+    "ArmorClassName": "Heavy",
+    "Stats": {
+        "Offense": 1,
+        "HP": 1
+    }
+}

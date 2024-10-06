@@ -23,6 +23,8 @@ public class PlayerStatType
         _getStatFrom = something;
     }
 
+    public static PlayerStatType? GetPlayerStatTypeByName(string name) => ALL.FirstOrDefault(x => x._name == name);
+
     public PlayerStat GetStatFrom(PlayerStats stats) => _getStatFrom(stats);
 
     public override string ToString() => _name;

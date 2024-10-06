@@ -1,0 +1,9 @@
+{
+    "Name": "Training Bow",
+    "GradeName": "Common",
+    "RangeName": "Long",
+    "Stats": {
+        "Offense": 1,
+        "Speed": 1
+    }
+}

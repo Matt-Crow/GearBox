@@ -1,0 +1,9 @@
+{
+    "Name": "Mage Initiate's Armor",
+    "GradeName": "Common",
+    "ArmorClassName": "Light",
+    "Stats": {
+        "Offense": 1,
+        "Energy": 1
+    }
+}

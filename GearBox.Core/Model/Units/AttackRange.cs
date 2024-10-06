@@ -1,11 +1,13 @@
 namespace GearBox.Core.Model.Units;
 
-public readonly struct AttackRange
+public class AttackRange
 {
     private readonly string _asString;
     public static readonly AttackRange MELEE = new("Melee range", Distance.FromTiles(1), 1.0, Color.GRAY);
     public static readonly AttackRange MEDIUM = new("Medium range", Distance.FromTiles(5), 0.9, Color.RED);
     public static readonly AttackRange LONG = new("Long range", Distance.FromTiles(10), 0.8, Color.BLACK);
+
+    public static readonly IEnumerable<AttackRange> ALL = [MELEE, MEDIUM, LONG];
 
     private AttackRange(string asString, Distance range, double weaponStatPenalty, Color projectileColor)
     {
@@ -14,6 +16,8 @@ public readonly struct AttackRange
         WeaponStatMultiplier = weaponStatPenalty;
         ProjectileColor = projectileColor;
     }
+
+    public static AttackRange? GetAttackRangeByName(string name) => ALL.FirstOrDefault(x => x._asString == name || x._asString == name + " range");
 
     /// <summary>
     /// How far this attack can travel
