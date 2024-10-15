@@ -29,7 +29,7 @@ public class PursueAiBehavior : IAiBehavior
         _controlling.StartMovingIn(newDirection);
 
         // check if close enough to attack
-        if (_controlling.BasicAttack.CanReach(_pursuing))
+        if (_controlling.BasicAttack.CanReach(_controlling, _pursuing))
         {
             _controlling.AiBehavior = new AttackAiBehavior(_controlling, _pursuing);
         }

@@ -25,7 +25,6 @@ public abstract class Character : IGameObject
         Serializer = new(Type, Serialize);
         Termination = new(this, () => DamageTaken >= MaxHitPoints);
         SetLevel(level);
-        BasicAttack = new(this);
     }
 
 
@@ -43,7 +42,7 @@ public abstract class Character : IGameObject
     public int Level { get; private set; }
     public double DamageModifier { get; protected set; } = 0.0;
     public ArmorClass ArmorClass { get; protected set; } = ArmorClass.NONE;
-    public BasicAttack BasicAttack { get; init; }
+    public BasicAttack BasicAttack { get; init; } = new BasicAttack();
     public IArea? CurrentArea { get; private set; }
     public IArea? LastArea { get; private set; }
     public Team Team { get; set; } = new(); // default to each on their own team
@@ -100,7 +99,7 @@ public abstract class Character : IGameObject
 
     public void UseBasicAttack(Direction inDirection)
     {
-        BasicAttack.Use(inDirection);
+        BasicAttack.Use(this, inDirection);
     }
 
     public void TakeDamage(int damage)

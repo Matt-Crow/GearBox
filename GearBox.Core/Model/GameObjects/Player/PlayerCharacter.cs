@@ -3,8 +3,6 @@ using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
 using System.Text.Json;
-using GearBox.Core.Model.Json.AreaUpdate;
-using GearBox.Core.Model.Json.AreaInit;
 using GearBox.Core.Model.Items.Shops;
 
 namespace GearBox.Core.Model.GameObjects.Player;
@@ -106,13 +104,21 @@ public class PlayerCharacter : Character
 
     public void GainXp(int xp)
     {
-        // untested
         Xp += xp;
         while (Xp >= XpToNextLevel)
         {
             SetLevel(Level + 1);
             UpdateStats();
             XpToNextLevel = GetXpByLevel(Level + 1);
+        }
+    }
+
+    public void LoseEnergy(int energy)
+    {
+        EnergyExpended += energy;
+        if (EnergyExpended > MaxEnergy)
+        {
+            EnergyExpended = MaxEnergy;
         }
     }
 
