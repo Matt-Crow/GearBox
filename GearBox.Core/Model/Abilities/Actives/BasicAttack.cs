@@ -13,9 +13,9 @@ public class BasicAttack() : ActiveAbility("Basic Attack", 0, Duration.FromSecon
         return distance.InPixels <= Range.Range.InPixels;
     }
 
-    protected override void OnUse(Character user, Direction inDirection)
+    protected override void OnUse(Character user, Direction inDirection, Attack attack)
     {
-        SpawnProjectile(user, inDirection, Range, 1.0);
+        SpawnProjectile(user, inDirection, attack, Range);
     }
 
     public override BasicAttack Copy() => new BasicAttack();

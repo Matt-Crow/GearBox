@@ -52,6 +52,8 @@ public class GameHub : Hub
     /// </summary>
     public Task UseBasicAttack(int bearingInDegrees) => Receive(new UseBasicAttack(Direction.FromBearingDegrees(bearingInDegrees)));
 
+    public Task UseActive(int number, int bearingInDegrees) => Receive(new UseActive(number, Direction.FromBearingDegrees(bearingInDegrees)));
+
     private Task Receive(IControlCommand command)
     {
         var id = Context.ConnectionId;

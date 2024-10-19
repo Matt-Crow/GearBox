@@ -4,12 +4,14 @@ using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
 using System.Text.Json;
 using GearBox.Core.Model.Items.Shops;
+using GearBox.Core.Model.Abilities.Actives;
 
 namespace GearBox.Core.Model.GameObjects.Player;
 
 public class PlayerCharacter : Character
 {
     private int _frameCount = 0; // used for regeneration
+    private readonly List<IActiveAbility> _actives = [];
 
     public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp), Color.BLUE)
     {
@@ -43,6 +45,15 @@ public class PlayerCharacter : Character
         SetOpenShop(null);
         AreaChanged?.Invoke(this, new AreaChangedEventArgs(this, CurrentArea, newArea));
         base.SetArea(newArea);
+    }
+
+    public void UseActive(int number, Direction inDirection)
+    {
+        var i = number - 1;
+        if (0 <= i && i < _actives.Count)
+        {
+            _actives[i].Use(this, inDirection);
+        }
     }
 
     public void SetOpenShop(ItemShop? shop)
@@ -137,11 +148,16 @@ public class PlayerCharacter : Character
 
         // restore 5% HP & energy per second
         _frameCount++;
-        if (_frameCount >= Duration.FromSeconds(5).InFrames)
+        if (_frameCount >= Duration.FromSeconds(1).InFrames)
         {
             HealPercent(0.05);
             RechargePercent(0.05);
             _frameCount = 0;
+        }
+
+        foreach (var active in _actives)
+        {
+            active.Update();
         }
     }
 

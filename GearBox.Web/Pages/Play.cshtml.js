@@ -34,18 +34,28 @@ async function main() {
         }
     });
 
+    const getBearing = () => {
+        const [px, py] = game.getPlayerCoords();
+        const dx = canvas.translatedMouseX - px;
+        const dy = canvas.translatedMouseY - py;
+        const angleInRadians = Math.atan2(-dy, dx); // y first, then x. -dy flips
+        const angleInDegrees = Math.trunc(180 * angleInRadians / Math.PI); // convert to int so it doesn't crash server
+        const bearing = 90 - angleInDegrees;
+        return bearing;
+    };
     document.addEventListener("keydown", e => {
         // uses e.repeat to check if key is held down
         if (keyMappings.has(e.code) && !e.repeat) {
             keyMappings.get(e.code)[1]();
         }
+        if (e.code.startsWith("Digit")) {
+            const numberAsString = e.code.replace("Digit", "");
+            const number = parseInt(numberAsString);
+            const bearing = getBearing();
+            client.useActive(number, bearing);
+        }
         if (e.code == "KeyQ") {
-            const [px, py] = game.getPlayerCoords();
-            const dx = canvas.translatedMouseX - px;
-            const dy = canvas.translatedMouseY - py;
-            const angleInRadians = Math.atan2(-dy, dx); // y first, then x. -dy flips
-            const angleInDegrees = Math.trunc(180 * angleInRadians / Math.PI); // convert to int so it doesn't crash server
-            const bearing = 90 - angleInDegrees;
+            const bearing = getBearing();
             client.useBasicAttack(bearing);
         }
         if (e.code == "KeyE") { 

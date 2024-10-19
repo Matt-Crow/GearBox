@@ -1,5 +1,6 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model;
+using GearBox.Core.Model.Abilities.Actives.Impl;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
@@ -18,6 +19,10 @@ webAppBuilder.Configuration
     .Bind(gearboxConfig);
 
 var game = new GameBuilder(gearboxConfig)
+    .DefineActiveAbilities(actives => actives
+        .Add(new Cleave())
+        .Add(new Firebolt())
+    )
     .DefineItems(items =>
     {
         foreach (var item in itemResources)

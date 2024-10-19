@@ -39,7 +39,8 @@ public abstract class ActiveAbility : IActiveAbility
         {
             return;
         }
-        OnUse(user, inDirection);
+        var attack = new Attack(user, GetDamageWhenUsedBy(user)); 
+        OnUse(user, inDirection, attack);
         _framesUntilNextUse = Cooldown.InFrames;
         if (user is PlayerCharacter player)
         {
@@ -47,17 +48,12 @@ public abstract class ActiveAbility : IActiveAbility
         }
     }
 
-    protected abstract void OnUse(Character user, Direction inDirection);
+    protected abstract void OnUse(Character user, Direction inDirection, Attack attack);
 
-    protected void SpawnProjectile(Character user, Direction inDirection, AttackRange range, double damageMultiplier)
+    protected void SpawnProjectile(Character user, Direction inDirection, Attack attack, AttackRange range)
     {
-        var inArea = user.CurrentArea ?? throw new Exception("Cannot use basic attack when not in an area");
-        
-        var damage = GetBaseDamagePerHitByLevel(user.Level) * (1.0 + user.DamageModifier) * damageMultiplier;
-        
-        // todo pull up in case multiple projectiles
-        var attack = new Attack(user, (int)damage); 
-        
+        var inArea = user.CurrentArea ?? throw new Exception("Cannot spawn projectile when not in an area");
+
         var projectile = new Projectile(
             user.Coordinates, 
             Velocity.FromPolar(Speed.FromTilesPerSecond(range.Range.InTiles), inDirection),
@@ -83,10 +79,11 @@ public abstract class ActiveAbility : IActiveAbility
     /// <summary>
     /// Helper method - only needed for damaging active abilities
     /// </summary>
-    protected static int GetBaseDamagePerHitByLevel(int level)
+    protected virtual int GetDamageWhenUsedBy(Character user)
     {
         // ranges from 50 to 183
-        var result = 43 + 7*level;
-        return result;
+        var result = 43.0 + 7*user.Level;
+        result = result*(1.0 + user.DamageModifier);
+        return (int)result;
     }
 }
