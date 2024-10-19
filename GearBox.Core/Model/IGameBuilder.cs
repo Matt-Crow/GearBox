@@ -1,3 +1,4 @@
+using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Crafting;
@@ -7,6 +8,7 @@ namespace GearBox.Core.Model;
 
 public interface IGameBuilder
 {
+    IGameBuilder DefineActiveAbilities(Func<IActiveAbilityFactory, IActiveAbilityFactory> defineActives);
     IGameBuilder DefineItems(Func<IItemFactory, IItemFactory> defineItems);
     IGameBuilder DefineEnemies(Func<IEnemyRepository, IEnemyRepository> defineEnemies);
     IGameBuilder AddCraftingRecipe(Func<CraftingRecipeBuilder, CraftingRecipe> recipe);

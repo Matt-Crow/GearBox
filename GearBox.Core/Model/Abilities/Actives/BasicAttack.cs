@@ -3,7 +3,7 @@ using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.Abilities.Actives;
 
-public class BasicAttack() : ActiveAbility(0, Duration.FromSeconds(0.5))
+public class BasicAttack() : ActiveAbility("Basic Attack", 0, Duration.FromSeconds(0.5))
 {
     public AttackRange Range { get; set; } = AttackRange.MELEE;
 
@@ -17,4 +17,6 @@ public class BasicAttack() : ActiveAbility(0, Duration.FromSeconds(0.5))
     {
         SpawnProjectile(user, inDirection, Range, 1.0);
     }
+
+    public override BasicAttack Copy() => new BasicAttack();
 }

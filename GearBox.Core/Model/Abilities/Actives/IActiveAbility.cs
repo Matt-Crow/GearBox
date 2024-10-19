@@ -9,6 +9,11 @@ namespace GearBox.Core.Model.Abilities.Actives;
 public interface IActiveAbility
 {
     /// <summary>
+    /// Must be unique within a game
+    /// </summary>
+    string Name { get; }
+
+    /// <summary>
     /// How must energy it costs a player to trigger this ability
     /// </summary>
     int EnergyCost { get; }
@@ -37,4 +42,9 @@ public interface IActiveAbility
     /// Called at the end of each frame
     /// </summary>
     void Update();
+
+    /// <summary>
+    /// Returns a deep copy of this
+    /// </summary>
+    IActiveAbility Copy();
 }

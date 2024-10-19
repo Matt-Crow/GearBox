@@ -8,12 +8,14 @@ public abstract class ActiveAbility : IActiveAbility
 {
     private int _framesUntilNextUse = 0;
 
-    public ActiveAbility(int energyCost, Duration cooldown)
+    public ActiveAbility(string name, int energyCost, Duration cooldown)
     {
+        Name = name;
         EnergyCost = energyCost;
         Cooldown = cooldown;
     }
 
+    public string Name { get; init; }
     public int EnergyCost { get; init; }
     public Duration Cooldown { get; init; }
     public Duration TimeUntilNextUse => Duration.FromFrames(_framesUntilNextUse);
@@ -75,6 +77,8 @@ public abstract class ActiveAbility : IActiveAbility
             _framesUntilNextUse = 0;
         }
     }
+
+    public abstract IActiveAbility Copy();
 
     /// <summary>
     /// Helper method - only needed for damaging active abilities

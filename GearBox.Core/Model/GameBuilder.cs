@@ -1,4 +1,5 @@
 using GearBox.Core.Config;
+using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Crafting;
@@ -9,6 +10,7 @@ namespace GearBox.Core.Model;
 public class GameBuilder : IGameBuilder
 {
     private readonly GearBoxConfig _config;
+    private readonly IActiveAbilityFactory _actives = new ActiveAbilityFactory();
     private readonly HashSet<CraftingRecipe> _craftingRecipes = [];
     private readonly List<AreaBuilder> _areas = []; // must be ordered so the first area added is the default area
     private readonly IItemFactory _itemFactory = new ItemFactory();
@@ -18,6 +20,12 @@ public class GameBuilder : IGameBuilder
     {
         _config = config;
         _enemies = new EnemyRepository(_itemFactory);
+    }
+
+    public IGameBuilder DefineActiveAbilities(Func<IActiveAbilityFactory, IActiveAbilityFactory> defineActives)
+    {
+        defineActives(_actives);
+        return this;
     }
 
     public IGameBuilder DefineItems(Func<IItemFactory, IItemFactory> defineItems)
