@@ -1,5 +1,6 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model;
+using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Actives.Impl;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Static;
@@ -7,10 +8,16 @@ using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 
-var bazaarMap = await GameResourceLoader.LoadMapByName("bazaar");
-var desertMap = await GameResourceLoader.LoadMapByName("desert");
-var canyonMap = await GameResourceLoader.LoadMapByName("canyon");
-var itemResources = await GameResourceLoader.LoadAllItems();
+// todo get this into GameBuilder
+var actives = new ActiveAbilityFactory()
+    .Add(new Cleave())
+    .Add(new Firebolt())
+    ;
+var resourceLoader = new GameResourceLoader(actives);
+var bazaarMap = await resourceLoader.LoadMapByName("bazaar");
+var desertMap = await resourceLoader.LoadMapByName("desert");
+var canyonMap = await resourceLoader.LoadMapByName("canyon");
+var itemResources = await resourceLoader.LoadAllItems();
 
 var webAppBuilder = WebApplication.CreateBuilder(args);
 var gearboxConfig = new GearBoxConfig();

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Static;
 using GearBox.Web.Model.Json;
@@ -8,9 +9,16 @@ namespace GearBox.Web.Infrastructure;
 /// <summary>
 /// Loads resources from the game-resources folder
 /// </summary>
-public static class GameResourceLoader
+public class GameResourceLoader
 {
-    public static async Task<Map> LoadMapByName(string name)
+    private readonly IActiveAbilityFactory _actives;
+
+    public GameResourceLoader(IActiveAbilityFactory actives)
+    {
+        _actives = actives;
+    }
+
+    public async Task<Map> LoadMapByName(string name)
     {
         if (!name.All(IsAllowedFileNameCharacter))
         {
@@ -23,7 +31,7 @@ public static class GameResourceLoader
         return json.ToMap();
     }
 
-    public static async Task<List<ItemUnion>> LoadAllItems()
+    public async Task<List<ItemUnion>> LoadAllItems()
     {
         var allItems = new List<ItemUnion>();
         var itemsFolder = Path.Combine("game-resources", "items");
@@ -44,7 +52,7 @@ public static class GameResourceLoader
         return allItems;
     }
 
-    private static async Task<List<ItemUnion>> LoadItems<T>(string folderPath)
+    private async Task<List<ItemUnion>> LoadItems<T>(string folderPath)
     where T : IItemJson
     {
         var items = new List<ItemUnion>();
@@ -56,12 +64,12 @@ public static class GameResourceLoader
         return items;
     }
 
-    private static async Task<ItemUnion> LoadItem<T>(string filePath)
+    private async Task<ItemUnion> LoadItem<T>(string filePath)
     where T : IItemJson
     {
         var text = await File.ReadAllTextAsync(filePath);
         var json = JsonSerializer.Deserialize<T>(text) ?? throw new Exception($"Failed to deserialize {filePath}");
-        var item = json.ToItem();
+        var item = json.ToItem(_actives);
         return item;
     }
 

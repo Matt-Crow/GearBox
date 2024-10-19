@@ -5,5 +5,8 @@
     "Stats": {
         "HP": 1,
         "Energy": 1
-    }
+    },
+    "ActiveNames": [
+        "Fire Bolt"
+    ]
 }

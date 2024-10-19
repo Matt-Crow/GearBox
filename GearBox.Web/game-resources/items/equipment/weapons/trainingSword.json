@@ -5,5 +5,8 @@
     "Stats": {
         "Offense": 1,
         "HP": 1
-    }
+    },
+    "ActiveNames": [
+        "Cleave"
+    ]
 }

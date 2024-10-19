@@ -76,6 +76,16 @@ public class PlayerCharacter : Character
         var multiplier = 1.0+Stats.Speed.Value;
         SetSpeed(Speed.FromPixelsPerFrame(BASE_SPEED.InPixelsPerFrame * multiplier));
         
+        _actives.Clear();
+        if (WeaponSlot.Value != null)
+        {
+            _actives.AddRange(WeaponSlot.Value.Actives);
+        }
+        if (ArmorSlot.Value != null)
+        {
+            _actives.AddRange(ArmorSlot.Value.Actives);
+        }
+
         base.UpdateStats();
     }
 
