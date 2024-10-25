@@ -62,6 +62,7 @@ export class Game {
             .addWeaponChangeListener(wea => this.#mainModal.setWeapon(wea))
             .addArmorChangeListener(arm => this.#mainModal.setArmor(arm))
             .addStatSummaryChangeListener(summary => this.#mainModal.setStatSummary(summary))
+            .addActiveChangeListener(actives => this.#views.viewAlive.playerHud.setActives(actives))
             .addOpenShopChangeListener(openShop => this.#mainModal.setShop(openShop))
             ;
 

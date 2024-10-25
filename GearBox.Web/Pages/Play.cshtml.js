@@ -13,6 +13,7 @@ async function main() {
     $("#respawn-button").on("click", () => client.respawn());
     
     const views = new Views(); // todo move more stuff into this
+    views.spawnHtml();
     const mainModal = new MainModal("#main-modal", client);
     const canvas = views.viewAlive.canvas;
     const game = new Game(mainModal, views);

@@ -13,6 +13,12 @@ public class BasicAttack() : ActiveAbility("Basic Attack", 0, Duration.FromSecon
         return distance.InPixels <= Range.Range.InPixels;
     }
 
+    public override string GetDescription(Character character)
+    {
+        var result = $"A melee attack which deals {GetDamageWhenUsedBy(character)} damage.";
+        return result;
+    }
+
     protected override void OnUse(Character user, Direction inDirection, Attack attack)
     {
         SpawnProjectile(user, inDirection, attack, Range);

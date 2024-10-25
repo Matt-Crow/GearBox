@@ -65,6 +65,8 @@ public abstract class ActiveAbility : IActiveAbility
         inArea.AddProjectile(projectile);
     }
 
+    public abstract string GetDescription(Character character);
+
     public void Update()
     {
         _framesUntilNextUse--;

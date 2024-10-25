@@ -1,6 +1,7 @@
 import { JsonDeserializer } from "../infrastructure/jsonDeserializer.js";
 import { JsonDeserializers } from "../infrastructure/jsonDeserializers.js";
 import { GameData } from "../messageHandlers/gameInitHandler.js";
+import { ActiveAbility } from "./activeAbility.js";
 import { InventoryDeserializer, Item } from "./item.js";
 import { TileMap } from "./map.js";
 import { Player, PlayerStatSummary } from "./player.js";
@@ -59,7 +60,9 @@ export class AreaUpdateHandler {
     #weaponChangeListeners = [];
     #armorChangeListeners = [];
     #statSummaryChangeListeners = [];
+    #activeChangeListeners = [];
     #openShopChangeListeners = [];
+    // better change listener idea
 
     /**
      * @param {Area} area 
@@ -125,6 +128,15 @@ export class AreaUpdateHandler {
     }
 
     /**
+     * @param {(ActiveAbility[]) => any} changeListener 
+     * @returns {AreaUpdateHandler}
+     */
+    addActiveChangeListener(changeListener) {
+        this.#activeChangeListeners.push(changeListener);
+        return this;
+    }
+
+    /**
      * @param {(OpenShop) => any} changeListener 
      * @returns {AreaUpdateHandler}
      */
@@ -145,6 +157,7 @@ export class AreaUpdateHandler {
         this.#handleChanges(json.uiStateChanges.weapon, v => Item.fromJson(v), this.#weaponChangeListeners);
         this.#handleChanges(json.uiStateChanges.armor, v => Item.fromJson(v), this.#armorChangeListeners);
         this.#handleChanges(json.uiStateChanges.summary, PlayerStatSummary.fromJson, this.#statSummaryChangeListeners);
+        this.#handleChanges(json.uiStateChanges.actives, actives => actives.map(ActiveAbility.fromJson), this.#activeChangeListeners);
         this.#handleChanges(json.uiStateChanges.openShop, v => this.#openShopDeserializer.deserialize(v), this.#openShopChangeListeners);
     }
 

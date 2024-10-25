@@ -16,10 +16,19 @@ export class ViewAlive {
         this.#playerHud = new PlayerHud(element.querySelector("#player-hud"));
     }
 
+    spawnHtml() {
+        this.#playerHud.spawnHtml();
+    }
+
     /**
      * @returns {Canvas}
      */
     get canvas() { return this.#canvas; }
+
+    /**
+     * @returns {PlayerHud}
+     */
+    get playerHud() { return this.#playerHud; }
 
     /**
      * @param {Area} area 

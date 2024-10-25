@@ -3,9 +3,15 @@ using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.Abilities.Actives.Impl;
 
-public class Cleave() : ActiveAbility("Cleave", 15, Duration.FromSeconds(0.5))
+public class Cleave() : ActiveAbility("Cleave", 15, Duration.FromSeconds(1.5))
 {
     public override IActiveAbility Copy() => new Cleave();
+
+    public override string GetDescription(Character character)
+    {
+        var result = $"A melee attack which deals {GetDamageWhenUsedBy(character)} damage to nearby enemies.";
+        return result;
+    }
 
     protected override void OnUse(Character user, Direction inDirection, Attack attack)
     {

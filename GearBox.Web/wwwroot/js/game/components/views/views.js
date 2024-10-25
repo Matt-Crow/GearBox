@@ -17,6 +17,10 @@ export class Views {
         this.#show(".view-loading");
     }
 
+    spawnHtml() {
+        this.#viewAlive.spawnHtml();
+    }
+
     /**
      * @returns {ViewAlive}
      */

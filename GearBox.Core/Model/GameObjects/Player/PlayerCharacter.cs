@@ -31,6 +31,7 @@ public class PlayerCharacter : Character
     public int EnergyRemaining => MaxEnergy - EnergyExpended;
     public PlayerStats Stats { get; init; } = new();
     public PlayerStatSummary StatSummary { get; init; }
+    public IEnumerable<IActiveAbility> Actives => _actives;
     public Inventory Inventory { get; init; } = new();
     public EquipmentSlot<WeaponStats> WeaponSlot { get; init; } = new();
     public EquipmentSlot<ArmorStats> ArmorSlot { get; init; } = new();

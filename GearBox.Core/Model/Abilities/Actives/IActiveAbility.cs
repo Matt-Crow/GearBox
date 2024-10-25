@@ -39,6 +39,11 @@ public interface IActiveAbility
     void Use(Character user, Direction inDirection);
 
     /// <summary>
+    /// Gets a description when used by the given character
+    /// </summary>
+    string GetDescription(Character character);
+
+    /// <summary>
     /// Called at the end of each frame
     /// </summary>
     void Update();

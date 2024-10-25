@@ -1,7 +1,10 @@
+import { ActiveAbility } from "../../../model/activeAbility.js";
 import { Player } from "../../../model/player.js";
+import { ActiveAbilityHud } from "./activeAbilityHud.js";
 
 export class PlayerHud {
     #element;
+    #activeHuds = [];
     #previous = null;
 
     /**
@@ -9,6 +12,19 @@ export class PlayerHud {
      */
     constructor(element) {
         this.#element = element;
+    }
+
+    spawnHtml() {
+        this.#activeHuds = [];
+        const $actives = $("#actives");
+        $actives.empty();
+        for (let i = 1; i <= 9; i++) {
+            $actives.append($("<div>").addClass(`active-${i} flex-fill`));
+            
+            const activeHud = new ActiveAbilityHud(`#actives .active-${i}`, i);
+            activeHud.spawnHtml();
+            this.#activeHuds.push(activeHud);
+        }
     }
 
     /**
@@ -20,6 +36,16 @@ export class PlayerHud {
             this.#bind(player);
             this.#previous = player;
         }
+    }
+
+    /**
+     * @param {ActiveAbility[]} actives 
+     */
+    setActives(actives) {
+        this.#activeHuds.forEach((hud, i) => {
+            const active = actives.length <= i ? null : actives[i];
+            hud.setActive(active);
+        });
     }
 
     /**

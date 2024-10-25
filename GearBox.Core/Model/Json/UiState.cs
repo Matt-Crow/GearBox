@@ -16,6 +16,9 @@ public readonly struct UiState
         Weapon = player.WeaponSlot.ToJson();
         Armor = player.ArmorSlot.ToJson();
         Summary = player.StatSummary.ToJson();
+        Actives = player.Actives
+            .Select(x => new ActiveAbilityJson(x, player))
+            .ToList();
         OpenShop = player.OpenShop?.GetOpenShopJsonFor(player);
     }
 
@@ -24,6 +27,7 @@ public readonly struct UiState
     public ItemJson? Weapon { get; init;}
     public ItemJson? Armor { get; init;}
     public PlayerStatSummaryJson Summary { get; init; }
+    public List<ActiveAbilityJson> Actives { get; init; }
     public OpenShopJson? OpenShop { get; init; }
 
     /// <summary>
@@ -38,6 +42,7 @@ public readonly struct UiState
             Weapon = CompareNullable(oldState?.Weapon, newState.Weapon),
             Armor = CompareNullable(oldState?.Armor, newState.Armor),
             Summary = Compare(oldState?.Summary, newState.Summary),
+            Actives = CompareList(oldState?.Actives, newState.Actives),
             OpenShop = CompareNullable(oldState?.OpenShop, newState.OpenShop)
         };
         return result;
@@ -96,6 +101,28 @@ public readonly struct UiState
             return MaybeChangeJson<OpenShopJson?>.NoChanges();
         }
         return MaybeChangeJson<OpenShopJson?>.Changed(newValue);
+    }
+
+    private static MaybeChangeJson<List<T>> CompareList<T>(List<T>? oldValue, List<T> newValue)
+    where T : IChange
+    {
+        if (oldValue == null)
+        {
+            return MaybeChangeJson<List<T>>.Changed(newValue);
+        }
+        if (oldValue.Count != newValue.Count)
+        {
+            return MaybeChangeJson<List<T>>.Changed(newValue);
+        }
+        
+        var anyChanged = oldValue.Zip(newValue)
+            .Where(pair => Hash(pair.First) != Hash(pair.Second))
+            .Any();
+        if (anyChanged)
+        {
+            return MaybeChangeJson<List<T>>.Changed(newValue);
+        }
+        return MaybeChangeJson<List<T>>.NoChanges();
     }
 
     private static MaybeChangeJson<T> Compare<T>(T? oldValue, T newValue)
