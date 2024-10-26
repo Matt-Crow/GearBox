@@ -3,8 +3,9 @@
 */
 
 import { Client } from "../infrastructure/client.js";
+import { UiStateChanges } from "../model/areaUpdate.js";
 import { CraftingRecipe } from "../model/crafting.js";
-import { Inventory, Item } from "../model/item.js";
+import { Inventory } from "../model/item.js";
 import { PlayerStatSummary } from "../model/player.js";
 import { OpenShop } from "../model/shop.js";
 import { EquipmentTab } from "./equipmentTab.js";
@@ -71,9 +72,9 @@ export class MainModal {
             .spawnHtml()
             .hide();
     
-        this.setWeapon(null);
-        this.setArmor(null);
-        this.setShop(null);
+        this.#weaponTab.setCurrent(null);
+        this.#armorTab.setCurrent(null);
+        this.#setShop(null);
     }
 
     /**
@@ -96,10 +97,21 @@ export class MainModal {
         if (this.#element.open) {
             this.#element.close();
             this.#client.closeShop();
-            this.setShop(null);
+            this.#setShop(null);
         } else {
             this.#element.showModal();
         }
+    }
+
+    /**
+     * @param {UiStateChanges} uiStateChanges 
+     */
+    handleUiStateChanges(uiStateChanges) {
+        uiStateChanges.inventory.handleChange(i => this.setInventory(i));
+        uiStateChanges.weapon.handleChange(w => this.#weaponTab.setCurrent(w));
+        uiStateChanges.armor.handleChange(a => this.#armorTab.setCurrent(a));
+        uiStateChanges.summary.handleChange(s => this.setStatSummary(s));
+        uiStateChanges.openShop.handleChange(os => this.#setShop(os));
     }
 
     /**
@@ -130,23 +142,9 @@ export class MainModal {
     }
 
     /**
-     * @param {Item?} weapon 
-     */
-    setWeapon(weapon) {
-        this.#weaponTab.setCurrent(weapon);
-    }
-
-    /**
-     * @param {Item?} armor 
-     */
-    setArmor(armor) {
-        this.#armorTab.setCurrent(armor);
-    }
-
-    /**
      * @param {OpenShop?} shop 
      */
-    setShop(shop) {
+    #setShop(shop) {
         this.#currentShop = shop;
 
         if (!shop) {

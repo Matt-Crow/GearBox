@@ -1,4 +1,5 @@
 import { ActiveAbility } from "../../../model/activeAbility.js";
+import { UiStateChanges } from "../../../model/areaUpdate.js";
 import { Player } from "../../../model/player.js";
 import { ActiveAbilityHud } from "./activeAbilityHud.js";
 
@@ -28,6 +29,13 @@ export class PlayerHud {
     }
 
     /**
+     * @param {UiStateChanges} uiStateChanges 
+     */
+    handleUiStateChanges(uiStateChanges) {
+        uiStateChanges.actives.handleChange(a => this.#setActives(a));
+    }
+
+    /**
      * @param {Player} player 
      */
     bindIfChanged(player) {
@@ -41,7 +49,7 @@ export class PlayerHud {
     /**
      * @param {ActiveAbility[]} actives 
      */
-    setActives(actives) {
+    #setActives(actives) {
         this.#activeHuds.forEach((hud, i) => {
             const active = actives.length <= i ? null : actives[i];
             hud.setActive(active);

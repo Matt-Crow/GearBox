@@ -1,28 +1,27 @@
 import { Game } from "../js/game/game.js";
 import { Client } from "../js/game/infrastructure/client.js";
-import { MainModal } from "../js/game/components/mainModal.js";
 import { Views } from "../js/game/components/views/views.js";
 
 $(async () => await main());
 
 async function main() {
     const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/area-hub")
-    .build();
+        .withUrl("/area-hub")
+        .build();
     const client = new Client(connection);
+    
     $("#respawn-button").on("click", () => client.respawn());
     
-    const views = new Views(); // todo move more stuff into this
+    const views = new Views(client);
     views.spawnHtml();
-    const mainModal = new MainModal("#main-modal", client);
-    const canvas = views.viewAlive.canvas;
-    const game = new Game(mainModal, views);
+
+    const game = new Game(views);
     
     connection.on("GameInit", handle(json => game.handleGameInit(json)));
     connection.on("AreaUpdate", handle(json => game.handleAreaUpdate(json)));
     
     await connection.start();
-
+    
     const keyMappings = new Map(); // value is [onUp, onDown]
     keyMappings.set("KeyW", [() => client.stopMovingUp(),    () => client.startMovingUp()]);
     keyMappings.set("KeyA", [() => client.stopMovingLeft(),  () => client.startMovingLeft()]);
@@ -34,7 +33,8 @@ async function main() {
             keyMappings.get(e.code)[0]();
         }
     });
-
+    
+    const canvas = views.viewAlive.canvas;
     const getBearing = () => {
         const [px, py] = game.getPlayerCoords();
         const dx = canvas.translatedMouseX - px;
@@ -60,7 +60,7 @@ async function main() {
             client.useBasicAttack(bearing);
         }
         if (e.code == "KeyE") { 
-            mainModal.toggle();
+            views.viewAlive.mainModal.toggle();
             client.openShop();
         }
     });

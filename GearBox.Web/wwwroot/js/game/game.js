@@ -6,12 +6,9 @@ import { projectileDeserializer } from "./model/projectile.js";
 import { Area, AreaUpdateHandler } from "./model/area.js";
 import { TileMap } from "./model/map.js";
 import { Shop } from "./model/shop.js";
-import { MainModal } from "./components/mainModal.js";
 import { Views } from "./components/views/views.js";
 
 export class Game {
-    #mainModal;
-
     #views;
 
     #areaUpdateHandler = () => {throw new Error("Cannot handle area update until after area init")};
@@ -21,11 +18,9 @@ export class Game {
     #area; // required for getting mouse cursor position relative to player :(
 
     /**
-     * @param {MainModal} mainModal 
      * @param {Views} views 
      */
-    constructor(mainModal, views) {
-        this.#mainModal = mainModal;
+    constructor(views) {
         this.#views = views;
         this.#area = null;
         setInterval(() => this.#draw(), 1000 / 24);
@@ -38,7 +33,7 @@ export class Game {
 
     handleGameInit(json) {
         this.#gameData = handleGameInit(json);
-        this.#mainModal.setCraftingRecipes(this.#gameData.craftingRecipes);
+        this.#views.viewAlive.mainModal.setCraftingRecipes(this.#gameData.craftingRecipes);
     }
 
     // todo rework this
@@ -52,18 +47,12 @@ export class Game {
             TileMap.fromJson(json.uiStateChanges.area.value.map),
             json.uiStateChanges.area.value.shops.map(j => Shop.fromJson(j))
         );
-        const updateHandler = new AreaUpdateHandler(area)
+        const updateHandler = new AreaUpdateHandler(area, this.#views)
             .addGameObjectType(characterDeserializer)
             .addGameObjectType(new PlayerJsonDeserializer())
             .addGameObjectType(projectileDeserializer)
             .addGameObjectType(new LootChestJsonDeserializer(this.#gameData.playerId))
             .addUpdateListener(w => this.#views.handleAreaUpdate(w))
-            .addInventoryChangeListener(inv => this.#mainModal.setInventory(inv))
-            .addWeaponChangeListener(wea => this.#mainModal.setWeapon(wea))
-            .addArmorChangeListener(arm => this.#mainModal.setArmor(arm))
-            .addStatSummaryChangeListener(summary => this.#mainModal.setStatSummary(summary))
-            .addActiveChangeListener(actives => this.#views.viewAlive.playerHud.setActives(actives))
-            .addOpenShopChangeListener(openShop => this.#mainModal.setShop(openShop))
             ;
 
         this.#areaUpdateHandler = json => updateHandler.handleAreaUpdate(json);

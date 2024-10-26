@@ -1,3 +1,5 @@
+import { Client } from "../../infrastructure/client.js";
+import { UiStateChanges } from "../../model/areaUpdate.js";
 import { Switcher } from "../shared/switcher.js";
 import { ViewAlive } from "./alive/viewAlive.js";
 
@@ -10,10 +12,13 @@ export class Views {
     #viewAlive;
     #wasAliveLastTime = null;
 
-    constructor() {
+    /**
+     * @param {Client} client 
+     */
+    constructor(client) {
         this.#selector = "#views";
         this.#switcher = new Switcher(this.#selector);
-        this.#viewAlive = new ViewAlive();
+        this.#viewAlive = new ViewAlive(client);
         this.#show(".view-loading");
     }
 
@@ -47,5 +52,12 @@ export class Views {
         } else {
             this.#show(".view-dead");
         }
+    }
+
+    /**
+     * @param {UiStateChanges} uiStateChanges 
+     */
+    handleUiStateChanges(uiStateChanges) {
+        this.#viewAlive.handleUiStateChanges(uiStateChanges);
     }
 }
