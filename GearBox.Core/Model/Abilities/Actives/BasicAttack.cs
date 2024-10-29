@@ -13,15 +13,15 @@ public class BasicAttack() : ActiveAbility("Basic Attack", 0, Duration.FromSecon
         return distance.InPixels <= Range.Range.InPixels;
     }
 
-    public override string GetDescription(Character character)
+    public override string GetDescription()
     {
-        var result = $"A melee attack which deals {GetDamageWhenUsedBy(character)} damage.";
+        var result = $"A melee attack which deals {GetDamage()} damage.";
         return result;
     }
 
-    protected override void OnUse(Character user, Direction inDirection, Attack attack)
+    protected override void OnUse(Direction inDirection, Attack attack)
     {
-        SpawnProjectile(user, inDirection, attack, Range);
+        SpawnProjectile(inDirection, attack, Range);
     }
 
     public override BasicAttack Copy() => new BasicAttack();

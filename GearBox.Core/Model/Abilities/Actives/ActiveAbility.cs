@@ -18,29 +18,31 @@ public abstract class ActiveAbility : IActiveAbility
     public string Name { get; init; }
     public int EnergyCost { get; init; }
     public Duration Cooldown { get; init; }
+    public Character? User { get; set; }
     public Duration TimeUntilNextUse => Duration.FromFrames(_framesUntilNextUse);
 
-    public bool CanBeUsedBy(Character character)
+    public bool CanBeUsed()
     {
         if (_framesUntilNextUse > 0)
         {
             return false;
         }
-        if (character is PlayerCharacter player && player.EnergyRemaining < EnergyCost)
+        if (User is PlayerCharacter player && player.EnergyRemaining < EnergyCost)
         {
             return false;
         }
         return true;
     }
 
-    public void Use(Character user, Direction inDirection)
+    public void Use(Direction inDirection)
     {
-        if (!CanBeUsedBy(user))
+        if (!CanBeUsed())
         {
             return;
         }
-        var attack = new Attack(user, GetDamageWhenUsedBy(user)); 
-        OnUse(user, inDirection, attack);
+        var user = User ?? throw new Exception("Cannot use if User isn't set");
+        var attack = new Attack(user, GetDamage()); 
+        OnUse(inDirection, attack);
         _framesUntilNextUse = Cooldown.InFrames;
         if (user is PlayerCharacter player)
         {
@@ -48,10 +50,11 @@ public abstract class ActiveAbility : IActiveAbility
         }
     }
 
-    protected abstract void OnUse(Character user, Direction inDirection, Attack attack);
+    protected abstract void OnUse(Direction inDirection, Attack attack);
 
-    protected void SpawnProjectile(Character user, Direction inDirection, Attack attack, AttackRange range)
+    protected void SpawnProjectile(Direction inDirection, Attack attack, AttackRange range)
     {
+        var user = User ?? throw new Exception("Cannot spawn projectile when user isn't set");
         var inArea = user.CurrentArea ?? throw new Exception("Cannot spawn projectile when not in an area");
 
         var projectile = new Projectile(
@@ -65,7 +68,7 @@ public abstract class ActiveAbility : IActiveAbility
         inArea.AddProjectile(projectile);
     }
 
-    public abstract string GetDescription(Character character);
+    public abstract string GetDescription();
 
     public void Update()
     {
@@ -81,11 +84,14 @@ public abstract class ActiveAbility : IActiveAbility
     /// <summary>
     /// Helper method - only needed for damaging active abilities
     /// </summary>
-    protected virtual int GetDamageWhenUsedBy(Character user)
+    protected virtual int GetDamage()
     {
+        var level = User?.Level ?? 1;
+        var damageModifier = User?.DamageModifier ?? 0.0;
+
         // ranges from 50 to 183
-        var result = 43.0 + 7*user.Level;
-        result = result*(1.0 + user.DamageModifier);
+        var result = 43.0 + 7*level;
+        result = result*(1.0 + damageModifier);
         return (int)result;
     }
 }

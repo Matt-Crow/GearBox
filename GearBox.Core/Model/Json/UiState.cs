@@ -17,7 +17,7 @@ public readonly struct UiState
         Armor = player.ArmorSlot.ToJson();
         Summary = player.StatSummary.ToJson();
         Actives = player.Actives
-            .Select(x => new ActiveAbilityJson(x, player))
+            .Select(x => new ActiveAbilityJson(x))
             .ToList();
         OpenShop = player.OpenShop?.GetOpenShopJsonFor(player);
     }

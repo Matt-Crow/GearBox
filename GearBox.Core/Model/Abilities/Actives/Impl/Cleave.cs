@@ -7,18 +7,18 @@ public class Cleave() : ActiveAbility("Cleave", 15, Duration.FromSeconds(1.5))
 {
     public override IActiveAbility Copy() => new Cleave();
 
-    public override string GetDescription(Character character)
+    public override string GetDescription()
     {
-        var result = $"A melee attack which deals {GetDamageWhenUsedBy(character)} damage to nearby enemies.";
+        var result = $"A melee attack which deals {GetDamage()} damage to nearby enemies.";
         return result;
     }
 
-    protected override void OnUse(Character user, Direction inDirection, Attack attack)
+    protected override void OnUse(Direction inDirection, Attack attack)
     {
-        SpawnProjectile(user, inDirection, attack, AttackRange.MELEE);
-        SpawnProjectile(user, inDirection.TurnedClockwiseByDegrees(45), attack, AttackRange.MELEE);
-        SpawnProjectile(user, inDirection.TurnedCounterClockwiseByDegrees(45), attack, AttackRange.MELEE);
+        SpawnProjectile(inDirection, attack, AttackRange.MELEE);
+        SpawnProjectile(inDirection.TurnedClockwiseByDegrees(45), attack, AttackRange.MELEE);
+        SpawnProjectile(inDirection.TurnedCounterClockwiseByDegrees(45), attack, AttackRange.MELEE);
     }
 
-    protected override int GetDamageWhenUsedBy(Character user) => base.GetDamageWhenUsedBy(user)/2;
+    protected override int GetDamage() => base.GetDamage()/2;
 }

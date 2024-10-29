@@ -24,6 +24,10 @@ public abstract class Character : IGameObject
         _mobility = new MobileBehavior(Body, Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
         Serializer = new(Type, Serialize);
         Termination = new(this, () => DamageTaken >= MaxHitPoints);
+        BasicAttack = new BasicAttack()
+        {
+            User = this
+        };
         SetLevel(level);
     }
 
@@ -42,7 +46,7 @@ public abstract class Character : IGameObject
     public int Level { get; private set; }
     public double DamageModifier { get; protected set; } = 0.0;
     public ArmorClass ArmorClass { get; protected set; } = ArmorClass.NONE;
-    public BasicAttack BasicAttack { get; init; } = new BasicAttack();
+    public BasicAttack BasicAttack { get; init; }
     public IArea? CurrentArea { get; private set; }
     public IArea? LastArea { get; private set; }
     public Team Team { get; set; } = new(); // default to each on their own team
@@ -99,7 +103,7 @@ public abstract class Character : IGameObject
 
     public void UseBasicAttack(Direction inDirection)
     {
-        BasicAttack.Use(this, inDirection);
+        BasicAttack.Use(inDirection);
     }
 
     public void TakeDamage(int damage)

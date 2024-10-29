@@ -1,18 +1,17 @@
 
 using GearBox.Core.Model.Abilities.Actives;
-using GearBox.Core.Model.GameObjects;
 
 namespace GearBox.Core.Model.Json;
 
 public class ActiveAbilityJson : IChange
 {
-    public ActiveAbilityJson(IActiveAbility ability, Character character)
+    public ActiveAbilityJson(IActiveAbility ability)
     {
         Name = ability.Name;
         EnergyCost = ability.EnergyCost;
         SecondsUntilNextUse = (int)ability.TimeUntilNextUse.InSeconds;
-        CanBeUsed = ability.CanBeUsedBy(character);
-        Description = ability.GetDescription(character);
+        CanBeUsed = ability.CanBeUsed();
+        Description = ability.GetDescription();
     }
 
     public string Name { get; init; }

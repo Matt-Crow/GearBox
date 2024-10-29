@@ -53,7 +53,7 @@ public class PlayerCharacter : Character
         var i = number - 1;
         if (0 <= i && i < _actives.Count)
         {
-            _actives[i].Use(this, inDirection);
+            _actives[i].Use(inDirection);
         }
     }
 
@@ -85,6 +85,10 @@ public class PlayerCharacter : Character
         if (ArmorSlot.Value != null)
         {
             _actives.AddRange(ArmorSlot.Value.Actives);
+        }
+        foreach (var active in _actives)
+        {
+            active.User = this;
         }
 
         base.UpdateStats();

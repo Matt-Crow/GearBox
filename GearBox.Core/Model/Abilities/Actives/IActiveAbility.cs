@@ -29,19 +29,24 @@ public interface IActiveAbility
     Duration TimeUntilNextUse { get; }
 
     /// <summary>
-    /// Checks whether the given character can currently trigger this ability
+    /// The character who this ability belongs to, if any
     /// </summary>
-    bool CanBeUsedBy(Character character);
+    Character? User { get; set; }
+
+    /// <summary>
+    /// Checks whether the current user can use this ability right now
+    /// </summary>
+    bool CanBeUsed();
 
     /// <summary>
     /// Triggers this active ability, if able
     /// </summary>
-    void Use(Character user, Direction inDirection);
+    void Use(Direction inDirection); 
 
     /// <summary>
-    /// Gets a description when used by the given character
+    /// Gets a short discription to display to the player
     /// </summary>
-    string GetDescription(Character character);
+    string GetDescription();
 
     /// <summary>
     /// Called at the end of each frame
