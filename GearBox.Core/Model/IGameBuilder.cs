@@ -8,9 +8,21 @@ namespace GearBox.Core.Model;
 
 public interface IGameBuilder
 {
-    IGameBuilder DefineActiveAbilities(Func<IActiveAbilityFactory, IActiveAbilityFactory> defineActives);
-    IGameBuilder DefineItems(Func<IItemFactory, IItemFactory> defineItems);
-    IGameBuilder DefineEnemies(Func<IEnemyRepository, IEnemyRepository> defineEnemies);
+    /// <summary>
+    /// A reference to the actives available in the game this is building.
+    /// </summary>
+    IActiveAbilityFactory Actives { get; }
+
+    /// <summary>
+    /// A reference to the items available in the game this is building.
+    /// </summary>
+    IItemFactory Items { get;}
+
+    /// <summary>
+    /// A reference to the enemies which can be encountered in the game this is building.
+    /// </summary>
+    IEnemyRepository Enemies { get; }
+
     IGameBuilder AddCraftingRecipe(Func<CraftingRecipeBuilder, CraftingRecipe> recipe);
 
     /// <summary>

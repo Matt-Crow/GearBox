@@ -1,6 +1,5 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model;
-using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Actives.Impl;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Static;
@@ -8,36 +7,39 @@ using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 
-// todo get this into GameBuilder
-var actives = new ActiveAbilityFactory()
-    .Add(new Cleave())
-    .Add(new Firebolt())
-    ;
-var resourceLoader = new GameResourceLoader(actives);
-var bazaarMap = await resourceLoader.LoadMapByName("bazaar");
-var desertMap = await resourceLoader.LoadMapByName("desert");
-var canyonMap = await resourceLoader.LoadMapByName("canyon");
-var itemResources = await resourceLoader.LoadAllItems();
+/*
+    Need to load some of the game resources in a specific order:
+    1. actives
+    2. items, which use actives
+    3. crafting recipes, which use items
+    4. enemies, which use items
+    5. areas, which use items and enemies
+*/
 
+// need to grab configuration before most other things
 var webAppBuilder = WebApplication.CreateBuilder(args);
 var gearboxConfig = new GearBoxConfig();
 webAppBuilder.Configuration
     .GetSection("GearBox")
     .Bind(gearboxConfig);
+var gameBuilder = new GameBuilder(gearboxConfig);
 
-var game = new GameBuilder(gearboxConfig)
-    .DefineActiveAbilities(actives => actives
-        .Add(new Cleave())
-        .Add(new Firebolt())
-    )
-    .DefineItems(items =>
-    {
-        foreach (var item in itemResources)
-        {
-            items = items.Add(item);
-        }
-        return items;
-    })
+// configure actives before items
+gameBuilder.Actives
+    .Add(new Cleave())
+    .Add(new Firebolt())
+    ;
+
+// configure items before crafting recipes and enemies
+var resourceLoader = new GameResourceLoader(gameBuilder.Actives);
+var itemResources = await resourceLoader.LoadAllItems();
+foreach (var item in itemResources)
+{
+    gameBuilder.Items.Add(item);
+}
+
+// configure crafting recipes after items
+gameBuilder
     .AddCraftingRecipe(recipe => recipe
         .And("Bronze", 25)
         .Makes("Bronze Khopesh")
@@ -45,23 +47,30 @@ var game = new GameBuilder(gearboxConfig)
     .AddCraftingRecipe(recipe => recipe
         .And("Bronze", 25)
         .Makes("Bronze Armor")
+    );
+
+// configure enemies after items
+gameBuilder.Enemies
+    .Add("Snake", Color.LIGHT_GREEN, loot => loot
+        .AddItem("Fang")
+        .AddItem("Bronze")
+        .Add(Grade.COMMON, new Gold(5))
     )
-    .DefineEnemies(enemies => enemies
-        .Add("Snake", Color.LIGHT_GREEN, loot => loot
-            .AddItem("Fang")
-            .AddItem("Bronze")
-            .Add(Grade.COMMON, new Gold(5))
-        )
-        .Add("Scorpion", Color.BLACK, loot => loot
-            .AddItem("Fighter Initiate's Armor")
-            .AddItem("Bronze")
-            .Add(Grade.UNCOMMON, new Gold(10))
-        )
-        .Add("Jackal", Color.TAN, loot => loot
-            .AddItem("Fang")
-            .Add(Grade.RARE, new Gold(25))
-        )
+    .Add("Scorpion", Color.BLACK, loot => loot
+        .AddItem("Fighter Initiate's Armor")
+        .AddItem("Bronze")
+        .Add(Grade.UNCOMMON, new Gold(10))
     )
+    .Add("Jackal", Color.TAN, loot => loot
+        .AddItem("Fang")
+        .Add(Grade.RARE, new Gold(25))
+    );
+
+// we have all the game data, now make areas in that game
+var bazaarMap = await resourceLoader.LoadMapByName("bazaar");
+var desertMap = await resourceLoader.LoadMapByName("desert");
+var canyonMap = await resourceLoader.LoadMapByName("canyon");
+gameBuilder
     .WithArea("desert", 1, area => area
         .AddLoot(loot => loot
             .AddItem("Stone")
@@ -101,8 +110,10 @@ var game = new GameBuilder(gearboxConfig)
         )
         .WithMap(canyonMap)
         .WithExit(BorderExit.Left("desert"))
-    )
-    .Build();
+    );
+
+// done defining - time to build
+var game = gameBuilder.Build();
 
 // Add services to the container.
 webAppBuilder.Services.AddRazorPages();

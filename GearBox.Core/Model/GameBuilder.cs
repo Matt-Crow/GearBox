@@ -10,40 +10,22 @@ namespace GearBox.Core.Model;
 public class GameBuilder : IGameBuilder
 {
     private readonly GearBoxConfig _config;
-    private readonly IActiveAbilityFactory _actives = new ActiveAbilityFactory();
     private readonly HashSet<CraftingRecipe> _craftingRecipes = [];
     private readonly List<AreaBuilder> _areas = []; // must be ordered so the first area added is the default area
-    private readonly IItemFactory _itemFactory = new ItemFactory();
-    private readonly IEnemyRepository _enemies;
 
     public GameBuilder(GearBoxConfig config)
     {
         _config = config;
-        _enemies = new EnemyRepository(_itemFactory);
+        Enemies = new EnemyRepository(Items);
     }
 
-    public IGameBuilder DefineActiveAbilities(Func<IActiveAbilityFactory, IActiveAbilityFactory> defineActives)
-    {
-        defineActives(_actives);
-        return this;
-    }
+    public IActiveAbilityFactory Actives { get; init; } = new ActiveAbilityFactory();
+    public IItemFactory Items { get; init; } = new ItemFactory();
+    public IEnemyRepository Enemies { get; init; }
 
-    public IGameBuilder DefineItems(Func<IItemFactory, IItemFactory> defineItems)
-    {
-        defineItems(_itemFactory);
-        return this;
-    }
-
-    public IGameBuilder DefineEnemies(Func<IEnemyRepository, IEnemyRepository> defineEnemies)
-    {
-        defineEnemies(_enemies);
-        return this;
-    }
-
-    
     public IGameBuilder AddCraftingRecipe(Func<CraftingRecipeBuilder, CraftingRecipe> recipe)
     {
-        var builder = new CraftingRecipeBuilder(_itemFactory);
+        var builder = new CraftingRecipeBuilder(Items);
         _craftingRecipes.Add(recipe(builder));
         return this;
     }
@@ -54,7 +36,7 @@ public class GameBuilder : IGameBuilder
         {
             throw new ArgumentException("Name must be unique within each game", nameof(name));
         }
-        _areas.Add(defineArea(new AreaBuilder(name, level, _itemFactory, new EnemyFactory(_config, _enemies))));
+        _areas.Add(defineArea(new AreaBuilder(name, level, Items, new EnemyFactory(_config, Enemies))));
         return this;
     }
 
