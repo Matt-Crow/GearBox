@@ -44,6 +44,15 @@ where T : IItem
 
     public ItemJson ToJson()
     {
+        var actives = new List<ActiveAbilityJson>();
+        if (Item is Equipment<WeaponStats> weapon)
+        {
+            actives.AddRange(weapon.Actives.Select(a => new ActiveAbilityJson(a)));
+        }
+        if (Item is Equipment<ArmorStats> armor)
+        {
+            actives.AddRange(armor.Actives.Select(a => new ActiveAbilityJson(a)));
+        }
         var result = new ItemJson(
             Item.Id,
             Item.Name,
@@ -52,7 +61,8 @@ where T : IItem
             Item.Description,
             Item.Level,
             Item.Details,
-            Quantity
+            Quantity,
+            actives
         );
         return result;
     }

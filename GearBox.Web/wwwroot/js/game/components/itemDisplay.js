@@ -1,3 +1,4 @@
+import { ActiveAbility } from "../model/activeAbility.js";
 import { Item } from "../model/item.js";
 
 export class ItemDisplay {
@@ -27,6 +28,11 @@ export class ItemDisplay {
                 .append($("<p>").append($("<b>").addClass("itemName text-nowrap")))
                 .append($("<p>").append($("<i>").addClass("itemDescription")))
                 .append($("<ul>").addClass("itemDetails"))
+                .append($("<div>").addClass("itemActives")
+                    .append($("<hr>"))
+                    .append($("<b>").append($("<u>").text("Active Abilities")))
+                    .append($("<div>").addClass("itemActiveList"))
+                )
             )
             .append($("<div>").addClass("itemNo")
                 .text(this.#emptyText)
@@ -61,6 +67,29 @@ export class ItemDisplay {
             .find(".itemDetails")
             .empty()
             .append(details);
+        
+        if (item.actives.length === 0) {
+            $this.find(".itemActives").hide();
+        } else {
+            $this.find(".itemActives").show();
+            const abilities = item.actives.map(act => this.#makeActiveDisplay(act));
+            $this
+                .find(".itemActiveList")
+                .empty()
+                .append(abilities);
+        }
+    }
+
+    /**
+     * @param {ActiveAbility} active 
+     * @returns a JQuery object
+     */
+    #makeActiveDisplay(active) {
+        const $result = $("<div>")
+            .append($("<b>").text(active.name))
+            .append($("<span>").text(`(${active.energyCost} energy)`))
+            .append($("<p>").addClass("text-wrap").css("width", "20rem").text(active.description));
+        return $result;
     }
 
     show() {

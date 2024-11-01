@@ -22,7 +22,10 @@ where T : IEquipmentStats
             Value.Description,
             Value.Level,
             Value.Details,
-            1 // quantity is always 1
+            1, // quantity is always 1
+            Value.Actives
+                .Select(a => new ActiveAbilityJson(a))
+                .ToList()
         );
         return result;
     }
