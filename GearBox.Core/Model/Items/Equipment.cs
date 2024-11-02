@@ -1,6 +1,7 @@
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.Json;
 
 namespace GearBox.Core.Model.Items;
 
@@ -71,6 +72,24 @@ where T : IEquipmentStats
     public override int GetHashCode()
     {
         return Id.GetHashCode();
+    }
+
+    public ItemJson ToJson()
+    {
+        var result = new ItemJson(
+            Id,
+            Name,
+            Grade.Name,
+            Grade.Order,
+            Description,
+            Level,
+            Details,
+            1, // quantity is always 1
+            Actives
+                .Select(a => new ActiveAbilityJson(a))
+                .ToList()
+        );
+        return result;
     }
 
     public static int GetStatPoints(int level, Grade grade)

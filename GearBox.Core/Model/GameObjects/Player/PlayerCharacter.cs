@@ -33,8 +33,8 @@ public class PlayerCharacter : Character
     public PlayerStatSummary StatSummary { get; init; }
     public IEnumerable<IActiveAbility> Actives => _actives;
     public Inventory Inventory { get; init; } = new();
-    public EquipmentSlot<WeaponStats> WeaponSlot { get; init; } = new();
-    public EquipmentSlot<ArmorStats> ArmorSlot { get; init; } = new();
+    public Equipment<WeaponStats>? Weapon { get; private set; } = null;
+    public Equipment<ArmorStats>? Armor { get; private set; } = null;
     
     /// <summary>
     /// The shop the player currently has open
@@ -65,8 +65,8 @@ public class PlayerCharacter : Character
     public override void UpdateStats()
     {
         var boosts = PlayerStatBoosts.Empty()
-            .Combine(WeaponSlot.Value?.StatBoosts)
-            .Combine(ArmorSlot.Value?.StatBoosts);
+            .Combine(Weapon?.StatBoosts)
+            .Combine(Armor?.StatBoosts);
         Stats.SetStatBoosts(boosts);
 
         MaxEnergy = GetMaxEnergyByLevel(Level);
@@ -78,13 +78,13 @@ public class PlayerCharacter : Character
         SetSpeed(Speed.FromPixelsPerFrame(BASE_SPEED.InPixelsPerFrame * multiplier));
         
         _actives.Clear();
-        if (WeaponSlot.Value != null)
+        if (Weapon != null)
         {
-            _actives.AddRange(WeaponSlot.Value.Actives);
+            _actives.AddRange(Weapon.Actives);
         }
-        if (ArmorSlot.Value != null)
+        if (Armor != null)
         {
-            _actives.AddRange(ArmorSlot.Value.Actives);
+            _actives.AddRange(Armor.Actives);
         }
         foreach (var active in _actives)
         {
@@ -102,9 +102,9 @@ public class PlayerCharacter : Character
             return;
         }
 
-        Inventory.Weapons.Add(WeaponSlot.Value); // put old weapon back in inventory
+        Inventory.Weapons.Add(Weapon); // put old weapon back in inventory
 
-        WeaponSlot.Value = weapon;
+        Weapon = weapon;
         Inventory.Weapons.Remove(weapon);
         BasicAttack.Range = weapon.Inner.AttackRange;
 
@@ -119,9 +119,9 @@ public class PlayerCharacter : Character
             return;
         }
 
-        Inventory.Armors.Add(ArmorSlot.Value); // put old armor back in inventory
+        Inventory.Armors.Add(Armor); // put old armor back in inventory
 
-        ArmorSlot.Value = armor;
+        Armor = armor;
         Inventory.Armors.Remove(armor);
         ArmorClass = armor.Inner.ArmorClass;
 
