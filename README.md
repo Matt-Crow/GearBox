@@ -9,3 +9,4 @@ A C# MMORPG-like game.
 - **WASD** to move 
 - **Q** to use basic attack
 - **E** to toggle inventory or open shop
+- **1-9** to use active abilities (if any)
