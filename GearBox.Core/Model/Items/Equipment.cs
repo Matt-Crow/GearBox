@@ -74,7 +74,7 @@ where T : IEquipmentStats
         return Id.GetHashCode();
     }
 
-    public ItemJson ToJson()
+    public ItemJson ToJson(int quantity)
     {
         var result = new ItemJson(
             Id,
@@ -84,7 +84,7 @@ where T : IEquipmentStats
             Description,
             Level,
             Details,
-            1, // quantity is always 1
+            quantity,
             Actives
                 .Select(a => new ActiveAbilityJson(a))
                 .ToList()

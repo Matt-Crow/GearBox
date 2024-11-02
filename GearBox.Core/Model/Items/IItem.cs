@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Json;
+
 namespace GearBox.Core.Model.Items;
 
 public interface IItem
@@ -28,6 +30,11 @@ public interface IItem
     /// The base value this item can be bought for from a shop
     /// </summary>
     Gold BuyValue { get; }
+
+    /// <summary>
+    /// Converts to JSON so it can be sent to the front-end
+    /// </summary>
+    ItemJson ToJson(int quantity);
 
     /*
     // can't do "IItem ToOwned()" https://stackoverflow.com/a/5709191

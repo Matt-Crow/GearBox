@@ -99,4 +99,6 @@ public class ItemUnion : IItem
         }
         throw new Exception($"Missing case in {nameof(Select)}");
     }
+
+    public ItemJson ToJson(int quantity) => Unwrapped.ToJson(quantity);
 }

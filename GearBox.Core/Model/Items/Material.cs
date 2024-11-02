@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Json;
+
 namespace GearBox.Core.Model.Items;
 
 /// <summary>
@@ -34,5 +36,21 @@ public class Material : IItem
     public Material ToOwned()
     {
         return this;
+    }
+
+    public ItemJson ToJson(int quantity)
+    {
+        var result = new ItemJson(
+            Id,
+            Name,
+            Grade.Name,
+            Grade.Order,
+            Description,
+            Level,
+            Details,
+            quantity,
+            [] // no actives
+        );
+        return result;
     }
 }

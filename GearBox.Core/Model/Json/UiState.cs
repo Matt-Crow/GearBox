@@ -13,8 +13,8 @@ public readonly struct UiState
         var area = player.CurrentArea ?? player.LastArea;
         Area = area?.ToJson();
         Inventory = player.Inventory.ToJson();
-        Weapon = player.Weapon?.ToJson();
-        Armor = player.Armor?.ToJson();
+        Weapon = player.Weapon?.ToJson(1);
+        Armor = player.Armor?.ToJson(1);
         Summary = player.StatSummary.ToJson();
         Actives = player.Actives
             .Select(x => new ActiveAbilityJson(x))
