@@ -33,9 +33,6 @@ public class ItemUnion : IItem
     public Guid? Id => Unwrapped.Id;
     public string Name => Unwrapped.Name;
     public Grade Grade => Unwrapped.Grade;
-    public string Description => Unwrapped.Description;
-    public int Level => Unwrapped.Level;
-    public IEnumerable<string> Details => Unwrapped.Details;
     public Gold BuyValue => Unwrapped.BuyValue;
 
 

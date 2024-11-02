@@ -36,10 +36,17 @@ where T : IEquipmentStats
     public string Name { get; init; }
     public T Inner { get;}
     public Grade Grade { get; init; }
+
+    /// <summary>
+    /// The minimum level players must have to equip this
+    /// </summary>
     public int Level { get; init; }
-    public string Description => ""; // equipment doesn't need a description
+    
     public Gold BuyValue { get; init; }
     
+    /// <summary>
+    /// Details to display in the GUI
+    /// </summary>
     public IEnumerable<string> Details => Inner.Details.Concat(StatBoosts.Details);
     
     /// <summary>
@@ -81,7 +88,7 @@ where T : IEquipmentStats
             Name,
             Grade.Name,
             Grade.Order,
-            Description,
+            "", // no description
             Level,
             Details,
             quantity,
