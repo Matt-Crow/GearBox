@@ -122,7 +122,7 @@ var game = gameBuilder.Build();
 // Add services to the container.
 webAppBuilder.Services
     .AddDbContext<IdentityDbContext>(options => options.UseInMemoryDatabase("Identity"))
-    .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = !true) // change back to true in #119
     .AddEntityFrameworkStores<IdentityDbContext>();
 webAppBuilder.Services.AddRazorPages();
 webAppBuilder.Services.AddSignalR();
