@@ -6,6 +6,9 @@ using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
+using GearBox.Web.Database;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 /*
     Need to load some of the game resources in a specific order:
@@ -18,6 +21,7 @@ using GearBox.Web.Infrastructure;
 
 // need to grab configuration before most other things
 var webAppBuilder = WebApplication.CreateBuilder(args);
+
 var gearboxConfig = new GearBoxConfig();
 webAppBuilder.Configuration
     .GetSection("GearBox")
@@ -116,6 +120,10 @@ gameBuilder
 var game = gameBuilder.Build();
 
 // Add services to the container.
+webAppBuilder.Services
+    .AddDbContext<IdentityDbContext>(options => options.UseInMemoryDatabase("Identity"))
+    .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<IdentityDbContext>();
 webAppBuilder.Services.AddRazorPages();
 webAppBuilder.Services.AddSignalR();
 webAppBuilder.Services.AddSingleton(new GameServer(game));
