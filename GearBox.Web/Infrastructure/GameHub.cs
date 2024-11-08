@@ -2,11 +2,13 @@ using GearBox.Core.Controls;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GearBox.Web.Infrastructure;
 
 // Hubs are transient: don't try storing data on them
+[Authorize]
 public class GameHub : Hub
 {
     private readonly GameServer _server;
