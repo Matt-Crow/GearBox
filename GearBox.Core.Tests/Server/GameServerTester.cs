@@ -7,14 +7,16 @@ namespace GearBox.Core.Tests.Server;
 
 public class GameServerTester
 {
+    public ConnectingUser AUser { get; set; } = new ConnectingUser("", "");
+
     [Fact]
     public async Task CannotConnectTwice()
     {
         var spy = new SpyConnection();
         var sut = new GameServer(MakeGame());
 
-        await sut.AddConnection("foo", spy);
-        await sut.AddConnection("foo", spy);
+        await sut.AddConnection("foo", AUser, spy);
+        await sut.AddConnection("foo", AUser, spy);
 
         Assert.Equal(1, sut.TotalConnections);
     }
@@ -26,7 +28,7 @@ public class GameServerTester
         var sut = new GameServer(MakeGame());
         Assert.Equal(0, sut.TotalConnections);
 
-        await sut.AddConnection("foo", spy);
+        await sut.AddConnection("foo", AUser, spy);
         Assert.Equal(1, sut.TotalConnections);
 
         sut.RemoveConnection("foo");
@@ -39,7 +41,7 @@ public class GameServerTester
         var spy = new SpyConnection();
         var sut = new GameServer(MakeGame());
 
-        await sut.AddConnection("foo", spy);
+        await sut.AddConnection("foo", AUser, spy);
 
         Assert.NotEmpty(spy.MessagesReceived);
     }
@@ -50,8 +52,8 @@ public class GameServerTester
         var client1 = new SpyConnection();
         var client2 = new SpyConnection();
         var sut = new GameServer(MakeGame());
-        await sut.AddConnection("foo", client1);
-        await sut.AddConnection("bar", client2);
+        await sut.AddConnection("foo", AUser, client1);
+        await sut.AddConnection("bar", AUser, client2);
 
         await sut.Update();
 
@@ -63,7 +65,7 @@ public class GameServerTester
     public async Task EnqueueCommand_GivenCommand_DoesNotExecuteImmediately()
     {
         var sut = new GameServer(MakeGame());
-        await sut.AddConnection("foo", new SpyConnection());
+        await sut.AddConnection("foo", AUser, new SpyConnection());
         var command = new SpyControlCommand();
 
         sut.EnqueueCommand("foo", command);
@@ -75,7 +77,7 @@ public class GameServerTester
     public async Task EnqueueCommand_GivenCommand_ExecutesAfterUpdate()
     {
         var sut = new GameServer(MakeGame());
-        await sut.AddConnection("foo", new SpyConnection());
+        await sut.AddConnection("foo", AUser, new SpyConnection());
         var command = new SpyControlCommand();
 
         sut.EnqueueCommand("foo", command);

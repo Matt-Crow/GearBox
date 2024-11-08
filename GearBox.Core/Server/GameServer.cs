@@ -37,24 +37,25 @@ public class GameServer
     /// <summary>
     /// Adds the given connection, then sends the area
     /// </summary>
-    public async Task AddConnection(string id, IConnection connection)
+    public async Task AddConnection(string id, ConnectingUser user, IConnection connection)
     {
         var task = Task.CompletedTask;
         lock (connectionLock)
         {
-            task = DoAddConnection(id, connection);
+            task = DoAddConnection(id, user, connection);
         }
         await task;
     }
 
-    private async Task DoAddConnection(string id, IConnection connection)
+    private async Task DoAddConnection(string id, ConnectingUser user, IConnection connection)
     {
         if (_connections.ContainsKey(id))
         {
             return;
         }
 
-        var player = new PlayerCharacter("The Player"); // will eventually read from repo
+        // todo GetPlayerCharacterByUserId(user.Id)
+        var player = new PlayerCharacter(user.Name); // will eventually read from repo
         var area = _game.GetDefaultArea();
 
         var spawnLocation = area.GetRandomFloorTile();

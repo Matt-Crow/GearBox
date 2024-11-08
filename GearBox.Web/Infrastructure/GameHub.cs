@@ -21,8 +21,10 @@ public class GameHub : Hub
     public override async Task OnConnectedAsync()
     {
         var id = Context.ConnectionId;
-        // new player
-        await _server.AddConnection(id, new GameHubConnection(Clients.Caller));
+        var userId = Context.UserIdentifier ?? throw new Exception("User must be authenticated");
+        var userName = Context.User?.Identity?.Name ?? throw new Exception("User must be authenticated");
+        var user = new ConnectingUser(userId, userName);
+        await _server.AddConnection(id, user, new GameHubConnection(Clients.Caller));
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
