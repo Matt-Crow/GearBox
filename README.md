@@ -10,3 +10,44 @@ A C# MMORPG-like game.
 - **Q** to use basic attack
 - **E** to toggle inventory or open shop
 - **1-9** to use active abilities (if any)
+
+## Setting up the environment
+You can skip all this setup by not providing a connection string,
+at which point the program uses an in-memory database.
+
+### 1. Install a Database
+This project uses PostgeSQL v17, which you can download from [PostgreSQL.org](https://www.postgresql.org/download/).
+Since this project queries the database through Entity Framework Core,
+so you might be able to use any database supported by it.
+Once you have a PostgreSQL database, go to the next step.
+
+### 2. Initialize the Database
+Before you can run the Entity Framework Core migrations,
+you'll need to set up the database for it.
+```
+CREATE DATABASE gearbox;
+\c gearbox
+CREATE SCHEMA gearbox;
+CREATE USER efcore WITH PASSWORD '<PASSWORD>';
+GRANT ALL PRIVILEGES ON SCHEMA gearbox TO efcore;
+```
+
+### 3. Set the Connection String
+Set the connection string in `/GearBox.Web/appsettings.Development.json`:
+```
+{
+    "ConnectionStrings": {
+        "gearbox": "host=localhost;port=5432;database=gearbox;SearchPath=gearbox;username=efcore;password=<PASSWORD>"
+    }
+}
+```
+
+### 4. Run Migrations
+If you haven't already installed `dotnet-ef`, run `dotnet tool install --global dotnet-ef`.
+Once you have that installed, `cd` into `/GearBox.Web`, then run `dotnet ef database update`.
+
+### 5. Revoke Permissions
+Once you've run migrations, it is a good practice to revoke excess permissions from service account like so:
+```
+REVOKE CREATE ON SCHEMA gearbox FROM efcore;
+```

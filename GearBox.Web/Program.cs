@@ -120,8 +120,17 @@ gameBuilder
 var game = gameBuilder.Build();
 
 // Add services to the container.
+var connString = webAppBuilder.Configuration.GetConnectionString("GearBox");
+if (string.IsNullOrEmpty(connString))
+{
+    Console.WriteLine("No connection string provided - defaulting to in-memory database");
+    webAppBuilder.Services.AddDbContext<IdentityDbContext>(options => options.UseInMemoryDatabase("GearBox"));   
+}
+else
+{
+    webAppBuilder.Services.AddDbContext<IdentityDbContext>(options => options.UseNpgsql(connString));
+}
 webAppBuilder.Services
-    .AddDbContext<IdentityDbContext>(options => options.UseInMemoryDatabase("Identity"))
     .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = !true) // change back to true in #119
     .AddEntityFrameworkStores<IdentityDbContext>();
 webAppBuilder.Services.AddRazorPages();
