@@ -11,6 +11,10 @@ A C# MMORPG-like game.
 - **E** to toggle inventory or open shop
 - **1-9** to use active abilities (if any)
 
+## Creating Migrations
+`dotnet ef migrations add <NAME> -c GearBox.Web.Database.GameDbContext -o Migrations/Game`
+`dotnet ef migrations add <NAME> -c GearBox.Web.Database.IdentityDbContext -o Migrations/Identity`
+
 ## Setting up the environment
 You can skip all this setup by not providing a connection string,
 at which point the program uses an in-memory database.
@@ -27,27 +31,34 @@ you'll need to set up the database for it.
 ```
 CREATE DATABASE gearbox;
 \c gearbox
-CREATE SCHEMA gearbox;
+CREATE SCHEMA game;
+CREATE SCHEMA identity;
 CREATE USER efcore WITH PASSWORD '<PASSWORD>';
-GRANT ALL PRIVILEGES ON SCHEMA gearbox TO efcore;
+GRANT ALL PRIVILEGES ON SCHEMA game TO efcore;
+GRANT ALL PRIVILEGES ON SCHEMA identity TO efcore;
 ```
 
 ### 3. Set the Connection String
-Set the connection string in `/GearBox.Web/appsettings.Development.json`:
+Set the connection strings in `/GearBox.Web/appsettings.Development.json`:
 ```
 {
     "ConnectionStrings": {
-        "gearbox": "host=localhost;port=5432;database=gearbox;SearchPath=gearbox;username=efcore;password=<PASSWORD>"
+        "game": "host=localhost;port=5432;database=gearbox;SearchPath=game;username=efcore;password=<PASSWORD>",
+        "identity": "host=localhost;port=5432;database=gearbox;SearchPath=identity;username=efcore;password=<PASSWORD>"
     }
 }
 ```
 
 ### 4. Run Migrations
 If you haven't already installed `dotnet-ef`, run `dotnet tool install --global dotnet-ef`.
-Once you have that installed, `cd` into `/GearBox.Web`, then run `dotnet ef database update`.
+Once you have that installed, `cd` into `/GearBox.Web`, then run 
+`dotnet ef database update -c GearBox.Web.Database.IdentityDbContext`
+and
+`dotnet ef database update -c GearBox.Web.Database.GameDbContext`.
 
 ### 5. Revoke Permissions
 Once you've run migrations, it is a good practice to revoke excess permissions from service account like so:
 ```
-REVOKE CREATE ON SCHEMA gearbox FROM efcore;
+REVOKE CREATE ON SCHEMA game FROM efcore;
+REVOKE CREATE ON SCHEMA identity FROM efcore;
 ```

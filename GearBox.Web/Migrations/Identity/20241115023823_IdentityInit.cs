@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace GearBox.Web.Migrations
+namespace GearBox.Web.Migrations.Identity
 {
     /// <inheritdoc />
-    public partial class IdentityCreate : Migration
+    public partial class IdentityInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

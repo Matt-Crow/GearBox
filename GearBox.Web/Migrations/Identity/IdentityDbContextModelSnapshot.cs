@@ -3,20 +3,17 @@ using System;
 using GearBox.Web.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace GearBox.Web.Migrations
+namespace GearBox.Web.Migrations.Identity
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20241111190233_IdentityCreate")]
-    partial class IdentityCreate
+    partial class IdentityDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
