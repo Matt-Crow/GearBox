@@ -31,4 +31,6 @@ public class DbPlayerCharacter
 
     [Column("equipped_armor_id")]
     public Guid? EquippedArmorId { get; set; }
+
+    public required virtual ICollection<DbPlayerCharacterItem> Items { get; set; }
 }

@@ -130,8 +130,20 @@ if (string.IsNullOrEmpty(gameConnString) || string.IsNullOrEmpty(identityConnStr
 }
 else
 {
-    webAppBuilder.Services.AddDbContext<GameDbContext>(options => options.UseNpgsql(gameConnString));
-    webAppBuilder.Services.AddDbContext<IdentityDbContext>(options => options.UseNpgsql(identityConnString));
+    /*
+        By default, EFCore only checks the "public" schema for applied migrations, even if a SearchPath is provided in the connection string.
+        This causes all migrations to be marked as "pending", as I apply those migrations to another schema.
+        To resolve this issue, I'm overwriting where it searches for the applied migrations.
+        https://github.com/npgsql/efcore.pg/issues/3180
+    */
+    webAppBuilder.Services.AddDbContext<GameDbContext>(options => options.UseNpgsql(
+        gameConnString, 
+        x => x.MigrationsHistoryTable("__EFMigrationsHistory", SearchPathHelper.GetSearchPathByConnectionString(gameConnString))
+    ));
+    webAppBuilder.Services.AddDbContext<IdentityDbContext>(options => options.UseNpgsql(
+        identityConnString, 
+        x => x.MigrationsHistoryTable("__EFMigrationsHistory", SearchPathHelper.GetSearchPathByConnectionString(identityConnString))
+    ));
 }
 webAppBuilder.Services
     .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = !true) // change back to true in #119
