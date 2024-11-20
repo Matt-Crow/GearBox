@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using GearBox.Core.Model.Items;
 
 namespace GearBox.Web.Database;
 
@@ -27,5 +28,22 @@ public class DbPlayerCharacterItem
     public int Quantity { get; set; }
 
     [ForeignKey(nameof(PlayerCharacterId))]
-    public required virtual DbPlayerCharacter PlayerCharacter { get; set;}
+    public required virtual DbPlayerCharacter PlayerCharacter { get; set; }
+
+    /// <summary>
+    /// Converts from the game model to the database model
+    /// </summary>
+    public static DbPlayerCharacterItem FromGameModel(DbPlayerCharacter parent, IItem gameModel, int level, int quantity)
+    {
+        var dbModel = new DbPlayerCharacterItem()
+        {
+            Id = gameModel.Id ?? new Guid(),
+            PlayerCharacterId = parent.Id,
+            Name = gameModel.Name,
+            Level = level,
+            Quantity = quantity,
+            PlayerCharacter = parent
+        };
+        return dbModel;
+    }
 }

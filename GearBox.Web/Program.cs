@@ -9,6 +9,7 @@ using GearBox.Web.Infrastructure;
 using GearBox.Web.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using GearBox.Core.Model.GameObjects.Player;
 
 /*
     Need to load some of the game resources in a specific order:
@@ -136,7 +137,7 @@ else
         To resolve this issue, I'm overwriting where it searches for the applied migrations.
         https://github.com/npgsql/efcore.pg/issues/3180
     */
-    webAppBuilder.Services.AddDbContext<GameDbContext>(options => options.UseNpgsql(
+    webAppBuilder.Services.AddDbContextFactory<GameDbContext>(options => options.UseNpgsql(
         gameConnString, 
         x => x.MigrationsHistoryTable("__EFMigrationsHistory", SearchPathHelper.GetSearchPathByConnectionString(gameConnString))
     ));
@@ -150,7 +151,10 @@ webAppBuilder.Services
     .AddEntityFrameworkStores<IdentityDbContext>();
 webAppBuilder.Services.AddRazorPages();
 webAppBuilder.Services.AddSignalR();
-webAppBuilder.Services.AddSingleton(new GameServer(game));
+webAppBuilder.Services
+    .AddSingleton<IPlayerCharacterRepository, PlayerCharacterRepository>()
+    .AddSingleton<GameServer>()
+    .AddSingleton(game);
 
 var app = webAppBuilder.Build();
 

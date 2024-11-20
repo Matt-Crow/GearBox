@@ -1,5 +1,6 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model;
+using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Server;
 using Xunit;
 
@@ -13,7 +14,7 @@ public class GameServerTester
     public async Task CannotConnectTwice()
     {
         var spy = new SpyConnection();
-        var sut = new GameServer(MakeGame());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
 
         await sut.AddConnection("foo", AUser, spy);
         await sut.AddConnection("foo", AUser, spy);
@@ -25,13 +26,13 @@ public class GameServerTester
     public async Task AddThenRemoveBehaveAsExpected()
     {
         var spy = new SpyConnection();
-        var sut = new GameServer(MakeGame());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
         Assert.Equal(0, sut.TotalConnections);
 
         await sut.AddConnection("foo", AUser, spy);
         Assert.Equal(1, sut.TotalConnections);
 
-        sut.RemoveConnection("foo");
+        await sut.RemoveConnection("foo");
         Assert.Equal(0, sut.TotalConnections);
     }
 
@@ -39,7 +40,7 @@ public class GameServerTester
     public async Task ClientReceivesAreaUponConnecting()
     {
         var spy = new SpyConnection();
-        var sut = new GameServer(MakeGame());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
 
         await sut.AddConnection("foo", AUser, spy);
 
@@ -51,7 +52,7 @@ public class GameServerTester
     {
         var client1 = new SpyConnection();
         var client2 = new SpyConnection();
-        var sut = new GameServer(MakeGame());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
         await sut.AddConnection("foo", AUser, client1);
         await sut.AddConnection("bar", AUser, client2);
 
@@ -64,7 +65,7 @@ public class GameServerTester
     [Fact]
     public async Task EnqueueCommand_GivenCommand_DoesNotExecuteImmediately()
     {
-        var sut = new GameServer(MakeGame());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
         await sut.AddConnection("foo", AUser, new SpyConnection());
         var command = new SpyControlCommand();
 
@@ -76,7 +77,7 @@ public class GameServerTester
     [Fact]
     public async Task EnqueueCommand_GivenCommand_ExecutesAfterUpdate()
     {
-        var sut = new GameServer(MakeGame());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
         await sut.AddConnection("foo", AUser, new SpyConnection());
         var command = new SpyControlCommand();
 
@@ -92,5 +93,24 @@ public class GameServerTester
             .WithArea("foo", 1, area => area.WithMap(new()))
             .Build();
         return result;
+    }
+
+    public static IPlayerCharacterRepository MakePlayerCharacterRepository()
+    {
+        var result = new PlayerCharacterRepositoryMock();
+        return result;
+    }
+}
+
+class PlayerCharacterRepositoryMock : IPlayerCharacterRepository
+{
+    public Task<PlayerCharacter?> GetPlayerCharacterByAspNetUserIdAsync(string aspNetUserId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task SavePlayerCharacterAsync(PlayerCharacter playerCharacter, string aspNetUserId)
+    {
+        return Task.CompletedTask;
     }
 }

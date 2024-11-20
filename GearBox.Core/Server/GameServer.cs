@@ -9,16 +9,19 @@ namespace GearBox.Core.Server;
 public class GameServer
 {
     private readonly IGame _game;
+    private readonly IPlayerCharacterRepository _playerCharacterRepository;
     private readonly Dictionary<string, IConnection> _connections = [];
     private readonly Dictionary<string, PlayerCharacter> _players = [];
     private readonly Dictionary<string, UiState?> _uiStates = [];
+    private readonly Dictionary<string, ConnectingUser> _users = [];
     private readonly List<PendingCommand> _pendingCommands = [];
     private readonly System.Timers.Timer _timer;
     private static readonly object connectionLock = new();
 
-    public GameServer(IGame game)
+    public GameServer(IGame game, IPlayerCharacterRepository playerCharacterRepository)
     {
         _game = game;
+        _playerCharacterRepository = playerCharacterRepository;
 
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
@@ -65,6 +68,7 @@ public class GameServer
         _connections.Add(id, connection);
         _players.Add(id, player);
         _uiStates.Add(id, null); // start with null UI state so it detects changes
+        _users.Add(id, user);
 
         await SendGameInitTo(id);
         await SendAreaUpdateTo(id);
@@ -81,8 +85,9 @@ public class GameServer
         return _connections[id].Send("GameInit", json);
     }
 
-    public void RemoveConnection(string id)
+    public async Task RemoveConnection(string id)
     {
+        var task = Task.CompletedTask;
         lock (connectionLock)
         {
             if (!_connections.ContainsKey(id))
@@ -91,15 +96,18 @@ public class GameServer
             }
 
             var player = _players[id];
+            task = _playerCharacterRepository.SavePlayerCharacterAsync(player, _users[id].Id); 
             player.CurrentArea?.RemovePlayer(player);
             _players.Remove(id);
             _connections.Remove(id);
+            _users.Remove(id);
 
             if (!_connections.Any())
             {
                 _timer.Stop();
             }
         }
+        await task;
     }
 
     /// <summary>
