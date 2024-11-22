@@ -17,8 +17,9 @@ public abstract class Character : IGameObject
     private readonly MobileBehavior _mobility;
 
 
-    public Character(string name, int level, Color? color = null)
+    public Character(string name, int level, Color? color = null, Guid? id = null)
     {
+        Id = id ?? Guid.NewGuid();
         Name = name;
         Color = color ?? Color.GREEN;
         _mobility = new MobileBehavior(Body, Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
@@ -32,7 +33,7 @@ public abstract class Character : IGameObject
     }
 
 
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; }
     public string Name { get; init; }
     protected Color Color { get; init; }
     public Serializer Serializer { get; init; }

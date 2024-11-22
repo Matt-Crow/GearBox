@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
+using GearBox.Core.Model.Items.Infrastructure;
 
 namespace GearBox.Web.Database;
 
@@ -58,19 +59,19 @@ public class DbPlayerCharacter
     {
         Xp = gameModel.Xp;
         Gold = gameModel.Inventory.Gold.Quantity;
+        
+        /*
+        If I set the ID of items as they enter the database,
+        EFCore issues that as an update, which fails, because they don't exist.
+        I want it to issue an insert, which requires the item ID to be empty.
+        It's a pain to set the Equipped*Id properties after saving to the database,
+        So I'll just require that players re-equip their stuff upon logging back in.
+
         EquippedWeaponId = gameModel.Weapon?.Id;
         EquippedArmorId = gameModel.Armor?.Id;
-    
+        */
+
         Items.Clear();
-        if (gameModel.Weapon != null)
-        {
-            Items.Add(DbPlayerCharacterItem.FromGameModel(
-                this,
-                gameModel.Weapon,
-                gameModel.Weapon.Level,
-                1
-            ));
-        }
         AddEquipmentSlot(gameModel.Weapon);
         AddEquipmentSlot(gameModel.Armor);
         AddInventoryTab(gameModel.Inventory.Materials, i => 0);
@@ -105,5 +106,32 @@ public class DbPlayerCharacter
         {
             Items.Add(item);
         }
+    }
+
+    public PlayerCharacter ToGameModel(IItemFactory itemFactory)
+    {
+        // don't need to store AspNetUserId in game model
+        var result = new PlayerCharacter(Name, Xp, Id);
+        result.Inventory.Add(new Gold(Gold));
+
+        foreach (var dbItem in Items)
+        {
+            var gameItems = dbItem.ToGameModel(itemFactory);
+            foreach (var gameItem in gameItems)
+            {
+                result.Inventory.Add(gameItem);
+            }
+        }
+
+        if (EquippedWeaponId != null)
+        {
+            result.EquipWeaponById(EquippedWeaponId.Value);
+        }
+        if (EquippedArmorId != null)
+        {
+            result.EquipArmorById(EquippedArmorId.Value);
+        }
+
+        return result;
     }
 }

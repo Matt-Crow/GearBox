@@ -57,8 +57,8 @@ public class GameServer
             return;
         }
 
-        // todo GetPlayerCharacterByUserId(user.Id)
-        var player = new PlayerCharacter(user.Name); // will eventually read from repo
+        var player = await _playerCharacterRepository.GetPlayerCharacterByAspNetUserIdAsync(user.Id)
+            ?? new PlayerCharacter(user.Name);
         var area = _game.GetDefaultArea();
 
         var spawnLocation = area.GetRandomFloorTile();

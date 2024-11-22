@@ -152,6 +152,7 @@ webAppBuilder.Services
 webAppBuilder.Services.AddRazorPages();
 webAppBuilder.Services.AddSignalR();
 webAppBuilder.Services
+    .AddSingleton(gameBuilder.Items)
     .AddSingleton<IPlayerCharacterRepository, PlayerCharacterRepository>()
     .AddSingleton<GameServer>()
     .AddSingleton(game);

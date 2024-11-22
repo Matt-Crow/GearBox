@@ -13,7 +13,7 @@ public class PlayerCharacter : Character
     private int _frameCount = 0; // used for regeneration
     private readonly List<IActiveAbility> _actives = [];
 
-    public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp), Color.BLUE)
+    public PlayerCharacter(string name, int xp = 0, Guid? id = null) : base(name, GetLevelByXp(xp), Color.BLUE, id)
     {
         Xp = xp;
         XpToNextLevel = GetXpByLevel(Level + 1);

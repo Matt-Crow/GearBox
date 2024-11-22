@@ -106,7 +106,7 @@ class PlayerCharacterRepositoryMock : IPlayerCharacterRepository
 {
     public Task<PlayerCharacter?> GetPlayerCharacterByAspNetUserIdAsync(string aspNetUserId)
     {
-        throw new NotImplementedException();
+        return Task.FromResult<PlayerCharacter?>(null);
     }
 
     public Task SavePlayerCharacterAsync(PlayerCharacter playerCharacter, string aspNetUserId)

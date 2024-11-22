@@ -1,4 +1,5 @@
 using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.Items.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace GearBox.Web.Database;
@@ -6,15 +7,26 @@ namespace GearBox.Web.Database;
 public class PlayerCharacterRepository : IPlayerCharacterRepository
 {
     private readonly IDbContextFactory<GameDbContext> _dbContextFactory;
+    private readonly IItemFactory _itemFactory;
 
-    public PlayerCharacterRepository(IDbContextFactory<GameDbContext> dbContextFactory)
+    public PlayerCharacterRepository(IDbContextFactory<GameDbContext> dbContextFactory, IItemFactory itemFactory)
     {
         _dbContextFactory = dbContextFactory;
+        _itemFactory = itemFactory;
     }
 
-    public Task<PlayerCharacter?> GetPlayerCharacterByAspNetUserIdAsync(string aspNetUserId)
+    public async Task<PlayerCharacter?> GetPlayerCharacterByAspNetUserIdAsync(string aspNetUserId)
     {
-        throw new NotImplementedException();
+        using var db = _dbContextFactory.CreateDbContext();
+        var dbModel = await db.PlayerCharacters.AsNoTracking()
+            .Where(p => p.AspNetUserId == aspNetUserId)
+            .Include(p => p.Items)
+            .FirstOrDefaultAsync();
+
+        // convert from database model
+        var gameModel = dbModel?.ToGameModel(_itemFactory);
+
+        return gameModel;
     }
 
     public async Task SavePlayerCharacterAsync(PlayerCharacter playerCharacter, string aspNetUserId)
@@ -22,6 +34,7 @@ public class PlayerCharacterRepository : IPlayerCharacterRepository
         using var db = _dbContextFactory.CreateDbContext();
         var existing = await db.PlayerCharacters
             .Where(p => p.Id == playerCharacter.Id)
+            .Include(p => p.Items)
             .FirstOrDefaultAsync();
         if (existing == null)
         {
