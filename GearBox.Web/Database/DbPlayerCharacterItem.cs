@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using GearBox.Core.Model.Items;
-using GearBox.Core.Model.Items.Infrastructure;
 
 namespace GearBox.Web.Database;
 
@@ -46,15 +45,5 @@ public class DbPlayerCharacterItem
             PlayerCharacter = parent
         };
         return dbModel;
-    }
-
-    public IEnumerable<ItemUnion> ToGameModel(IItemFactory itemFactory)
-    {
-        // need to set ID?
-        var gameModel = itemFactory.Make(Name) ?? throw new Exception($"Invalid item name: {Name}");
-        for (var i = 0; i < Quantity; i++)
-        {
-            yield return gameModel.ToOwned(Level);
-        }
     }
 }

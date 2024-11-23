@@ -22,7 +22,7 @@ public class PlayerCharacterTester
         var weapon = new Equipment<WeaponStats>("weapon", new WeaponStats());
         sut.Inventory.Weapons.Add(weapon);
 
-        sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID shouldn't be null"));
+        sut.EquipWeaponById(GetId(weapon));
 
         Assert.Equal(weapon, sut.Weapon);
     }
@@ -34,7 +34,7 @@ public class PlayerCharacterTester
         var weapon = new Equipment<WeaponStats>("weapon", new WeaponStats());
         sut.Inventory.Weapons.Add(weapon);
 
-        sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID shouldn't be null"));
+        sut.EquipWeaponById(GetId(weapon));
 
         Assert.False(sut.Inventory.Weapons.Contains(weapon));
     }
@@ -47,9 +47,9 @@ public class PlayerCharacterTester
         var notYetEquipped = new Equipment<WeaponStats>("weapon 2", new WeaponStats());
         sut.Inventory.Weapons.Add(alreadyEquipped);
         sut.Inventory.Weapons.Add(notYetEquipped);
-        sut.EquipWeaponById(alreadyEquipped.Id ?? throw new Exception("Weapon ID shouldn't be null"));
+        sut.EquipWeaponById(GetId(alreadyEquipped));
 
-        sut.EquipWeaponById(notYetEquipped.Id ?? throw new Exception("Weapon ID shouldn't be null"));
+        sut.EquipWeaponById(GetId(notYetEquipped));
 
         Assert.True(sut.Inventory.Weapons.Contains(alreadyEquipped));
     }
@@ -62,7 +62,7 @@ public class PlayerCharacterTester
         var weapon = new Equipment<WeaponStats>("bar", new WeaponStats(), level: 20);
         sut.Inventory.Weapons.Add(weapon);
 
-        sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID should not be null"));
+        sut.EquipWeaponById(GetId(weapon));
 
         Assert.Null(sut.Weapon);
     }
@@ -75,7 +75,7 @@ public class PlayerCharacterTester
         player.Inventory.Weapons.Add(weapon1);
         var before = new UiState(player);
         
-        player.EquipWeaponById(weapon1.Id ?? throw new Exception("Weapon ID should not be null"));
+        player.EquipWeaponById(GetId(weapon1));
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
@@ -90,13 +90,19 @@ public class PlayerCharacterTester
         var weapon2 = new Equipment<WeaponStats>("foo", new WeaponStats()); // same weapon, different ID
         player.Inventory.Weapons.Add(weapon1);
         player.Inventory.Weapons.Add(weapon2);
-        player.EquipWeaponById(weapon1.Id ?? throw new Exception("Weapon ID should not be null"));
+        player.EquipWeaponById(GetId(weapon1));
         var before = new UiState(player);
 
-        player.EquipWeaponById(weapon2.Id ?? throw new Exception("Weapon ID should not be null"));
+        player.EquipWeaponById(GetId(weapon2));
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
         Assert.True(compared.Weapon.HasChanged);
+    }
+
+    private Guid GetId<T>(Equipment<T> equipment)
+    where T : IEquipmentStats
+    {
+        return equipment.Id ?? throw new Exception("ID should not be null");
     }
 }

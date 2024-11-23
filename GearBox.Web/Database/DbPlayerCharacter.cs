@@ -28,11 +28,9 @@ public class DbPlayerCharacter
     [Column("gold")]
     public int Gold { get; set; }
 
-    [Column("equipped_weapon_id")]
-    public Guid? EquippedWeaponId { get; set; }
+    public DbEquippedItem? EquippedWeapon { get; set; }
 
-    [Column("equipped_armor_id")]
-    public Guid? EquippedArmorId { get; set; }
+    public DbEquippedItem? EquippedArmor { get; set; }
 
     public required virtual ICollection<DbPlayerCharacterItem> Items { get; set; }
 
@@ -59,38 +57,27 @@ public class DbPlayerCharacter
     {
         Xp = gameModel.Xp;
         Gold = gameModel.Inventory.Gold.Quantity;
+
+        EquippedWeapon = MakeEquipmentSlot(gameModel.Weapon);
+        EquippedArmor = MakeEquipmentSlot(gameModel.Armor);     
         
-        /*
-        If I set the ID of items as they enter the database,
-        EFCore issues that as an update, which fails, because they don't exist.
-        I want it to issue an insert, which requires the item ID to be empty.
-        It's a pain to set the Equipped*Id properties after saving to the database,
-        So I'll just require that players re-equip their stuff upon logging back in.
-
-        EquippedWeaponId = gameModel.Weapon?.Id;
-        EquippedArmorId = gameModel.Armor?.Id;
-        */
-
         Items.Clear();
-        AddEquipmentSlot(gameModel.Weapon);
-        AddEquipmentSlot(gameModel.Armor);
         AddInventoryTab(gameModel.Inventory.Materials, i => 0);
         AddInventoryTab(gameModel.Inventory.Weapons, i => i.Level);
         AddInventoryTab(gameModel.Inventory.Armors, i => i.Level);
     }
 
-    private void AddEquipmentSlot<T>(Equipment<T>? equipmentSlot)
+    private DbEquippedItem? MakeEquipmentSlot<T>(Equipment<T>? equipmentSlot)
     where T : IEquipmentStats
     {
-        if (equipmentSlot != null)
-        {
-            Items.Add(DbPlayerCharacterItem.FromGameModel(
-                this,
-                equipmentSlot,
-                equipmentSlot.Level,
-                1
-            ));
-        }
+        var dbModel = equipmentSlot == null
+            ? null
+            : new DbEquippedItem()
+            {
+                Name = equipmentSlot.Name,
+                Level = equipmentSlot.Level
+            };
+        return dbModel;
     }
 
     private void AddInventoryTab<T>(InventoryTab<T> tab, Func<T, int> getLevel)
@@ -116,20 +103,26 @@ public class DbPlayerCharacter
 
         foreach (var dbItem in Items)
         {
-            var gameItems = dbItem.ToGameModel(itemFactory);
-            foreach (var gameItem in gameItems)
-            {
-                result.Inventory.Add(gameItem);
-            }
+            /*
+                itemFactory.Make returns an ItemUnion,
+                which has no way of storing quantity,
+                so it would be confusing to put a ToGameModel method in DbPlayerCharacterItems
+            */
+            var gameItem = itemFactory.Make(dbItem.Name) ?? throw new Exception($"Invalid item name: {dbItem.Name}");
+            result.Inventory.Add(gameItem.ToOwned(dbItem.Level), dbItem.Quantity);
         }
 
-        if (EquippedWeaponId != null)
+        if (EquippedWeapon != null)
         {
-            result.EquipWeaponById(EquippedWeaponId.Value);
+            var gameItem = itemFactory.Make(EquippedWeapon.Name) ?? throw new Exception($"Invalid item name: {EquippedWeapon.Name}");
+            result.Inventory.Add(gameItem);
+            result.EquipWeaponById(gameItem.Id ?? throw new Exception("Weapon must have ID"));
         }
-        if (EquippedArmorId != null)
+        if (EquippedArmor != null)
         {
-            result.EquipArmorById(EquippedArmorId.Value);
+            var gameItem = itemFactory.Make(EquippedArmor.Name) ?? throw new Exception($"Invalid item name: {EquippedArmor.Name}");
+            result.Inventory.Add(gameItem);
+            result.EquipArmorById(gameItem.Id ?? throw new Exception("Armor must have ID"));
         }
 
         return result;
