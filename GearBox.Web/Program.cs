@@ -8,7 +8,6 @@ using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 using GearBox.Web.Database;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using GearBox.Core.Model.GameObjects.Player;
 
 /*
@@ -121,31 +120,11 @@ gameBuilder
 var game = gameBuilder.Build();
 
 // Add services to the container.
-var gameConnString = webAppBuilder.Configuration.GetConnectionString("game");
-var identityConnString = webAppBuilder.Configuration.GetConnectionString("identity");
-if (string.IsNullOrEmpty(gameConnString) || string.IsNullOrEmpty(identityConnString))
-{
-    Console.WriteLine("No connection string provided - defaulting to in-memory database");
-    webAppBuilder.Services.AddDbContext<GameDbContext>(options => options.UseInMemoryDatabase("game"));   
-    webAppBuilder.Services.AddDbContext<IdentityDbContext>(options => options.UseInMemoryDatabase("identity"));   
-}
-else
-{
-    /*
-        By default, EFCore only checks the "public" schema for applied migrations, even if a SearchPath is provided in the connection string.
-        This causes all migrations to be marked as "pending", as I apply those migrations to another schema.
-        To resolve this issue, I'm overwriting where it searches for the applied migrations.
-        https://github.com/npgsql/efcore.pg/issues/3180
-    */
-    webAppBuilder.Services.AddDbContextFactory<GameDbContext>(options => options.UseNpgsql(
-        gameConnString, 
-        x => x.MigrationsHistoryTable("__EFMigrationsHistory", SearchPathHelper.GetSearchPathByConnectionString(gameConnString))
-    ));
-    webAppBuilder.Services.AddDbContext<IdentityDbContext>(options => options.UseNpgsql(
-        identityConnString, 
-        x => x.MigrationsHistoryTable("__EFMigrationsHistory", SearchPathHelper.GetSearchPathByConnectionString(identityConnString))
-    ));
-}
+var config = webAppBuilder.Configuration;
+webAppBuilder.Services
+    .AddDbContextFactory<GameDbContext>(ConnectionStringHelper.UsePostgresOrInMemory(config, "game"))
+    .AddDbContext<IdentityDbContext>(ConnectionStringHelper.UsePostgresOrInMemory(config, "identity"));
+
 webAppBuilder.Services
     .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = !true) // change back to true in #119
     .AddEntityFrameworkStores<IdentityDbContext>();
