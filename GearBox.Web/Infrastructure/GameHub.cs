@@ -24,12 +24,13 @@ public class GameHub : Hub
         var userId = Context.UserIdentifier ?? throw new Exception("User must be authenticated");
         var userName = Context.User?.Identity?.Name ?? throw new Exception("User must be authenticated");
         var user = new ConnectingUser(userId, userName);
-        await _server.AddConnection(id, user, new GameHubConnection(Clients.Caller));
+        _server.AddConnection(id, user, new GameHubConnection(Clients.Caller));
+        await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await _server.RemoveConnection(Context.ConnectionId);
+        _server.RemoveConnection(Context.ConnectionId);
         await base.OnDisconnectedAsync(exception);
     }
 

@@ -9,15 +9,16 @@ public class GameServer
 {
     private readonly IGame _game;
     private readonly IPlayerCharacterRepository _playerCharacterRepository;
-    private readonly Dictionary<string, PlayerConnection> _connectedPlayers = [];
+    private readonly ConnectionManager _connectionManager;
     private readonly List<PendingCommand> _pendingCommands = [];
     private readonly System.Timers.Timer _timer;
-    private static readonly object connectionLock = new();
+
 
     public GameServer(IGame game, IPlayerCharacterRepository playerCharacterRepository)
     {
         _game = game;
         _playerCharacterRepository = playerCharacterRepository;
+        _connectionManager = new ConnectionManager();
 
         // could use this instead, but read the comments 
         // https://stackoverflow.com/questions/75060940/how-to-use-game-loops-to-trigger-signalr-group-messages
@@ -34,61 +35,49 @@ public class GameServer
     /// <summary>
     /// The total number of clients currently connected to the server.
     /// </summary>
-    public int TotalConnections => _connectedPlayers.Count;
+    public int TotalConnections => _connectionManager.ConnectedPlayers.Count;
 
     /// <summary>
-    /// Adds the given connection, then sends the area
+    /// Enqueues the connection so it will start receiving messages starting on the next update.
     /// </summary>
-    public async Task AddConnection(string id, ConnectingUser user, IConnection connection)
+    public void AddConnection(string id, ConnectingUser user, IConnection connection)
     {
-        var task = Task.CompletedTask;
-        lock (connectionLock)
-        {
-            task = DoAddConnection(id, user, connection);
-        }
-        await task;
-    }
-
-    private async Task DoAddConnection(string connectionId, ConnectingUser user, IConnection connection)
-    {
-        if (_connectedPlayers.ContainsKey(connectionId))
-        {
-            return;
-        }
-
-        var player = await _playerCharacterRepository.GetPlayerCharacterByAspNetUserIdAsync(user.Id)
-            ?? new PlayerCharacter(user.Name);
-        
-        var conn = new PlayerConnection(user.Id, connection, player);
-        _connectedPlayers.Add(connectionId, conn);
-
-        await conn.HandleConnect(_game);
-
+        _connectionManager.EnqueueConnection(id, () => DoAddConnection(id, user, connection));
         if (!_timer.Enabled)
         {
             _timer.Start();
         }
     }
 
-    public async Task RemoveConnection(string connectionId)
+    private async Task DoAddConnection(string connectionId, ConnectingUser user, IConnection connection)
     {
-        var task = Task.CompletedTask;
-        lock (connectionLock)
+        var player = await _playerCharacterRepository.GetPlayerCharacterByAspNetUserIdAsync(user.Id)
+            ?? new PlayerCharacter(user.Name);
+        
+        var conn = new PlayerConnection(user.Id, connection, player);
+        _connectionManager.ConnectedPlayers.Add(connectionId, conn);
+
+        await conn.HandleConnect(_game);
+    }
+
+    /// <summary>
+    /// Enqueues the connection for removal at the next update.
+    /// </summary>
+    public void RemoveConnection(string connectionId)
+    {
+        _connectionManager.EnqueueDisconnect(connectionId, () => DoDisconnect(connectionId));
+    }
+
+    private async Task DoDisconnect(string connectionId)
+    {
+        await _connectionManager.ConnectedPlayers[connectionId].HandleDisconnect(_playerCharacterRepository);
+        _connectionManager.ConnectedPlayers.Remove(connectionId);
+
+        // need to run this in here instead of in RemoveConnection so timer stops after the player has been saved to DB
+        if (!_connectionManager.ConnectedPlayers.Any())
         {
-            if (!_connectedPlayers.ContainsKey(connectionId))
-            {
-                return;
-            }
-
-            task = _connectedPlayers[connectionId].HandleDisconnect(_playerCharacterRepository);
-            _connectedPlayers.Remove(connectionId);
-
-            if (!_connectedPlayers.Any())
-            {
-                _timer.Stop();
-            }
+            _timer.Stop();
         }
-        await task;
     }
 
     /// <summary>
@@ -99,33 +88,38 @@ public class GameServer
         _pendingCommands.Add(new(id, command));
     }
 
+    /// <summary>
+    /// Runs all pending connection changes and commands, updates the game, then tells everyone about it.
+    /// </summary>
     public async Task Update()
     {
-        var tasks = new List<Task>();
-        lock (connectionLock)
-        {
-            var executeThese = _pendingCommands
-                .Where(pc => _connectedPlayers.ContainsKey(pc.ConnectionId))
-                .ToList();
-            _pendingCommands.Clear();
-            foreach (var command in executeThese)
-            {
-                try
-                {
-                    command.Command.ExecuteOn(_connectedPlayers[command.ConnectionId].Player);
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine(ex);
-                }
-            }
+        // check for pending connections
+        await _connectionManager.RunCallbacks();
 
-            _game.Update();
-            tasks = _connectedPlayers.Values
-                .Select(cp => cp.SendAreaUpdate())
-                .ToList();
+        // check for pending commands
+        var executeThese = _pendingCommands
+            .Where(pc => _connectionManager.ConnectedPlayers.ContainsKey(pc.ConnectionId))
+            .ToList();
+        _pendingCommands.Clear();
+        foreach (var command in executeThese)
+        {
+            try
+            {
+                command.Command.ExecuteOn(_connectionManager.ConnectedPlayers[command.ConnectionId].Player);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
         }
+
+        // update the game
+        _game.Update();
+
         // notify everyone of the update
+        var tasks = _connectionManager.ConnectedPlayers.Values
+            .Select(cp => cp.SendAreaUpdate())
+            .ToList();
         await Task.WhenAll(tasks);
     }
 }

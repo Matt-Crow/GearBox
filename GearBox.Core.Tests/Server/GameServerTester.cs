@@ -16,8 +16,9 @@ public class GameServerTester
         var spy = new SpyConnection();
         var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
 
-        await sut.AddConnection("foo", AUser, spy);
-        await sut.AddConnection("foo", AUser, spy);
+        sut.AddConnection("foo", AUser, spy);
+        sut.AddConnection("foo", AUser, spy);
+        await sut.Update();
 
         Assert.Equal(1, sut.TotalConnections);
     }
@@ -29,20 +30,23 @@ public class GameServerTester
         var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
         Assert.Equal(0, sut.TotalConnections);
 
-        await sut.AddConnection("foo", AUser, spy);
+        sut.AddConnection("foo", AUser, spy);
+        await sut.Update();
         Assert.Equal(1, sut.TotalConnections);
 
-        await sut.RemoveConnection("foo");
+        sut.RemoveConnection("foo");
+        await sut.Update();
         Assert.Equal(0, sut.TotalConnections);
     }
 
     [Fact]
-    public async Task ClientReceivesAreaUponConnecting()
+    public async void ClientReceivesAreaUponConnecting()
     {
         var spy = new SpyConnection();
         var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
 
-        await sut.AddConnection("foo", AUser, spy);
+        sut.AddConnection("foo", AUser, spy);
+        await sut.Update();
 
         Assert.NotEmpty(spy.MessagesReceived);
     }
@@ -53,8 +57,8 @@ public class GameServerTester
         var client1 = new SpyConnection();
         var client2 = new SpyConnection();
         var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
-        await sut.AddConnection("foo", AUser, client1);
-        await sut.AddConnection("bar", AUser, client2);
+        sut.AddConnection("foo", AUser, client1);
+        sut.AddConnection("bar", AUser, client2);
 
         await sut.Update();
 
@@ -63,10 +67,10 @@ public class GameServerTester
     }
 
     [Fact]
-    public async Task EnqueueCommand_GivenCommand_DoesNotExecuteImmediately()
+    public void EnqueueCommand_GivenCommand_DoesNotExecuteImmediately()
     {
         var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
-        await sut.AddConnection("foo", AUser, new SpyConnection());
+        sut.AddConnection("foo", AUser, new SpyConnection());
         var command = new SpyControlCommand();
 
         sut.EnqueueCommand("foo", command);
@@ -78,7 +82,7 @@ public class GameServerTester
     public async Task EnqueueCommand_GivenCommand_ExecutesAfterUpdate()
     {
         var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
-        await sut.AddConnection("foo", AUser, new SpyConnection());
+        sut.AddConnection("foo", AUser, new SpyConnection());
         var command = new SpyControlCommand();
 
         sut.EnqueueCommand("foo", command);
