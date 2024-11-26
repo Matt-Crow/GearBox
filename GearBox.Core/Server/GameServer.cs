@@ -12,6 +12,7 @@ public class GameServer
     private readonly ConnectionManager _connectionManager;
     private readonly List<PendingCommand> _pendingCommands = [];
     private readonly System.Timers.Timer _timer;
+    private bool _isCurrentlyUpdating = false;
 
 
     public GameServer(IGame game, IPlayerCharacterRepository playerCharacterRepository)
@@ -29,7 +30,7 @@ public class GameServer
             AutoReset = true,
             Enabled = false
         };
-        _timer.Elapsed += async (sender, e) => await Update();
+        _timer.Elapsed += async (sender, e) => await TryUpdate();
     }
 
     /// <summary>
@@ -86,6 +87,40 @@ public class GameServer
     public void EnqueueCommand(string id, IControlCommand command)
     {
         _pendingCommands.Add(new(id, command));
+    }
+
+    private async Task TryUpdate()
+    {
+        /*
+            Suppose the game updates every 50ms.
+            When a user connects, we have to load from the database.
+            This can take more than 50ms to run, so the next update starts before that update can finish.
+                Update#1 - start
+                Update#1 - slowly load user from database
+                Update#2 - start
+                Update#1 - end
+                Update#2 - end
+            This leads to concurrent modification.
+            To circumvent this, skip any updates which occur when another update is running.
+            Unfortunately, this leads to lag spikes affecting all users when a user connects.
+
+            A better implementation would send the long-running tasks to some queue for processing outside of the update loop.
+        */
+        if (_isCurrentlyUpdating)
+        {
+            Console.WriteLine("An update is currently in progress; skipping this update.");
+            return;
+        }
+        _isCurrentlyUpdating = true;
+        try
+        {
+            await Update();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
+        _isCurrentlyUpdating = false;
     }
 
     /// <summary>
