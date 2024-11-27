@@ -7,6 +7,7 @@ using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 using GearBox.Web.Database;
+using GearBox.Web.Email;
 using Microsoft.AspNetCore.Identity;
 using GearBox.Core.Model.GameObjects.Player;
 
@@ -168,5 +169,12 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapHub<GameHub>("/area-hub");
+
+
+
+
+await new EmailSender().SendEmailAsync("mattcrow19@gmail.com", "Test Email", "<p>Hello world!</p>");
+
+
 
 app.Run();
