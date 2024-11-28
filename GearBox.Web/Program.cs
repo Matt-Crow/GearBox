@@ -10,6 +10,7 @@ using GearBox.Web.Database;
 using GearBox.Web.Email;
 using Microsoft.AspNetCore.Identity;
 using GearBox.Core.Model.GameObjects.Player;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 /*
     Need to load some of the game resources in a specific order:
@@ -135,7 +136,8 @@ webAppBuilder.Services
     .AddSingleton(gameBuilder.Items)
     .AddSingleton<IPlayerCharacterRepository, PlayerCharacterRepository>()
     .AddSingleton<GameServer>()
-    .AddSingleton(game);
+    .AddSingleton(game)
+    .AddScoped<IEmailSender, EmailSender>(); // is it supposed to be scoped?
 
 var app = webAppBuilder.Build();
 
@@ -172,8 +174,8 @@ app.MapHub<GameHub>("/area-hub");
 
 
 
-
-await new EmailSender().SendEmailAsync("mattcrow19@gmail.com", "Test Email", "<p>Hello world!</p>");
+var emailSender = app.Services.CreateScope().ServiceProvider.GetRequiredService<IEmailSender>();
+await emailSender.SendEmailAsync("mattcrow19@gmail.com", "Test Email", "<p>Hello world!</p>");
 
 
 
