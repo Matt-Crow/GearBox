@@ -19,11 +19,21 @@ A C# MMORPG-like game.
 
 ### Configuring Emails
 I use GMail to send application emails.
-Create a service account, then put it's json file under '/secrets'.
-Rename the file to `gmail-service-account.json`.
 
-In `appsettings.development.json`, set `SmtpFolder` to the full path to a folder on the machine.
-The app will temporarily store emails it sends in there.
+In your appsetting file, add this block:
+```
+"Email": {
+    "SenderEmailAddress": <any email address>,
+    "SmtpFolder": <full path to a folder for temporary files>
+}
+```
+
+You'll also need to set up the GMail API, like so:
+
+1. On https://console.cloud.google.com/, create a new project.
+2. Enable the GMail API for the project.
+3. Create a new desktop OAuth 2.0 Client ID
+4. Download the OAuth client secret, then store it as `/secrets/client_secret.json`
 
 ### Database setup
 You can skip all this setup by not providing a connection string,

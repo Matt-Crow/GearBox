@@ -2,8 +2,11 @@ using System.Net.Mail;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Gmail.v1;
 using Google.Apis.Gmail.v1.Data;
+using Google.Apis.Http;
 using Google.Apis.Services;
+using Google.Apis.Util.Store;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Options;
 
 namespace GearBox.Web.Email;
 
@@ -14,50 +17,82 @@ namespace GearBox.Web.Email;
 */
 public class EmailSender : IEmailSender
 {
-    private readonly IConfiguration _config;
+    private readonly EmailConfig _config;
+    private static readonly string SERVICE_ACCOUNT_PATH = "./secrets/gmail-service-account.json";
+    private static readonly string OAUTH_SECRET_PATH = "./secrets/client_secret.json";
 
-    public EmailSender(IConfiguration config)
+    /// <summary>
+    /// If Google API fails do to insufficient scopes, try deleting this file.
+    /// </summary>
+    private static readonly string OAUTH_TOKEN_PATH = "./secrets/tokens";
+    private static readonly IEnumerable<string> SCOPES = [GmailService.Scope.GmailSend];
+
+    public EmailSender(IOptions<EmailConfig> config)
     {
-        _config = config;
+        _config = config.Value;
+        _config.Validate();
     }
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
-        // load service account credentials
-        // Gmail API does not support API keys, so use service account instead
-        var creds = ServiceAccountCredential.FromServiceAccountData(File.OpenRead("./secrets/gmail-service-account.json"));
-        creds.Scopes = [
-            GmailService.Scope.GmailSend // only need this one
-        ];
-        var init = new BaseClientService.Initializer()
+        /*
+            Google offers three forms of authentication:
+            1. API key, which is disabled for GMail
+            2. OAuth client ID, which authenticates as a person (not what I want)
+            3. Service Account, which keeps failing with 400 error
+
+            I'll keep trying to get the service account to work, but will need to use the OAuth client ID for now.
+        */
+        IConfigurableHttpClientInitializer creds = _config.UseServiceAccount
+            ? await AuthorizeServiceAccount()
+            : await AuthorizeOAuthClient();
+
+        var sender = _config.SenderEmailAddress;
+        if (_config.UseServiceAccount)
         {
-            ApplicationName = "GearBox",
-            HttpClientInitializer = creds
-        };
+            sender = (await AuthorizeServiceAccount()).Id;
+        }
 
-        var sender = creds.Id;
-        using var mrMime = CreateDotNetEmail(new MailAddress(sender), new MailAddress(email), subject, htmlMessage);
-
-        var asRfc2822 = await ToRFC2822(mrMime);
-
-        // only need to set Raw - that's what the API explorer does
+        using var dotnetEmail = CreateDotNetEmail(new MailAddress(sender), new MailAddress(email), subject, htmlMessage);
+        var asRfc2822 = await ToRFC2822(dotnetEmail);
         var message = new Message()
         {
             Raw = Convert.ToBase64String(asRfc2822) 
         };
 
-        using var gmail = new GmailService(init);
-        try
+        using var gmail = new GmailService(new BaseClientService.Initializer()
         {
-            var request = gmail.Users.Messages.Send(message, "me");
-            var response = await request.ExecuteAsync();
-            Console.WriteLine(response);
-        }
-        catch (System.Exception ex)
-        {
-            Console.Error.WriteLine(ex);
-            throw;
-        }
+            HttpClientInitializer = creds
+        });
+        var request = gmail.Users.Messages.Send(message, "me");
+        await request.ExecuteAsync();
+    }
+
+    private static async Task<UserCredential> AuthorizeOAuthClient()
+    {
+        /*
+            Service account isn't working, so I'm trying this one.
+            https://github.com/googleworkspace/dotnet-samples/blob/main/gmail/GmailQuickstart/GmailQuickstart.cs
+        */
+        using var stream = File.OpenRead(OAUTH_SECRET_PATH);
+        var secrets = GoogleClientSecrets.FromStream(stream);
+        var creds = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+            secrets.Secrets,
+            SCOPES,
+            "gearbox", // normally, the user's name would go here
+            CancellationToken.None,
+            new FileDataStore(OAUTH_TOKEN_PATH, true)
+        );
+        return creds;
+    }
+
+    private static async Task<ServiceAccountCredential> AuthorizeServiceAccount()
+    {
+        using var stream = File.OpenRead(SERVICE_ACCOUNT_PATH);
+        var creds = ServiceAccountCredential.FromServiceAccountData(stream);
+        creds.Scopes = SCOPES;
+        await Task.CompletedTask;
+        return creds;
     }
 
     private static MailMessage CreateDotNetEmail(MailAddress from, MailAddress to, string subject, string htmlBody)
@@ -83,7 +118,7 @@ public class EmailSender : IEmailSender
         */
 
         // we'll temporarily store files here - SmtpClient gives file a random name, so store in unique folder to find it easily
-        var smtpFolder = _config.GetValue<string>("SmtpFolder") ?? throw new Exception("Need to set SmtpFolder to a full path to a folder in appsettings");
+        var smtpFolder = _config.SmtpFolder;
         var uniqueFolderName = Guid.NewGuid().ToString();
         var folderForThisEmail = Path.Combine(smtpFolder, uniqueFolderName);
         Directory.CreateDirectory(folderForThisEmail);
