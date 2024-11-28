@@ -7,6 +7,7 @@ using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 using GearBox.Web.Database;
+using GearBox.Web.Email;
 using Microsoft.AspNetCore.Identity;
 using GearBox.Core.Model.GameObjects.Player;
 
@@ -134,7 +135,8 @@ webAppBuilder.Services
     .AddSingleton(gameBuilder.Items)
     .AddSingleton<IPlayerCharacterRepository, PlayerCharacterRepository>()
     .AddSingleton<GameServer>()
-    .AddSingleton(game);
+    .AddSingleton(game)
+    .Configure<EmailConfig>(webAppBuilder.Configuration.GetSection(EmailConfig.ConfigSection));
 
 var app = webAppBuilder.Build();
 
