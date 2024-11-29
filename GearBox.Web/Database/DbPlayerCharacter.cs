@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 
 namespace GearBox.Web.Database;
 
@@ -31,6 +32,9 @@ public class DbPlayerCharacter
     public DbEquippedItem? EquippedWeapon { get; set; }
 
     public DbEquippedItem? EquippedArmor { get; set; }
+
+    [ForeignKey(nameof(AspNetUserId))]
+    public IdentityUser AspNetUser { get; set; } = null!;
 
     public required virtual ICollection<DbPlayerCharacterItem> Items { get; set; }
 
