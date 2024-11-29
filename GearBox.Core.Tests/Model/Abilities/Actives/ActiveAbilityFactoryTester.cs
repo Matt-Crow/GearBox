@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Abilities.Actives.Impl;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model.Abilities.Actives;

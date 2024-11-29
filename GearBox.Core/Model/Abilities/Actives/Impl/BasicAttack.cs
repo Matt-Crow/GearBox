@@ -1,7 +1,7 @@
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model.Abilities.Actives;
+namespace GearBox.Core.Model.Abilities.Actives.Impl;
 
 public class BasicAttack() : ActiveAbility("Basic Attack", 0, Duration.FromSeconds(0.5))
 {

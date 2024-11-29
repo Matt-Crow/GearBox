@@ -1,5 +1,5 @@
 using System.Text.Json;
-using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Abilities.Actives.Impl;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Units;
