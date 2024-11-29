@@ -6,10 +6,10 @@ namespace GearBox.Web.Database;
 
 public class PlayerCharacterRepository : IPlayerCharacterRepository
 {
-    private readonly IDbContextFactory<GameDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<GearBoxDbContext> _dbContextFactory;
     private readonly IItemFactory _itemFactory;
 
-    public PlayerCharacterRepository(IDbContextFactory<GameDbContext> dbContextFactory, IItemFactory itemFactory)
+    public PlayerCharacterRepository(IDbContextFactory<GearBoxDbContext> dbContextFactory, IItemFactory itemFactory)
     {
         _dbContextFactory = dbContextFactory;
         _itemFactory = itemFactory;

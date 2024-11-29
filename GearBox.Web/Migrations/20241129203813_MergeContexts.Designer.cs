@@ -3,17 +3,20 @@ using System;
 using GearBox.Web.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace GearBox.Web.Migrations.Identity
+namespace GearBox.Web.Migrations
 {
-    [DbContext(typeof(IdentityDbContext))]
-    partial class IdentityDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(GearBoxDbContext))]
+    [Migration("20241129203813_MergeContexts")]
+    partial class MergeContexts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,67 @@ namespace GearBox.Web.Migrations.Identity
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("GearBox.Web.Database.DbPlayerCharacter", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("AspNetUserId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("asp_net_user_id");
+
+                    b.Property<int>("Gold")
+                        .HasColumnType("integer")
+                        .HasColumnName("gold");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<int>("Xp")
+                        .HasColumnType("integer")
+                        .HasColumnName("xp");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("gb_player_character");
+                });
+
+            modelBuilder.Entity("GearBox.Web.Database.DbPlayerCharacterItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer")
+                        .HasColumnName("level");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("PlayerCharacterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("player_character_id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlayerCharacterId");
+
+                    b.ToTable("gb_player_character_item");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -222,6 +286,68 @@ namespace GearBox.Web.Migrations.Identity
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("GearBox.Web.Database.DbPlayerCharacter", b =>
+                {
+                    b.OwnsOne("GearBox.Web.Database.DbEquippedItem", "EquippedArmor", b1 =>
+                        {
+                            b1.Property<Guid>("DbPlayerCharacterId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Level")
+                                .HasColumnType("integer")
+                                .HasColumnName("equipped_armor_level");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("equipped_armor_name");
+
+                            b1.HasKey("DbPlayerCharacterId");
+
+                            b1.ToTable("gb_player_character");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DbPlayerCharacterId");
+                        });
+
+                    b.OwnsOne("GearBox.Web.Database.DbEquippedItem", "EquippedWeapon", b1 =>
+                        {
+                            b1.Property<Guid>("DbPlayerCharacterId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Level")
+                                .HasColumnType("integer")
+                                .HasColumnName("equipped_weapon_level");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("equipped_weapon_name");
+
+                            b1.HasKey("DbPlayerCharacterId");
+
+                            b1.ToTable("gb_player_character");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DbPlayerCharacterId");
+                        });
+
+                    b.Navigation("EquippedArmor");
+
+                    b.Navigation("EquippedWeapon");
+                });
+
+            modelBuilder.Entity("GearBox.Web.Database.DbPlayerCharacterItem", b =>
+                {
+                    b.HasOne("GearBox.Web.Database.DbPlayerCharacter", "PlayerCharacter")
+                        .WithMany("Items")
+                        .HasForeignKey("PlayerCharacterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PlayerCharacter");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -271,6 +397,11 @@ namespace GearBox.Web.Migrations.Identity
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("GearBox.Web.Database.DbPlayerCharacter", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

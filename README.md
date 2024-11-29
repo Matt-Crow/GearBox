@@ -12,8 +12,7 @@ A C# MMORPG-like game.
 - **1-9** to use active abilities (if any)
 
 ## Creating Migrations
-`dotnet ef migrations add <NAME> -c GearBox.Web.Database.GameDbContext -o Migrations/Game`
-`dotnet ef migrations add <NAME> -c GearBox.Web.Database.IdentityDbContext -o Migrations/Identity`
+`dotnet ef migrations add <NAME>`
 
 ## Setting up the environment
 
@@ -51,11 +50,9 @@ you'll need to set up the database for it.
 ```
 CREATE DATABASE gearbox;
 \c gearbox
-CREATE SCHEMA game;
-CREATE SCHEMA identity;
+CREATE SCHEMA gb;
 CREATE USER efcore WITH PASSWORD '<PASSWORD>';
-GRANT ALL PRIVILEGES ON SCHEMA game TO efcore;
-GRANT ALL PRIVILEGES ON SCHEMA identity TO efcore;
+GRANT ALL PRIVILEGES ON SCHEMA gb TO efcore;
 ```
 
 #### 3. Set the Connection String
@@ -63,8 +60,7 @@ Set the connection strings in `/GearBox.Web/appsettings.Development.json`:
 ```
 {
     "ConnectionStrings": {
-        "game": "host=localhost;port=5432;database=gearbox;SearchPath=game;username=efcore;password=<PASSWORD>",
-        "identity": "host=localhost;port=5432;database=gearbox;SearchPath=identity;username=efcore;password=<PASSWORD>"
+        "GearBoxDbContext": "host=localhost;port=5432;database=gearbox;SearchPath=gb;username=efcore;password=<PASSWORD>"
     }
 }
 ```
@@ -72,13 +68,15 @@ Set the connection strings in `/GearBox.Web/appsettings.Development.json`:
 #### 4. Run Migrations
 If you haven't already installed `dotnet-ef`, run `dotnet tool install --global dotnet-ef`.
 Once you have that installed, `cd` into `/GearBox.Web`, then run 
-`dotnet ef database update -c GearBox.Web.Database.IdentityDbContext`
-and
-`dotnet ef database update -c GearBox.Web.Database.GameDbContext`.
+`dotnet ef database update`.
 
 #### 5. Revoke Permissions
 Once you've run migrations, it is a good practice to revoke excess permissions from service account like so:
+`REVOKE CREATE ON SCHEMA gb FROM efcore;`
+
+## Notes
+The identity pages were scaffolded by running 
 ```
-REVOKE CREATE ON SCHEMA game FROM efcore;
-REVOKE CREATE ON SCHEMA identity FROM efcore;
+dotnet tool install -g dotnet-aspnet-codegenerator
+dotnet aspnet-codegenerator identity -dc GearBox.Web.Database.IdentityDbContext -f
 ```

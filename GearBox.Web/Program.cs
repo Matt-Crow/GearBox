@@ -123,13 +123,11 @@ var game = gameBuilder.Build();
 
 // Add services to the container.
 var config = webAppBuilder.Configuration;
-webAppBuilder.Services
-    .AddDbContextFactory<GameDbContext>(ConnectionStringHelper.UsePostgresOrInMemory(config, "game"))
-    .AddDbContext<IdentityDbContext>(ConnectionStringHelper.UsePostgresOrInMemory(config, "identity"));
+webAppBuilder.Services.AddDbContextFactory<GearBoxDbContext>(ConnectionStringHelper.UsePostgresOrInMemory(config, "GearBoxDbContext"));
 
 webAppBuilder.Services
     .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true) 
-    .AddEntityFrameworkStores<IdentityDbContext>();
+    .AddEntityFrameworkStores<GearBoxDbContext>();
 webAppBuilder.Services.AddRazorPages();
 webAppBuilder.Services.AddSignalR();
 webAppBuilder.Services

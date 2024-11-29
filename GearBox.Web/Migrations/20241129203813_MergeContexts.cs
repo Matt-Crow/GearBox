@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace GearBox.Web.Migrations.Identity
+namespace GearBox.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class IdentityInit : Migration
+    public partial class MergeContexts : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -49,6 +49,25 @@ namespace GearBox.Web.Migrations.Identity
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "gb_player_character",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    asp_net_user_id = table.Column<string>(type: "text", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    xp = table.Column<int>(type: "integer", nullable: false),
+                    gold = table.Column<int>(type: "integer", nullable: false),
+                    equipped_weapon_name = table.Column<string>(type: "text", nullable: true),
+                    equipped_weapon_level = table.Column<int>(type: "integer", nullable: true),
+                    equipped_armor_name = table.Column<string>(type: "text", nullable: true),
+                    equipped_armor_level = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_gb_player_character", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -157,6 +176,27 @@ namespace GearBox.Web.Migrations.Identity
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "gb_player_character_item",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    player_character_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    level = table.Column<int>(type: "integer", nullable: false),
+                    quantity = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_gb_player_character_item", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_gb_player_character_item_gb_player_character_player_charact~",
+                        column: x => x.player_character_id,
+                        principalTable: "gb_player_character",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -193,6 +233,11 @@ namespace GearBox.Web.Migrations.Identity
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gb_player_character_item_player_character_id",
+                table: "gb_player_character_item",
+                column: "player_character_id");
         }
 
         /// <inheritdoc />
@@ -214,10 +259,16 @@ namespace GearBox.Web.Migrations.Identity
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "gb_player_character_item");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "gb_player_character");
         }
     }
 }
