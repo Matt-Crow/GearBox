@@ -8,8 +8,9 @@ using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 using GearBox.Web.Database;
 using GearBox.Web.Email;
-using Microsoft.AspNetCore.Identity;
 using GearBox.Core.Model.GameObjects.Player;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Identity;
 
 /*
     Need to load some of the game resources in a specific order:
@@ -127,7 +128,7 @@ webAppBuilder.Services
     .AddDbContext<IdentityDbContext>(ConnectionStringHelper.UsePostgresOrInMemory(config, "identity"));
 
 webAppBuilder.Services
-    .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = !true) // change back to true in #119
+    .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true) 
     .AddEntityFrameworkStores<IdentityDbContext>();
 webAppBuilder.Services.AddRazorPages();
 webAppBuilder.Services.AddSignalR();
@@ -136,7 +137,8 @@ webAppBuilder.Services
     .AddSingleton<IPlayerCharacterRepository, PlayerCharacterRepository>()
     .AddSingleton<GameServer>()
     .AddSingleton(game)
-    .Configure<EmailConfig>(webAppBuilder.Configuration.GetSection(EmailConfig.ConfigSection));
+    .Configure<EmailConfig>(webAppBuilder.Configuration.GetSection(EmailConfig.ConfigSection))
+    .AddTransient<IEmailSender, EmailSender>();
 
 var app = webAppBuilder.Build();
 
