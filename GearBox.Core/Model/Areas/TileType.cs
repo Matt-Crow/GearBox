@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Areas;
 
 /// <summary>
 /// defines one type of tile which may exist on a map

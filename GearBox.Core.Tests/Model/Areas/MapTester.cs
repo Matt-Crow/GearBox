@@ -1,9 +1,9 @@
-namespace GearBox.Core.Tests.Model.Static;
+namespace GearBox.Core.Tests.Model.Areas;
 
 using GearBox.Core.Model;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Enemies;
-using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 using Xunit;
 
@@ -41,7 +41,7 @@ public class MapTester
             .SetTileTypeForKey(1, type1)
             .SetTileTypeForKey(1, type2)
             .SetTileAt(Coordinates.ORIGIN, 1);
-        
+
         var actual = sut.GetTileAt(Coordinates.ORIGIN);
 
         Assert.Equal(type2, actual);
@@ -90,7 +90,7 @@ public class MapTester
             .SetTileTypeForKey(1, AWall())
             .SetTileAt(Coordinates.ORIGIN, 1);
         var projectile = new Projectile(Coordinates.ORIGIN.CenteredOnTile(), Velocity.ZERO, Distance.FromTiles(5), new Attack(new EnemyCharacter("foo", 1), 1), Color.BLACK);
-    
+
         sut.CheckForCollisions(projectile.Body);
 
         Assert.True(projectile.Termination.IsTerminated);

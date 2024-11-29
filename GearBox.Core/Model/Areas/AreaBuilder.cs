@@ -2,7 +2,6 @@ using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Model.Items.Shops;
-using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.Areas;

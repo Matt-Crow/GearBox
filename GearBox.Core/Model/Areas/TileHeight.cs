@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Areas;
 
 /// <summary>
 /// Multiton for wall, floor, or pit
@@ -9,12 +9,12 @@ public class TileHeight
     /// Blocks characters and projectiles
     /// </summary>
     public static readonly TileHeight WALL = new("Wall", 1);
-    
+
     /// <summary>
     /// Does not block anything
     /// </summary>
     public static readonly TileHeight FLOOR = new("Floor", 0);
-    
+
     /// <summary>
     /// Blocks characters
     /// </summary>

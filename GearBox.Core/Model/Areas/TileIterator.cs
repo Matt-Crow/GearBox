@@ -1,6 +1,6 @@
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Areas;
 
 public class TileIterator
 {
@@ -21,7 +21,7 @@ public class TileIterator
 
     public TileIterator(Map map) : this(map, Coordinates.ORIGIN, new(map.Width, map.Height))
     {
-        
+
     }
 
     private Coordinates CurrentPoint { get => Coordinates.FromTiles(_currentX, _currentY); }

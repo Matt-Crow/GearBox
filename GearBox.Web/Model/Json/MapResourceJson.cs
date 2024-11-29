@@ -1,5 +1,5 @@
 using GearBox.Core.Model;
-using GearBox.Core.Model.Static;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Web.Model.Json;

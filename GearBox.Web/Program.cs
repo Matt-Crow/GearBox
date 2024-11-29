@@ -2,7 +2,6 @@ using GearBox.Core.Config;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Abilities.Actives.Impl;
 using GearBox.Core.Model.Items;
-using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
@@ -11,6 +10,7 @@ using GearBox.Web.Email;
 using GearBox.Core.Model.GameObjects.Player;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
+using GearBox.Core.Model.Areas;
 
 /*
     Need to load some of the game resources in a specific order:

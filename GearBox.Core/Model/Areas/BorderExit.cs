@@ -1,9 +1,8 @@
-using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Areas;
 
 /// <summary>
 /// An exit which triggers when a player reaches a border of the map
@@ -21,22 +20,22 @@ public class BorderExit : IExit
     }
 
     public static BorderExit Left(string destinationName) => new(
-        destinationName, 
+        destinationName,
         (body, bounds) => body.LeftInPixels < 0,
         (body, bounds) => body.RightInPixels = bounds.WidthInPixels
     );
     public static BorderExit Right(string destinationName) => new(
-        destinationName, 
+        destinationName,
         (body, bounds) => body.RightInPixels > bounds.WidthInPixels,
         (body, bounds) => body.LeftInPixels = 0
     );
     public static BorderExit Top(string destinationName) => new(
-        destinationName, 
+        destinationName,
         (body, bounds) => body.TopInPixels < 0,
         (body, bounds) => body.BottomInPixels = bounds.HeightInPixels
     );
     public static BorderExit Bottom(string destinationName) => new(
-        destinationName, 
+        destinationName,
         (body, bounds) => body.BottomInPixels > bounds.HeightInPixels,
         (body, bounds) => body.TopInPixels = 0
     );

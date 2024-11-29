@@ -1,7 +1,6 @@
-using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
 
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Areas;
 
 /// <summary>
 /// An exit exists in an area, and moves players to another area when they pass through it.
@@ -11,7 +10,7 @@ public interface IExit
     /// <summary>
     /// The name of the area this sends players to when they reach this exits
     /// </summary>
-    string DestinationName { get;}
+    string DestinationName { get; }
 
     /// <summary>
     /// Checks whether the given player should exit the given area

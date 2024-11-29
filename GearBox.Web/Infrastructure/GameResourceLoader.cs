@@ -1,7 +1,7 @@
 using System.Text.Json;
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Items;
-using GearBox.Core.Model.Static;
 using GearBox.Web.Model.Json;
 
 namespace GearBox.Web.Infrastructure;

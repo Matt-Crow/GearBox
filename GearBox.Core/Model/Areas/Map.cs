@@ -1,10 +1,9 @@
-
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Json.AreaInit;
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Areas;
 
 /// <summary>
 /// a Map is a matrix of tiles the player can see and collide with
@@ -15,7 +14,7 @@ public class Map : ISerializable<MapJson>
     private readonly Dictionary<int, TileType> _tileTypes = [];
 
 
-    public Map() : this(Dimensions.InTiles(20)) 
+    public Map() : this(Dimensions.InTiles(20))
     {
 
     }
@@ -60,7 +59,7 @@ public class Map : ISerializable<MapJson>
         {
             throw new ArgumentException($"invalid tileType {tileType}");
         }
-        _tileMap[y,x] = tileType;
+        _tileMap[y, x] = tileType;
         return this;
     }
 
@@ -81,7 +80,7 @@ public class Map : ISerializable<MapJson>
         Validate(coordinates);
         var x = coordinates.XInTiles;
         var y = coordinates.YInTiles;
-        var i = _tileMap[y,x];
+        var i = _tileMap[y, x];
         var result = _tileTypes[i];
         return result;
     }
@@ -129,7 +128,7 @@ public class Map : ISerializable<MapJson>
         {
             throw new Exception("Objects with large radius are not supported yet");
         }
-        
+
         if (!body.IsWithin(Bounds))
         {
             body.OnCollidedWithMapEdge(new CollideWithMapEdgeEventArgs(Bounds));
@@ -170,7 +169,7 @@ public class Map : ISerializable<MapJson>
         return FindFloorTileAround(source) ?? throw new Exception("No floor tiles");
     }
 
-    private Coordinates? FindFloorTileAround(Coordinates source, int searchRadius=0)
+    private Coordinates? FindFloorTileAround(Coordinates source, int searchRadius = 0)
     {
         /*
             recursively search squares of tiles around a source
@@ -205,7 +204,7 @@ public class Map : ISerializable<MapJson>
         {
             return null;
         }
-        
+
         Coordinates? found = null;
         found ??= FindFloorTileAlongLine(upperL, upperR, 1, 0); // right across the top
         found ??= FindFloorTileAlongLine(upperR, lowerR, 0, 1); // down the right
@@ -226,7 +225,7 @@ public class Map : ISerializable<MapJson>
         }
         return null;
     }
-    
+
     public MapJson ToJson()
     {
         var tilesByHeight = new Dictionary<TileHeight, List<TileJson>>()

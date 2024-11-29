@@ -1,7 +1,7 @@
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Units;
 
-namespace GearBox.Core.Model.Static;
+namespace GearBox.Core.Model.Areas;
 
 public class Tile
 {
@@ -27,7 +27,7 @@ public class Tile
     }
     public void ShoveOut(BodyBehavior body)
     {
-        if (body.Radius.InPixels*2 > Distance.FromTiles(1).InPixels)
+        if (body.Radius.InPixels * 2 > Distance.FromTiles(1).InPixels)
         {
             throw new Exception("large radius not supported");
         }
