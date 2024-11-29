@@ -1,6 +1,4 @@
-using GearBox.Core.Model.Json.AreaUpdate;
-
-namespace GearBox.Core.Model.Json;
+namespace GearBox.Core.Model.Json.AreaUpdate;
 
 public class UiStateChangesJson
 {

@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Json.AreaInit;
+namespace GearBox.Core.Model.Json.AreaUpdate;
 
 public class TileJson
 {
@@ -10,6 +10,6 @@ public class TileJson
     }
 
     public ColorJson Color { get; init; }
-    public int X { get; init; } 
+    public int X { get; init; }
     public int Y { get; init; }
 }

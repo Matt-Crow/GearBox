@@ -1,4 +1,3 @@
-
 namespace GearBox.Core.Model.Json.AreaUpdate;
 
 public class InventoryJson : IChange, IJson

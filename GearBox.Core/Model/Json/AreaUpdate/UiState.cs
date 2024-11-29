@@ -1,7 +1,6 @@
 using GearBox.Core.Model.GameObjects.Player;
-using GearBox.Core.Model.Json.AreaUpdate;
 
-namespace GearBox.Core.Model.Json;
+namespace GearBox.Core.Model.Json.AreaUpdate;
 
 /// <summary>
 /// Describes how a player's UI should look
@@ -24,8 +23,8 @@ public readonly struct UiState
 
     public AreaJson? Area { get; init; }
     public InventoryJson Inventory { get; init; }
-    public ItemJson? Weapon { get; init;}
-    public ItemJson? Armor { get; init;}
+    public ItemJson? Weapon { get; init; }
+    public ItemJson? Armor { get; init; }
     public PlayerStatSummaryJson Summary { get; init; }
     public List<ActiveAbilityJson> Actives { get; init; }
     public OpenShopJson? OpenShop { get; init; }
@@ -114,7 +113,7 @@ public readonly struct UiState
         {
             return MaybeChangeJson<List<T>>.Changed(newValue);
         }
-        
+
         var anyChanged = oldValue.Zip(newValue)
             .Where(pair => Hash(pair.First) != Hash(pair.Second))
             .Any();

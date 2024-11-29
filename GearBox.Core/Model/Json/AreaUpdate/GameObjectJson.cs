@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Json;
+namespace GearBox.Core.Model.Json.AreaUpdate;
 
 /// <summary>
 /// Workaround for https://github.com/dotnet/runtime/issues/31742

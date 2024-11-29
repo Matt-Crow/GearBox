@@ -5,7 +5,6 @@ using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Utils;
 using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
-using GearBox.Core.Model.Json;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Shops;
 

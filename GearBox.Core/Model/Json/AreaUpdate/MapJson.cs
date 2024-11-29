@@ -1,5 +1,4 @@
-
-namespace GearBox.Core.Model.Json.AreaInit;
+namespace GearBox.Core.Model.Json.AreaUpdate;
 
 public class MapJson : IJson
 {

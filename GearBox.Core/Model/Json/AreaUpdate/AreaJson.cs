@@ -1,7 +1,4 @@
-
-using GearBox.Core.Model.Json.AreaInit;
-
-namespace GearBox.Core.Model.Json;
+namespace GearBox.Core.Model.Json.AreaUpdate;
 
 public class AreaJson : IChange
 {

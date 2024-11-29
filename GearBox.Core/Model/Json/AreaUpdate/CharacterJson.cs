@@ -1,26 +1,16 @@
-namespace GearBox.Core.Model.Json;
+namespace GearBox.Core.Model.Json.AreaUpdate;
 
-public readonly struct PlayerJson : IJson
+public readonly struct CharacterJson : IJson
 {
-    public PlayerJson(
-        Guid id, 
-        string name, 
-        int level, 
-        ColorJson color,
-        int x, 
-        int y, 
-        FractionJson hitPoints, 
-        FractionJson energy
-    )
+    public CharacterJson(Guid id, string name, int level, ColorJson color, int xInPixels, int yInPixels, FractionJson hitPoints)
     {
         Id = id;
         Name = name;
         Level = level;
         Color = color;
-        X = x;
-        Y = y;
+        X = xInPixels;
+        Y = yInPixels;
         HitPoints = hitPoints;
-        Energy = energy;
     }
 
     public Guid Id { get; init; }
@@ -30,5 +20,4 @@ public readonly struct PlayerJson : IJson
     public int X { get; init; }
     public int Y { get; init; }
     public FractionJson HitPoints { get; init; }
-    public FractionJson Energy { get; init; }
 }

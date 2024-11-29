@@ -6,13 +6,13 @@ namespace GearBox.Core.Model.Json;
 public readonly struct ItemJson : IChange, IJson
 {
     public ItemJson(
-        Guid? id, 
-        string name, 
+        Guid? id,
+        string name,
         string gradeName,
         int gradeOrder,
-        string description, 
+        string description,
         int level,
-        IEnumerable<string> details, 
+        IEnumerable<string> details,
         int quantity,
         List<ActiveAbilityJson> actives
     )
@@ -43,5 +43,5 @@ public readonly struct ItemJson : IChange, IJson
 
     public List<ActiveAbilityJson> Actives { get; init; }
 
-    public IEnumerable<object?> DynamicValues => [Id, Name, Description, Level, ..Details, Quantity, ..Actives.SelectMany(a => a.DynamicValues)];
+    public IEnumerable<object?> DynamicValues => [Id, Name, Description, Level, .. Details, Quantity, .. Actives.SelectMany(a => a.DynamicValues)];
 }

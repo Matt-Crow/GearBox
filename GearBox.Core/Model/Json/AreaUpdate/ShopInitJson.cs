@@ -1,7 +1,6 @@
+namespace GearBox.Core.Model.Json.AreaUpdate;
 
-namespace GearBox.Core.Model.Json.AreaInit;
-
-public class ShopInitJson 
+public class ShopInitJson
 {
     public ShopInitJson(string name, int xInPixels, int yInPixels, ColorJson color)
     {

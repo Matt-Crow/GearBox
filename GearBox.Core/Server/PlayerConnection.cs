@@ -1,6 +1,6 @@
 using GearBox.Core.Model;
 using GearBox.Core.Model.GameObjects.Player;
-using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Server;
 

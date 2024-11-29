@@ -5,6 +5,7 @@ using GearBox.Core.Model.Units;
 using System.Text.Json;
 using GearBox.Core.Model.Items.Shops;
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model.GameObjects.Player;
 

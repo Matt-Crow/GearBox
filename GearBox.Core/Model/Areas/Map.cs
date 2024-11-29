@@ -1,6 +1,6 @@
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Json;
-using GearBox.Core.Model.Json.AreaInit;
+using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.Areas;
