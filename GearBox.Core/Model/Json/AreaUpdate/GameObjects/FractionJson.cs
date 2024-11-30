@@ -1,4 +1,4 @@
-namespace GearBox.Core.Model.Json.AreaUpdate;
+namespace GearBox.Core.Model.Json.AreaUpdate.GameObjects;
 
 public readonly struct FractionJson : IJson
 {

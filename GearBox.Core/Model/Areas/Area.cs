@@ -7,6 +7,7 @@ using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Shops;
+using GearBox.Core.Model.Json.AreaUpdate.GameObjects;
 
 namespace GearBox.Core.Model.Areas;
 

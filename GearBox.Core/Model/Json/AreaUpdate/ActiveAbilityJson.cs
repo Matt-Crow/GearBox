@@ -1,7 +1,6 @@
-
 using GearBox.Core.Model.Abilities.Actives;
 
-namespace GearBox.Core.Model.Json;
+namespace GearBox.Core.Model.Json.AreaUpdate;
 
 public class ActiveAbilityJson : IChange
 {

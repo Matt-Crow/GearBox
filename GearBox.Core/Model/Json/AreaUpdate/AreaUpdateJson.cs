@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Json.AreaUpdate.GameObjects;
+
 namespace GearBox.Core.Model.Json.AreaUpdate;
 
 /// <summary>

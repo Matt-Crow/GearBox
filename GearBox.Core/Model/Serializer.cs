@@ -1,4 +1,4 @@
-using GearBox.Core.Model.Json.AreaUpdate;
+using GearBox.Core.Model.Json.AreaUpdate.GameObjects;
 using System.Text.Json;
 
 namespace GearBox.Core.Model;
