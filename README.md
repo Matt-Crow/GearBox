@@ -17,11 +17,21 @@ A C# MMORPG-like game.
 ## Setting up the environment
 
 ### Configuring Emails
-I use GMail to send application emails.
+I use GMail to send application emails, but you can log emails to the console instead when testing.
 
+#### Using the console sender
+This should only be used for testing, but you can use the console sender by adding this block to your appsettings:
+```
+"Email": {
+    "SendEmails": false
+}
+```
+
+#### Using GMail
 In your appsetting file, add this block:
 ```
 "Email": {
+    "SendEmails": true,
     "SenderEmailAddress": <any email address>,
     "SmtpFolder": <full path to a folder for temporary files>
 }

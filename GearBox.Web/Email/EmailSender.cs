@@ -17,6 +17,7 @@ namespace GearBox.Web.Email;
 */
 public class EmailSender : IEmailSender
 {
+    private readonly ILogger<EmailSender> _logger;
     private readonly EmailConfig _config;
     private static readonly string SERVICE_ACCOUNT_PATH = "./secrets/gmail-service-account.json";
     private static readonly string OAUTH_SECRET_PATH = "./secrets/client_secret.json";
@@ -27,14 +28,29 @@ public class EmailSender : IEmailSender
     private static readonly string OAUTH_TOKEN_PATH = "./secrets/tokens";
     private static readonly IEnumerable<string> SCOPES = [GmailService.Scope.GmailSend];
 
-    public EmailSender(IOptions<EmailConfig> config)
+    public EmailSender(ILogger<EmailSender> logger, IOptions<EmailConfig> config)
     {
+        _logger = logger;
         _config = config.Value;
         _config.Validate();
     }
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
+        var guid = Guid.NewGuid();
+        _logger.LogInformation("SendEmailAsync started {Guid}", guid);
+        _logger.LogInformation("TO: {Email}", email);
+        _logger.LogInformation("SUBJECT: {Subject}", subject);
+        _logger.LogInformation("MESSAGE: {HtmlMessage}", htmlMessage);
+
+        if (!_config.SendEmails)
+        {
+            _logger.LogInformation("Email sending is disabled. Canceling {Guid}", guid);
+            return;
+        }        
+
+
+
         /*
             Google offers three forms of authentication:
             1. API key, which is disabled for GMail
@@ -66,6 +82,8 @@ public class EmailSender : IEmailSender
         });
         var request = gmail.Users.Messages.Send(message, "me");
         await request.ExecuteAsync();
+
+        _logger.LogInformation("Done sending email {Guid}", guid);
     }
 
     private static async Task<UserCredential> AuthorizeOAuthClient()
