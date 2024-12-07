@@ -1,4 +1,4 @@
-using System.Net.Mail;
+using System.Text;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Gmail.v1;
 using Google.Apis.Gmail.v1.Data;
@@ -7,6 +7,7 @@ using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
+using MimeKit;
 
 namespace GearBox.Web.Email;
 
@@ -28,12 +29,14 @@ public class EmailSender : IEmailSender
     private static readonly string OAUTH_TOKEN_PATH = "./secrets/tokens";
     private static readonly IEnumerable<string> SCOPES = [GmailService.Scope.GmailSend];
 
+
     public EmailSender(ILogger<EmailSender> logger, IOptions<EmailConfig> config)
     {
         _logger = logger;
         _config = config.Value;
         _config.Validate();
     }
+
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
@@ -69,9 +72,27 @@ public class EmailSender : IEmailSender
             sender = (await AuthorizeServiceAccount()).Id;
         }
 
-        using var dotnetEmail = CreateDotNetEmail(new MailAddress(sender), new MailAddress(email), subject, htmlMessage);
-        var asRfc2822 = await ToRFC2822(dotnetEmail);
-        var message = new Message()
+        /*
+            GMail needs email in RFC2822 format.
+            There is no easy way to do this in dotnet.
+            Instead, use MailKit.
+
+            MailKit to .eml: https://github.com/jstedfast/MailKit/issues/100
+            MailKit documentation: https://mimekit.net/docs/html/R_Project_Documentation.htm
+        */
+        using var mailkitEmail = new MimeMessage()
+        {
+            Sender = new MailboxAddress("GearBox", sender),
+            Subject = subject,
+            Body = new BodyBuilder()
+            {
+                HtmlBody = htmlMessage
+            }.ToMessageBody()
+        };
+        mailkitEmail.To.Add(new MailboxAddress(email, email));
+        var asRfc2822 = Encoding.UTF8.GetBytes(mailkitEmail.ToString());
+
+        var gmailMessage = new Message()
         {
             Raw = Convert.ToBase64String(asRfc2822) 
         };
@@ -80,7 +101,7 @@ public class EmailSender : IEmailSender
         {
             HttpClientInitializer = creds
         });
-        var request = gmail.Users.Messages.Send(message, "me");
+        var request = gmail.Users.Messages.Send(gmailMessage, "me");
         await request.ExecuteAsync();
 
         _logger.LogInformation("Done sending email {Guid}", guid);
@@ -111,50 +132,5 @@ public class EmailSender : IEmailSender
         creds.Scopes = SCOPES;
         await Task.CompletedTask;
         return creds;
-    }
-
-    private static MailMessage CreateDotNetEmail(MailAddress from, MailAddress to, string subject, string htmlBody)
-    {
-        var result = new MailMessage()
-        {
-            From = from,
-            Subject = subject,
-            Body = htmlBody,
-            IsBodyHtml = true
-        };
-        result.To.Add(to);
-        return result;
-    }
-
-    private async Task<byte[]> ToRFC2822(MailMessage email)
-    {
-        /*
-            Need to serialize a MailMessage to RFC 2822 format so gmail can use it.
-            Unfortunately, .NET does not make this easy.
-            This hacky solution uses SmtpClient to send the email to a file, then reads the file.
-            Credit: https://stackoverflow.com/q/18745392
-        */
-
-        // we'll temporarily store files here - SmtpClient gives file a random name, so store in unique folder to find it easily
-        var smtpFolder = _config.SmtpFolder;
-        var uniqueFolderName = Guid.NewGuid().ToString();
-        var folderForThisEmail = Path.Combine(smtpFolder, uniqueFolderName);
-        Directory.CreateDirectory(folderForThisEmail);
-
-        // sending the email writes it to a file in our folder we just created
-        using var smtp = new SmtpClient("localhost")
-        {
-            DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
-            PickupDirectoryLocation = folderForThisEmail
-        };
-        smtp.Send(email); // send async isn't the async version of this
-        
-        // we just created this folder, so the only file in there is the email
-        var emailFile = Directory.GetFiles(smtp.PickupDirectoryLocation)[0];
-        var rfc2822String = await File.ReadAllTextAsync(emailFile);
-        Directory.Delete(folderForThisEmail, true);
-
-        var rfc2822Bytes = System.Text.Encoding.UTF8.GetBytes(rfc2822String); 
-        return rfc2822Bytes;
     }
 }

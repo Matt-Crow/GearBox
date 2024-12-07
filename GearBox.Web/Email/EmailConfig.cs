@@ -16,11 +16,6 @@ public class EmailConfig
     public string SenderEmailAddress { get; set; } = "";
 
     /// <summary>
-    /// Folder where the app will temporarily store emails it sends.
-    /// </summary>
-    public string SmtpFolder { get; set; } = "";
-
-    /// <summary>
     /// Whether to try using the service account to send emails (currently broken)
     /// </summary>
     public bool UseServiceAccount { get; set; }
@@ -36,10 +31,6 @@ public class EmailConfig
         if (string.IsNullOrEmpty(SenderEmailAddress))
         {
             throw new Exception($"Need to configure {ConfigSection}.{nameof(SenderEmailAddress)} in appsettings");
-        }
-        if (string.IsNullOrEmpty(SmtpFolder))
-        {
-            throw new Exception($"Need to configure {ConfigSection}.{nameof(SmtpFolder)} in appsettings");
         }
     }
 }

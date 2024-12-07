@@ -32,8 +32,7 @@ In your appsetting file, add this block:
 ```
 "Email": {
     "SendEmails": true,
-    "SenderEmailAddress": <any email address>,
-    "SmtpFolder": <full path to a folder for temporary files>
+    "SenderEmailAddress": <any email address>
 }
 ```
 
