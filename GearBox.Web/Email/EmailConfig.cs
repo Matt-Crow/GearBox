@@ -15,11 +15,6 @@ public class EmailConfig
     /// </summary>
     public string SenderEmailAddress { get; set; } = "";
 
-    /// <summary>
-    /// Whether to try using the service account to send emails (currently broken)
-    /// </summary>
-    public bool UseServiceAccount { get; set; }
-
     public void Validate()
     {
         if (!SendEmails)

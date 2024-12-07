@@ -18,6 +18,7 @@ namespace GearBox.Web.Email;
 */
 public class EmailSender : IEmailSender
 {
+
     private readonly ILogger<EmailSender> _logger;
     private readonly EmailConfig _config;
     private static readonly string SERVICE_ACCOUNT_PATH = "./secrets/gmail-service-account.json";
@@ -27,6 +28,13 @@ public class EmailSender : IEmailSender
     /// If Google API fails do to insufficient scopes, try deleting this file.
     /// </summary>
     private static readonly string OAUTH_TOKEN_PATH = "./secrets/tokens";
+    
+    /// <summary>
+    /// Service account doesn't work yet.
+    /// Set this to true when testing #128.
+    /// </summary>
+    private static readonly bool USE_SERVICE_ACCOUNT = false;
+    
     private static readonly IEnumerable<string> SCOPES = [GmailService.Scope.GmailSend];
 
 
@@ -62,12 +70,12 @@ public class EmailSender : IEmailSender
 
             I'll keep trying to get the service account to work, but will need to use the OAuth client ID for now.
         */
-        IConfigurableHttpClientInitializer creds = _config.UseServiceAccount
+        IConfigurableHttpClientInitializer creds = USE_SERVICE_ACCOUNT
             ? await AuthorizeServiceAccount()
             : await AuthorizeOAuthClient();
 
         var sender = _config.SenderEmailAddress;
-        if (_config.UseServiceAccount)
+        if (USE_SERVICE_ACCOUNT)
         {
             sender = (await AuthorizeServiceAccount()).Id;
         }
