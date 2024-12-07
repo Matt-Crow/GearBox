@@ -2,7 +2,6 @@ using System.Text;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Gmail.v1;
 using Google.Apis.Gmail.v1.Data;
-using Google.Apis.Http;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -18,22 +17,14 @@ namespace GearBox.Web.Email;
 */
 public class EmailSender : IEmailSender
 {
-
     private readonly ILogger<EmailSender> _logger;
     private readonly EmailConfig _config;
-    private static readonly string SERVICE_ACCOUNT_PATH = "./secrets/gmail-service-account.json";
     private static readonly string OAUTH_SECRET_PATH = "./secrets/client_secret.json";
 
     /// <summary>
-    /// If Google API fails do to insufficient scopes, try deleting this file.
+    /// If Google API fails do to insufficient scopes, try deleting this folder.
     /// </summary>
     private static readonly string OAUTH_TOKEN_PATH = "./secrets/tokens";
-    
-    /// <summary>
-    /// Service account doesn't work yet.
-    /// Set this to true when testing #128.
-    /// </summary>
-    private static readonly bool USE_SERVICE_ACCOUNT = false;
     
     private static readonly IEnumerable<string> SCOPES = [GmailService.Scope.GmailSend];
 
@@ -48,6 +39,7 @@ public class EmailSender : IEmailSender
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
+        // a more secure system would not log htmlMessage
         var guid = Guid.NewGuid();
         _logger.LogInformation("SendEmailAsync started {Guid}", guid);
         _logger.LogInformation("TO: {Email}", email);
@@ -61,24 +53,16 @@ public class EmailSender : IEmailSender
         }        
 
 
-
         /*
             Google offers three forms of authentication:
             1. API key, which is disabled for GMail
-            2. OAuth client ID, which authenticates as a person (not what I want)
-            3. Service Account, which keeps failing with 400 error
-
-            I'll keep trying to get the service account to work, but will need to use the OAuth client ID for now.
+            2. OAuth client ID, which authenticates as a person
+            3. Service Account, which cannot send emails on its own behalf
+            
+            Therefore, OAuth client ID is my only option, 
+            though it is very awkward and not production-ready.
         */
-        IConfigurableHttpClientInitializer creds = USE_SERVICE_ACCOUNT
-            ? await AuthorizeServiceAccount()
-            : await AuthorizeOAuthClient();
-
-        var sender = _config.SenderEmailAddress;
-        if (USE_SERVICE_ACCOUNT)
-        {
-            sender = (await AuthorizeServiceAccount()).Id;
-        }
+        var creds = await AuthorizeOAuthClient();
 
         /*
             GMail needs email in RFC2822 format.
@@ -90,7 +74,7 @@ public class EmailSender : IEmailSender
         */
         using var mailkitEmail = new MimeMessage()
         {
-            Sender = new MailboxAddress("GearBox", sender),
+            Sender = new MailboxAddress("GearBox", _config.SenderEmailAddress),
             Subject = subject,
             Body = new BodyBuilder()
             {
@@ -118,7 +102,6 @@ public class EmailSender : IEmailSender
     private static async Task<UserCredential> AuthorizeOAuthClient()
     {
         /*
-            Service account isn't working, so I'm trying this one.
             https://github.com/googleworkspace/dotnet-samples/blob/main/gmail/GmailQuickstart/GmailQuickstart.cs
         */
         using var stream = File.OpenRead(OAUTH_SECRET_PATH);
@@ -130,15 +113,6 @@ public class EmailSender : IEmailSender
             CancellationToken.None,
             new FileDataStore(OAUTH_TOKEN_PATH, true)
         );
-        return creds;
-    }
-
-    private static async Task<ServiceAccountCredential> AuthorizeServiceAccount()
-    {
-        using var stream = File.OpenRead(SERVICE_ACCOUNT_PATH);
-        var creds = ServiceAccountCredential.FromServiceAccountData(stream);
-        creds.Scopes = SCOPES;
-        await Task.CompletedTask;
         return creds;
     }
 }
