@@ -28,7 +28,7 @@ public class AttackAiBehavior : IAiBehavior
         {
             _controlling.AiBehavior = new WanderAiBehavior(_controlling);
         }
-        else if (_controlling.BasicAttack.CanReach(_attacking))
+        else if (_controlling.BasicAttack.CanReach(_controlling, _attacking))
         {
             // turn and attack
             _controlling.StopMoving();

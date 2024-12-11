@@ -1,5 +1,10 @@
+using GearBox.Core.Model.Areas;
+
 namespace GearBox.Core.Model.GameObjects.Enemies;
 
+/// <summary>
+/// Handles enemies players may encounter in an area
+/// </summary>
 public interface IEnemyFactory
 {
     /// <summary>
@@ -8,4 +13,6 @@ public interface IEnemyFactory
     IEnemyFactory Add(string name);
 
     EnemyCharacter? MakeRandom(int level);
+
+    GameTimer MakeSpawnTimer(IArea area);
 }

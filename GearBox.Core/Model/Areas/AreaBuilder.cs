@@ -2,7 +2,6 @@ using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Model.Items.Shops;
-using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.Areas;
@@ -17,13 +16,13 @@ public class AreaBuilder
     private readonly IEnemyFactory _enemies;
     private readonly List<IExit> _exits = [];
 
-    public AreaBuilder(string name, int level, IItemFactory itemFactory, IEnemyRepository enemies)
+    public AreaBuilder(string name, int level, IItemFactory itemFactory, IEnemyFactory enemies)
     {
         Name = name;
         _level = level;
         _itemFactory = itemFactory;
         _lootBuilder = new(itemFactory);
-        _enemies = new EnemyFactory(enemies);
+        _enemies = enemies;
     }
 
     /// <summary>
@@ -80,12 +79,6 @@ public class AreaBuilder
             _exits
         );
         result.AddTimer(new GameTimer(() => result.SpawnLootChest(), Duration.FromSeconds(10).InFrames));
-        var spawner = new EnemySpawner(result, new EnemySpawnerOptions()
-        {
-            WaveSize = 3,
-            MaxChildren = 10
-        });
-        result.AddTimer(new GameTimer(spawner.SpawnWave, Duration.FromSeconds(10).InFrames));
 
         return result;
     }

@@ -1,0 +1,1 @@
+Stores secret files.

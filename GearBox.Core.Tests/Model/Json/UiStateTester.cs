@@ -2,7 +2,7 @@ using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Shops;
-using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.AreaUpdate;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model.Json;

@@ -1,7 +1,8 @@
 using System.Text.Json;
-using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Abilities.Actives.Impl;
 using GearBox.Core.Model.Areas;
-using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.AreaUpdate;
+using GearBox.Core.Model.Json.AreaUpdate.GameObjects;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.GameObjects;
@@ -17,19 +18,23 @@ public abstract class Character : IGameObject
     private readonly MobileBehavior _mobility;
 
 
-    public Character(string name, int level, Color? color = null)
+    public Character(string name, int level, Color? color = null, Guid? id = null)
     {
+        Id = id ?? Guid.NewGuid();
         Name = name;
         Color = color ?? Color.GREEN;
         _mobility = new MobileBehavior(Body, Velocity.FromPolar(BASE_SPEED, Direction.DOWN));
         Serializer = new(Type, Serialize);
         Termination = new(this, () => DamageTaken >= MaxHitPoints);
+        BasicAttack = new BasicAttack()
+        {
+            User = this
+        };
         SetLevel(level);
-        BasicAttack = new(this);
     }
 
 
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; }
     public string Name { get; init; }
     protected Color Color { get; init; }
     public Serializer Serializer { get; init; }

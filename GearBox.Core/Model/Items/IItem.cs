@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Json;
+
 namespace GearBox.Core.Model.Items;
 
 public interface IItem
@@ -8,26 +10,25 @@ public interface IItem
     /// </summary>
     Guid? Id { get; }
 
+    /// <summary>
+    /// Identifies the specific item this.
+    /// </summary>
     string Name { get; }
 
+    /// <summary>
+    /// How high quality or rare this item is.
+    /// </summary>
     Grade Grade { get; }
 
-    string Description { get; }
-
     /// <summary>
-    /// The minimum level players must have to use this item
-    /// </summary>
-    int Level { get; }
-
-    /// <summary>
-    /// Details to display in the GUI
-    /// </summary>
-    IEnumerable<string> Details { get; }
-
-    /// <summary>
-    /// The base value this item can be bought for from a shop
+    /// The base value this item can be bought for from a shop.
     /// </summary>
     Gold BuyValue { get; }
+
+    /// <summary>
+    /// Converts to JSON so it can be sent to the front-end.
+    /// </summary>
+    ItemJson ToJson(int quantity);
 
     /*
     // can't do "IItem ToOwned()" https://stackoverflow.com/a/5709191

@@ -1,19 +1,20 @@
 using GearBox.Core.Model.Areas;
-using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
 using System.Text.Json;
-using GearBox.Core.Model.Json.AreaUpdate;
-using GearBox.Core.Model.Json.AreaInit;
 using GearBox.Core.Model.Items.Shops;
+using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Json.AreaUpdate.GameObjects;
 
 namespace GearBox.Core.Model.GameObjects.Player;
 
 public class PlayerCharacter : Character
 {
     private int _frameCount = 0; // used for regeneration
+    private readonly List<IActiveAbility> _actives = [];
 
-    public PlayerCharacter(string name, int xp=0) : base(name, GetLevelByXp(xp), Color.BLUE)
+    public PlayerCharacter(string name, int xp = 0, Guid? id = null) : base(name, GetLevelByXp(xp), Color.BLUE, id)
     {
         Xp = xp;
         XpToNextLevel = GetXpByLevel(Level + 1);
@@ -31,9 +32,10 @@ public class PlayerCharacter : Character
     public int EnergyRemaining => MaxEnergy - EnergyExpended;
     public PlayerStats Stats { get; init; } = new();
     public PlayerStatSummary StatSummary { get; init; }
+    public IEnumerable<IActiveAbility> Actives => _actives;
     public Inventory Inventory { get; init; } = new();
-    public EquipmentSlot<WeaponStats> WeaponSlot { get; init; } = new();
-    public EquipmentSlot<ArmorStats> ArmorSlot { get; init; } = new();
+    public Equipment<WeaponStats>? Weapon { get; private set; } = null;
+    public Equipment<ArmorStats>? Armor { get; private set; } = null;
     
     /// <summary>
     /// The shop the player currently has open
@@ -47,6 +49,15 @@ public class PlayerCharacter : Character
         base.SetArea(newArea);
     }
 
+    public void UseActive(int number, Direction inDirection)
+    {
+        var i = number - 1;
+        if (0 <= i && i < _actives.Count)
+        {
+            _actives[i].Use(inDirection);
+        }
+    }
+
     public void SetOpenShop(ItemShop? shop)
     {
         OpenShop = shop;
@@ -55,8 +66,8 @@ public class PlayerCharacter : Character
     public override void UpdateStats()
     {
         var boosts = PlayerStatBoosts.Empty()
-            .Combine(WeaponSlot.Value?.StatBoosts)
-            .Combine(ArmorSlot.Value?.StatBoosts);
+            .Combine(Weapon?.StatBoosts)
+            .Combine(Armor?.StatBoosts);
         Stats.SetStatBoosts(boosts);
 
         MaxEnergy = GetMaxEnergyByLevel(Level);
@@ -67,6 +78,20 @@ public class PlayerCharacter : Character
         var multiplier = 1.0+Stats.Speed.Value;
         SetSpeed(Speed.FromPixelsPerFrame(BASE_SPEED.InPixelsPerFrame * multiplier));
         
+        _actives.Clear();
+        if (Weapon != null)
+        {
+            _actives.AddRange(Weapon.Actives);
+        }
+        if (Armor != null)
+        {
+            _actives.AddRange(Armor.Actives);
+        }
+        foreach (var active in _actives)
+        {
+            active.User = this;
+        }
+
         base.UpdateStats();
     }
 
@@ -78,9 +103,9 @@ public class PlayerCharacter : Character
             return;
         }
 
-        Inventory.Weapons.Add(WeaponSlot.Value); // put old weapon back in inventory
+        Inventory.Weapons.Add(Weapon); // put old weapon back in inventory
 
-        WeaponSlot.Value = weapon;
+        Weapon = weapon;
         Inventory.Weapons.Remove(weapon);
         BasicAttack.Range = weapon.Inner.AttackRange;
 
@@ -95,9 +120,9 @@ public class PlayerCharacter : Character
             return;
         }
 
-        Inventory.Armors.Add(ArmorSlot.Value); // put old armor back in inventory
+        Inventory.Armors.Add(Armor); // put old armor back in inventory
 
-        ArmorSlot.Value = armor;
+        Armor = armor;
         Inventory.Armors.Remove(armor);
         ArmorClass = armor.Inner.ArmorClass;
 
@@ -106,13 +131,21 @@ public class PlayerCharacter : Character
 
     public void GainXp(int xp)
     {
-        // untested
         Xp += xp;
         while (Xp >= XpToNextLevel)
         {
             SetLevel(Level + 1);
             UpdateStats();
             XpToNextLevel = GetXpByLevel(Level + 1);
+        }
+    }
+
+    public void LoseEnergy(int energy)
+    {
+        EnergyExpended += energy;
+        if (EnergyExpended > MaxEnergy)
+        {
+            EnergyExpended = MaxEnergy;
         }
     }
 
@@ -131,11 +164,16 @@ public class PlayerCharacter : Character
 
         // restore 5% HP & energy per second
         _frameCount++;
-        if (_frameCount >= Duration.FromSeconds(5).InFrames)
+        if (_frameCount >= Duration.FromSeconds(1).InFrames)
         {
             HealPercent(0.05);
             RechargePercent(0.05);
             _frameCount = 0;
+        }
+
+        foreach (var active in _actives)
+        {
+            active.Update();
         }
     }
 

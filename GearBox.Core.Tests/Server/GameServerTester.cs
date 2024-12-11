@@ -1,4 +1,6 @@
+using GearBox.Core.Config;
 using GearBox.Core.Model;
+using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Server;
 using Xunit;
 
@@ -6,14 +8,17 @@ namespace GearBox.Core.Tests.Server;
 
 public class GameServerTester
 {
+    public ConnectingUser AUser { get; set; } = new ConnectingUser("", "");
+
     [Fact]
     public async Task CannotConnectTwice()
     {
         var spy = new SpyConnection();
-        var sut = new GameServer(MakeGame());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
 
-        await sut.AddConnection("foo", spy);
-        await sut.AddConnection("foo", spy);
+        sut.AddConnection("foo", AUser, spy);
+        sut.AddConnection("foo", AUser, spy);
+        await sut.Update();
 
         Assert.Equal(1, sut.TotalConnections);
     }
@@ -22,23 +27,26 @@ public class GameServerTester
     public async Task AddThenRemoveBehaveAsExpected()
     {
         var spy = new SpyConnection();
-        var sut = new GameServer(MakeGame());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
         Assert.Equal(0, sut.TotalConnections);
 
-        await sut.AddConnection("foo", spy);
+        sut.AddConnection("foo", AUser, spy);
+        await sut.Update();
         Assert.Equal(1, sut.TotalConnections);
 
         sut.RemoveConnection("foo");
+        await sut.Update();
         Assert.Equal(0, sut.TotalConnections);
     }
 
     [Fact]
-    public async Task ClientReceivesAreaUponConnecting()
+    public async void ClientReceivesAreaUponConnecting()
     {
         var spy = new SpyConnection();
-        var sut = new GameServer(MakeGame());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
 
-        await sut.AddConnection("foo", spy);
+        sut.AddConnection("foo", AUser, spy);
+        await sut.Update();
 
         Assert.NotEmpty(spy.MessagesReceived);
     }
@@ -48,9 +56,9 @@ public class GameServerTester
     {
         var client1 = new SpyConnection();
         var client2 = new SpyConnection();
-        var sut = new GameServer(MakeGame());
-        await sut.AddConnection("foo", client1);
-        await sut.AddConnection("bar", client2);
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
+        sut.AddConnection("foo", AUser, client1);
+        sut.AddConnection("bar", AUser, client2);
 
         await sut.Update();
 
@@ -59,10 +67,10 @@ public class GameServerTester
     }
 
     [Fact]
-    public async Task EnqueueCommand_GivenCommand_DoesNotExecuteImmediately()
+    public void EnqueueCommand_GivenCommand_DoesNotExecuteImmediately()
     {
-        var sut = new GameServer(MakeGame());
-        await sut.AddConnection("foo", new SpyConnection());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
+        sut.AddConnection("foo", AUser, new SpyConnection());
         var command = new SpyControlCommand();
 
         sut.EnqueueCommand("foo", command);
@@ -73,8 +81,8 @@ public class GameServerTester
     [Fact]
     public async Task EnqueueCommand_GivenCommand_ExecutesAfterUpdate()
     {
-        var sut = new GameServer(MakeGame());
-        await sut.AddConnection("foo", new SpyConnection());
+        var sut = new GameServer(MakeGame(), MakePlayerCharacterRepository());
+        sut.AddConnection("foo", AUser, new SpyConnection());
         var command = new SpyControlCommand();
 
         sut.EnqueueCommand("foo", command);
@@ -85,9 +93,28 @@ public class GameServerTester
 
     public static IGame MakeGame()
     {
-        var result = new GameBuilder()
+        var result = new GameBuilder(new GearBoxConfig())
             .WithArea("foo", 1, area => area.WithMap(new()))
             .Build();
         return result;
+    }
+
+    public static IPlayerCharacterRepository MakePlayerCharacterRepository()
+    {
+        var result = new PlayerCharacterRepositoryMock();
+        return result;
+    }
+}
+
+class PlayerCharacterRepositoryMock : IPlayerCharacterRepository
+{
+    public Task<PlayerCharacter?> GetPlayerCharacterByAspNetUserIdAsync(string aspNetUserId)
+    {
+        return Task.FromResult<PlayerCharacter?>(null);
+    }
+
+    public Task SavePlayerCharacterAsync(PlayerCharacter playerCharacter, string aspNetUserId)
+    {
+        return Task.CompletedTask;
     }
 }

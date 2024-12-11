@@ -1,5 +1,6 @@
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
+using GearBox.Core.Model.Json.AreaUpdate;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model.GameObjects.Player;
@@ -11,7 +12,7 @@ public class PlayerCharacterTester
     {
         var sut = new PlayerCharacter("foo");
         sut.EquipWeaponById(Guid.Empty);
-        Assert.Null(sut.WeaponSlot.Value);
+        Assert.Null(sut.Weapon);
     }
 
     [Fact]
@@ -21,9 +22,9 @@ public class PlayerCharacterTester
         var weapon = new Equipment<WeaponStats>("weapon", new WeaponStats());
         sut.Inventory.Weapons.Add(weapon);
 
-        sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID shouldn't be null"));
+        sut.EquipWeaponById(GetId(weapon));
 
-        Assert.Equal(weapon, sut.WeaponSlot.Value);
+        Assert.Equal(weapon, sut.Weapon);
     }
 
     [Fact]
@@ -33,7 +34,7 @@ public class PlayerCharacterTester
         var weapon = new Equipment<WeaponStats>("weapon", new WeaponStats());
         sut.Inventory.Weapons.Add(weapon);
 
-        sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID shouldn't be null"));
+        sut.EquipWeaponById(GetId(weapon));
 
         Assert.False(sut.Inventory.Weapons.Contains(weapon));
     }
@@ -46,9 +47,9 @@ public class PlayerCharacterTester
         var notYetEquipped = new Equipment<WeaponStats>("weapon 2", new WeaponStats());
         sut.Inventory.Weapons.Add(alreadyEquipped);
         sut.Inventory.Weapons.Add(notYetEquipped);
-        sut.EquipWeaponById(alreadyEquipped.Id ?? throw new Exception("Weapon ID shouldn't be null"));
+        sut.EquipWeaponById(GetId(alreadyEquipped));
 
-        sut.EquipWeaponById(notYetEquipped.Id ?? throw new Exception("Weapon ID shouldn't be null"));
+        sut.EquipWeaponById(GetId(notYetEquipped));
 
         Assert.True(sut.Inventory.Weapons.Contains(alreadyEquipped));
     }
@@ -61,8 +62,47 @@ public class PlayerCharacterTester
         var weapon = new Equipment<WeaponStats>("bar", new WeaponStats(), level: 20);
         sut.Inventory.Weapons.Add(weapon);
 
-        sut.EquipWeaponById(weapon.Id ?? throw new Exception("Weapon ID should not be null"));
+        sut.EquipWeaponById(GetId(weapon));
 
-        Assert.Null(sut.WeaponSlot.Value);
+        Assert.Null(sut.Weapon);
+    }
+
+    [Fact]
+    public void DynamicValues_AfterEquipping_Change()
+    {
+        var player = new PlayerCharacter("foo");
+        var weapon1 = new Equipment<WeaponStats>("foo", new WeaponStats());
+        player.Inventory.Weapons.Add(weapon1);
+        var before = new UiState(player);
+        
+        player.EquipWeaponById(GetId(weapon1));
+        var after = new UiState(player);
+        var compared = UiState.GetChanges(before, after);
+        
+        Assert.True(compared.Weapon.HasChanged);
+    }
+
+    [Fact]
+    public void DynamicValues_AfterSwitching_Change()
+    {
+        var player = new PlayerCharacter("foo");
+        var weapon1 = new Equipment<WeaponStats>("foo", new WeaponStats());
+        var weapon2 = new Equipment<WeaponStats>("foo", new WeaponStats()); // same weapon, different ID
+        player.Inventory.Weapons.Add(weapon1);
+        player.Inventory.Weapons.Add(weapon2);
+        player.EquipWeaponById(GetId(weapon1));
+        var before = new UiState(player);
+
+        player.EquipWeaponById(GetId(weapon2));
+        var after = new UiState(player);
+        var compared = UiState.GetChanges(before, after);
+        
+        Assert.True(compared.Weapon.HasChanged);
+    }
+
+    private Guid GetId<T>(Equipment<T> equipment)
+    where T : IEquipmentStats
+    {
+        return equipment.Id ?? throw new Exception("ID should not be null");
     }
 }

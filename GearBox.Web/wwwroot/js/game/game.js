@@ -1,32 +1,15 @@
-import { Canvas } from "./components/canvas.js";
-import { GameOverScreen } from "./components/gameOverScreen.js";
-import { PlayerHud } from "./components/playerHud.js";
 import { handleGameInit } from "./messageHandlers/gameInitHandler.js";
 import { characterDeserializer } from "./model/character.js";
 import { LootChestJsonDeserializer } from "./model/lootChest.js";
-import { PlayerChangeHandler } from "./model/player.js";
+import { PlayerJsonDeserializer } from "./model/player.js";
 import { projectileDeserializer } from "./model/projectile.js";
 import { Area, AreaUpdateHandler } from "./model/area.js";
 import { TileMap } from "./model/map.js";
 import { Shop } from "./model/shop.js";
-import { MainModal } from "./components/mainModal.js";
+import { Views } from "./components/views/views.js";
 
 export class Game {
-
-    /**
-     * The custom canvas component this draws on.
-     */
-    #canvas;
-
-    #mainModal;
-
-    /**
-     * The PlayerHud for the current player.
-     */
-    #playerHud;
-
-
-    #gameOverScreen;
+    #views;
 
     #areaUpdateHandler = () => {throw new Error("Cannot handle area update until after area init")};
 
@@ -35,16 +18,10 @@ export class Game {
     #area; // required for getting mouse cursor position relative to player :(
 
     /**
-     * @param {Canvas} canvas the custom canvas component to draw on.
-     * @param {MainModal} mainModal 
-     * @param {PlayerHud} playerHud the player HUD for the current player
-     * @param {GameOverScreen} gameOverScreen 
+     * @param {Views} views 
      */
-    constructor(canvas, mainModal, playerHud, gameOverScreen) {
-        this.#canvas = canvas
-        this.#mainModal = mainModal;
-        this.#playerHud = playerHud;
-        this.#gameOverScreen = gameOverScreen;
+    constructor(views) {
+        this.#views = views;
         this.#area = null;
         setInterval(() => this.#draw(), 1000 / 24);
     }
@@ -56,7 +33,7 @@ export class Game {
 
     handleGameInit(json) {
         this.#gameData = handleGameInit(json);
-        this.#mainModal.setCraftingRecipes(this.#gameData.craftingRecipes);
+        this.#views.viewAlive.mainModal.setCraftingRecipes(this.#gameData.craftingRecipes);
     }
 
     // todo rework this
@@ -70,17 +47,12 @@ export class Game {
             TileMap.fromJson(json.uiStateChanges.area.value.map),
             json.uiStateChanges.area.value.shops.map(j => Shop.fromJson(j))
         );
-        const updateHandler = new AreaUpdateHandler(area)
+        const updateHandler = new AreaUpdateHandler(area, this.#views)
             .addGameObjectType(characterDeserializer)
-            .addGameObjectType(new PlayerChangeHandler(this.#gameData.playerId, this.#playerHud.playerUpdateListener))
+            .addGameObjectType(new PlayerJsonDeserializer())
             .addGameObjectType(projectileDeserializer)
             .addGameObjectType(new LootChestJsonDeserializer(this.#gameData.playerId))
-            .addUpdateListener(w => this.#gameOverScreen.update(w))
-            .addInventoryChangeListener(inv => this.#mainModal.setInventory(inv))
-            .addWeaponChangeListener(wea => this.#mainModal.setWeapon(wea))
-            .addArmorChangeListener(arm => this.#mainModal.setArmor(arm))
-            .addStatSummaryChangeListener(summary => this.#mainModal.setStatSummary(summary))
-            .addOpenShopChangeListener(openShop => this.#mainModal.setShop(openShop))
+            .addUpdateListener(w => this.#views.handleAreaUpdate(w))
             ;
 
         this.#areaUpdateHandler = json => updateHandler.handleAreaUpdate(json);
@@ -97,7 +69,7 @@ export class Game {
 
     #draw() {
         if (this.#area) {
-            this.#canvas.draw(this.#area);
+            this.#views.viewAlive.canvas.draw(this.#area);
         }
     }
 }

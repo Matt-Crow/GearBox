@@ -21,13 +21,35 @@ body {
   margin-bottom: 60px;
 }
 
-#playerDead {
+#player-hud-hp {
+  border: 5px solid red;
+  border-radius: 100%;
+  background-color: red;
+  color: white;
+}
+
+#player-hud-energy {
+  border: 5px solid blue;
+  border-radius: 100%;
+  background-color: blue;
+  color: white;
+}
+
+#views .view-dead {
   min-height: 100vh;
   min-width: 100vw;
   background-color: black;
 }
 
-#playerDead p {
+#views .view-dead {
   color: yellow;
   text-align: center;
+}
+
+.gb-tooltip {
+  background-color: white;
+  border: 5px solid black;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
 }

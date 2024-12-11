@@ -1,80 +1,51 @@
+using GearBox.Core.Config;
 using GearBox.Core.Model;
-using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.Abilities.Actives.Impl;
 using GearBox.Core.Model.Items;
-using GearBox.Core.Model.Static;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
+using GearBox.Web.Database;
+using GearBox.Web.Email;
+using GearBox.Core.Model.GameObjects.Player;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Identity;
+using GearBox.Core.Model.Areas;
 
-var bazaarMap = await GameResourceLoader.LoadMapByName("bazaar");
-var desertMap = await GameResourceLoader.LoadMapByName("desert");
-var canyonMap = await GameResourceLoader.LoadMapByName("canyon");
+/*
+    Need to load some of the game resources in a specific order:
+    1. actives
+    2. items, which use actives
+    3. crafting recipes, which use items
+    4. enemies, which use items
+    5. areas, which use items and enemies
+*/
 
+// need to grab configuration before most other things
 var webAppBuilder = WebApplication.CreateBuilder(args);
 
-var game = new GameBuilder()
-    .DefineItems(items => items
-        .Add(ItemUnion.Of(new Material("Stone", Grade.COMMON, "A low-grade mining material, but it's better than nothing.")))
-        .Add(ItemUnion.Of(new Material("Bronze", Grade.UNCOMMON, "Used to craft low-level melee equipment")))
-        .Add(ItemUnion.Of(new Material("Silver", Grade.RARE, "Used to craft enhancements for your equipment.")))
-        .Add(ItemUnion.Of(new Material("Gold", Grade.EPIC, "Used to craft powerful magical artifacts.")))
-        .Add(ItemUnion.Of(new Material("Titanium", Grade.LEGENDARY, "A high-grade mining material for crafting powerful melee equipment.")))
-        .Add(ItemUnion.Of(new Equipment<WeaponStats>("Training Sword", new WeaponStats(AttackRange.MELEE), Grade.COMMON, new()
-            {
-                {PlayerStatType.OFFENSE, 1},
-                {PlayerStatType.MAX_HIT_POINTS, 1}
-            }))
-        )
-        .Add(ItemUnion.Of(new Equipment<WeaponStats>("Training Bow", new WeaponStats(AttackRange.LONG), Grade.COMMON, new()
-            {
-                {PlayerStatType.OFFENSE, 1},
-                {PlayerStatType.SPEED, 1}
-            })) 
-        )
-        .Add(ItemUnion.Of(new Equipment<WeaponStats>("Training Staff", new WeaponStats(AttackRange.MEDIUM), Grade.COMMON, new()
-            {
-                {PlayerStatType.MAX_HIT_POINTS, 1},
-                {PlayerStatType.MAX_ENERGY, 1}
-            }))
-        )
-        .Add(ItemUnion.Of(new Equipment<ArmorStats>("Fighter Initiate's Armor", new ArmorStats(ArmorClass.HEAVY), Grade.COMMON, new()
-            {
-                {PlayerStatType.MAX_HIT_POINTS, 1},
-                {PlayerStatType.OFFENSE, 1}
-            }))
-        )
-        .Add(ItemUnion.Of(new Equipment<ArmorStats>("Archer Initiate's Armor", new ArmorStats(ArmorClass.MEDIUM), Grade.COMMON, new()
-            {
-                {PlayerStatType.SPEED, 1},
-                {PlayerStatType.OFFENSE, 1}
-            }))
-        )
-        .Add(ItemUnion.Of(new Equipment<ArmorStats>("Mage Initiate's Armor", new ArmorStats(ArmorClass.LIGHT), Grade.COMMON, new()
-            {
-                {PlayerStatType.MAX_ENERGY, 1},
-                {PlayerStatType.OFFENSE, 1}
-            }))
-        )
-        .Add(ItemUnion.Of(new Equipment<WeaponStats>("Bronze Khopesh", new WeaponStats(AttackRange.MELEE), Grade.UNCOMMON, new()
-            {
-                {PlayerStatType.OFFENSE, 2},
-                {PlayerStatType.MAX_HIT_POINTS, 1}
-            }))
-        )
-        .Add(ItemUnion.Of(new Equipment<ArmorStats>("Bronze Armor", new ArmorStats(ArmorClass.HEAVY), Grade.UNCOMMON, new()
-            {
-                {PlayerStatType.OFFENSE, 1},
-                {PlayerStatType.MAX_HIT_POINTS, 2},
-                {PlayerStatType.MAX_ENERGY, 1}
-            }))
-        )
-        .Add(ItemUnion.Of(new Equipment<WeaponStats>("Fang", new WeaponStats(AttackRange.MELEE), Grade.COMMON, new()
-            {
-                {PlayerStatType.OFFENSE, 2},
-                {PlayerStatType.SPEED, 1}
-            }))
-        )
-    )
+var gearboxConfig = new GearBoxConfig();
+webAppBuilder.Configuration
+    .GetSection("GearBox")
+    .Bind(gearboxConfig);
+var gameBuilder = new GameBuilder(gearboxConfig);
+
+// configure actives before items
+gameBuilder.Actives
+    .Add(new Cleave())
+    .Add(new Firebolt())
+    ;
+
+// configure items before crafting recipes and enemies
+var resourceLoader = new GameResourceLoader(gameBuilder.Actives);
+var itemResources = await resourceLoader.LoadAllItems();
+foreach (var item in itemResources)
+{
+    gameBuilder.Items.Add(item);
+}
+
+// configure crafting recipes after items
+gameBuilder
     .AddCraftingRecipe(recipe => recipe
         .And("Bronze", 25)
         .Makes("Bronze Khopesh")
@@ -82,23 +53,30 @@ var game = new GameBuilder()
     .AddCraftingRecipe(recipe => recipe
         .And("Bronze", 25)
         .Makes("Bronze Armor")
+    );
+
+// configure enemies after items
+gameBuilder.Enemies
+    .Add("Snake", Color.LIGHT_GREEN, loot => loot
+        .AddItem("Fang")
+        .AddItem("Bronze")
+        .Add(Grade.COMMON, new Gold(5))
     )
-    .DefineEnemies(enemies => enemies
-        .Add("Snake", Color.LIGHT_GREEN, loot => loot
-            .AddItem("Fang")
-            .AddItem("Bronze")
-            .Add(Grade.COMMON, new Gold(5))
-        )
-        .Add("Scorpion", Color.BLACK, loot => loot
-            .AddItem("Fighter Initiate's Armor")
-            .AddItem("Bronze")
-            .Add(Grade.UNCOMMON, new Gold(10))
-        )
-        .Add("Jackal", Color.TAN, loot => loot
-            .AddItem("Fang")
-            .Add(Grade.RARE, new Gold(25))
-        )
+    .Add("Scorpion", Color.BLACK, loot => loot
+        .AddItem("Fighter Initiate's Armor")
+        .AddItem("Bronze")
+        .Add(Grade.UNCOMMON, new Gold(10))
     )
+    .Add("Jackal", Color.TAN, loot => loot
+        .AddItem("Fang")
+        .Add(Grade.RARE, new Gold(25))
+    );
+
+// we have all the game data, now make areas in that game
+var bazaarMap = await resourceLoader.LoadMapByName("bazaar");
+var desertMap = await resourceLoader.LoadMapByName("desert");
+var canyonMap = await resourceLoader.LoadMapByName("canyon");
+gameBuilder
     .WithArea("desert", 1, area => area
         .AddLoot(loot => loot
             .AddItem("Stone")
@@ -138,13 +116,27 @@ var game = new GameBuilder()
         )
         .WithMap(canyonMap)
         .WithExit(BorderExit.Left("desert"))
-    )
-    .Build();
+    );
+
+// done defining - time to build
+var game = gameBuilder.Build();
 
 // Add services to the container.
+var config = webAppBuilder.Configuration;
+webAppBuilder.Services.AddDbContextFactory<GearBoxDbContext>(ConnectionStringHelper.UsePostgresOrInMemory(config, "GearBoxDbContext"));
+
+webAppBuilder.Services
+    .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true) 
+    .AddEntityFrameworkStores<GearBoxDbContext>();
 webAppBuilder.Services.AddRazorPages();
 webAppBuilder.Services.AddSignalR();
-webAppBuilder.Services.AddSingleton(new GameServer(game)); 
+webAppBuilder.Services
+    .AddSingleton(gameBuilder.Items)
+    .AddSingleton<IPlayerCharacterRepository, PlayerCharacterRepository>()
+    .AddSingleton<GameServer>()
+    .AddSingleton(game)
+    .Configure<EmailConfig>(webAppBuilder.Configuration.GetSection(EmailConfig.ConfigSection))
+    .AddTransient<IEmailSender, EmailSender>();
 
 var app = webAppBuilder.Build();
 
@@ -173,6 +165,7 @@ else
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();

@@ -1,0 +1,9 @@
+{
+    "Name": "Archer Initiate's Armor",
+    "GradeName": "Common",
+    "ArmorClassName": "Medium",
+    "Stats": {
+        "Offense": 1,
+        "Speed": 1
+    }
+}

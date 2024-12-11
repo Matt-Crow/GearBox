@@ -15,9 +15,6 @@ where T : IItem
     public T Item { get; init; }
     public int Quantity { get; private set; }
 
-    // Item.Id is immutable, but required to detect crafting
-    public IEnumerable<object?> DynamicValues => [Item.Id, Quantity];
-
     public void AddQuantity(int quantity)
     {
         MustBeNonNegative(nameof(quantity), quantity);
@@ -42,18 +39,5 @@ where T : IItem
         }
     }
 
-    public ItemJson ToJson()
-    {
-        var result = new ItemJson(
-            Item.Id,
-            Item.Name,
-            Item.Grade.Name,
-            Item.Grade.Order,
-            Item.Description,
-            Item.Level,
-            Item.Details,
-            Quantity
-        );
-        return result;
-    }
+    public ItemJson ToJson() => Item.ToJson(Quantity);
 }

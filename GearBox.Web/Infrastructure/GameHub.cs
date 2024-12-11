@@ -2,11 +2,13 @@ using GearBox.Core.Controls;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GearBox.Web.Infrastructure;
 
 // Hubs are transient: don't try storing data on them
+[Authorize]
 public class GameHub : Hub
 {
     private readonly GameServer _server;
@@ -19,8 +21,11 @@ public class GameHub : Hub
     public override async Task OnConnectedAsync()
     {
         var id = Context.ConnectionId;
-        // new player
-        await _server.AddConnection(id, new GameHubConnection(Clients.Caller));
+        var userId = Context.UserIdentifier ?? throw new Exception("User must be authenticated");
+        var userName = Context.User?.Identity?.Name ?? throw new Exception("User must be authenticated");
+        var user = new ConnectingUser(userId, userName);
+        _server.AddConnection(id, user, new GameHubConnection(Clients.Caller));
+        await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -51,6 +56,8 @@ public class GameHub : Hub
     /// Note the parameter is the bearing in degrees, so 0 means up, 90 means to the right, etc.
     /// </summary>
     public Task UseBasicAttack(int bearingInDegrees) => Receive(new UseBasicAttack(Direction.FromBearingDegrees(bearingInDegrees)));
+
+    public Task UseActive(int number, int bearingInDegrees) => Receive(new UseActive(number, Direction.FromBearingDegrees(bearingInDegrees)));
 
     private Task Receive(IControlCommand command)
     {

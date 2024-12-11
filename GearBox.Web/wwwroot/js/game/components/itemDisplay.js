@@ -1,3 +1,4 @@
+import { ActiveAbility } from "../model/activeAbility.js";
 import { Item } from "../model/item.js";
 
 export class ItemDisplay {
@@ -24,9 +25,14 @@ export class ItemDisplay {
             .empty()
             .append($("<div>").addClass("itemYes")
                 .append($("<h2>").text(this.#title))
-                .append($("<p>").append($("<b>").addClass("itemName")))
+                .append($("<p>").append($("<b>").addClass("itemName text-nowrap")))
                 .append($("<p>").append($("<i>").addClass("itemDescription")))
                 .append($("<ul>").addClass("itemDetails"))
+                .append($("<div>").addClass("itemActives")
+                    .append($("<hr>"))
+                    .append($("<b>").append($("<u>").text("Active Abilities")))
+                    .append($("<div>").addClass("itemActiveList"))
+                )
             )
             .append($("<div>").addClass("itemNo")
                 .text(this.#emptyText)
@@ -61,6 +67,66 @@ export class ItemDisplay {
             .find(".itemDetails")
             .empty()
             .append(details);
+        
+        if (item.actives.length === 0) {
+            $this.find(".itemActives").hide();
+        } else {
+            $this.find(".itemActives").show();
+            const abilities = item.actives.map(act => this.#makeActiveDisplay(act));
+            $this
+                .find(".itemActiveList")
+                .empty()
+                .append(abilities);
+        }
+    }
+
+    /**
+     * @param {ActiveAbility} active 
+     * @returns a JQuery object
+     */
+    #makeActiveDisplay(active) {
+        const $result = $("<div>")
+            .append($("<b>").text(active.name))
+            .append($("<span>").text(`(${active.energyCost} energy)`))
+            .append($("<p>").addClass("text-wrap").css("width", "20rem").text(active.description));
+        return $result;
+    }
+
+    show() {
+        $(this.#selector).show();
+        return this;
+    }
+
+    hide() {
+        $(this.#selector).hide();
+        return this;
+    }
+
+    handleRowCreated(record, row) {
+        row.addEventListener("mouseenter", _ => {
+            this.bind(record);
+            $(this.#selector).show();
+        });
+        row.addEventListener("mouseleave", _ => {
+            this.bind(null);
+            $(this.#selector).hide();
+        });
+        row.addEventListener("mousemove", e => {
+            /*
+                e.client_ is relative to viewport
+                css left is relative to containing block
+                so need to convert e.client_ to relative to containing block
+                https://developer.mozilla.org/en-US/docs/Web/CSS/left#:~:text=for%20absolutely%20positioned%20elements%2C%20the%20distance%20to%20the%20left%20edge%20of%20the%20containing%20block
+            */
+            const containingBlock = $(e.target).offsetParent();
+            const blockCoords = containingBlock[0].getBoundingClientRect();
+            $(this.#selector)
+                .css({
+                    left: e.clientX - blockCoords.left + 25,
+                    top: e.clientY - blockCoords.top + 25
+                })
+                .show();
+        });
     }
 }
 

@@ -1,0 +1,10 @@
+{
+    "Name": "Bronze Armor",
+    "GradeName": "Uncommon",
+    "ArmorClassName": "Heavy",
+    "Stats": {
+        "Offense": 1,
+        "HP": 2,
+        "Energy": 1
+    }
+}

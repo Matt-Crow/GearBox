@@ -1,0 +1,12 @@
+{
+    "Name": "Training Sword",
+    "GradeName": "Common",
+    "RangeName": "Melee",
+    "Stats": {
+        "Offense": 1,
+        "HP": 1
+    },
+    "ActiveNames": [
+        "Cleave"
+    ]
+}

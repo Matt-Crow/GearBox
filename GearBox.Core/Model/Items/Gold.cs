@@ -1,6 +1,6 @@
 namespace GearBox.Core.Model.Items;
 
-public readonly struct Gold
+public class Gold
 {
     public static readonly Gold NONE = new(0);
 

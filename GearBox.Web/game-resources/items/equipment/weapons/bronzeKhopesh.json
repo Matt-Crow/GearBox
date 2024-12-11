@@ -1,0 +1,12 @@
+{
+    "Name": "Bronze Khopesh",
+    "GradeName": "Uncommon",
+    "RangeName": "Melee",
+    "Stats": {
+        "Offense": 2,
+        "HP": 1
+    },
+    "ActiveNames": [
+        "Cleave"
+    ]
+}

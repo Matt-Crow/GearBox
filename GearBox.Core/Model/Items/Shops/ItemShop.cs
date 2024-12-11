@@ -1,6 +1,5 @@
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Player;
-using GearBox.Core.Model.Json.AreaInit;
 using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
 
@@ -149,7 +148,7 @@ public class ItemShop
             var opt = new OpenShopOptionJson(
                 item.ToJson(), 
                 item.Item.BuyValue.Quantity,
-                playerGold == null || playerGold.Value.Quantity >= item.Item.BuyValue.Quantity
+                playerGold == null || playerGold.Quantity >= item.Item.BuyValue.Quantity
             );
             result.Add(opt);
         }

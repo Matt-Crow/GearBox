@@ -140,6 +140,9 @@ public readonly struct Direction
     public double YMultiplier => -Math.Sin(Math.PI/2 - _bearingInRadians);
     public bool IsCardinal => BearingInDegrees % 90 == 0;
 
+    public Direction TurnedClockwiseByDegrees(int degrees) => FromBearingDegrees(BearingInDegrees + degrees);
+    public Direction TurnedCounterClockwiseByDegrees(int degrees) => FromBearingDegrees(BearingInDegrees - degrees);
+
     public bool IsOrthogonalTo(Direction other)
     {
         var dotProduct = other.XMultiplier*XMultiplier + other.YMultiplier*YMultiplier;

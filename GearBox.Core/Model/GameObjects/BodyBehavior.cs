@@ -1,4 +1,4 @@
-using GearBox.Core.Model.Static;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.GameObjects;

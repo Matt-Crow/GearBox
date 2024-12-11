@@ -69,6 +69,10 @@ export class Client {
         this.#signalr.invoke("UseBasicAttack", bearingInDegrees);
     }
 
+    useActive(number, bearingInDegrees) {
+        this.#signalr.invoke("UseActive", number, bearingInDegrees);
+    }
+
     respawn() {
         this.#signalr.invoke("Respawn");
     }

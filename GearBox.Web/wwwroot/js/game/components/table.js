@@ -1,17 +1,17 @@
 export class Table {
     #selector;
     #columns;
-    #onRecordHover;
+    #onRowCreated;
 
     /**
      * @param {string} selector 
      * @param {Column[]} columns 
-     * @param {(record: any) => any} onRecordHover called with data when user hovers over a row, called with null when they stop hovering
+     * @param {(record: any, row: HTMLTableRowElement) => any} onRowCreated called when a row is created for a record
      */
-    constructor(selector, columns, onRecordHover) {
+    constructor(selector, columns, onRowCreated=null) {
         this.#selector = selector;
         this.#columns = columns;
-        this.#onRecordHover = onRecordHover;
+        this.#onRowCreated = onRowCreated ?? (_ => {});
     }
 
     spawnHtml() {
@@ -42,16 +42,14 @@ export class Table {
     }
 
     #createRow(record) {
-        const $row = $("<tr>")
-            .hover(
-                () => this.#onRecordHover(record),
-                () => this.#onRecordHover(null)
-            );
+        const $row = $("<tr>");
         
         this.#columns.forEach(col => {
             const cellData = col.makeCellData(record);
             return $row.append($("<td>").append(cellData));
         });
+
+        this.#onRowCreated(record, $row[0]);
         
         return $row;
     }

@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Json;
+using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model;
 

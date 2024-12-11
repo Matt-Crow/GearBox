@@ -1,9 +1,6 @@
 import { Game } from "../js/game/game.js";
-import { PlayerHud } from "../js/game/components/playerHud.js";
 import { Client } from "../js/game/infrastructure/client.js";
-import { Canvas } from "../js/game/components/canvas.js";
-import { GameOverScreen } from "../js/game/components/gameOverScreen.js";
-import { MainModal } from "../js/game/components/mainModal.js";
+import { Views } from "../js/game/components/views/views.js";
 
 $(async () => await main());
 
@@ -13,17 +10,18 @@ async function main() {
         .build();
     const client = new Client(connection);
     
-    const canvas = new Canvas(findElement("#canvas"));
-    const mainModal = new MainModal("#main-modal", client);
-    const hud = new PlayerHud(findElement("#playerHud"));
-    const gameOverScreen = new GameOverScreen(findElement("#playerAlive"), findElement("#playerDead"), findElement("#respawnButton"), client);
-    const game = new Game(canvas, mainModal, hud, gameOverScreen);
+    $("#respawn-button").on("click", () => client.respawn());
+    
+    const views = new Views(client);
+    views.spawnHtml();
+
+    const game = new Game(views);
     
     connection.on("GameInit", handle(json => game.handleGameInit(json)));
     connection.on("AreaUpdate", handle(json => game.handleAreaUpdate(json)));
     
     await connection.start();
-
+    
     const keyMappings = new Map(); // value is [onUp, onDown]
     keyMappings.set("KeyW", [() => client.stopMovingUp(),    () => client.startMovingUp()]);
     keyMappings.set("KeyA", [() => client.stopMovingLeft(),  () => client.startMovingLeft()]);
@@ -35,23 +33,34 @@ async function main() {
             keyMappings.get(e.code)[0]();
         }
     });
-
+    
+    const canvas = views.viewAlive.canvas;
+    const getBearing = () => {
+        const [px, py] = game.getPlayerCoords();
+        const dx = canvas.translatedMouseX - px;
+        const dy = canvas.translatedMouseY - py;
+        const angleInRadians = Math.atan2(-dy, dx); // y first, then x. -dy flips
+        const angleInDegrees = Math.trunc(180 * angleInRadians / Math.PI); // convert to int so it doesn't crash server
+        const bearing = 90 - angleInDegrees;
+        return bearing;
+    };
     document.addEventListener("keydown", e => {
         // uses e.repeat to check if key is held down
         if (keyMappings.has(e.code) && !e.repeat) {
             keyMappings.get(e.code)[1]();
         }
+        if (e.code.startsWith("Digit")) {
+            const numberAsString = e.code.replace("Digit", "");
+            const number = parseInt(numberAsString);
+            const bearing = getBearing();
+            client.useActive(number, bearing);
+        }
         if (e.code == "KeyQ") {
-            const [px, py] = game.getPlayerCoords();
-            const dx = canvas.translatedMouseX - px;
-            const dy = canvas.translatedMouseY - py;
-            const angleInRadians = Math.atan2(-dy, dx); // y first, then x. -dy flips
-            const angleInDegrees = Math.trunc(180 * angleInRadians / Math.PI); // convert to int so it doesn't crash server
-            const bearing = 90 - angleInDegrees;
+            const bearing = getBearing();
             client.useBasicAttack(bearing);
         }
         if (e.code == "KeyE") { 
-            mainModal.toggle();
+            views.viewAlive.mainModal.toggle();
             client.openShop();
         }
     });

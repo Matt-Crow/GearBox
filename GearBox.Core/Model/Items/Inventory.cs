@@ -37,12 +37,12 @@ public class Inventory
         Gold = Gold.Plus(other.Gold);
     }
 
-    public void Add(ItemUnion? item)
+    public void Add(ItemUnion? item, int quantity = 1)
     {
         item?.Match(
-            m => Materials.Add(m),
-            w => Weapons.Add(w),
-            a => Armors.Add(a)
+            m => Materials.Add(m, quantity),
+            w => Weapons.Add(w, quantity),
+            a => Armors.Add(a, quantity)
         );
     }
 
@@ -52,7 +52,7 @@ public class Inventory
         {
             return;
         }
-        Gold = Gold.Plus(gold.Value);
+        Gold = Gold.Plus(gold);
     }
 
     public void Remove(ItemUnion? item)
@@ -70,7 +70,7 @@ public class Inventory
         {
             return;
         }
-        Gold = new Gold(Gold.Quantity - gold.Value.Quantity);
+        Gold = new Gold(Gold.Quantity - gold.Quantity);
     }
 
     public bool Contains(ItemUnion item)

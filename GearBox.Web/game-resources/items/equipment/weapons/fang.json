@@ -1,0 +1,9 @@
+{
+    "Name": "Fang",
+    "GradeName": "Common",
+    "RangeName": "Melee",
+    "Stats": {
+        "Offense": 2,
+        "Speed": 1
+    }
+}

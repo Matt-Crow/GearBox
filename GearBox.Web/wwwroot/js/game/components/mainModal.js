@@ -3,13 +3,14 @@
 */
 
 import { Client } from "../infrastructure/client.js";
+import { UiStateChanges } from "../model/areaUpdate.js";
 import { CraftingRecipe } from "../model/crafting.js";
-import { Inventory, Item } from "../model/item.js";
+import { Inventory } from "../model/item.js";
 import { PlayerStatSummary } from "../model/player.js";
 import { OpenShop } from "../model/shop.js";
 import { EquipmentTab } from "./equipmentTab.js";
 import { ItemDisplay } from "./itemDisplay.js";
-import { Switcher } from "./switcher.js";
+import { Switcher } from "./shared/switcher.js";
 import { ActionColumn, ConditionalActionColumn, DataColumn, Table } from "./table.js";
 
 /**
@@ -46,18 +47,19 @@ export class MainModal {
             new DataColumn("Type", m => m.name),
             new DataColumn("Description", m => m.description),
             new DataColumn("Quantity", m => m.quantity)
-        ], _ => null); // do nothing on hover
+        ]);
         this.#materialTable.spawnHtml();
+
+        this.#craftPreview = new ItemDisplay("#craft-preview", "Preview")
+            .spawnHtml()
+            .hide();
 
         this.#recipeTable = new Table("#recipes", [
             new DataColumn("Recipe", r => r.makes.name),
             new DataColumn("Ingredients", r => r.ingredients.map(i => `${i.name} x${i.quantity}`).join(", ")),
             new ActionColumn("Action", "craft", r => this.#client.craft(r.id))
-        ], r => this.#setCraftPreview(r?.makes));
+        ], (record, row) => this.#craftPreview.handleRowCreated(record?.makes, row));
         this.#recipeTable.spawnHtml();
-
-        this.#craftPreview = new ItemDisplay("#craftPreview", "Preview", "Hover over a craft button to preview")
-            .spawnHtml();
         
         this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equipWeapon(id));
         this.#armorTab = new EquipmentTab("#armorTab", id => client.equipArmor(id));
@@ -65,11 +67,14 @@ export class MainModal {
         this.#shopBuyTable = this.#makeShopTable(".shop-buy", "buy", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopSellTable = this.#makeShopTable(".shop-sell", "sell", opt => client.shopSell(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopBuybackTable = this.#makeShopTable(".shop-buyback", "buy back", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
-        this.#shopHoverInfo = new ItemDisplay(`${selector} .shop-hover-info`, "Item Preview", "Hover over an item to preview it");
-        this.#shopHoverInfo.spawnHtml();
+        this.#shopHoverInfo = new ItemDisplay(`${selector} .shop-preview`, "Item Preview");
+        this.#shopHoverInfo
+            .spawnHtml()
+            .hide();
     
-        this.setWeapon(null);
-        this.setShop(null);
+        this.#weaponTab.setCurrent(null);
+        this.#armorTab.setCurrent(null);
+        this.#setShop(null);
     }
 
     /**
@@ -83,7 +88,7 @@ export class MainModal {
             new DataColumn("Item", x => x.item.name),
             new DataColumn("Price", x => x.price),
             new ConditionalActionColumn("Action", buttonText, onButtonClick, i => i.canAfford)
-        ], shopOption => this.#shopHoverInfo.bind(shopOption?.item));
+        ], (record, row) => this.#shopHoverInfo.handleRowCreated(record?.item, row));
         result.spawnHtml();
         return result;
     }
@@ -92,10 +97,21 @@ export class MainModal {
         if (this.#element.open) {
             this.#element.close();
             this.#client.closeShop();
-            this.setShop(null);
+            this.#setShop(null);
         } else {
             this.#element.showModal();
         }
+    }
+
+    /**
+     * @param {UiStateChanges} uiStateChanges 
+     */
+    handleUiStateChanges(uiStateChanges) {
+        uiStateChanges.inventory.handleChange(i => this.setInventory(i));
+        uiStateChanges.weapon.handleChange(w => this.#weaponTab.setCurrent(w));
+        uiStateChanges.armor.handleChange(a => this.#armorTab.setCurrent(a));
+        uiStateChanges.summary.handleChange(s => this.setStatSummary(s));
+        uiStateChanges.openShop.handleChange(os => this.#setShop(os));
     }
 
     /**
@@ -116,13 +132,6 @@ export class MainModal {
     }
 
     /**
-     * @param {Item?} item 
-     */
-    #setCraftPreview(item) {
-        this.#craftPreview.bind(item);
-    }
-
-    /**
      * @param {Inventory} inventory 
      */
     setInventory(inventory) {
@@ -133,23 +142,9 @@ export class MainModal {
     }
 
     /**
-     * @param {Item?} weapon 
-     */
-    setWeapon(weapon) {
-        this.#weaponTab.setCurrent(weapon);
-    }
-
-    /**
-     * @param {Item?} armor 
-     */
-    setArmor(armor) {
-        this.#armorTab.setCurrent(armor);
-    }
-
-    /**
      * @param {OpenShop?} shop 
      */
-    setShop(shop) {
+    #setShop(shop) {
         this.#currentShop = shop;
 
         if (!shop) {

@@ -1,3 +1,5 @@
+using GearBox.Core.Model.Json;
+
 namespace GearBox.Core.Model.Items;
 
 /// <summary>
@@ -17,8 +19,6 @@ public class Material : IItem
     public string Name { get; init; }
     public Grade Grade { get; init; }
     public string Description { get; init; }
-    public int Level => 0; // players of any level can use any material
-    public IEnumerable<string> Details => []; // materials have no details for now
     public Gold BuyValue { get; init; }
 
     public override bool Equals(object? obj)
@@ -34,5 +34,21 @@ public class Material : IItem
     public Material ToOwned()
     {
         return this;
+    }
+
+    public ItemJson ToJson(int quantity)
+    {
+        var result = new ItemJson(
+            Id,
+            Name,
+            Grade.Name,
+            Grade.Order,
+            Description,
+            0, // no level
+            [], // no details
+            quantity,
+            [] // no actives
+        );
+        return result;
     }
 }

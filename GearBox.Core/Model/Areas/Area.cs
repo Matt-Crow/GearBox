@@ -1,16 +1,13 @@
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Player;
-using GearBox.Core.Model.Json.AreaInit;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
-using GearBox.Core.Model.Static;
 using GearBox.Core.Utils;
 using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
-using GearBox.Core.Model.Json;
 using GearBox.Core.Model.GameObjects.Enemies;
-using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Model.Items.Shops;
+using GearBox.Core.Model.Json.AreaUpdate.GameObjects;
 
 namespace GearBox.Core.Model.Areas;
 
@@ -46,8 +43,10 @@ public class Area : IArea
         _map = map ?? new();
         Shops = shops ?? [];
         _loot = loot ?? new LootTable([]);
-        _enemyFactory = enemyFactory ?? new EnemyFactory(new EnemyRepository(new ItemFactory()));
+        _enemyFactory = enemyFactory ?? EnemyFactory.MakeDefault();
         _exits = exits ?? [];
+
+        AddTimer(_enemyFactory.MakeSpawnTimer(this));
     }
 
     public string Name { get; init; }
