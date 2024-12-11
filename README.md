@@ -1,5 +1,5 @@
 # GearBox
-A C# MMORPG-like game.
+A C# ARPG-like game.
 
 ## Running Tests
 `dotnet watch --project GearBox.Core.Tests test`
