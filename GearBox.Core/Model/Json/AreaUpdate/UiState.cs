@@ -59,7 +59,7 @@ public readonly struct UiState
             return MaybeChangeJson<AreaJson?>.Changed(newValue);
         }
         // generics are pain, so I can't delegate to Compare
-        if (Hash(oldValue) == Hash(newValue))
+        if (AreTheSame(oldValue, newValue))
         {
             return MaybeChangeJson<AreaJson?>.NoChanges();
         }
@@ -77,7 +77,7 @@ public readonly struct UiState
             return MaybeChangeJson<ItemJson?>.Changed(newValue);
         }
         // generics are pain, so I can't delegate to Compare
-        if (Hash(oldValue) == Hash(newValue))
+        if (AreTheSame(oldValue, newValue))
         {
             return MaybeChangeJson<ItemJson?>.NoChanges();
         }
@@ -95,7 +95,7 @@ public readonly struct UiState
             return MaybeChangeJson<OpenShopJson?>.Changed(newValue);
         }
         // generics are pain, so I can't delegate to Compare
-        if (Hash(oldValue) == Hash(newValue))
+        if (AreTheSame(oldValue, newValue))
         {
             return MaybeChangeJson<OpenShopJson?>.NoChanges();
         }
@@ -115,7 +115,7 @@ public readonly struct UiState
         }
 
         var anyChanged = oldValue.Zip(newValue)
-            .Where(pair => Hash(pair.First) != Hash(pair.Second))
+            .Where(pair => !AreTheSame(pair.First, pair.Second))
             .Any();
         if (anyChanged)
         {
@@ -131,20 +131,54 @@ public readonly struct UiState
         {
             return MaybeChangeJson<T>.Changed(newValue);
         }
-        if (Hash(oldValue) == Hash(newValue))
+        if (AreTheSame(oldValue, newValue))
         {
             return MaybeChangeJson<T>.NoChanges();
         }
         return MaybeChangeJson<T>.Changed(newValue);
     }
 
-    private static int Hash(IChange obj)
+    private static bool AreTheSame(IChange oldObj, IChange newObj)
     {
-        var hashCode = new HashCode();
-        foreach (var item in obj.DynamicValues)
+        var oldValues = oldObj.DynamicValues;
+        var newValues = newObj.DynamicValues;
+
+        if (oldValues.Count() != newValues.Count())
         {
-            hashCode.Add(item);
+            return false;
         }
-        return hashCode.ToHashCode();
+
+        // check if any of the DynamicValues do not match
+        var anyDifferences = oldValues
+            .Zip(newValues)
+            .Any(pair => AreDifferent(pair.First, pair.Second));
+        return !anyDifferences;
+    }
+
+    private static bool AreDifferent(object? a, object? b)
+    {
+        /*
+            Cannot simply check if a != b,
+            as that behaves different for strings.
+            (object?)"foo" != (object?)"foo" sometimes I think
+        */
+
+        // simplify problem by filtering out nulls first
+        if (a == null && b == null)
+        {
+            return false;
+        }
+        if (a == null && b != null)
+        {
+            return true;
+        }
+        if (a != null && b == null)
+        {
+            return true;
+        }
+
+        // by now, we know they are not null
+        var equal = a!.Equals(b);
+        return !equal;
     }
 }
