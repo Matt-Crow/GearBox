@@ -50,14 +50,6 @@ public readonly struct UiState
     // making this generic is pain - don't try it!
     private static MaybeChangeJson<AreaJson?> CompareNullable(AreaJson? oldValue, AreaJson? newValue)
     {
-        if (oldValue == null && newValue == null)
-        {
-            return MaybeChangeJson<AreaJson?>.NoChanges();
-        }
-        if (oldValue == null || newValue == null)
-        {
-            return MaybeChangeJson<AreaJson?>.Changed(newValue);
-        }
         // generics are pain, so I can't delegate to Compare
         if (AreTheSame(oldValue, newValue))
         {
@@ -68,14 +60,6 @@ public readonly struct UiState
 
     private static MaybeChangeJson<ItemJson?> CompareNullable(ItemJson? oldValue, ItemJson? newValue)
     {
-        if (oldValue == null && newValue == null)
-        {
-            return MaybeChangeJson<ItemJson?>.NoChanges();
-        }
-        if (oldValue == null || newValue == null)
-        {
-            return MaybeChangeJson<ItemJson?>.Changed(newValue);
-        }
         // generics are pain, so I can't delegate to Compare
         if (AreTheSame(oldValue, newValue))
         {
@@ -86,14 +70,6 @@ public readonly struct UiState
 
     private static MaybeChangeJson<OpenShopJson?> CompareNullable(OpenShopJson? oldValue, OpenShopJson? newValue)
     {
-        if (oldValue == null && newValue == null)
-        {
-            return MaybeChangeJson<OpenShopJson?>.NoChanges();
-        }
-        if (oldValue == null || newValue == null)
-        {
-            return MaybeChangeJson<OpenShopJson?>.Changed(newValue);
-        }
         // generics are pain, so I can't delegate to Compare
         if (AreTheSame(oldValue, newValue))
         {
@@ -127,10 +103,6 @@ public readonly struct UiState
     private static MaybeChangeJson<T> Compare<T>(T? oldValue, T newValue)
     where T : IChange
     {
-        if (oldValue == null)
-        {
-            return MaybeChangeJson<T>.Changed(newValue);
-        }
         if (AreTheSame(oldValue, newValue))
         {
             return MaybeChangeJson<T>.NoChanges();
@@ -138,8 +110,29 @@ public readonly struct UiState
         return MaybeChangeJson<T>.Changed(newValue);
     }
 
-    private static bool AreTheSame(IChange oldObj, IChange newObj)
+    private static bool AreTheSame(IChange? oldObj, IChange? newObj)
     {
+        /*
+            3 cases to consider:
+                Are both null?
+                Is only one null?
+                Are neither null?
+        */
+
+        // both are null
+        if (oldObj == null && newObj == null)
+        {
+            return true;
+        }
+
+        // only one is null
+        if (oldObj == null || newObj == null)
+        {
+            return false;
+        }
+
+        // neither is null
+
         var oldValues = oldObj.DynamicValues;
         var newValues = newObj.DynamicValues;
 
@@ -151,34 +144,7 @@ public readonly struct UiState
         // check if any of the DynamicValues do not match
         var anyDifferences = oldValues
             .Zip(newValues)
-            .Any(pair => AreDifferent(pair.First, pair.Second));
+            .Any(pair => !Equals(pair.First, pair.Second)); // Nullable<T>.Equals() method
         return !anyDifferences;
-    }
-
-    private static bool AreDifferent(object? a, object? b)
-    {
-        /*
-            Cannot simply check if a != b,
-            as that behaves different for strings.
-            (object?)"foo" != (object?)"foo" sometimes I think
-        */
-
-        // simplify problem by filtering out nulls first
-        if (a == null && b == null)
-        {
-            return false;
-        }
-        if (a == null && b != null)
-        {
-            return true;
-        }
-        if (a != null && b == null)
-        {
-            return true;
-        }
-
-        // by now, we know they are not null
-        var equal = a!.Equals(b);
-        return !equal;
     }
 }
