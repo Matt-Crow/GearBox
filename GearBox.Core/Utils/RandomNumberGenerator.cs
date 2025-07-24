@@ -2,6 +2,8 @@ namespace GearBox.Core.Utils;
 
 public class RandomNumberGenerator : IRandomNumberGenerator
 {
+    public int Next(int max) => Random.Shared.Next(max);
+
     public bool CheckChance(double percentChance)
     {
         if (percentChance == 0.0)
@@ -26,7 +28,7 @@ public class RandomNumberGenerator : IRandomNumberGenerator
             throw new ArgumentException($"{nameof(options)} cannot be empty");
         }
 
-        var index = Random.Shared.Next(options.Count);
+        var index = Next(options.Count);
         var choice = options[index];
         return choice;
     }

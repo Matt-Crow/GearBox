@@ -3,6 +3,11 @@ namespace GearBox.Core.Utils;
 public interface IRandomNumberGenerator
 {
     /// <summary>
+    /// Returns a non-negative int less than max
+    /// </summary>
+    int Next(int max);
+
+    /// <summary>
     /// For example, CheckChance(0.33) returns true 33% of the time
     /// </summary>
     bool CheckChance(double percentChance);

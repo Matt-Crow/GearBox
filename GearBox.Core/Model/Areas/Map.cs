@@ -2,6 +2,7 @@ using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Json;
 using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Units;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Areas;
 
@@ -10,16 +11,17 @@ namespace GearBox.Core.Model.Areas;
 /// </summary>
 public class Map : ISerializable<MapJson>
 {
+    private readonly IRandomNumberGenerator _rng;
     private readonly int[,] _tileMap;
     private readonly Dictionary<int, TileType> _tileTypes = [];
 
 
-    public Map() : this(Dimensions.InTiles(20))
+    public Map() : this(Dimensions.InTiles(20), new RandomNumberGenerator())
     {
 
     }
 
-    public Map(Dimensions dimensions)
+    public Map(Dimensions dimensions, IRandomNumberGenerator rng)
     {
         var width = dimensions.WidthInTiles;
         var height = dimensions.HeightInTiles;
@@ -31,6 +33,8 @@ public class Map : ISerializable<MapJson>
         {
             throw new ArgumentException("height must be positive");
         }
+
+        _rng = rng;
         _tileMap = new int[height, width]; // initializes all to 0
         _tileTypes[0] = new TileType(Color.BLUE, TileHeight.FLOOR);
         Width = Distance.FromTiles(_tileMap.GetLength(1));
@@ -162,9 +166,8 @@ public class Map : ISerializable<MapJson>
 
     public Coordinates GetRandomFloorTile()
     {
-        var random = new Random();
-        var x = random.Next(Width.InTiles);
-        var y = random.Next(Height.InTiles);
+        var x = _rng.Next(Width.InTiles);
+        var y = _rng.Next(Height.InTiles);
         var source = Coordinates.FromTiles(x, y);
         return FindFloorTileAround(source) ?? throw new Exception("No floor tiles");
     }

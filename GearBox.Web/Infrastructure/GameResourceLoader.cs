@@ -2,6 +2,7 @@ using System.Text.Json;
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Items;
+using GearBox.Core.Utils;
 using GearBox.Web.Model.Json;
 
 namespace GearBox.Web.Infrastructure;
@@ -12,10 +13,12 @@ namespace GearBox.Web.Infrastructure;
 public class GameResourceLoader
 {
     private readonly IActiveAbilityFactory _actives;
+    private readonly IRandomNumberGenerator _rng;
 
-    public GameResourceLoader(IActiveAbilityFactory actives)
+    public GameResourceLoader(IActiveAbilityFactory actives, IRandomNumberGenerator rng)
     {
         _actives = actives;
+        _rng = rng;
     }
 
     public async Task<Map> LoadMapByName(string name)
@@ -28,7 +31,7 @@ public class GameResourceLoader
         var path = Path.Combine("game-resources", "maps", name + ".json");
         var text = await File.ReadAllTextAsync(path);
         var json = JsonSerializer.Deserialize<MapResourceJson>(text) ?? throw new ArgumentException($"Map not found: {name}");
-        return json.ToMap();
+        return json.ToMap(_rng);
     }
 
     public async Task<List<ItemUnion>> LoadAllItems()
