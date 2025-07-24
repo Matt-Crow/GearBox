@@ -3,6 +3,7 @@ using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies.Ai;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.GameObjects.Enemies;
 
@@ -10,16 +11,18 @@ public class EnemyFactory : IEnemyFactory
 {
     private readonly GearBoxConfig _config;
     private readonly IEnemyRepository _allEnemies;
+    private readonly IRandomNumberGenerator _rng;
     private readonly List<string> _names = [];
     private int _childCount = 0;
 
-    public EnemyFactory(GearBoxConfig config, IEnemyRepository allEnemies)
+    public EnemyFactory(GearBoxConfig config, IEnemyRepository allEnemies, IRandomNumberGenerator rng)
     {
         _config = config;
         _allEnemies = allEnemies;
+        _rng = rng;
     }
 
-    public static EnemyFactory MakeDefault() => new EnemyFactory(new GearBoxConfig(), new EnemyRepository(new ItemFactory()));
+    public static EnemyFactory MakeDefault() => new EnemyFactory(new GearBoxConfig(), new EnemyRepository(new ItemFactory()), new RandomNumberGenerator());
 
     public IEnemyFactory Add(string name)
     {
@@ -34,7 +37,7 @@ public class EnemyFactory : IEnemyFactory
         {
             return null;
         }
-        var name = _names[Random.Shared.Next(_names.Count)];
+        var name = _rng.ChooseRandom(_names);
         var result = _allEnemies.GetEnemyByName(name, level) ?? throw new Exception($"Bad enemy name: {name}");
 
         if (_config.DisableAI)
@@ -57,7 +60,7 @@ public class EnemyFactory : IEnemyFactory
 
         player.GainXp((int)(enemy.Level * _config.EnemyXpDropMultiplier));
 
-        if (Random.Shared.NextDouble() > _config.EnemyLootDropChance)
+        if (!_rng.CheckChance(_config.EnemyLootDropChance))
         {
             return;
         }

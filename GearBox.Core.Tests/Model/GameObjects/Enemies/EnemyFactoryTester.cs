@@ -3,6 +3,7 @@ using GearBox.Core.Model;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.GameObjects.Enemies.Ai;
 using GearBox.Core.Model.Items;
+using GearBox.Core.Utils;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model.GameObjects.Enemies;
@@ -13,7 +14,7 @@ public class EnemyFactoryTester
     public void MakeRandom_GivenAiNotDisabled_ShouldNotHaveNullAi()
     {
         var config = new GearBoxConfig();
-        var sut = new EnemyFactory(config, new EnemyRepositoryMock())
+        var sut = new EnemyFactory(config, new EnemyRepositoryMock(), new RandomNumberGeneratorMock())
             .Add("foo");
 
         var result = sut.MakeRandom(1) ?? throw new Exception("Mock should be configured to return non-null");
@@ -28,7 +29,7 @@ public class EnemyFactoryTester
         {
             DisableAI = true
         };
-        var sut = new EnemyFactory(config, new EnemyRepositoryMock())
+        var sut = new EnemyFactory(config, new EnemyRepositoryMock(), new RandomNumberGeneratorMock())
             .Add("foo");
 
         var result = sut.MakeRandom(1) ?? throw new Exception("Mock should be configured to return non-null");
@@ -41,5 +42,17 @@ public class EnemyFactoryTester
         public IEnemyRepository Add(string name, Color color, Func<LootTableBuilder, LootTableBuilder> loot) => this;
 
         public EnemyCharacter? GetEnemyByName(string name, int level) => new EnemyCharacter(name, level);
+    }
+
+    private class RandomNumberGeneratorMock : IRandomNumberGenerator
+    {
+        private readonly RandomNumberGenerator _inner = new();
+
+        public bool CheckChance(double percentChance)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public T ChooseRandom<T>(List<T> options) => _inner.ChooseRandom(options);
     }
 }
