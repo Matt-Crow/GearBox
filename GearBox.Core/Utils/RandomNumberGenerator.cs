@@ -4,6 +4,8 @@ public class RandomNumberGenerator : IRandomNumberGenerator
 {
     public int Next(int max) => Random.Shared.Next(max);
 
+    public int Next(int minValue, int maxValue) => Random.Shared.Next(minValue, maxValue);
+
     public bool CheckChance(double percentChance)
     {
         if (percentChance == 0.0)

@@ -40,10 +40,9 @@ public class EnemyFactory : IEnemyFactory
         var name = _rng.ChooseRandom(_names);
         var result = _allEnemies.GetEnemyByName(name, level) ?? throw new Exception($"Bad enemy name: {name}");
 
-        if (_config.DisableAI)
+        if (!_config.DisableAI)
         {
-            result.AiBehavior = new NullAiBehavior();
-            result.StopMoving();
+            result.AiBehavior = new WanderAiBehavior(result, _rng);
         }
 
         result.Killed += (sender, e) => HandleKilled(result, e);

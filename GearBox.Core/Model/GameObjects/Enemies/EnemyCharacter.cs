@@ -7,7 +7,7 @@ public class EnemyCharacter : Character
 {
     public EnemyCharacter(string name, int level = 1, Color? color = null, LootTable? loot = null) : base(name, level, color)
     {
-        AiBehavior = new WanderAiBehavior(this);
+        AiBehavior = new NullAiBehavior();
         Loot = loot ?? new LootTable([]);
     }
 

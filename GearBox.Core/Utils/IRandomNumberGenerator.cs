@@ -8,6 +8,11 @@ public interface IRandomNumberGenerator
     int Next(int max);
 
     /// <summary>
+    /// Returns a random integer that is within a specified range.
+    /// </summary>
+    int Next(int minValue, int maxValue);
+
+    /// <summary>
     /// For example, CheckChance(0.33) returns true 33% of the time
     /// </summary>
     bool CheckChance(double percentChance);
