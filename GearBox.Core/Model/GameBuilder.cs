@@ -19,7 +19,7 @@ public class GameBuilder : IGameBuilder
     {
         _config = config;
         _rng = rng;
-        Enemies = new EnemyRepository(Items);
+        Enemies = new EnemyRepository(Items, rng);
     }
 
     public IActiveAbilityFactory Actives { get; init; } = new ActiveAbilityFactory();
@@ -40,7 +40,7 @@ public class GameBuilder : IGameBuilder
             throw new ArgumentException("Name must be unique within each game", nameof(name));
         }
 
-        _areas.Add(defineArea(new AreaBuilder(name, level, Items, new EnemyFactory(_config, Enemies, _rng))));
+        _areas.Add(defineArea(new AreaBuilder(name, level, Items, new EnemyFactory(_config, Enemies, _rng), _rng)));
         return this;
     }
 

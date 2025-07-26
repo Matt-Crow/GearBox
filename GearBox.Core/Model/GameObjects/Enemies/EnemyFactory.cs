@@ -22,7 +22,7 @@ public class EnemyFactory : IEnemyFactory
         _rng = rng;
     }
 
-    public static EnemyFactory MakeDefault() => new EnemyFactory(new GearBoxConfig(), new EnemyRepository(new ItemFactory()), new RandomNumberGenerator());
+    public static EnemyFactory MakeDefault() => new EnemyFactory(new GearBoxConfig(), new EnemyRepository(new ItemFactory(), new RandomNumberGenerator()), new RandomNumberGenerator());
 
     public IEnemyFactory Add(string name)
     {

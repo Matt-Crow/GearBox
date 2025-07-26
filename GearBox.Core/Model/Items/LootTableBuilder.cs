@@ -1,15 +1,18 @@
 using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Items;
 
 public class LootTableBuilder
 {
     private readonly IItemFactory _itemFactory;
+    private readonly IRandomNumberGenerator _rng;
     private readonly List<LootOption> _lootOptions = [];
 
-    public LootTableBuilder(IItemFactory itemFactory)
+    public LootTableBuilder(IItemFactory itemFactory, IRandomNumberGenerator rng)
     {
         _itemFactory = itemFactory;
+        _rng = rng;
     }
 
     public LootTableBuilder AddItem(string name)
@@ -33,7 +36,7 @@ public class LootTableBuilder
                 gold => opt
             ))
             .ToList();
-        var result = new LootTable(lootOptions);
+        var result = new LootTable(lootOptions, _rng);
         return result;
     }
 }
