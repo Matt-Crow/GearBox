@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Items;
+using GearBox.Core.Utils;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model.Items;
@@ -11,7 +12,7 @@ public class LootTableTester
         var expected = new Material("foo");
         var sut = new LootTable([
             new LootOption(1, ItemUnion.Of(expected))
-        ]);
+        ], new RandomNumberGenerator());
 
         var inventory = sut.GetRandomLoot();
         var actual = inventory.Materials.Content.First().Item;
@@ -26,7 +27,7 @@ public class LootTableTester
         var expected = new Equipment<WeaponStats>("foo", new WeaponStats());
         var sut = new LootTable([
             new LootOption(1, ItemUnion.Of(expected))
-        ]);
+        ], new RandomNumberGenerator());
 
         var inventory = sut.GetRandomLoot();
         var actual = inventory.Weapons.Content.First().Item;

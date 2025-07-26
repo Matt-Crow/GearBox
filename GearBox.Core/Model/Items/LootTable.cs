@@ -1,3 +1,5 @@
+using GearBox.Core.Utils;
+
 namespace GearBox.Core.Model.Items;
 
 /// <summary>
@@ -6,17 +8,19 @@ namespace GearBox.Core.Model.Items;
 public class LootTable
 {
     private readonly List<LootOption> _lootOptions = [];
+    private readonly IRandomNumberGenerator _rng;
 
-    public LootTable(List<LootOption> options)
+    public LootTable(List<LootOption> options, IRandomNumberGenerator rng)
     {
         _lootOptions = options;
+        _rng = rng;
     }
 
     public Inventory GetRandomLoot()
     {
         var result = new Inventory();
         var numItems = _lootOptions.Any()
-            ? Random.Shared.Next(0, 3) + 1
+            ? _rng.Next(0, 3) + 1
             : 0;
         for (int i = 0; i < numItems; i++)
         {
@@ -32,7 +36,7 @@ public class LootTable
     private LootOption ChooseRandomLootOption()
     {
         var totalWeight = _lootOptions.Sum(x => x.Weight);
-        var randomNumber = Random.Shared.Next(totalWeight);
+        var randomNumber = _rng.Next(totalWeight);
         foreach (var weightedItem in _lootOptions)
         {
             if (weightedItem.Weight > randomNumber)

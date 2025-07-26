@@ -5,6 +5,7 @@ using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Units;
+using GearBox.Core.Utils;
 using Xunit;
 
 public class MapTester
@@ -14,7 +15,7 @@ public class MapTester
     [InlineData(0)]
     public void SizeInTilesMustBePositive(int sizeInTiles)
     {
-        Assert.Throws<ArgumentException>(() => new Map(Dimensions.InTiles(sizeInTiles)));
+        Assert.Throws<ArgumentException>(() => new Map(Dimensions.InTiles(sizeInTiles), new RandomNumberGenerator()));
     }
 
     [Fact]
@@ -52,7 +53,7 @@ public class MapTester
     [InlineData(100, 0)]
     public void CannotSetTileOutOfBounds(int x, int y)
     {
-        var sut = new Map(Dimensions.InTiles(20))
+        var sut = new Map(Dimensions.InTiles(20), new RandomNumberGenerator())
             .SetTileTypeForKey(1, AWall());
 
         Assert.Throws<ArgumentException>(() => sut.SetTileAt(Coordinates.FromTiles(x, y), 1));

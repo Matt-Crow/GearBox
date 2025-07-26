@@ -3,6 +3,7 @@ using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Model.Items.Shops;
 using GearBox.Core.Model.Units;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.Areas;
 
@@ -16,12 +17,12 @@ public class AreaBuilder
     private readonly IEnemyFactory _enemies;
     private readonly List<IExit> _exits = [];
 
-    public AreaBuilder(string name, int level, IItemFactory itemFactory, IEnemyFactory enemies)
+    public AreaBuilder(string name, int level, IItemFactory itemFactory, IEnemyFactory enemies, IRandomNumberGenerator rng)
     {
         Name = name;
         _level = level;
         _itemFactory = itemFactory;
-        _lootBuilder = new(itemFactory);
+        _lootBuilder = new(itemFactory, rng);
         _enemies = enemies;
     }
 

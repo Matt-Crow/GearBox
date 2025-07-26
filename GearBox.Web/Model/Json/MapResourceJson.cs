@@ -1,6 +1,7 @@
 using GearBox.Core.Model;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Units;
+using GearBox.Core.Utils;
 
 namespace GearBox.Web.Model.Json;
 
@@ -16,13 +17,13 @@ public class MapResourceJson
     /// Attempts to convert from JSON to a map.
     /// Throws an exception if the JSON is not formatted properly.
     /// </summary>
-    public Map ToMap()
+    public Map ToMap(IRandomNumberGenerator rng)
     {
         var width = Tiles.Max(row => row.Count);
         var result = new Map(new Dimensions(
             Distance.FromTiles(Tiles.Count), 
             Distance.FromTiles(width)
-        ));
+        ), rng);
 
         foreach (var tileType in TileTypes)
         {

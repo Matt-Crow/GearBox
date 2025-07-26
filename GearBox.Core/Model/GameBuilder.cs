@@ -4,19 +4,22 @@ using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model;
 
 public class GameBuilder : IGameBuilder
 {
     private readonly GearBoxConfig _config;
+    private readonly IRandomNumberGenerator _rng;
     private readonly HashSet<CraftingRecipe> _craftingRecipes = [];
     private readonly List<AreaBuilder> _areas = []; // must be ordered so the first area added is the default area
 
-    public GameBuilder(GearBoxConfig config)
+    public GameBuilder(GearBoxConfig config, IRandomNumberGenerator rng)
     {
         _config = config;
-        Enemies = new EnemyRepository(Items);
+        _rng = rng;
+        Enemies = new EnemyRepository(Items, rng);
     }
 
     public IActiveAbilityFactory Actives { get; init; } = new ActiveAbilityFactory();
@@ -36,7 +39,8 @@ public class GameBuilder : IGameBuilder
         {
             throw new ArgumentException("Name must be unique within each game", nameof(name));
         }
-        _areas.Add(defineArea(new AreaBuilder(name, level, Items, new EnemyFactory(_config, Enemies))));
+
+        _areas.Add(defineArea(new AreaBuilder(name, level, Items, new EnemyFactory(_config, Enemies, _rng), _rng)));
         return this;
     }
 

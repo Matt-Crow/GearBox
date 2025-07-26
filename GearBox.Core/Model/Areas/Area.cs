@@ -42,7 +42,7 @@ public class Area : IArea
         _game = game ?? new Game();
         _map = map ?? new();
         Shops = shops ?? [];
-        _loot = loot ?? new LootTable([]);
+        _loot = loot ?? new LootTable([], new RandomNumberGenerator());
         _enemyFactory = enemyFactory ?? EnemyFactory.MakeDefault();
         _exits = exits ?? [];
 

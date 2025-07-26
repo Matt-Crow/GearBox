@@ -11,6 +11,7 @@ using GearBox.Core.Model.GameObjects.Player;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
 using GearBox.Core.Model.Areas;
+using GearBox.Core.Utils;
 
 /*
     Need to load some of the game resources in a specific order:
@@ -28,7 +29,8 @@ var gearboxConfig = new GearBoxConfig();
 webAppBuilder.Configuration
     .GetSection("GearBox")
     .Bind(gearboxConfig);
-var gameBuilder = new GameBuilder(gearboxConfig);
+var rng = new RandomNumberGenerator();
+var gameBuilder = new GameBuilder(gearboxConfig, rng);
 
 // configure actives before items
 gameBuilder.Actives
@@ -37,7 +39,7 @@ gameBuilder.Actives
     ;
 
 // configure items before crafting recipes and enemies
-var resourceLoader = new GameResourceLoader(gameBuilder.Actives);
+var resourceLoader = new GameResourceLoader(gameBuilder.Actives, rng);
 var itemResources = await resourceLoader.LoadAllItems();
 foreach (var item in itemResources)
 {
