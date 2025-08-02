@@ -2,9 +2,9 @@ using GearBox.Core.Model.Areas;
 
 namespace GearBox.Core.Model.GameObjects;
 
-public class CollideWithTileEventArgs : EventArgs
+public class CollideWithTileEvent
 {
-    public CollideWithTileEventArgs(Tile tile) => Tile = tile;
+    public CollideWithTileEvent(Tile tile) => Tile = tile;
 
     public Tile Tile { get; init; }
 }

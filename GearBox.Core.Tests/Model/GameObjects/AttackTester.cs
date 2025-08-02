@@ -10,10 +10,10 @@ public class AttackTester
     public void HandleCollision_CalledTwice_OnlyInflictsDamageOnce()
     {
         var sut = new Attack(new EnemyCharacter("foo", 1), 42);
-        var eventArgs = new CollideEventArgs(new EnemyCharacter("bar", 1));
+        var eventArgs = new CollideEvent(new EnemyCharacter("bar", 1));
 
-        sut.HandleCollision(null, eventArgs);
-        sut.HandleCollision(null, eventArgs);
+        sut.HandleCollision(eventArgs);
+        sut.HandleCollision(eventArgs);
 
         Assert.Equal(42, eventArgs.CollidedWith.DamageTaken);
     }

@@ -18,7 +18,7 @@ public class Attack
         return target != UsedBy && !_collidedWith.Contains(target) && target.Team != UsedBy.Team;
     }
 
-    public void HandleCollision(object? sender, CollideEventArgs args)
+    public void HandleCollision(CollideEvent args)
     {
         var target = args.CollidedWith;
 

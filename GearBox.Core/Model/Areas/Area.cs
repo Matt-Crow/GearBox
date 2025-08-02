@@ -197,7 +197,7 @@ public class Area : IArea
             .Where(obj => obj.Body.CollidesWith(body));
         foreach (var character in collidingCharacters)
         {
-            body.OnCollided(new CollideEventArgs(character));
+            body.OnCollided(new CollideEvent(character));
         }
     }
 }

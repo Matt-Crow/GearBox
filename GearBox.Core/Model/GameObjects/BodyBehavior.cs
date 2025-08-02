@@ -1,5 +1,6 @@
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Units;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.GameObjects;
 
@@ -55,9 +56,9 @@ public class BodyBehavior
         set => Location = Coordinates.FromPixels(Location.XInPixels, value - Radius.InPixels);
     }
 
-    public event EventHandler<CollideEventArgs>? Collided;
-    public event EventHandler<CollideWithMapEdgeEventArgs>? CollideWithMapEdge;
-    public event EventHandler<CollideWithTileEventArgs>? CollideWithTile;
+    public EventEmitter<CollideEvent> EventCollided { get; } = new();
+    public EventEmitter<CollideWithMapEdgeEvent> EventCollideWithMapEdge { get; } = new();
+    public EventEmitter<CollideWithTileEvent> EventCollideWithTile { get; } = new();
 
     public bool CollidesWith(BodyBehavior other)
     {
@@ -78,12 +79,12 @@ public class BodyBehavior
         return withinX && withinY;
     }
 
-    public void OnCollided(CollideEventArgs args)
+    public void OnCollided(CollideEvent args)
     {
-        Collided?.Invoke(this, args);
+        EventCollided.EmitEvent(args);
     }
 
-    public void OnCollidedWithMapEdge(CollideWithMapEdgeEventArgs args)
+    public void OnCollidedWithMapEdge(CollideWithMapEdgeEvent args)
     {
         // by default, keep in bounds
         if (LeftInPixels < 0)
@@ -103,14 +104,14 @@ public class BodyBehavior
             BottomInPixels = args.MapDimensions.HeightInPixels;
         }
         
-        CollideWithMapEdge?.Invoke(this, args);
+        EventCollideWithMapEdge.EmitEvent(args);
     }
 
-    public void OnCollidedWithTile(CollideWithTileEventArgs args)
+    public void OnCollidedWithTile(CollideWithTileEvent args)
     {
         // default to shoving out
         args.Tile.ShoveOut(this);
         
-        CollideWithTile?.Invoke(this, args);
+        EventCollideWithTile.EmitEvent(args);
     }
 }
