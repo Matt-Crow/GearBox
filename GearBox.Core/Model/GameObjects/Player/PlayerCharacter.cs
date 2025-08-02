@@ -6,6 +6,7 @@ using System.Text.Json;
 using GearBox.Core.Model.Items.Shops;
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Json.AreaUpdate.GameObjects;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.GameObjects.Player;
 
@@ -22,7 +23,7 @@ public class PlayerCharacter : Character
         UpdateStats();
     }
 
-    public event EventHandler<AreaChangedEventArgs>? AreaChanged;
+    public EventEmitter<AreaChangedEvent> EventAreaChanged { get; } = new();
 
     protected override string Type => "playerCharacter";
     public int Xp { get; private set; } // experience points
@@ -45,7 +46,7 @@ public class PlayerCharacter : Character
     public override void SetArea(IArea? newArea)
     {
         SetOpenShop(null);
-        AreaChanged?.Invoke(this, new AreaChangedEventArgs(this, CurrentArea, newArea));
+        EventAreaChanged.EmitEvent(new AreaChangedEvent(this, CurrentArea, newArea));
         base.SetArea(newArea);
     }
 
