@@ -1,3 +1,5 @@
+using GearBox.Core.Utils;
+
 namespace GearBox.Core.Model.GameObjects;
 
 public class TerminateBehavior
@@ -12,11 +14,10 @@ public class TerminateBehavior
     }
 
     public bool IsTerminated => _isTerminated.Invoke();
-
-    public event EventHandler<TerminateEventArgs>? Terminated;
+    public EventEmitter<TerminateEvent> EventTerminated { get; } = new();
 
     public void OnTerminated()
     {
-        Terminated?.Invoke(this, new(_obj));
+        EventTerminated.EmitEvent(new TerminateEvent(_obj));
     }
 }

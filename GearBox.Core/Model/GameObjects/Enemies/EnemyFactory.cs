@@ -90,8 +90,8 @@ public class EnemyFactory : IEnemyFactory
         {
             return;
         }
-        
-        enemy.Termination.Terminated += (sender, e) => _childCount--;
+
+        enemy.Termination.EventTerminated.AddListener(_ => _childCount--);
         
         _childCount++;
     }

@@ -65,7 +65,7 @@ public class Area : IArea
         player.Team = _playerTeam;
         _characters.AddGameObject(player);
         _players.Add(player);
-        player.Termination.Terminated += (sender, args) => RemovePlayer(player);
+        player.Termination.EventTerminated.AddListener(_ => RemovePlayer(player));
     }
 
     public EnemyCharacter? SpawnEnemy()
