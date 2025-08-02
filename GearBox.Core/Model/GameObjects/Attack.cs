@@ -25,7 +25,7 @@ public class Attack
         if (CanResolveAgainst(target))
         {
             _collidedWith.Add(target);
-            var attackEvent = new AttackedEventArgs(this, target);
+            var attackEvent = new AttackedEvent(this, target);
             target.HandleAttacked(attackEvent);
         }
     }

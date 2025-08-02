@@ -1,9 +1,9 @@
 using System.Text.Json;
 using GearBox.Core.Model.Abilities.Actives.Impl;
 using GearBox.Core.Model.Areas;
-using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Json.AreaUpdate.GameObjects;
 using GearBox.Core.Model.Units;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.GameObjects;
 
@@ -52,9 +52,8 @@ public abstract class Character : IGameObject
     public IArea? CurrentArea { get; private set; }
     public IArea? LastArea { get; private set; }
     public Team Team { get; set; } = new(); // default to each on their own team
-
-    public event EventHandler<AttackedEventArgs>? Attacked;
-    public event EventHandler<KilledEventArgs>? Killed;
+    public EventEmitter<AttackedEvent> EventAttacked { get; } = new();
+    public EventEmitter<KilledEvent> EventKilled { get; } = new();
 
     public void SetLevel(int level)
     {
@@ -126,7 +125,7 @@ public abstract class Character : IGameObject
         }
     }
 
-    public void HandleAttacked(AttackedEventArgs attackEvent)
+    public void HandleAttacked(AttackedEvent attackEvent)
     {
         if (Termination.IsTerminated)
         {
@@ -135,12 +134,12 @@ public abstract class Character : IGameObject
         }
 
         TakeDamage(attackEvent.AttackUsed.Damage);
-        Attacked?.Invoke(this, attackEvent);
+        EventAttacked.EmitEvent(attackEvent);
 
         if (Termination.IsTerminated)
         {
-            var killedEvent = new KilledEventArgs(attackEvent);
-            Killed?.Invoke(this, killedEvent);
+            var killedEvent = new KilledEvent(attackEvent);
+            EventKilled.EmitEvent(killedEvent);
         }
     }
 

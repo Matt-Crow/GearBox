@@ -1,8 +1,8 @@
 namespace GearBox.Core.Model.GameObjects;
 
-public class AttackedEventArgs : EventArgs
+public class AttackedEvent
 {
-    public AttackedEventArgs(Attack attackUsed, Character whoWasAttacked)
+    public AttackedEvent(Attack attackUsed, Character whoWasAttacked)
     {
         AttackUsed = attackUsed;
         WhoWasAttacked = whoWasAttacked;

@@ -45,12 +45,12 @@ public class EnemyFactory : IEnemyFactory
             result.AiBehavior = new WanderAiBehavior(result, _rng);
         }
 
-        result.Killed += (sender, e) => HandleKilled(result, e);
+        result.EventKilled.AddListener(e => HandleKilled(result, e));
 
         return result;
     }
 
-    private void HandleKilled(EnemyCharacter enemy, KilledEventArgs e)
+    private void HandleKilled(EnemyCharacter enemy, KilledEvent e)
     {
         if (e.AttackEvent.AttackUsed.UsedBy is not PlayerCharacter player)
         {
