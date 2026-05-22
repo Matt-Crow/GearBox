@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Crafting;
@@ -12,6 +13,11 @@ public interface IGameBuilder
     /// A reference to the actives available in the game this is building.
     /// </summary>
     IActiveAbilityFactory Actives { get; }
+
+    /// <summary>
+    /// A reference to the passives available in the game this is building.
+    /// </summary>
+    IPassiveAbilityFactory Passives { get; }
 
     /// <summary>
     /// A reference to the items available in the game this is building.

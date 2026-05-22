@@ -8,5 +8,6 @@ public class UiStateChangesJson
     public MaybeChangeJson<ItemJson?> Armor { get; set; }
     public MaybeChangeJson<PlayerStatSummaryJson> Summary { get; set; }
     public MaybeChangeJson<List<ActiveAbilityJson>> Actives { get; set; }
+    public MaybeChangeJson<List<PassiveAbilityJson>> Passives { get; set; }
     public MaybeChangeJson<OpenShopJson?> OpenShop { get; set; }
 }

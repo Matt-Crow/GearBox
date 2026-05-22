@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
 
@@ -27,6 +28,14 @@ public static class ItemJsonUtils
     {
         var result = activeNames
             .Select(name => factory.Make(name) ?? throw new ArgumentException($"Invalid active name: \"{name}\""))
+            .ToList();
+        return result;
+    }
+
+    public static IEnumerable<IPassiveAbility> GetPassives(IPassiveAbilityFactory factory, List<string> passiveNames)
+    {
+        var result = passiveNames
+            .Select(name => factory.Make(name) ?? throw new ArgumentException($"Invalid passive name: \"{name}\""))
             .ToList();
         return result;
     }

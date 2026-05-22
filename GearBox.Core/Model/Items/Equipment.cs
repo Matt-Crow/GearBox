@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Json;
@@ -20,6 +21,7 @@ where T : IEquipmentStats
         Grade? grade = null,
         Dictionary<PlayerStatType, int>? statWeights = null,
         IEnumerable<IActiveAbility>? actives = null,
+        IEnumerable<IPassiveAbility>? passives = null,
         int? level = null
     )
     {
@@ -31,6 +33,7 @@ where T : IEquipmentStats
         _statWeights = statWeights ?? [];
         StatBoosts = new PlayerStatBoosts(_statWeights, Inner.GetStatPoints(Level, Grade));
         Actives = actives ?? [];
+        Passives = passives ?? [];
     }
     
     public Guid? Id { get; init; } = Guid.NewGuid();
@@ -61,13 +64,19 @@ where T : IEquipmentStats
     public IEnumerable<IActiveAbility> Actives { get; init; }
 
     /// <summary>
+    /// The passive abilities this provides when equipped
+    /// </summary>
+    public IEnumerable<IPassiveAbility> Passives { get; init; }
+
+    /// <summary>
     /// Returns this if it is immutable, or a clone otherwise
     /// </summary>
     public Equipment<T> ToOwned(int? level=null)
     {
         var newLevel = level ?? Level;
         var newActives = Actives.Select(a => a.Copy()).ToList();
-        var result = new Equipment<T>(Name, Inner, Grade, _statWeights, newActives, newLevel);
+        var newPassives = Passives.Select(p => p.Copy()).ToList();
+        var result = new Equipment<T>(Name, Inner, Grade, _statWeights, newActives, newPassives, newLevel);
         return result;
     }
 
@@ -95,6 +104,9 @@ where T : IEquipmentStats
             quantity,
             Actives
                 .Select(a => new ActiveAbilityJson(a))
+                .ToList(),
+            Passives
+                .Select(p => new PassiveAbilityJson(p))
                 .ToList()
         );
         return result;

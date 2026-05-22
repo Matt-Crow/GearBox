@@ -7,6 +7,7 @@ using GearBox.Core.Model.Items.Shops;
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Json.AreaUpdate.GameObjects;
 using GearBox.Core.Utils;
+using GearBox.Core.Model.Abilities.Passives;
 
 namespace GearBox.Core.Model.GameObjects.Player;
 
@@ -14,6 +15,8 @@ public class PlayerCharacter : Character
 {
     private int _frameCount = 0; // used for regeneration
     private readonly List<IActiveAbility> _actives = [];
+    private readonly List<IPassiveAbility> _passives = [];
+
 
     public PlayerCharacter(string name, int xp = 0, Guid? id = null) : base(name, GetLevelByXp(xp), Color.BLUE, id)
     {
@@ -34,6 +37,7 @@ public class PlayerCharacter : Character
     public PlayerStats Stats { get; init; } = new();
     public PlayerStatSummary StatSummary { get; init; }
     public IEnumerable<IActiveAbility> Actives => _actives;
+    public IEnumerable<IPassiveAbility> Passives => _passives;
     public Inventory Inventory { get; init; } = new();
     public Equipment<WeaponStats>? Weapon { get; private set; } = null;
     public Equipment<ArmorStats>? Armor { get; private set; } = null;
@@ -79,18 +83,31 @@ public class PlayerCharacter : Character
         var multiplier = 1.0+Stats.Speed.Value;
         SetSpeed(Speed.FromPixelsPerFrame(BASE_SPEED.InPixelsPerFrame * multiplier));
         
+        // unregister old passives
+        foreach (var passive in _passives)
+        {
+            passive.SetUser(null);
+        }
+
         _actives.Clear();
+        _passives.Clear();
         if (Weapon != null)
         {
             _actives.AddRange(Weapon.Actives);
+            _passives.AddRange(Weapon.Passives);
         }
         if (Armor != null)
         {
             _actives.AddRange(Armor.Actives);
+            _passives.AddRange(Armor.Passives);
         }
         foreach (var active in _actives)
         {
             active.User = this;
+        }
+        foreach (var passive in _passives)
+        {
+            passive.SetUser(this);
         }
 
         base.UpdateStats();
@@ -175,6 +192,11 @@ public class PlayerCharacter : Character
         foreach (var active in _actives)
         {
             active.Update();
+        }
+
+        foreach (var passive in _passives)
+        {
+            passive.Update();
         }
     }
 
