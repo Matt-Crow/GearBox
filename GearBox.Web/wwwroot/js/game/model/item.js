@@ -1,4 +1,5 @@
 import { ActiveAbility } from "./activeAbility.js";
+import { PassiveAbility } from "./passiveAbility.js";
 
 export class Inventory {
     #weapons;
@@ -44,6 +45,7 @@ export class Item {
     #details;
     #quantity;
     #actives;
+    #passives;
 
     /**
      * @param {string?} id
@@ -55,8 +57,9 @@ export class Item {
      * @param {string[]} details 
      * @param {number} quantity 
      * @param {ActiveAbility[]} actives 
+     * @param {PassiveAbility[]} passives
      */
-    constructor(id, name, gradeName, gradeOrder, description, level, details, quantity, actives) {
+    constructor(id, name, gradeName, gradeOrder, description, level, details, quantity, actives, passives) {
         this.#id = id;
         this.#name = name;
         this.#gradeName = gradeName;
@@ -66,6 +69,7 @@ export class Item {
         this.#details = details;
         this.#quantity = quantity;
         this.#actives = actives;
+        this.#passives = passives;
     }
 
     get id() { return this.#id; }
@@ -77,6 +81,7 @@ export class Item {
     get details() { return this.#details; }
     get quantity() { return this.#quantity; }
     get actives() { return this.#actives; }
+    get passives() { return this.#passives; }
 
     /**
      * @param {object} json 
@@ -96,7 +101,8 @@ export class Item {
             json.level,
             json.details.slice(),
             json.quantity,
-            json.actives.map(ActiveAbility.fromJson)
+            json.actives.map(ActiveAbility.fromJson),
+            json.passives.map(PassiveAbility.fromJson)
         );
         return result;
     }

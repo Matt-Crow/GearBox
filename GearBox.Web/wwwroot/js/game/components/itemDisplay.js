@@ -1,5 +1,6 @@
 import { ActiveAbility } from "../model/activeAbility.js";
 import { Item } from "../model/item.js";
+import { PassiveAbility } from "../model/passiveAbility.js";
 
 export class ItemDisplay {
     #selector;
@@ -32,6 +33,11 @@ export class ItemDisplay {
                     .append($("<hr>"))
                     .append($("<b>").append($("<u>").text("Active Abilities")))
                     .append($("<div>").addClass("itemActiveList"))
+                )
+                .append($("<div>").addClass("itemPassives")
+                    .append($("<hr>"))
+                    .append($("<b>").append($("<u>").text("Passive Abilities")))
+                    .append($("<div>").addClass("itemPassiveList"))
                 )
             )
             .append($("<div>").addClass("itemNo")
@@ -78,6 +84,17 @@ export class ItemDisplay {
                 .empty()
                 .append(abilities);
         }
+
+        if (item.passives.length === 0) {
+            $this.find(".itemPassives").hide();
+        } else {
+            $this.find(".itemPassives").show();
+            const abilities = item.passives.map(pas => this.#makePassiveDisplay(pas));
+            $this
+                .find(".itemPassiveList")
+                .empty()
+                .append(abilities);
+        }
     }
 
     /**
@@ -89,6 +106,17 @@ export class ItemDisplay {
             .append($("<b>").text(active.name))
             .append($("<span>").text(`(${active.energyCost} energy)`))
             .append($("<p>").addClass("text-wrap").css("width", "20rem").text(active.description));
+        return $result;
+    }
+
+    /**
+     * @param {PassiveAbility} passive 
+     * @returns a JQuery object
+     */
+    #makePassiveDisplay(passive) {
+        const $result = $("<div>")
+            .append($("<b>").text(passive.name))
+            .append($("<p>").addClass("text-wrap").css("width", "20rem").text(passive.description));
         return $result;
     }
 
