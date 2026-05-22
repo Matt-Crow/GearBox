@@ -73,4 +73,18 @@ public class EventEmitterTester
 
         Assert.Equal(1, count);
     }
+
+    [Fact]
+    public void RemoveListener_RemovesBeforeEmittingNextEvent()
+    {
+        var triggered = false;
+        Action<int> listener = _ => triggered = true;
+        var sut = new EventEmitter<int>();
+        sut.AddListener(listener);
+
+        sut.RemoveListener(listener);
+        sut.EmitEvent(42);
+
+        Assert.False(triggered);
+    }
 }

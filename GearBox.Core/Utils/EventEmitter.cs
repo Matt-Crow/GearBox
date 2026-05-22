@@ -20,6 +20,14 @@ public class EventEmitter<T>
     }
 
     /// <summary>
+    /// The modifier is no longer invoked when this emits an event.
+    /// </summary>
+    public void RemoveModifier(Func<T, T> modifier)
+    {
+        _modifiers.Remove(modifier);
+    }
+
+    /// <summary>
     /// If the canceler returns true, cancels the event.
     /// </summary>
     public void AddCanceler(Func<T, bool> canceler, int? times = null)
@@ -28,11 +36,27 @@ public class EventEmitter<T>
     }
 
     /// <summary>
+    /// The canceler is no longer invoked when this emits an event.
+    /// </summary>
+    public void RemoveCanceler(Func<T, bool> canceler)
+    {
+        _cancelers.Remove(canceler);
+    }
+
+    /// <summary>
     /// The listener is invoked when this emits an event.
     /// </summary>
     public void AddListener(Action<T> listener, int? times = null)
     {
         _listeners.Add(listener, times);
+    }
+
+    /// <summary>
+    /// The listener is no longer invoked when this emits an event.
+    /// </summary>
+    public void RemoveListener(Action<T> listener)
+    {
+        _listeners.Remove(listener);
     }
 
     /// <summary>
@@ -67,6 +91,11 @@ public class EventEmitter<T>
         public void Add(U value, int? times = null)
         {
             _inner.Add(new RunsUpToXTimes<U>(value, times));
+        }
+
+        public void Remove(U value)
+        {
+            _inner.RemoveAll(wrapper => wrapper.Inner != null && wrapper.Inner.Equals(value));
         }
 
         public void Iterate(Action<U> visitor)
