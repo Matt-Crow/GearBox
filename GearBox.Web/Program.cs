@@ -44,6 +44,7 @@ gameBuilder.Passives
     .Add(Armored.Heavily())
     .Add(new Intangible())
     .Add(new Levitate())
+    .Add(new Spikey())
     ;
 
 // configure items before crafting recipes and enemies
@@ -91,6 +92,7 @@ gameBuilder
         .AddLoot(loot => loot
             .AddItem("Stone")
             .AddItem("Bronze")
+            .AddItem("Cactus Armor")
             .Add(Grade.COMMON, new Gold(5))
             .Add(Grade.UNCOMMON, new Gold(10))
         )
