@@ -6,6 +6,7 @@ import { ActiveAbility } from "./activeAbility.js";
 import { MaybeChange, UiStateChanges } from "./areaUpdate.js";
 import { InventoryDeserializer, Item } from "./item.js";
 import { TileMap } from "./map.js";
+import { PassiveAbility } from "./passiveAbility.js";
 import { Player, PlayerStatSummary } from "./player.js";
 import { OpenShopDeserializer, Shop } from "./shop.js";
 
@@ -104,6 +105,7 @@ export class AreaUpdateHandler {
             MaybeChange.fromJson(json.uiStateChanges.armor, Item.fromJson),
             MaybeChange.fromJson(json.uiStateChanges.summary, PlayerStatSummary.fromJson),
             MaybeChange.fromJson(json.uiStateChanges.actives, actives => actives.map(ActiveAbility.fromJson)),
+            MaybeChange.fromJson(json.uiStateChanges.passives, passives => passives.map(PassiveAbility.fromJson)),
             MaybeChange.fromJson(json.uiStateChanges.openShop, v => this.#openShopDeserializer.deserialize(v))
         );
         this.#views.handleUiStateChanges(uiStateChanges);
