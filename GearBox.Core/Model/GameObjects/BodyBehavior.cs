@@ -109,9 +109,11 @@ public class BodyBehavior
 
     public void OnCollidedWithTile(CollideWithTileEvent args)
     {
-        // default to shoving out
-        args.Tile.ShoveOut(this);
-        
-        EventCollideWithTile.EmitEvent(args);
+        var result = EventCollideWithTile.EmitEvent(args);
+        if (!result.IsCanceled)
+        {
+            // default to shoving out
+            args.Tile.ShoveOut(this);
+        }
     }
 }

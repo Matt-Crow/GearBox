@@ -42,6 +42,8 @@ gameBuilder.Passives
     .Add(Armored.Lightly())
     .Add(Armored.Moderately())
     .Add(Armored.Heavily())
+    .Add(new Intangible())
+    .Add(new Levitate())
     ;
 
 // configure items before crafting recipes and enemies
@@ -103,6 +105,8 @@ gameBuilder
     .WithArea("bazaar", 1, area => area
         .WithMap(bazaarMap)
         .AddShop("Starter Weapon Shop", Coordinates.FromTiles(2, 7), Color.BLUE, shop => shop
+            .AddItem("Spectral Armor")
+            .AddItem("Armor of Flight")
             .AddItem("Training Sword")
             .AddItem("Training Bow")
             .AddItem("Training Staff")

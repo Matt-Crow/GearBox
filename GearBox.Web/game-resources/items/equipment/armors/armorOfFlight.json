@@ -1,0 +1,10 @@
+{
+    "Name": "Armor of Flight",
+    "GradeName": "Rare",
+    "Stats": {
+        "Speed": 1
+    },
+    "PassiveNames": [
+        "Levitate"
+    ]
+}
