@@ -5,9 +5,9 @@ namespace GearBox.Core.Model.GameObjects;
 /// Termination is when any game object should be removed from the game.
 /// Killed is when a character takes too much damage and must be terminated.
 /// </summary>
-public class KilledEventArgs : EventArgs
+public class KilledEvent
 {
-    public KilledEventArgs(AttackedEventArgs attackEvent)
+    public KilledEvent(AttackedEvent attackEvent)
     {
         AttackEvent = attackEvent;
     }
@@ -15,5 +15,5 @@ public class KilledEventArgs : EventArgs
     /// <summary>
     /// The attack event which killed
     /// </summary>
-    public AttackedEventArgs AttackEvent { get; init; }
+    public AttackedEvent AttackEvent { get; init; }
 }

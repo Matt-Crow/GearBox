@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Utils;
+using GearBox.Core.Model.Abilities.Passives.Impl;
 
 /*
     Need to load some of the game resources in a specific order:
@@ -32,14 +33,22 @@ webAppBuilder.Configuration
 var rng = new RandomNumberGenerator();
 var gameBuilder = new GameBuilder(gearboxConfig, rng);
 
-// configure actives before items
+// configure actives and passives before items, as items can provide both
 gameBuilder.Actives
     .Add(new Cleave())
     .Add(new Firebolt())
     ;
+gameBuilder.Passives
+    .Add(Armored.Lightly())
+    .Add(Armored.Moderately())
+    .Add(Armored.Heavily())
+    .Add(new Intangible())
+    .Add(new Levitate())
+    .Add(new Spikey())
+    ;
 
 // configure items before crafting recipes and enemies
-var resourceLoader = new GameResourceLoader(gameBuilder.Actives, rng);
+var resourceLoader = new GameResourceLoader(gameBuilder.Actives, gameBuilder.Passives, rng);
 var itemResources = await resourceLoader.LoadAllItems();
 foreach (var item in itemResources)
 {
@@ -83,6 +92,7 @@ gameBuilder
         .AddLoot(loot => loot
             .AddItem("Stone")
             .AddItem("Bronze")
+            .AddItem("Cactus Armor")
             .Add(Grade.COMMON, new Gold(5))
             .Add(Grade.UNCOMMON, new Gold(10))
         )
@@ -97,6 +107,8 @@ gameBuilder
     .WithArea("bazaar", 1, area => area
         .WithMap(bazaarMap)
         .AddShop("Starter Weapon Shop", Coordinates.FromTiles(2, 7), Color.BLUE, shop => shop
+            .AddItem("Spectral Armor")
+            .AddItem("Armor of Flight")
             .AddItem("Training Sword")
             .AddItem("Training Bow")
             .AddItem("Training Staff")

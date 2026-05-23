@@ -5,9 +5,9 @@ namespace GearBox.Core.Model.Areas;
 /// <summary>
 /// Used when a player enters or leaves an area
 /// </summary>
-public class AreaChangedEventArgs
+public class AreaChangedEvent
 {
-    public AreaChangedEventArgs(PlayerCharacter whoChangedAreas, IArea? oldArea, IArea? newArea)
+    public AreaChangedEvent(PlayerCharacter whoChangedAreas, IArea? oldArea, IArea? newArea)
     {
         WhoChangedAreas = whoChangedAreas;
         OldArea = oldArea;

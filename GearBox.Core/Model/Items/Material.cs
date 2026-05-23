@@ -47,7 +47,8 @@ public class Material : IItem
             0, // no level
             [], // no details
             quantity,
-            [] // no actives
+            [], // no actives
+            [] // no passives
         );
         return result;
     }

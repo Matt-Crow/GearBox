@@ -1,5 +1,6 @@
 using System.Text.Json;
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Utils;
@@ -13,11 +14,13 @@ namespace GearBox.Web.Infrastructure;
 public class GameResourceLoader
 {
     private readonly IActiveAbilityFactory _actives;
+    private readonly IPassiveAbilityFactory _passives;
     private readonly IRandomNumberGenerator _rng;
 
-    public GameResourceLoader(IActiveAbilityFactory actives, IRandomNumberGenerator rng)
+    public GameResourceLoader(IActiveAbilityFactory actives, IPassiveAbilityFactory passives, IRandomNumberGenerator rng)
     {
         _actives = actives;
+        _passives = passives;
         _rng = rng;
     }
 
@@ -72,7 +75,7 @@ public class GameResourceLoader
     {
         var text = await File.ReadAllTextAsync(filePath);
         var json = JsonSerializer.Deserialize<T>(text) ?? throw new Exception($"Failed to deserialize {filePath}");
-        var item = json.ToItem(_actives);
+        var item = json.ToItem(_actives, _passives);
         return item;
     }
 

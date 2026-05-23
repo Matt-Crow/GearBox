@@ -65,7 +65,7 @@ public class Area : IArea
         player.Team = _playerTeam;
         _characters.AddGameObject(player);
         _players.Add(player);
-        player.Termination.Terminated += (sender, args) => RemovePlayer(player);
+        player.Termination.EventTerminated.AddListener(_ => RemovePlayer(player));
     }
 
     public EnemyCharacter? SpawnEnemy()
@@ -197,7 +197,7 @@ public class Area : IArea
             .Where(obj => obj.Body.CollidesWith(body));
         foreach (var character in collidingCharacters)
         {
-            body.OnCollided(new CollideEventArgs(character));
+            body.OnCollided(new CollideEvent(character));
         }
     }
 }

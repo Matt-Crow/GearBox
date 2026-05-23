@@ -18,14 +18,14 @@ public class Attack
         return target != UsedBy && !_collidedWith.Contains(target) && target.Team != UsedBy.Team;
     }
 
-    public void HandleCollision(object? sender, CollideEventArgs args)
+    public void HandleCollision(CollideEvent args)
     {
         var target = args.CollidedWith;
 
         if (CanResolveAgainst(target))
         {
             _collidedWith.Add(target);
-            var attackEvent = new AttackedEventArgs(this, target);
+            var attackEvent = new AttackedEvent(this, target);
             target.HandleAttacked(attackEvent);
         }
     }

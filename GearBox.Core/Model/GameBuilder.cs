@@ -1,5 +1,6 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Crafting;
@@ -23,6 +24,7 @@ public class GameBuilder : IGameBuilder
     }
 
     public IActiveAbilityFactory Actives { get; init; } = new ActiveAbilityFactory();
+    public IPassiveAbilityFactory Passives { get; init; } = new PassiveAbilityFactory();
     public IItemFactory Items { get; init; } = new ItemFactory();
     public IEnemyRepository Enemies { get; init; }
 

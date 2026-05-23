@@ -135,7 +135,7 @@ public class Map : ISerializable<MapJson>
 
         if (!body.IsWithin(Bounds))
         {
-            body.OnCollidedWithMapEdge(new CollideWithMapEdgeEventArgs(Bounds));
+            body.OnCollidedWithMapEdge(new CollideWithMapEdgeEvent(Bounds));
         }
 
         /*
@@ -159,7 +159,7 @@ public class Map : ISerializable<MapJson>
             var tile = iter.Current;
             if (body.CanCollideWith(tile.TileType.Height) && tile.IsCollidingWith(body))
             {
-                body.OnCollidedWithTile(new CollideWithTileEventArgs(tile));
+                body.OnCollidedWithTile(new CollideWithTileEvent(tile));
             }
         }
     }

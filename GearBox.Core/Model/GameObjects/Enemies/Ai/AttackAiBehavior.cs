@@ -1,4 +1,3 @@
-using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Utils;
@@ -16,13 +15,12 @@ public class AttackAiBehavior : IAiBehavior
         _controlling = controlling;
         _attacking = attacking;
         _rng = rng;
-        attacking.AreaChanged += HandleAreaChangedEvent;
-    }
 
-    private void HandleAreaChangedEvent(object? sender, AreaChangedEventArgs e)
-    {
-        _controlling.AiBehavior = new WanderAiBehavior(_controlling, _rng);
-        e.WhoChangedAreas.AreaChanged -= HandleAreaChangedEvent;
+        // wander around once the target gets away
+        attacking.EventAreaChanged.AddListener(
+            _ => _controlling.AiBehavior = new WanderAiBehavior(_controlling, _rng),
+            1 // only run once
+        );
     }
 
     public void Update()

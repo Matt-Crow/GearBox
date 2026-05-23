@@ -1,5 +1,6 @@
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Units;
+using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.GameObjects;
 
@@ -55,9 +56,9 @@ public class BodyBehavior
         set => Location = Coordinates.FromPixels(Location.XInPixels, value - Radius.InPixels);
     }
 
-    public event EventHandler<CollideEventArgs>? Collided;
-    public event EventHandler<CollideWithMapEdgeEventArgs>? CollideWithMapEdge;
-    public event EventHandler<CollideWithTileEventArgs>? CollideWithTile;
+    public EventEmitter<CollideEvent> EventCollided { get; } = new();
+    public EventEmitter<CollideWithMapEdgeEvent> EventCollideWithMapEdge { get; } = new();
+    public EventEmitter<CollideWithTileEvent> EventCollideWithTile { get; } = new();
 
     public bool CollidesWith(BodyBehavior other)
     {
@@ -78,39 +79,40 @@ public class BodyBehavior
         return withinX && withinY;
     }
 
-    public void OnCollided(CollideEventArgs args)
+    public void OnCollided(CollideEvent args)
     {
-        Collided?.Invoke(this, args);
+        EventCollided.ProcessEvent(args, _ => {});
     }
 
-    public void OnCollidedWithMapEdge(CollideWithMapEdgeEventArgs args)
+    public void OnCollidedWithMapEdge(CollideWithMapEdgeEvent args)
     {
-        // by default, keep in bounds
-        if (LeftInPixels < 0)
+        EventCollideWithMapEdge.ProcessEvent(args, _ =>
         {
-            LeftInPixels = 0;
-        }
-        else if (RightInPixels >= args.MapDimensions.WidthInPixels)
-        {
-            RightInPixels = args.MapDimensions.WidthInPixels;
-        }
-        if (TopInPixels < 0)
-        {
-            TopInPixels = 0;
-        }
-        else if (BottomInPixels >= args.MapDimensions.HeightInPixels)
-        {
-            BottomInPixels = args.MapDimensions.HeightInPixels;
-        }
-        
-        CollideWithMapEdge?.Invoke(this, args);
+            // by default, keep in bounds
+            if (LeftInPixels < 0)
+            {
+                LeftInPixels = 0;
+            }
+            else if (RightInPixels >= args.MapDimensions.WidthInPixels)
+            {
+                RightInPixels = args.MapDimensions.WidthInPixels;
+            }
+            if (TopInPixels < 0)
+            {
+                TopInPixels = 0;
+            }
+            else if (BottomInPixels >= args.MapDimensions.HeightInPixels)
+            {
+                BottomInPixels = args.MapDimensions.HeightInPixels;
+            } 
+        });
     }
 
-    public void OnCollidedWithTile(CollideWithTileEventArgs args)
+    public void OnCollidedWithTile(CollideWithTileEvent args)
     {
-        // default to shoving out
-        args.Tile.ShoveOut(this);
-        
-        CollideWithTile?.Invoke(this, args);
+        EventCollideWithTile.ProcessEvent(args, e =>
+        {
+            e.Tile.ShoveOut(this);
+        });
     }
 }

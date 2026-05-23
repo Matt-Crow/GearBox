@@ -22,9 +22,9 @@ public class Projectile : IGameObject
         {
             Location = coordinates
         };
-        Body.Collided += HandleCollision;
-        Body.CollideWithMapEdge += (_, _) => _terminating = true;
-        Body.CollideWithTile += (_, _) => _terminating = true;
+        Body.EventCollided.AddListener(HandleCollision);
+        Body.EventCollideWithMapEdge.AddListener(_ => _terminating = true);
+        Body.EventCollideWithTile.AddListener(_ => _terminating = true);
         _attack = attack;
         _mobility = new(Body, velocity);
         _mobility.StartMovingIn(velocity.Angle); // MobileBehavior defaults to not moving
@@ -40,11 +40,11 @@ public class Projectile : IGameObject
     private Color Color { get; init; }
     
 
-    private void HandleCollision(object? sender, CollideEventArgs e)
+    private void HandleCollision(CollideEvent e)
     {
         if (!_terminating && _attack.CanResolveAgainst(e.CollidedWith))
         {
-            _attack.HandleCollision(sender, e);
+            _attack.HandleCollision(e);
             _terminating = true;
         }
     }

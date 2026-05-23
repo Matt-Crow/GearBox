@@ -1,0 +1,11 @@
+{
+    "Name": "Spectral Armor",
+    "GradeName": "Rare",
+    "Stats": {
+        "Energy": 1,
+        "Speed": 4
+    },
+    "PassiveNames": [
+        "Intangible"
+    ]
+}

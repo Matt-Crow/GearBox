@@ -6,6 +6,7 @@ import { Client } from "../infrastructure/client.js";
 import { UiStateChanges } from "../model/areaUpdate.js";
 import { CraftingRecipe } from "../model/crafting.js";
 import { Inventory } from "../model/item.js";
+import { PassiveAbility } from "../model/passiveAbility.js";
 import { PlayerStatSummary } from "../model/player.js";
 import { OpenShop } from "../model/shop.js";
 import { EquipmentTab } from "./equipmentTab.js";
@@ -111,6 +112,7 @@ export class MainModal {
         uiStateChanges.weapon.handleChange(w => this.#weaponTab.setCurrent(w));
         uiStateChanges.armor.handleChange(a => this.#armorTab.setCurrent(a));
         uiStateChanges.summary.handleChange(s => this.setStatSummary(s));
+        uiStateChanges.passives.handleChange(p => this.setPassives(p));
         uiStateChanges.openShop.handleChange(os => this.#setShop(os));
     }
 
@@ -122,6 +124,19 @@ export class MainModal {
             .find(".stats-list")
             .empty();
         statSummary.lines.forEach(line => $statsList.append($("<li>").text(line)));
+    }
+
+    /**
+     * @param {PassiveAbility[]} passives 
+     */
+    setPassives(passives) {
+        const $passiveList = $(this.#element)
+            .find(".passive-list")
+            .empty();
+        passives.forEach(passive => $passiveList.append($("<li>")
+            .append($("<b>").text(passive.name + ": "))
+            .append(passive.description)
+        ));
     }
 
     /**

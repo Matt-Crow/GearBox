@@ -4,6 +4,7 @@
 
 import { ActiveAbility } from "./activeAbility.js";
 import { Inventory, Item } from "./item.js";
+import { PassiveAbility } from "./passiveAbility.js";
 import { PlayerStatSummary } from "./player.js";
 import { OpenShop } from "./shop.js";
 
@@ -31,6 +32,7 @@ export class UiStateChanges {
     #armor;
     #summary;
     #actives;
+    #passives;
     #openShop;
 
     /**
@@ -41,6 +43,7 @@ export class UiStateChanges {
      * @param {MaybeChange<Item?>} armor 
      * @param {MaybeChange<PlayerStatSummary>} summary 
      * @param {MaybeChange<ActiveAbility[]} actives 
+     * @param {MaybeChange<PassiveAbility[]} passives
      * @param {MaybeChange<OpenShop?>} openShop 
      */
     constructor(
@@ -50,6 +53,7 @@ export class UiStateChanges {
         armor,
         summary,
         actives,
+        passives,
         openShop
     ) {
         this.#area = area;
@@ -58,6 +62,7 @@ export class UiStateChanges {
         this.#armor = armor;
         this.#summary = summary;
         this.#actives = actives;
+        this.#passives = passives;
         this.#openShop = openShop;
     }
 
@@ -66,6 +71,7 @@ export class UiStateChanges {
     get armor() { return this.#armor; }
     get summary() { return this.#summary; }
     get actives() { return this.#actives; }
+    get passives() { return this.#passives; }
     get openShop() { return this.#openShop; }
 }
 

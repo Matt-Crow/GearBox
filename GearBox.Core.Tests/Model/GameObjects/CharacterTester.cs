@@ -10,7 +10,7 @@ public class CharacterTester
     {
         var timesCalled = 0;
         var sut = new ExampleCharacter();
-        sut.Killed += (sender, args) => timesCalled++;
+        sut.EventKilled.AddListener(_ => timesCalled++);
 
         sut.HandleAttacked(new(new Attack(new ExampleCharacter(), 9999), sut));
         sut.HandleAttacked(new(new Attack(new ExampleCharacter(), 9999), sut));

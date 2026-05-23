@@ -18,6 +18,9 @@ public readonly struct UiState
         Actives = player.Actives
             .Select(x => new ActiveAbilityJson(x))
             .ToList();
+        Passives = player.Passives
+            .Select(x => new PassiveAbilityJson(x))
+            .ToList();
         OpenShop = player.OpenShop?.GetOpenShopJsonFor(player);
     }
 
@@ -27,6 +30,7 @@ public readonly struct UiState
     public ItemJson? Armor { get; init; }
     public PlayerStatSummaryJson Summary { get; init; }
     public List<ActiveAbilityJson> Actives { get; init; }
+    public List<PassiveAbilityJson> Passives { get; init; }
     public OpenShopJson? OpenShop { get; init; }
 
     /// <summary>
@@ -42,6 +46,7 @@ public readonly struct UiState
             Armor = CompareNullable(oldState?.Armor, newState.Armor),
             Summary = Compare(oldState?.Summary, newState.Summary),
             Actives = CompareList(oldState?.Actives, newState.Actives),
+            Passives = CompareList(oldState?.Passives, newState.Passives),
             OpenShop = CompareNullable(oldState?.OpenShop, newState.OpenShop)
         };
         return result;

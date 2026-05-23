@@ -16,7 +16,8 @@ public readonly struct ItemJson : IChange, IJson
         int level,
         IEnumerable<string> details,
         int quantity,
-        List<ActiveAbilityJson> actives
+        List<ActiveAbilityJson> actives,
+        List<PassiveAbilityJson> passives
     )
     {
         Id = id;
@@ -28,6 +29,7 @@ public readonly struct ItemJson : IChange, IJson
         Details = details;
         Quantity = quantity;
         Actives = actives;
+        Passives = passives;
     }
 
     public Guid? Id { get; init; }
@@ -44,6 +46,7 @@ public readonly struct ItemJson : IChange, IJson
     public int Quantity { get; init; }
 
     public List<ActiveAbilityJson> Actives { get; init; }
+    public List<PassiveAbilityJson> Passives { get; init; }
 
-    public IEnumerable<object?> DynamicValues => [Id, Name, Description, Level, .. Details, Quantity, .. Actives.SelectMany(a => a.DynamicValues)];
+    public IEnumerable<object?> DynamicValues => [Id, Name, Description, Level, .. Details, Quantity, .. Actives.SelectMany(a => a.DynamicValues), .. Passives.SelectMany(p => p.DynamicValues)];
 }

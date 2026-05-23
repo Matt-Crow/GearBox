@@ -1,0 +1,11 @@
+{
+    "Name": "Cactus Armor",
+    "GradeName": "Uncommon",
+    "Stats": {
+        "HP": 4,
+        "Offense": 1
+    },
+    "PassiveNames": [
+        "Spikey"
+    ]
+}
