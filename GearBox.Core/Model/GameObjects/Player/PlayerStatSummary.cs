@@ -28,10 +28,6 @@ public class PlayerStatSummary
         new(
             p => $"Speed: {p.Stats.Speed.Points} (+{Percent(p.Stats.Speed.Value)} movement speed)",
             p => [p.Stats.Speed.Points]
-        ),
-        new(
-            p => $"Armor class: {p.ArmorClass} (-{Percent(p.ArmorClass.DamageReduction)} damage taken)",
-            p => [p.ArmorClass]
         )
     ];
 

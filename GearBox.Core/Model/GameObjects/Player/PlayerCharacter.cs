@@ -1,5 +1,4 @@
 using GearBox.Core.Model.Areas;
-using GearBox.Core.Model.Json.AreaUpdate;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Units;
 using System.Text.Json;
@@ -142,7 +141,6 @@ public class PlayerCharacter : Character
 
         Armor = armor;
         Inventory.Armors.Remove(armor);
-        ArmorClass = armor.Inner.ArmorClass;
 
         UpdateStats();
     }

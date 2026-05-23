@@ -47,7 +47,6 @@ public abstract class Character : IGameObject
     protected virtual string Type => "character";
     public int Level { get; private set; }
     public double DamageModifier { get; protected set; } = 0.0;
-    public ArmorClass ArmorClass { get; protected set; } = ArmorClass.NONE;
     public BasicAttack BasicAttack { get; init; }
     public IArea? CurrentArea { get; private set; }
     public IArea? LastArea { get; private set; }
@@ -113,7 +112,6 @@ public abstract class Character : IGameObject
         var modifiedDamage = EventDamaged.EmitEvent(new DamagedEvent(this, damage));
         if (!modifiedDamage.IsCanceled && modifiedDamage.Value != null)
         {
-            //DamageTaken += ArmorClass.ReduceDamage(modifiedDamage.Value.Damage);
             DamageTaken += modifiedDamage.Value.Damage;
             if (DamageTaken > MaxHitPoints)
             {
