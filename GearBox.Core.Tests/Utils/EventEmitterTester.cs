@@ -14,9 +14,21 @@ public class EventEmitterTester
         sut.AddCanceler(e => e == 41);
         sut.AddListener(_ => listenerWasInvoked = true);
 
-        sut.EmitEvent(42);
+        sut.ProcessEvent(42, _ => {});
 
         Assert.False(listenerWasInvoked);
+    }
+
+    [Fact]
+    public void Action_GivenCanceled_DoesNotRun()
+    {
+        var actionWasInvoked = false;
+        var sut = new EventEmitter<int>();
+        sut.AddCanceler(_ => true);
+
+        sut.ProcessEvent(42, _ => actionWasInvoked = true);
+
+        Assert.False(actionWasInvoked);
     }
 
     [Fact]
@@ -27,9 +39,35 @@ public class EventEmitterTester
         sut.AddListener(_ => listenerWasInvoked = true);
         sut.AddCanceler(_ => true);
 
-        sut.EmitEvent(42);
+        sut.ProcessEvent(42, _ => {});
 
         Assert.False(listenerWasInvoked);
+    }
+
+    [Fact]
+    public void Listeners_RunAfterAction()
+    {
+        var result = new List<string>();
+        var sut = new EventEmitter<int>();
+        sut.AddListener(_ => result.Add("Listener"));
+
+        sut.ProcessEvent(42, _ => result.Add("Action"));
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("Action", result[0]);
+        Assert.Equal("Listener", result[1]);
+    }
+
+    [Fact]
+    public void Action_ReceivesModifiedEvent()
+    {
+        var actual = 0;
+        var sut = new EventEmitter<int>();
+        sut.AddModifier(i => i * 2);
+
+        sut.ProcessEvent(4, e => actual = e);
+
+        Assert.Equal(8, actual);
     }
 
     [Fact]
@@ -39,8 +77,8 @@ public class EventEmitterTester
         var sut = new EventEmitter<int>();
         sut.AddListener(_ => count++);
 
-        sut.EmitEvent(42);
-        sut.EmitEvent(42);
+        sut.ProcessEvent(42, _ => {});
+        sut.ProcessEvent(42, _ => {});
 
         Assert.Equal(2, count);
     }
@@ -52,9 +90,9 @@ public class EventEmitterTester
         var sut = new EventEmitter<int>();
         sut.AddListener(_ => count++, 2);
 
-        sut.EmitEvent(42);
-        sut.EmitEvent(42);
-        sut.EmitEvent(42);
+        sut.ProcessEvent(42, _ => {});
+        sut.ProcessEvent(42, _ => {});
+        sut.ProcessEvent(42, _ => {});
 
         Assert.Equal(2, count);
     }
@@ -67,9 +105,9 @@ public class EventEmitterTester
         sut.AddListener(_ => count++);
         sut.AddCanceler(_ => true, 2);
 
-        sut.EmitEvent(42);
-        sut.EmitEvent(42);
-        sut.EmitEvent(42);
+        sut.ProcessEvent(42, _ => {});
+        sut.ProcessEvent(42, _ => {});
+        sut.ProcessEvent(42, _ => {});
 
         Assert.Equal(1, count);
     }
@@ -83,7 +121,7 @@ public class EventEmitterTester
         sut.AddListener(listener);
 
         sut.RemoveListener(listener);
-        sut.EmitEvent(42);
+        sut.ProcessEvent(42, _ => {});
 
         Assert.False(triggered);
     }

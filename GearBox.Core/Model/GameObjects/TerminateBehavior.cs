@@ -18,6 +18,6 @@ public class TerminateBehavior
 
     public void OnTerminated()
     {
-        EventTerminated.EmitEvent(new TerminateEvent(_obj));
+        EventTerminated.ProcessEvent(new TerminateEvent(_obj), _ => {});
     }
 }

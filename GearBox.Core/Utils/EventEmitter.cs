@@ -60,9 +60,12 @@ public class EventEmitter<T>
     }
 
     /// <summary>
-    /// Notifies listeners that the given event occurred.
+    /// Applies event modifiers, 
+    /// checks whether the event should be canceled,
+    /// invokes the given action if it shouldn't,
+    /// then notifies listerners of the event.
     /// </summary>
-    public EventResult<T> EmitEvent(T e)
+    public void ProcessEvent(T e, Action<T> thenDoThis)
     {
         _modifiers.Iterate(modifier => e = modifier(e));
 
@@ -74,14 +77,11 @@ public class EventEmitter<T>
                 cancelIt = true;
             }
         });
-        if (cancelIt)
+        if (!cancelIt)
         {
-            return EventResult<T>.CanceledResult();
+            thenDoThis(e);
+            _listeners.Iterate(listener => listener(e));
         }
-
-        _listeners.Iterate(listener => listener(e));
-
-        return EventResult<T>.ValueResult(e);
     }
 
     private class TerminableList<U>

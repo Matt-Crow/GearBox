@@ -49,8 +49,10 @@ public class PlayerCharacter : Character
     public override void SetArea(IArea? newArea)
     {
         SetOpenShop(null);
-        EventAreaChanged.EmitEvent(new AreaChangedEvent(this, CurrentArea, newArea));
-        base.SetArea(newArea);
+        EventAreaChanged.ProcessEvent(new AreaChangedEvent(this, CurrentArea, newArea), e =>
+        {
+            base.SetArea(e.NewArea);
+        });
     }
 
     public void UseActive(int number, Direction inDirection)

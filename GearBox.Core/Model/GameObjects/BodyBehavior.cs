@@ -81,39 +81,38 @@ public class BodyBehavior
 
     public void OnCollided(CollideEvent args)
     {
-        EventCollided.EmitEvent(args);
+        EventCollided.ProcessEvent(args, _ => {});
     }
 
     public void OnCollidedWithMapEdge(CollideWithMapEdgeEvent args)
     {
-        // by default, keep in bounds
-        if (LeftInPixels < 0)
+        EventCollideWithMapEdge.ProcessEvent(args, _ =>
         {
-            LeftInPixels = 0;
-        }
-        else if (RightInPixels >= args.MapDimensions.WidthInPixels)
-        {
-            RightInPixels = args.MapDimensions.WidthInPixels;
-        }
-        if (TopInPixels < 0)
-        {
-            TopInPixels = 0;
-        }
-        else if (BottomInPixels >= args.MapDimensions.HeightInPixels)
-        {
-            BottomInPixels = args.MapDimensions.HeightInPixels;
-        }
-        
-        EventCollideWithMapEdge.EmitEvent(args);
+            // by default, keep in bounds
+            if (LeftInPixels < 0)
+            {
+                LeftInPixels = 0;
+            }
+            else if (RightInPixels >= args.MapDimensions.WidthInPixels)
+            {
+                RightInPixels = args.MapDimensions.WidthInPixels;
+            }
+            if (TopInPixels < 0)
+            {
+                TopInPixels = 0;
+            }
+            else if (BottomInPixels >= args.MapDimensions.HeightInPixels)
+            {
+                BottomInPixels = args.MapDimensions.HeightInPixels;
+            } 
+        });
     }
 
     public void OnCollidedWithTile(CollideWithTileEvent args)
     {
-        var result = EventCollideWithTile.EmitEvent(args);
-        if (!result.IsCanceled)
+        EventCollideWithTile.ProcessEvent(args, e =>
         {
-            // default to shoving out
-            args.Tile.ShoveOut(this);
-        }
+            e.Tile.ShoveOut(this);
+        });
     }
 }

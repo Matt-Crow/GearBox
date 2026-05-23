@@ -109,15 +109,17 @@ public abstract class Character : IGameObject
 
     public void TakeDamage(int damage)
     {
-        var modifiedDamage = EventDamaged.EmitEvent(new DamagedEvent(this, damage));
-        if (!modifiedDamage.IsCanceled && modifiedDamage.Value != null)
-        {
-            DamageTaken += modifiedDamage.Value.Damage;
-            if (DamageTaken > MaxHitPoints)
+        EventDamaged.ProcessEvent(
+            new DamagedEvent(this, damage),
+            modifiedDamage =>
             {
-                DamageTaken = MaxHitPoints;
+                DamageTaken += modifiedDamage.Damage;
+                if (DamageTaken > MaxHitPoints)
+                {
+                    DamageTaken = MaxHitPoints;
+                }
             }
-        }
+        );
     }
 
     public void HealPercent(double percent)
@@ -138,13 +140,14 @@ public abstract class Character : IGameObject
         }
 
         TakeDamage(attackEvent.AttackUsed.Damage);
-        EventAttacked.EmitEvent(attackEvent);
-
-        if (Termination.IsTerminated)
+        EventAttacked.ProcessEvent(attackEvent, e =>
         {
-            var killedEvent = new KilledEvent(attackEvent);
-            EventKilled.EmitEvent(killedEvent);
-        }
+            if (Termination.IsTerminated)
+            {
+                var killedEvent = new KilledEvent(e);
+                EventKilled.ProcessEvent(killedEvent, _ => {});
+            }
+        });
     }
 
     public virtual void Update()
