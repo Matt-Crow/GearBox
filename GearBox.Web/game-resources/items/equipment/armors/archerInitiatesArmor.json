@@ -5,5 +5,8 @@
     "Stats": {
         "Offense": 1,
         "Speed": 1
-    }
+    },
+    "PassiveNames": [
+        "Moderately Armored"
+    ]
 }

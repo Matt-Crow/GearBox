@@ -53,6 +53,7 @@ public abstract class Character : IGameObject
     public IArea? LastArea { get; private set; }
     public Team Team { get; set; } = new(); // default to each on their own team
     public EventEmitter<AttackedEvent> EventAttacked { get; } = new();
+    public EventEmitter<DamagedEvent> EventDamaged { get; } = new();
     public EventEmitter<KilledEvent> EventKilled { get; } = new();
 
     public void SetLevel(int level)
@@ -109,10 +110,15 @@ public abstract class Character : IGameObject
 
     public void TakeDamage(int damage)
     {
-        DamageTaken += ArmorClass.ReduceDamage(damage);
-        if (DamageTaken > MaxHitPoints)
+        var modifiedDamage = EventDamaged.EmitEvent(new DamagedEvent(this, damage));
+        if (!modifiedDamage.IsCanceled && modifiedDamage.Value != null)
         {
-            DamageTaken = MaxHitPoints;
+            //DamageTaken += ArmorClass.ReduceDamage(modifiedDamage.Value.Damage);
+            DamageTaken += modifiedDamage.Value.Damage;
+            if (DamageTaken > MaxHitPoints)
+            {
+                DamageTaken = MaxHitPoints;
+            }
         }
     }
 

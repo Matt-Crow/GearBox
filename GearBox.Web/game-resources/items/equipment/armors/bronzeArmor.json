@@ -6,5 +6,8 @@
         "Offense": 1,
         "HP": 2,
         "Energy": 1
-    }
+    },
+    "PassiveNames": [
+        "Heavily Armored"
+    ]
 }

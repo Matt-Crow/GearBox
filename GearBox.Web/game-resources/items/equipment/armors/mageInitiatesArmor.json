@@ -5,5 +5,8 @@
     "Stats": {
         "Offense": 1,
         "Energy": 1
-    }
+    },
+    "PassiveNames": [
+        "Lightly Armored"
+    ]
 }
