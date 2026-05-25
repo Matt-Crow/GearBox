@@ -1,7 +1,6 @@
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
-using GearBox.Core.Model.Units;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model.Items;
@@ -12,8 +11,8 @@ public class InventoryTester
     public void GetBySpecifier_FindsByIdFirst()
     {
         var sut = new Inventory();
-        var weapon1 = new Equipment<WeaponStats>("foo", new WeaponStats(AttackRange.MELEE));
-        var weapon2 = new Equipment<WeaponStats>("foo", new WeaponStats(AttackRange.MELEE));
+        var weapon1 = new Equipment<WeaponStats>("foo", new WeaponStats());
+        var weapon2 = new Equipment<WeaponStats>("foo", new WeaponStats());
         sut.Weapons.Add(weapon1);
         sut.Weapons.Add(weapon2);
 

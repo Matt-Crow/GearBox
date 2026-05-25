@@ -126,7 +126,6 @@ public class PlayerCharacter : Character
 
         Weapon = weapon;
         Inventory.Weapons.Remove(weapon);
-        BasicAttack.Range = weapon.Inner.AttackRange;
 
         UpdateStats();
     }

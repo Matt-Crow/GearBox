@@ -1,12 +1,14 @@
 {
     "Name": "Training Staff",
     "GradeName": "Common",
-    "RangeName": "Medium",
     "Stats": {
         "HP": 1,
         "Energy": 1
     },
     "ActiveNames": [
         "Fire Bolt"
+    ],
+    "PassiveNames": [
+        "Moderately Ranged"
     ]
 }

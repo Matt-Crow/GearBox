@@ -42,6 +42,8 @@ gameBuilder.Passives
     .Add(Armored.Lightly())
     .Add(Armored.Moderately())
     .Add(Armored.Heavily())
+    .Add(Ranged.Moderately())
+    .Add(Ranged.Long())
     .Add(new Intangible())
     .Add(new Levitate())
     .Add(new Spikey())
