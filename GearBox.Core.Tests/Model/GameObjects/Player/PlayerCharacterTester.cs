@@ -19,7 +19,7 @@ public class PlayerCharacterTester
     public void Equip_GivenWeapon_SetsWeaponSlot()
     {
         var sut = new PlayerCharacter("foo");
-        var weapon = new Equipment("weapon");
+        var weapon = AWeapon();
         sut.Inventory.Weapons.Add(weapon);
 
         sut.EquipWeaponById(GetId(weapon));
@@ -31,7 +31,7 @@ public class PlayerCharacterTester
     public void Equip_GivenWeapon_RemovesFromInventory()
     {
         var sut = new PlayerCharacter("foo");
-        var weapon = new Equipment("weapon");
+        var weapon = AWeapon();
         sut.Inventory.Weapons.Add(weapon);
 
         sut.EquipWeaponById(GetId(weapon));
@@ -43,8 +43,8 @@ public class PlayerCharacterTester
     public void Equip_GivenWeaponAlreadyEquipped_AddsToInventory()
     {
         var sut = new PlayerCharacter("foo");
-        var alreadyEquipped = new Equipment("weapon 1");
-        var notYetEquipped = new Equipment("weapon 2");
+        var alreadyEquipped = new Equipment("weapon 1", EquipmentSlotType.WEAPON);
+        var notYetEquipped = new Equipment("weapon 2", EquipmentSlotType.WEAPON);
         sut.Inventory.Weapons.Add(alreadyEquipped);
         sut.Inventory.Weapons.Add(notYetEquipped);
         sut.EquipWeaponById(GetId(alreadyEquipped));
@@ -59,7 +59,7 @@ public class PlayerCharacterTester
     {
         var sut = new PlayerCharacter("foo");
         sut.SetLevel(1);
-        var weapon = new Equipment("bar", level: 20);
+        var weapon = new Equipment("bar", EquipmentSlotType.WEAPON, level: 20);
         sut.Inventory.Weapons.Add(weapon);
 
         sut.EquipWeaponById(GetId(weapon));
@@ -71,7 +71,7 @@ public class PlayerCharacterTester
     public void DynamicValues_AfterEquipping_Change()
     {
         var player = new PlayerCharacter("foo");
-        var weapon1 = new Equipment("foo");
+        var weapon1 = AWeapon();
         player.Inventory.Weapons.Add(weapon1);
         var before = new UiState(player);
         
@@ -86,8 +86,8 @@ public class PlayerCharacterTester
     public void DynamicValues_AfterSwitching_Change()
     {
         var player = new PlayerCharacter("foo");
-        var weapon1 = new Equipment("foo");
-        var weapon2 = new Equipment("foo"); // same weapon, different ID
+        var weapon1 = AWeapon();
+        var weapon2 = AWeapon(); // same weapon, different ID
         player.Inventory.Weapons.Add(weapon1);
         player.Inventory.Weapons.Add(weapon2);
         player.EquipWeaponById(GetId(weapon1));
@@ -104,4 +104,6 @@ public class PlayerCharacterTester
     {
         return equipment.Id ?? throw new Exception("ID should not be null");
     }
+
+    private Equipment AWeapon() => new Equipment("foo", EquipmentSlotType.WEAPON);
 }

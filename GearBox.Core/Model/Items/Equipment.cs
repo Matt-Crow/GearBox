@@ -17,6 +17,7 @@ public class Equipment : IItem
 
     public Equipment(
         string name, 
+        EquipmentSlotType slotType,
         Grade? grade = null,
         Dictionary<PlayerStatType, int>? statWeights = null,
         IEnumerable<IActiveAbility>? actives = null,
@@ -25,6 +26,7 @@ public class Equipment : IItem
     )
     {
         Name = name;
+        SlotType = slotType;
         Grade = grade ?? Grade.COMMON;
         Level = level ?? 1;
         BuyValue = new Gold(Grade.BuyValueBase * (Level + Character.MAX_LEVEL / 2));
@@ -36,6 +38,11 @@ public class Equipment : IItem
     
     public Guid? Id { get; init; } = Guid.NewGuid();
     public string Name { get; init; }
+
+    /// <summary>
+    /// The type of slot this can be equipped in
+    /// </summary>
+    public EquipmentSlotType SlotType { get; init; }
 
     public Grade Grade { get; init; }
 
@@ -74,7 +81,7 @@ public class Equipment : IItem
         var newLevel = level ?? Level;
         var newActives = Actives.Select(a => a.Copy()).ToList();
         var newPassives = Passives.Select(p => p.Copy()).ToList();
-        var result = new Equipment(Name, Grade, _statWeights, newActives, newPassives, newLevel);
+        var result = new Equipment(Name, SlotType, Grade, _statWeights, newActives, newPassives, newLevel);
         return result;
     }
 

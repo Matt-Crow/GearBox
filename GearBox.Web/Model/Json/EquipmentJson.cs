@@ -16,10 +16,12 @@ public class EquipmentJson : IItemJson
 
     public ItemUnion ToItem(IActiveAbilityFactory actives, IPassiveAbilityFactory passives)
     {
+        var slotType = EquipmentSlotType.GetEquipmentSlotTypeByName(Slot) ?? throw new Exception($"Invalid slot type: \"{Slot}\"");
         var grade = ItemJsonUtils.GetGradeByName(GradeName);
         var statDictionary = ItemJsonUtils.GetPlayerStats(Stats);
         var equipment = new Equipment(
             Name, 
+            slotType,
             grade, 
             statDictionary, 
             ItemJsonUtils.GetActives(actives, ActiveNames),

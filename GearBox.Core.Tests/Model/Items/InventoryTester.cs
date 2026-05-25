@@ -11,8 +11,8 @@ public class InventoryTester
     public void GetBySpecifier_FindsByIdFirst()
     {
         var sut = new Inventory();
-        var weapon1 = new Equipment("foo");
-        var weapon2 = new Equipment("foo");
+        var weapon1 = AWeapon();
+        var weapon2 = AWeapon();
         sut.Weapons.Add(weapon1);
         sut.Weapons.Add(weapon2);
 
@@ -25,13 +25,14 @@ public class InventoryTester
     public void Craft_GivenCannotCraft_DoesNothing()
     {
         var sut = new Inventory();
+        var weapon = AWeapon();
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(new Material("foo")))
-            .Add(ItemUnion.OfWeapon(new Equipment("bar")))
+            .Add(ItemUnion.OfWeapon(weapon))
             ;
         var recipe = new CraftingRecipeBuilder(items)
             .And("foo")
-            .Makes("bar");
+            .Makes(weapon.Name);
 
         sut.Craft(recipe);
 
@@ -43,14 +44,15 @@ public class InventoryTester
     {
         var ingredient = new Material("foo");
         var sut = new Inventory();
+        var weapon = AWeapon();
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(ingredient))
-            .Add(ItemUnion.OfWeapon(new Equipment("bar")))
+            .Add(ItemUnion.OfWeapon(weapon))
             ;
         sut.Materials.Add(ingredient);
         var recipe = new CraftingRecipeBuilder(items)
             .And("foo")
-            .Makes("bar");
+            .Makes(weapon.Name);
         
         sut.Craft(recipe);
 
@@ -61,19 +63,21 @@ public class InventoryTester
     public void Craft_GivenCanCraft_AddsItem()
     {
         var ingredient = new Material("foo");
-        var item = new Equipment("bar");
+        var weapon = AWeapon();
         var sut = new Inventory();
         sut.Materials.Add(ingredient);
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(ingredient))
-            .Add(ItemUnion.OfWeapon(item))
+            .Add(ItemUnion.OfWeapon(weapon))
             ;
         var recipe = new CraftingRecipeBuilder(items)
             .And("foo")
-            .Makes("bar");
+            .Makes(weapon.Name);
         
         sut.Craft(recipe);
 
-        Assert.Contains(item.Name, sut.Weapons.Content.Select(stack => stack.Item.Name));
+        Assert.Contains(weapon.Name, sut.Weapons.Content.Select(stack => stack.Item.Name));
     }
+
+    private Equipment AWeapon() => new Equipment("weapon", EquipmentSlotType.WEAPON);
 }

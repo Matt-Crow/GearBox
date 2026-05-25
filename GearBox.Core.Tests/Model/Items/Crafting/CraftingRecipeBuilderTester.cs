@@ -12,7 +12,7 @@ public class CraftingRecipeBuilderTester
     {
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(new Material("foo")))
-            .Add(ItemUnion.OfWeapon(new Equipment("bar")))
+            .Add(ItemUnion.OfWeapon(new Equipment("bar", EquipmentSlotType.WEAPON)))
             ;
         var sut = new CraftingRecipeBuilder(items);
 
