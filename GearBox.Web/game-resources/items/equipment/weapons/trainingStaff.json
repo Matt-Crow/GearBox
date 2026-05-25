@@ -1,5 +1,6 @@
 {
     "Name": "Training Staff",
+    "Slot": "Weapon",
     "GradeName": "Common",
     "Stats": {
         "HP": 1,

@@ -1,5 +1,6 @@
 {
     "Name": "Fighter Initiate's Armor",
+    "Slot": "Armor",
     "GradeName": "Common",
     "Stats": {
         "Offense": 1,

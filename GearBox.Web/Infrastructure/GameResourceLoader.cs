@@ -48,11 +48,11 @@ public class GameResourceLoader
         allItems.AddRange(materials);
 
         var weaponsFolder = Path.Combine(itemsFolder, "equipment", "weapons");
-        var weapons = await LoadItems<WeaponJson>(weaponsFolder);
+        var weapons = await LoadItems<EquipmentJson>(weaponsFolder);
         allItems.AddRange(weapons);
 
         var armorsFolder = Path.Combine(itemsFolder, "equipment", "armors");
-        var armors = await LoadItems<ArmorJson>(armorsFolder);
+        var armors = await LoadItems<EquipmentJson>(armorsFolder);
         allItems.AddRange(armors);
 
         return allItems;

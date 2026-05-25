@@ -1,5 +1,6 @@
 {
     "Name": "Bronze Khopesh",
+    "Slot": "Weapon",
     "GradeName": "Uncommon",
     "Stats": {
         "Offense": 2,

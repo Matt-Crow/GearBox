@@ -1,5 +1,6 @@
 {
     "Name": "Bronze Armor",
+    "Slot": "Armor",
     "GradeName": "Uncommon",
     "Stats": {
         "Offense": 1,

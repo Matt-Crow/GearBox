@@ -1,5 +1,6 @@
 {
     "Name": "Cactus Armor",
+    "Slot": "Armor",
     "GradeName": "Uncommon",
     "Stats": {
         "HP": 4,

@@ -1,5 +1,6 @@
 {
     "Name": "Armor of Flight",
+    "Slot": "Armor",
     "GradeName": "Rare",
     "Stats": {
         "Speed": 1
