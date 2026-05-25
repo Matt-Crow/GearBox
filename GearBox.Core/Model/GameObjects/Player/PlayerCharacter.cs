@@ -38,8 +38,8 @@ public class PlayerCharacter : Character
     public IEnumerable<IActiveAbility> Actives => _actives;
     public IEnumerable<IPassiveAbility> Passives => _passives;
     public Inventory Inventory { get; init; } = new();
-    public Equipment<WeaponStats>? Weapon { get; private set; } = null;
-    public Equipment<ArmorStats>? Armor { get; private set; } = null;
+    public Equipment? Weapon { get; private set; } = null;
+    public Equipment? Armor { get; private set; } = null;
     
     /// <summary>
     /// The shop the player currently has open

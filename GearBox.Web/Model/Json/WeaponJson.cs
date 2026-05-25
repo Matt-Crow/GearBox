@@ -17,14 +17,13 @@ public class WeaponJson : IItemJson
     {
         var grade = ItemJsonUtils.GetGradeByName(GradeName);
         var statDictionary = ItemJsonUtils.GetPlayerStats(Stats);
-        var weapon = new Equipment<WeaponStats>(
+        var weapon = new Equipment(
             Name, 
-            new WeaponStats(), 
             grade, 
             statDictionary, 
             ItemJsonUtils.GetActives(actives, ActiveNames),
             ItemJsonUtils.GetPassives(passives, PassiveNames)
         );
-        return ItemUnion.Of(weapon);
+        return ItemUnion.OfWeapon(weapon);
     }
 }

@@ -14,11 +14,11 @@ public class EquipmentTester
         {
             {stat, 1}
         };
-        var sut = new Equipment<WeaponStats>("foo", new WeaponStats(), statWeights: weights, level: 1);
+        var sut = new Equipment("foo", statWeights: weights, level: 1);
 
         var other = sut.ToOwned(2);
 
-        int GetStat(Equipment<WeaponStats> w) => w.StatBoosts.Get(stat);
+        int GetStat(Equipment w) => w.StatBoosts.Get(stat);
         Assert.True(GetStat(other) > GetStat(sut));
     }
 }

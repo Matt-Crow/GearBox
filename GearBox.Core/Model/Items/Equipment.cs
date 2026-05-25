@@ -10,14 +10,13 @@ namespace GearBox.Core.Model.Items;
 /// <summary>
 /// An Equipment is a type of item which a player can wield
 /// </summary>
-public class Equipment<T> : IItem
-where T : IEquipmentStats
+public class Equipment : IItem
 {
     private readonly Dictionary<PlayerStatType, int> _statWeights;
 
+
     public Equipment(
         string name, 
-        T inner,
         Grade? grade = null,
         Dictionary<PlayerStatType, int>? statWeights = null,
         IEnumerable<IActiveAbility>? actives = null,
@@ -26,19 +25,18 @@ where T : IEquipmentStats
     )
     {
         Name = name;
-        Inner = inner;
         Grade = grade ?? Grade.COMMON;
         Level = level ?? 1;
         BuyValue = new Gold(Grade.BuyValueBase * (Level + Character.MAX_LEVEL / 2));
         _statWeights = statWeights ?? [];
-        StatBoosts = new PlayerStatBoosts(_statWeights, Inner.GetStatPoints(Level, Grade));
+        StatBoosts = new PlayerStatBoosts(_statWeights, GetStatPoints(Level, Grade));
         Actives = actives ?? [];
         Passives = passives ?? [];
     }
     
     public Guid? Id { get; init; } = Guid.NewGuid();
     public string Name { get; init; }
-    public T Inner { get;}
+
     public Grade Grade { get; init; }
 
     /// <summary>
@@ -51,7 +49,7 @@ where T : IEquipmentStats
     /// <summary>
     /// Details to display in the GUI
     /// </summary>
-    public IEnumerable<string> Details => Inner.Details.Concat(StatBoosts.Details);
+    public IEnumerable<string> Details => StatBoosts.Details;
     
     /// <summary>
     /// The stat boosts this provides when equipped
@@ -71,18 +69,18 @@ where T : IEquipmentStats
     /// <summary>
     /// Returns this if it is immutable, or a clone otherwise
     /// </summary>
-    public Equipment<T> ToOwned(int? level=null)
+    public Equipment ToOwned(int? level=null)
     {
         var newLevel = level ?? Level;
         var newActives = Actives.Select(a => a.Copy()).ToList();
         var newPassives = Passives.Select(p => p.Copy()).ToList();
-        var result = new Equipment<T>(Name, Inner, Grade, _statWeights, newActives, newPassives, newLevel);
+        var result = new Equipment(Name, Grade, _statWeights, newActives, newPassives, newLevel);
         return result;
     }
 
     public override bool Equals(object? obj)
     {
-        var other = obj as Equipment<T>;
+        var other = obj as Equipment;
         return other?.Id == Id;
     }
     

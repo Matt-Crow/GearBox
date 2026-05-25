@@ -11,8 +11,8 @@ public class InventoryTester
     public void GetBySpecifier_FindsByIdFirst()
     {
         var sut = new Inventory();
-        var weapon1 = new Equipment<WeaponStats>("foo", new WeaponStats());
-        var weapon2 = new Equipment<WeaponStats>("foo", new WeaponStats());
+        var weapon1 = new Equipment("foo");
+        var weapon2 = new Equipment("foo");
         sut.Weapons.Add(weapon1);
         sut.Weapons.Add(weapon2);
 
@@ -26,8 +26,8 @@ public class InventoryTester
     {
         var sut = new Inventory();
         var items = new ItemFactory()
-            .Add(ItemUnion.Of(new Material("foo")))
-            .Add(ItemUnion.Of(new Equipment<WeaponStats>("bar", new WeaponStats())))
+            .Add(ItemUnion.OfMaterial(new Material("foo")))
+            .Add(ItemUnion.OfWeapon(new Equipment("bar")))
             ;
         var recipe = new CraftingRecipeBuilder(items)
             .And("foo")
@@ -44,8 +44,8 @@ public class InventoryTester
         var ingredient = new Material("foo");
         var sut = new Inventory();
         var items = new ItemFactory()
-            .Add(ItemUnion.Of(ingredient))
-            .Add(ItemUnion.Of(new Equipment<WeaponStats>("bar", new WeaponStats())))
+            .Add(ItemUnion.OfMaterial(ingredient))
+            .Add(ItemUnion.OfWeapon(new Equipment("bar")))
             ;
         sut.Materials.Add(ingredient);
         var recipe = new CraftingRecipeBuilder(items)
@@ -61,12 +61,12 @@ public class InventoryTester
     public void Craft_GivenCanCraft_AddsItem()
     {
         var ingredient = new Material("foo");
-        var item = new Equipment<WeaponStats>("bar", new WeaponStats());
+        var item = new Equipment("bar");
         var sut = new Inventory();
         sut.Materials.Add(ingredient);
         var items = new ItemFactory()
-            .Add(ItemUnion.Of(ingredient))
-            .Add(ItemUnion.Of(item))
+            .Add(ItemUnion.OfMaterial(ingredient))
+            .Add(ItemUnion.OfWeapon(item))
             ;
         var recipe = new CraftingRecipeBuilder(items)
             .And("foo")

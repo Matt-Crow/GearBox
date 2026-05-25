@@ -8,8 +8,8 @@ namespace GearBox.Core.Model.Items;
 /// </summary>
 public class Inventory 
 {
-    public InventoryTab<Equipment<WeaponStats>> Weapons { get; init; } = new();
-    public InventoryTab<Equipment<ArmorStats>> Armors { get; init; } = new();
+    public InventoryTab<Equipment> Weapons { get; init; } = new();
+    public InventoryTab<Equipment> Armors { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
     public Gold Gold { get; private set; } = Gold.NONE;
     public bool IsEmpty => Weapons.IsEmpty && Armors.IsEmpty && Materials.IsEmpty && Gold.Quantity == 0;
@@ -90,15 +90,15 @@ public class Inventory
         var material = Materials.GetBySpecifier(specifier);
         if (weapon != null)
         {
-            return ItemUnion.Of(weapon);
+            return ItemUnion.OfWeapon(weapon);
         }
         if (armor != null)
         {
-            return ItemUnion.Of(armor);
+            return ItemUnion.OfArmor(armor);
         }
         if (material != null)
         {
-            return ItemUnion.Of(material);
+            return ItemUnion.OfMaterial(material);
         }
         return null;
     }

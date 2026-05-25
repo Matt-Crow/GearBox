@@ -13,7 +13,7 @@ public class MaterialJson : IItemJson
     public ItemUnion ToItem(IActiveAbilityFactory actives, IPassiveAbilityFactory passives)
     {
         var grade = ItemJsonUtils.GetGradeByName(GradeName);
-        var result = ItemUnion.Of(new Material(Name, grade, Description));
+        var result = ItemUnion.OfMaterial(new Material(Name, grade, Description));
         return result;
     }
 }

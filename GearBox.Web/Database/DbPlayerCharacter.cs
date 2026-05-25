@@ -71,8 +71,7 @@ public class DbPlayerCharacter
         AddInventoryTab(gameModel.Inventory.Armors, i => i.Level);
     }
 
-    private DbEquippedItem? MakeEquipmentSlot<T>(Equipment<T>? equipmentSlot)
-    where T : IEquipmentStats
+    private DbEquippedItem? MakeEquipmentSlot(Equipment? equipmentSlot)
     {
         var dbModel = equipmentSlot == null
             ? null

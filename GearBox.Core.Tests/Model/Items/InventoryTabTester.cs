@@ -48,9 +48,9 @@ public class InventoryTabTester
     [Fact]
     public void Add_GivenEquipment_DoesNotSum()
     {
-        var sut = new InventoryTab<Equipment<WeaponStats>>();
-        var item1 = new Equipment<WeaponStats>("foo", new WeaponStats());
-        var item2 = new Equipment<WeaponStats>("foo", new WeaponStats());
+        var sut = new InventoryTab<Equipment>();
+        var item1 = new Equipment("foo");
+        var item2 = new Equipment("foo");
     
         sut.Add(item1);
         sut.Add(item2);
