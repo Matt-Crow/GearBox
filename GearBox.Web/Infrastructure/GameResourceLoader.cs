@@ -43,40 +43,27 @@ public class GameResourceLoader
         var itemsFolder = Path.Combine("game-resources", "items");
 
         // materials are probably better off stored in CSV files though
-        var materialsFolder = Path.Combine(itemsFolder, "materials");
-        var materials = await LoadItems<MaterialJson>(materialsFolder);
+        var materials = await LoadItems<MaterialJson>(Path.Combine(itemsFolder, "materials.json"));
         allItems.AddRange(materials);
 
-        var weaponsFolder = Path.Combine(itemsFolder, "equipment", "weapons");
-        var weapons = await LoadItems<EquipmentJson>(weaponsFolder);
+        var weapons = await LoadItems<EquipmentJson>(Path.Combine(itemsFolder, "equipment", "weapons.json"));
         allItems.AddRange(weapons);
 
-        var armorsFolder = Path.Combine(itemsFolder, "equipment", "armors");
-        var armors = await LoadItems<EquipmentJson>(armorsFolder);
+        var armors = await LoadItems<EquipmentJson>(Path.Combine(itemsFolder, "equipment", "armors.json"));
         allItems.AddRange(armors);
 
         return allItems;
     }
 
-    private async Task<List<ItemUnion>> LoadItems<T>(string folderPath)
-    where T : IItemJson
-    {
-        var items = new List<ItemUnion>();
-        foreach (var filePath in Directory.EnumerateFiles(folderPath, "*.json"))
-        {
-            var item = await LoadItem<T>(filePath);
-            items.Add(item);
-        }
-        return items;
-    }
-
-    private async Task<ItemUnion> LoadItem<T>(string filePath)
+    private async Task<List<ItemUnion>> LoadItems<T>(string filePath)
     where T : IItemJson
     {
         var text = await File.ReadAllTextAsync(filePath);
-        var json = JsonSerializer.Deserialize<T>(text) ?? throw new Exception($"Failed to deserialize {filePath}");
-        var item = json.ToItem(_actives, _passives);
-        return item;
+        var json = JsonSerializer.Deserialize<List<T>>(text) ?? throw new Exception($"Failed to deserialize {filePath}");
+        var items = json
+            .Select(itemJson => itemJson.ToItem(_actives, _passives))
+            .ToList();
+        return items;
     }
 
     /// <summary>

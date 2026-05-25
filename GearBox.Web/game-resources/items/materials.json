@@ -1,0 +1,27 @@
+[
+    {
+        "Name": "Stone",
+        "GradeName": "Common",
+        "Description": "A low-grade mining material, but it's better than nothing."
+    },
+    {
+        "Name": "Bronze",
+        "GradeName": "Uncommon",
+        "Description": "Used to craft low-level melee equipment."
+    },
+    {
+        "Name": "Silver",
+        "GradeName": "Rare",
+        "Description": "Used to craft enhancements for your equipment."
+    },
+    {
+        "Name": "Gold",
+        "GradeName": "Epic",
+        "Description": "Used to craft powerful magical artifacts."
+    },
+    {
+        "Name": "Titanium",
+        "GradeName": "Legendary",
+        "Description": "A high-grade mining material for crafting powerful melee equipment."
+    }
+]
