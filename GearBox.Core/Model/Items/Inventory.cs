@@ -41,10 +41,11 @@ public class Inventory
     {
         item?.Match(
             m => Materials.Add(m, quantity),
-            w => Weapons.Add(w, quantity),
-            a => Armors.Add(a, quantity)
+            e => GetTab(e).Add(e, quantity)
         );
     }
+
+    private InventoryTab<Equipment> GetTab(Equipment e) => e.SlotType.GetInventoryTab(this);
 
     public void Add(Gold? gold)
     {
@@ -59,8 +60,7 @@ public class Inventory
     {
         item?.Match(
             m => Materials.Remove(m),
-            w => Weapons.Remove(w),
-            a => Armors.Remove(a)
+            e => GetTab(e).Remove(e)
         );
     }
 
@@ -77,24 +77,18 @@ public class Inventory
     {
         var result = item.Select(
             m => Materials.Contains(m),
-            w => Weapons.Contains(w),
-            a => Armors.Contains(a)
+            e => GetTab(e).Contains(e)
         );
         return result;
     }
 
     public ItemUnion? GetBySpecifier(ItemSpecifier specifier)
     {
-        var weapon = Weapons.GetBySpecifier(specifier);
-        var armor = Armors.GetBySpecifier(specifier);
+        var equipment = Weapons.GetBySpecifier(specifier) ?? Armors.GetBySpecifier(specifier);
         var material = Materials.GetBySpecifier(specifier);
-        if (weapon != null)
+        if (equipment != null)
         {
-            return ItemUnion.OfWeapon(weapon);
-        }
-        if (armor != null)
-        {
-            return ItemUnion.OfArmor(armor);
+            return ItemUnion.OfEquipment(equipment);
         }
         if (material != null)
         {

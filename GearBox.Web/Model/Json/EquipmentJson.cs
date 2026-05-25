@@ -28,16 +28,6 @@ public class EquipmentJson : IItemJson
             ItemJsonUtils.GetPassives(passives, PassiveNames)
         );
 
-        if (Slot == "Weapon")
-        {
-            return ItemUnion.OfWeapon(equipment);
-        }
-
-        if (Slot == "Armor")
-        {
-            return ItemUnion.OfArmor(equipment);
-        }
-
-        throw new Exception($"Invalid slot: \"{Slot}\"");
+        return ItemUnion.OfEquipment(equipment);
     }
 }

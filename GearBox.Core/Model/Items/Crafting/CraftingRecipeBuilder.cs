@@ -17,7 +17,6 @@ public class CraftingRecipeBuilder
         Material? material = null;
         _itemFactory.Make(materialName)?.Match(
             m => material = m,
-            _ => {},
             _ => {}
         );
         if (material == null)

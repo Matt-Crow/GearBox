@@ -26,7 +26,7 @@ public class LootTableTester
     {
         var expected = new Equipment("foo", EquipmentSlotType.WEAPON);
         var sut = new LootTable([
-            new LootOption(1, ItemUnion.OfWeapon(expected))
+            new LootOption(1, ItemUnion.OfEquipment(expected))
         ], new RandomNumberGenerator());
 
         var inventory = sut.GetRandomLoot();

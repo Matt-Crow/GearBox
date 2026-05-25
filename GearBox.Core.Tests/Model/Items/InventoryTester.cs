@@ -28,7 +28,7 @@ public class InventoryTester
         var weapon = AWeapon();
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(new Material("foo")))
-            .Add(ItemUnion.OfWeapon(weapon))
+            .Add(ItemUnion.OfEquipment(weapon))
             ;
         var recipe = new CraftingRecipeBuilder(items)
             .And("foo")
@@ -47,7 +47,7 @@ public class InventoryTester
         var weapon = AWeapon();
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(ingredient))
-            .Add(ItemUnion.OfWeapon(weapon))
+            .Add(ItemUnion.OfEquipment(weapon))
             ;
         sut.Materials.Add(ingredient);
         var recipe = new CraftingRecipeBuilder(items)
@@ -68,7 +68,7 @@ public class InventoryTester
         sut.Materials.Add(ingredient);
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(ingredient))
-            .Add(ItemUnion.OfWeapon(weapon))
+            .Add(ItemUnion.OfEquipment(weapon))
             ;
         var recipe = new CraftingRecipeBuilder(items)
             .And("foo")

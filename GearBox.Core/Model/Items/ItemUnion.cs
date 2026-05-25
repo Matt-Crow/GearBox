@@ -9,21 +9,20 @@ namespace GearBox.Core.Model.Items;
 public class ItemUnion : IItem
 {
     private readonly Material? _material;
-    private readonly Equipment? _weapon;
-    private readonly Equipment? _armor;
+    private readonly Equipment? _equipment;
 
 
-    private ItemUnion(Material? material, Equipment? weapon, Equipment? armor)
+    private ItemUnion(Material? material, Equipment? equipment)
     {
         _material = material;
-        _weapon = weapon;
-        _armor = armor;
-        Unwrapped = (IItem?)_material ?? (IItem?)_weapon ?? (IItem?)_armor ?? throw new ArgumentNullException(null, "One argument must not be null");
+        _equipment = equipment;
+        Unwrapped = (IItem?)_material ?? (IItem?)_equipment ?? throw new ArgumentNullException(null, "One argument must not be null");
     }
 
-    public static ItemUnion OfMaterial(Material material) => new ItemUnion(material, null, null);
-    public static ItemUnion OfWeapon(Equipment weapon) => new ItemUnion(null, weapon, null);
-    public static ItemUnion OfArmor(Equipment armor) => new ItemUnion(null, null, armor);
+
+    public static ItemUnion OfMaterial(Material material) => new ItemUnion(material, null);
+    public static ItemUnion OfEquipment(Equipment equipment) => new ItemUnion(null, equipment);
+
 
     /// <summary>
     /// The item contained within this ItemUnion
@@ -38,8 +37,7 @@ public class ItemUnion : IItem
 
     public ItemJson ToJson() => Select(
         m => new ItemStack<Material>(m).ToJson(),
-        w => new ItemStack<Equipment>(w).ToJson(),
-        a => new ItemStack<Equipment>(a).ToJson()
+        e => new ItemStack<Equipment>(e).ToJson()
     );
 
     /// <summary>
@@ -48,27 +46,22 @@ public class ItemUnion : IItem
     /// </summary>
     public ItemUnion ToOwned(int? level=null) => Select(
         m => OfMaterial(m.ToOwned()),
-        w => OfWeapon(w.ToOwned(level)),
-        a => OfArmor(a.ToOwned(level))
+        e => OfEquipment(e.ToOwned(level))
     );
 
     /// <summary>
     /// Invokes one of the provided actions on the wrapped value.
     /// The exact action called depends on the type of the wrapped value.
     /// </summary>
-    public void Match(Action<Material> withMaterial, Action<Equipment> withWeapon, Action<Equipment> withArmor)
+    public void Match(Action<Material> withMaterial, Action<Equipment> withEquipment)
     {
         if (_material != null)
         {
             withMaterial(_material);
         }
-        else if (_weapon != null)
+        else if (_equipment != null)
         {
-            withWeapon(_weapon);
-        }
-        else if (_armor != null)
-        {
-            withArmor(_armor);
+            withEquipment(_equipment);
         }
         else
         {
@@ -80,19 +73,15 @@ public class ItemUnion : IItem
     /// Applies one of the provided mapping functions to the wrapped value and returns the result.
     /// The exact mapping function called depends on the type of the wrapped value.
     /// </summary>
-    public T Select<T>(Func<Material, T> fromMaterial, Func<Equipment, T> fromWeapon, Func<Equipment, T> fromArmor)
+    public T Select<T>(Func<Material, T> fromMaterial, Func<Equipment, T> fromEquipment)
     {
         if (_material != null)
         {
             return fromMaterial(_material);
         }
-        if (_weapon != null)
+        if (_equipment != null)
         {
-            return fromWeapon(_weapon);
-        }
-        if (_armor != null)
-        {
-            return fromArmor(_armor);
+            return fromEquipment(_equipment);
         }
         throw new Exception($"Missing case in {nameof(Select)}");
     }
