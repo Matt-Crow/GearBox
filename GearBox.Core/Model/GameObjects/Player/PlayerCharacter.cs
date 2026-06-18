@@ -147,7 +147,7 @@ public class PlayerCharacter : Character
         }
 
         // determine where the equipment goes
-        var tab = equipment.SlotType.GetInventoryTab(Inventory);
+        var tab = Inventory.GetTab(equipment);
         var slot = GetSlotFor(equipment);
         
         // swap the old and new ones from the slot to the inventory

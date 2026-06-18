@@ -105,6 +105,7 @@ public class Equipment : IItem
             Grade.Order,
             "", // no description
             Level,
+            SlotType.Name,
             Details,
             quantity,
             Actives

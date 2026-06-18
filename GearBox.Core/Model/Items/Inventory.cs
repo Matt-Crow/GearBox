@@ -8,20 +8,12 @@ namespace GearBox.Core.Model.Items;
 /// </summary>
 public class Inventory 
 {
-    public Inventory()
-    {
-        EquipmentTabs = [
-            Manipulators,
-            Torsos
-        ];    
-    }
-
-
-    public InventoryTab<Equipment> Manipulators { get; init; } = new();
-    public InventoryTab<Equipment> Torsos { get; init; } = new();
-    public InventoryTab<Material> Materials { get; init; } = new();
     public Gold Gold { get; private set; } = Gold.NONE;
-    public List<InventoryTab<Equipment>> EquipmentTabs { get; init; }
+    public InventoryTab<Material> Materials { get; init; } = new();
+    public List<EquipmentTab> EquipmentTabs { get; init; } = EquipmentSlotType.ALL
+        .Select(slotType => new EquipmentTab(slotType))
+        .ToList();
+    
     public bool IsEmpty => EquipmentTabs.All(tab => tab.IsEmpty) && Materials.IsEmpty && Gold.Quantity == 0;
 
     /// <summary>
@@ -58,7 +50,10 @@ public class Inventory
         );
     }
 
-    private InventoryTab<Equipment> GetTab(Equipment e) => e.SlotType.GetInventoryTab(this);
+    public InventoryTab<Equipment> GetTab(Equipment e)
+    {
+        return EquipmentTabs.First(tab => tab.SlotType == e.SlotType);
+    }
 
     public void Add(Gold? gold)
     {
@@ -97,7 +92,9 @@ public class Inventory
 
     public ItemUnion? GetBySpecifier(ItemSpecifier specifier)
     {
-        var equipment = Manipulators.GetBySpecifier(specifier) ?? Torsos.GetBySpecifier(specifier);
+        var equipment = EquipmentTabs
+            .Select(tab => tab.GetBySpecifier(specifier))
+            .FirstOrDefault(e => e != null);
         var material = Materials.GetBySpecifier(specifier);
         if (equipment != null)
         {
@@ -136,5 +133,12 @@ public class Inventory
         return result;
     }
 
-    public InventoryJson ToJson() => new(Manipulators.ToJson(), Torsos.ToJson(), Materials.ToJson(), Gold.Quantity);
+    public InventoryJson ToJson()
+    {
+        var equipmentJson = EquipmentTabs
+            .SelectMany(tab => tab.Content)
+            .Select(stack => stack.ToJson())
+            .ToList();
+        return new(equipmentJson, Materials.ToJson(), Gold.Quantity);
+    }
 }

@@ -28,8 +28,9 @@ export class Inventory {
 
 export class InventoryDeserializer {
     deserialize(json) {
-        const manipulators = json.manipulators.items.map(x => Item.fromJson(x));
-        const torsos = json.torsos.items.map(x => Item.fromJson(x));
+        const equipment = json.equipment.map(x => Item.fromJson(x));
+        const manipulators = equipment.filter(item => item.slotType == "Manipulator");
+        const torsos = equipment.filter(item => item.slotType == "Torso");
         const materials = json.materials.items.map(x => Item.fromJson(x));
         return new Inventory(manipulators, torsos, materials, json.gold);
     }
@@ -42,6 +43,7 @@ export class Item {
     #gradeOrder;
     #description;
     #level;
+    #slotType;
     #details;
     #quantity;
     #actives;
@@ -54,18 +56,20 @@ export class Item {
      * @param {number} gradeOrder  
      * @param {string} description 
      * @param {number} level
+     * @param {string} slotType
      * @param {string[]} details 
      * @param {number} quantity 
      * @param {ActiveAbility[]} actives 
      * @param {PassiveAbility[]} passives
      */
-    constructor(id, name, gradeName, gradeOrder, description, level, details, quantity, actives, passives) {
+    constructor(id, name, gradeName, gradeOrder, description, level, slotType, details, quantity, actives, passives) {
         this.#id = id;
         this.#name = name;
         this.#gradeName = gradeName;
         this.#gradeOrder = gradeOrder;
         this.#description = description;
         this.#level = level;
+        this.#slotType = slotType;
         this.#details = details;
         this.#quantity = quantity;
         this.#actives = actives;
@@ -78,6 +82,7 @@ export class Item {
     get gradeOrder() { return this.#gradeOrder; }
     get description() { return this.#description; }
     get level() { return this.#level; }
+    get slotType() { return this.#slotType; }
     get details() { return this.#details; }
     get quantity() { return this.#quantity; }
     get actives() { return this.#actives; }
@@ -99,6 +104,7 @@ export class Item {
             json.gradeOrder,
             json.description,
             json.level,
+            json.slotType,
             json.details.slice(),
             json.quantity,
             json.actives.map(ActiveAbility.fromJson),

@@ -2,22 +2,19 @@ namespace GearBox.Core.Model.Json.AreaUpdate;
 
 public class InventoryJson : IChange, IJson
 {
-    public InventoryJson(InventoryTabJson manipulators, InventoryTabJson torsos, InventoryTabJson materials, int gold)
+    public InventoryJson(List<ItemJson> equipment, InventoryTabJson materials, int gold)
     {
-        Manipulators = manipulators;
-        Torsos = torsos;
+        Equipment = equipment;
         Materials = materials;
         Gold = gold;
     }
 
-    public InventoryTabJson Manipulators { get; init; }
-    public InventoryTabJson Torsos { get; init; }
+    public List<ItemJson> Equipment { get; init; }
     public InventoryTabJson Materials { get; init; }
     public int Gold { get; init; }
 
     public IEnumerable<object?> DynamicValues => Array.Empty<object?>()
-        .Concat(Manipulators.DynamicValues)
-        .Concat(Torsos.DynamicValues)
+        .Concat(Equipment.SelectMany(e => e.DynamicValues))
         .Concat(Materials.DynamicValues)
         .Append(Gold);
 }

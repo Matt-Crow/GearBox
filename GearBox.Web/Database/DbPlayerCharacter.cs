@@ -67,8 +67,10 @@ public class DbPlayerCharacter
         
         Items.Clear();
         AddInventoryTab(gameModel.Inventory.Materials, i => 0);
-        AddInventoryTab(gameModel.Inventory.Manipulators, i => i.Level);
-        AddInventoryTab(gameModel.Inventory.Torsos, i => i.Level);
+        foreach (var equipmentTab in gameModel.Inventory.EquipmentTabs)
+        {
+            AddInventoryTab(equipmentTab, i => i.Level);
+        }
     }
 
     private DbEquippedItem? MakeEquipmentSlot(Equipment? equipmentSlot)
