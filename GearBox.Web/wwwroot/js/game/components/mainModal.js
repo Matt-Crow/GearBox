@@ -62,8 +62,8 @@ export class MainModal {
         ], (record, row) => this.#craftPreview.handleRowCreated(record?.makes, row));
         this.#recipeTable.spawnHtml();
         
-        this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equipWeapon(id));
-        this.#armorTab = new EquipmentTab("#armorTab", id => client.equipArmor(id));
+        this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equip(id));
+        this.#armorTab = new EquipmentTab("#armorTab", id => client.equip(id));
 
         this.#shopBuyTable = this.#makeShopTable(".shop-buy", "buy", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopSellTable = this.#makeShopTable(".shop-sell", "sell", opt => client.shopSell(this.#currentShop?.id, opt.item.id, opt.item.name));

@@ -13,17 +13,25 @@ namespace GearBox.Core.Model.GameObjects.Player;
 public class PlayerCharacter : Character
 {
     private int _frameCount = 0; // used for regeneration
+    private readonly EquipmentSlot _weaponSlot = new(EquipmentSlotType.WEAPON);
+    private readonly EquipmentSlot _armorSlot = new(EquipmentSlotType.ARMOR); 
+    private readonly List<EquipmentSlot> _equipmentSlots;
     private readonly List<IActiveAbility> _actives = [];
     private readonly List<IPassiveAbility> _passives = [];
 
 
     public PlayerCharacter(string name, int xp = 0, Guid? id = null) : base(name, GetLevelByXp(xp), Color.BLUE, id)
     {
+        _equipmentSlots = [
+            _weaponSlot,
+            _armorSlot
+        ];
         Xp = xp;
         XpToNextLevel = GetXpByLevel(Level + 1);
         StatSummary = new PlayerStatSummary(this);
         UpdateStats();
     }
+    
 
     public EventEmitter<AreaChangedEvent> EventAreaChanged { get; } = new();
 
@@ -38,8 +46,8 @@ public class PlayerCharacter : Character
     public IEnumerable<IActiveAbility> Actives => _actives;
     public IEnumerable<IPassiveAbility> Passives => _passives;
     public Inventory Inventory { get; init; } = new();
-    public Equipment? Weapon { get; private set; } = null;
-    public Equipment? Armor { get; private set; } = null;
+    public Equipment? Weapon => _weaponSlot.Equipment;
+    public Equipment? Armor => _armorSlot.Equipment;
     
     /// <summary>
     /// The shop the player currently has open
@@ -114,34 +122,41 @@ public class PlayerCharacter : Character
         base.UpdateStats();
     }
 
-    public void EquipWeaponById(Guid id)
+    /// <summary>
+    /// Equips the equipment with the given ID if it is in the inventory and is equippable.
+    /// </summary>
+    public void EquipById(Guid id)
     {
-        var weapon = Inventory.Weapons.GetBySpecifier(ItemSpecifier.ById(id));
-        if (weapon == null || weapon.Level > Level)
+        var maybeItem = Inventory.GetBySpecifier(ItemSpecifier.ById(id));
+        if (maybeItem == null)
         {
             return;
         }
 
-        Inventory.Weapons.Add(Weapon); // put old weapon back in inventory
-
-        Weapon = weapon;
-        Inventory.Weapons.Remove(weapon);
-
-        UpdateStats();
+        maybeItem.Match(
+            material => {},
+            EquipFromInventory
+        );
     }
 
-    public void EquipArmorById(Guid id)
+    private void EquipFromInventory(Equipment equipment)
     {
-        var armor = Inventory.Armors.GetBySpecifier(ItemSpecifier.ById(id));
-        if (armor == null || armor.Level > Level)
+        if (equipment.Level > Level)
         {
             return;
         }
 
-        Inventory.Armors.Add(Armor); // put old armor back in inventory
-
-        Armor = armor;
-        Inventory.Armors.Remove(armor);
+        // determine where the equipment goes
+        var slotType = equipment.SlotType;
+        var tab = slotType.GetInventoryTab(Inventory);
+        var slot = _equipmentSlots
+            .FirstOrDefault(slot => slot.SlotType == slotType) 
+            ?? throw new Exception($"PlayerCharacter is missing equipment slot for type {slotType.Name}");
+        
+        // swap the old and new ones from the slot to the inventory
+        tab.Add(slot.Equipment);
+        slot.Equipment = equipment;
+        tab.Remove(equipment);
 
         UpdateStats();
     }

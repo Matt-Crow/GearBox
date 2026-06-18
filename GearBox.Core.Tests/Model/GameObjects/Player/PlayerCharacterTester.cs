@@ -11,7 +11,7 @@ public class PlayerCharacterTester
     public void Equip_GivenNotInInventory_DoesNothing()
     {
         var sut = new PlayerCharacter("foo");
-        sut.EquipWeaponById(Guid.Empty);
+        sut.EquipById(Guid.Empty);
         Assert.Null(sut.Weapon);
     }
 
@@ -22,7 +22,7 @@ public class PlayerCharacterTester
         var weapon = AWeapon();
         sut.Inventory.Weapons.Add(weapon);
 
-        sut.EquipWeaponById(GetId(weapon));
+        sut.EquipById(GetId(weapon));
 
         Assert.Equal(weapon, sut.Weapon);
     }
@@ -34,7 +34,7 @@ public class PlayerCharacterTester
         var weapon = AWeapon();
         sut.Inventory.Weapons.Add(weapon);
 
-        sut.EquipWeaponById(GetId(weapon));
+        sut.EquipById(GetId(weapon));
 
         Assert.False(sut.Inventory.Weapons.Contains(weapon));
     }
@@ -47,9 +47,9 @@ public class PlayerCharacterTester
         var notYetEquipped = new Equipment("weapon 2", EquipmentSlotType.WEAPON);
         sut.Inventory.Weapons.Add(alreadyEquipped);
         sut.Inventory.Weapons.Add(notYetEquipped);
-        sut.EquipWeaponById(GetId(alreadyEquipped));
+        sut.EquipById(GetId(alreadyEquipped));
 
-        sut.EquipWeaponById(GetId(notYetEquipped));
+        sut.EquipById(GetId(notYetEquipped));
 
         Assert.True(sut.Inventory.Weapons.Contains(alreadyEquipped));
     }
@@ -62,7 +62,7 @@ public class PlayerCharacterTester
         var weapon = new Equipment("bar", EquipmentSlotType.WEAPON, level: 20);
         sut.Inventory.Weapons.Add(weapon);
 
-        sut.EquipWeaponById(GetId(weapon));
+        sut.EquipById(GetId(weapon));
 
         Assert.Null(sut.Weapon);
     }
@@ -75,7 +75,7 @@ public class PlayerCharacterTester
         player.Inventory.Weapons.Add(weapon1);
         var before = new UiState(player);
         
-        player.EquipWeaponById(GetId(weapon1));
+        player.EquipById(GetId(weapon1));
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
@@ -90,10 +90,10 @@ public class PlayerCharacterTester
         var weapon2 = AWeapon(); // same weapon, different ID
         player.Inventory.Weapons.Add(weapon1);
         player.Inventory.Weapons.Add(weapon2);
-        player.EquipWeaponById(GetId(weapon1));
+        player.EquipById(GetId(weapon1));
         var before = new UiState(player);
 
-        player.EquipWeaponById(GetId(weapon2));
+        player.EquipById(GetId(weapon2));
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         

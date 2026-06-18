@@ -5,12 +5,8 @@ export class Client {
         this.#signalr = signalr;    
     }
 
-    equipWeapon(id) {
-        this.#signalr.invoke("EquipWeapon", id)
-    }
-
-    equipArmor(id) {
-        this.#signalr.invoke("EquipArmor", id)
+    equip(id) {
+        this.#signalr.invoke("Equip", id);
     }
 
     startMovingUp() {

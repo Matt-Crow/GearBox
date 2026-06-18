@@ -119,13 +119,13 @@ public class DbPlayerCharacter
         {
             var gameItem = itemFactory.Make(EquippedWeapon.Name) ?? throw new Exception($"Invalid item name: {EquippedWeapon.Name}");
             result.Inventory.Add(gameItem);
-            result.EquipWeaponById(gameItem.Id ?? throw new Exception("Weapon must have ID"));
+            result.EquipById(gameItem.Id ?? throw new Exception("Weapon must have ID"));
         }
         if (EquippedArmor != null)
         {
             var gameItem = itemFactory.Make(EquippedArmor.Name) ?? throw new Exception($"Invalid item name: {EquippedArmor.Name}");
             result.Inventory.Add(gameItem);
-            result.EquipArmorById(gameItem.Id ?? throw new Exception("Armor must have ID"));
+            result.EquipById(gameItem.Id ?? throw new Exception("Armor must have ID"));
         }
 
         return result;
