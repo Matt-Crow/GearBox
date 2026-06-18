@@ -11,13 +11,13 @@ public class Inventory
     public Inventory()
     {
         EquipmentTabs = [
-            Weapons,
+            Manipulators,
             Torsos
         ];    
     }
 
 
-    public InventoryTab<Equipment> Weapons { get; init; } = new();
+    public InventoryTab<Equipment> Manipulators { get; init; } = new();
     public InventoryTab<Equipment> Torsos { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
     public Gold Gold { get; private set; } = Gold.NONE;
@@ -97,7 +97,7 @@ public class Inventory
 
     public ItemUnion? GetBySpecifier(ItemSpecifier specifier)
     {
-        var equipment = Weapons.GetBySpecifier(specifier) ?? Torsos.GetBySpecifier(specifier);
+        var equipment = Manipulators.GetBySpecifier(specifier) ?? Torsos.GetBySpecifier(specifier);
         var material = Materials.GetBySpecifier(specifier);
         if (equipment != null)
         {
@@ -136,5 +136,5 @@ public class Inventory
         return result;
     }
 
-    public InventoryJson ToJson() => new(Weapons.ToJson(), Torsos.ToJson(), Materials.ToJson(), Gold.Quantity);
+    public InventoryJson ToJson() => new(Manipulators.ToJson(), Torsos.ToJson(), Materials.ToJson(), Gold.Quantity);
 }

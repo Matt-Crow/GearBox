@@ -43,8 +43,8 @@ public class PlayerCharacterTester
     public void Equip_GivenSlotAlreadyEquipped_AddsToInventory()
     {
         var sut = new PlayerCharacter("foo");
-        var alreadyEquipped = new Equipment("Equipment 1", EquipmentSlotType.WEAPON);
-        var notYetEquipped = new Equipment("Equipment 2", EquipmentSlotType.WEAPON);
+        var alreadyEquipped = new Equipment("Equipment 1", EquipmentSlotType.MANIPULATOR);
+        var notYetEquipped = new Equipment("Equipment 2", EquipmentSlotType.MANIPULATOR);
         sut.Inventory.Add(alreadyEquipped);
         sut.Inventory.Add(notYetEquipped);
         sut.EquipById(GetId(alreadyEquipped));
@@ -59,7 +59,7 @@ public class PlayerCharacterTester
     {
         var sut = new PlayerCharacter("foo");
         sut.SetLevel(1);
-        var equipment = new Equipment("bar", EquipmentSlotType.WEAPON, level: 20);
+        var equipment = new Equipment("bar", EquipmentSlotType.MANIPULATOR, level: 20);
         sut.Inventory.Add(equipment);
 
         sut.EquipById(GetId(equipment));
@@ -79,7 +79,7 @@ public class PlayerCharacterTester
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
-        Assert.True(compared.Weapon.HasChanged);
+        Assert.True(compared.Manipulator.HasChanged);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class PlayerCharacterTester
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
-        Assert.True(compared.Weapon.HasChanged);
+        Assert.True(compared.Manipulator.HasChanged);
     }
 
     private Guid GetId(Equipment equipment)
@@ -105,5 +105,5 @@ public class PlayerCharacterTester
         return equipment.Id ?? throw new Exception("ID should not be null");
     }
 
-    private Equipment AnEquipment() => new Equipment("Some equipment", EquipmentSlotType.WEAPON);
+    private Equipment AnEquipment() => new Equipment("Some equipment", EquipmentSlotType.MANIPULATOR);
 }

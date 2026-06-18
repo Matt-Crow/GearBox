@@ -2,14 +2,14 @@ namespace GearBox.Core.Model.Items;
 
 /// <summary>
 /// Each piece of equipment goes in a specific slot.
-/// It wouldn't make sense to equip a torso in your weapon slot!
+/// It wouldn't make sense to equip a torso in your manipulator slot!
 /// </summary>
 public class EquipmentSlotType
 {
-    public static readonly EquipmentSlotType WEAPON = new("Weapon", i => i.Weapons);
+    public static readonly EquipmentSlotType MANIPULATOR = new("Manipulator", i => i.Manipulators);
     public static readonly EquipmentSlotType TORSO = new("Torso", i => i.Torsos);
 
-    public static readonly IEnumerable<EquipmentSlotType> ALL = [WEAPON, TORSO];
+    public static readonly IEnumerable<EquipmentSlotType> ALL = [MANIPULATOR, TORSO];
 
     private readonly Func<Inventory, InventoryTab<Equipment>> _getInventoryTab;
 

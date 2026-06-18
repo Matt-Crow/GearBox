@@ -12,7 +12,7 @@ public readonly struct UiState
         var area = player.CurrentArea ?? player.LastArea;
         Area = area?.ToJson();
         Inventory = player.Inventory.ToJson();
-        Weapon = player.Weapon?.ToJson(1);
+        Manipulator = player.Manipulator?.ToJson(1);
         Torso = player.Torso?.ToJson(1);
         Summary = player.StatSummary.ToJson();
         Actives = player.Actives
@@ -26,7 +26,7 @@ public readonly struct UiState
 
     public AreaJson? Area { get; init; }
     public InventoryJson Inventory { get; init; }
-    public ItemJson? Weapon { get; init; }
+    public ItemJson? Manipulator { get; init; }
     public ItemJson? Torso { get; init; }
     public PlayerStatSummaryJson Summary { get; init; }
     public List<ActiveAbilityJson> Actives { get; init; }
@@ -42,7 +42,7 @@ public readonly struct UiState
         {
             Area = CompareNullable(oldState?.Area, newState.Area),
             Inventory = Compare(oldState?.Inventory, newState.Inventory),
-            Weapon = CompareNullable(oldState?.Weapon, newState.Weapon),
+            Manipulator = CompareNullable(oldState?.Manipulator, newState.Manipulator),
             Torso = CompareNullable(oldState?.Torso, newState.Torso),
             Summary = Compare(oldState?.Summary, newState.Summary),
             Actives = CompareList(oldState?.Actives, newState.Actives),

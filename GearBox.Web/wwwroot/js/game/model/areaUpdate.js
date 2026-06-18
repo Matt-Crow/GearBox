@@ -28,7 +28,7 @@ export class AreaUpdate {
 export class UiStateChanges {
     #area;
     #inventory;
-    #weapon;
+    #manipulator;
     #torso;
     #summary;
     #actives;
@@ -39,7 +39,7 @@ export class UiStateChanges {
      * 
      * @param {*} area 
      * @param {MaybeChange<Inventory>} inventory 
-     * @param {MaybeChange<Item?>} weapon 
+     * @param {MaybeChange<Item?>} manipulator 
      * @param {MaybeChange<Item?>} torso 
      * @param {MaybeChange<PlayerStatSummary>} summary 
      * @param {MaybeChange<ActiveAbility[]} actives 
@@ -49,7 +49,7 @@ export class UiStateChanges {
     constructor(
         area,
         inventory,
-        weapon,
+        manipulator,
         torso,
         summary,
         actives,
@@ -58,7 +58,7 @@ export class UiStateChanges {
     ) {
         this.#area = area;
         this.#inventory = inventory;
-        this.#weapon = weapon;
+        this.#manipulator = manipulator;
         this.#torso = torso;
         this.#summary = summary;
         this.#actives = actives;
@@ -67,7 +67,7 @@ export class UiStateChanges {
     }
 
     get inventory() { return this.#inventory; }
-    get weapon() { return this.#weapon; }
+    get manipulator() { return this.#manipulator; }
     get torso() { return this.#torso; }
     get summary() { return this.#summary; }
     get actives() { return this.#actives; }

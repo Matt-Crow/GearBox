@@ -79,5 +79,5 @@ public class InventoryTester
         Assert.NotNull(sut.GetBySpecifier(ItemSpecifier.ByName(equipment.Name)));
     }
 
-    private Equipment AnEquipment() => new Equipment("Some equipment", EquipmentSlotType.WEAPON);
+    private Equipment AnEquipment() => new Equipment("Some equipment", EquipmentSlotType.MANIPULATOR);
 }

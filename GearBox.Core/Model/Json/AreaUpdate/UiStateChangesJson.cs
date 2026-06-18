@@ -4,7 +4,7 @@ public class UiStateChangesJson
 {
     public MaybeChangeJson<AreaJson?> Area { get; set; }
     public MaybeChangeJson<InventoryJson> Inventory { get; set; }
-    public MaybeChangeJson<ItemJson?> Weapon { get; set; }
+    public MaybeChangeJson<ItemJson?> Manipulator { get; set; }
     public MaybeChangeJson<ItemJson?> Torso { get; set; }
     public MaybeChangeJson<PlayerStatSummaryJson> Summary { get; set; }
     public MaybeChangeJson<List<ActiveAbilityJson>> Actives { get; set; }

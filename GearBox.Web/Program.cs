@@ -108,7 +108,7 @@ gameBuilder
     )
     .WithArea("bazaar", 1, area => area
         .WithMap(bazaarMap)
-        .AddShop("Starter Weapon Shop", Coordinates.FromTiles(2, 7), Color.BLUE, shop => shop
+        .AddShop("Starter Equipment Shop", Coordinates.FromTiles(2, 7), Color.BLUE, shop => shop
             .AddItem("Spectral Armor")
             .AddItem("Armor of Flight")
             .AddItem("Training Sword")

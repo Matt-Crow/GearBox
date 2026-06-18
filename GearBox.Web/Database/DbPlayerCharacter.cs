@@ -29,7 +29,7 @@ public class DbPlayerCharacter
     [Column("gold")]
     public int Gold { get; set; }
 
-    public DbEquippedItem? EquippedWeapon { get; set; }
+    public DbEquippedItem? EquippedManipulator { get; set; }
 
     public DbEquippedItem? EquippedTorso { get; set; }
 
@@ -62,12 +62,12 @@ public class DbPlayerCharacter
         Xp = gameModel.Xp;
         Gold = gameModel.Inventory.Gold.Quantity;
 
-        EquippedWeapon = MakeEquipmentSlot(gameModel.Weapon);
+        EquippedManipulator = MakeEquipmentSlot(gameModel.Manipulator);
         EquippedTorso = MakeEquipmentSlot(gameModel.Torso);     
         
         Items.Clear();
         AddInventoryTab(gameModel.Inventory.Materials, i => 0);
-        AddInventoryTab(gameModel.Inventory.Weapons, i => i.Level);
+        AddInventoryTab(gameModel.Inventory.Manipulators, i => i.Level);
         AddInventoryTab(gameModel.Inventory.Torsos, i => i.Level);
     }
 
@@ -115,11 +115,11 @@ public class DbPlayerCharacter
             result.Inventory.Add(gameItem.ToOwned(dbItem.Level), dbItem.Quantity);
         }
 
-        if (EquippedWeapon != null)
+        if (EquippedManipulator != null)
         {
-            var gameItem = itemFactory.Make(EquippedWeapon.Name) ?? throw new Exception($"Invalid item name: {EquippedWeapon.Name}");
+            var gameItem = itemFactory.Make(EquippedManipulator.Name) ?? throw new Exception($"Invalid item name: {EquippedManipulator.Name}");
             result.Inventory.Add(gameItem);
-            result.EquipById(gameItem.Id ?? throw new Exception("Weapon must have ID"));
+            result.EquipById(gameItem.Id ?? throw new Exception("Manipulator must have ID"));
         }
         if (EquippedTorso != null)
         {

@@ -101,7 +101,7 @@ export class AreaUpdateHandler {
         const uiStateChanges = new UiStateChanges(
             null, // todo area
             MaybeChange.fromJson(json.uiStateChanges.inventory, v => this.#inventoryDeserializer.deserialize(v)),
-            MaybeChange.fromJson(json.uiStateChanges.weapon, Item.fromJson),
+            MaybeChange.fromJson(json.uiStateChanges.manipulator, Item.fromJson),
             MaybeChange.fromJson(json.uiStateChanges.torso, Item.fromJson),
             MaybeChange.fromJson(json.uiStateChanges.summary, PlayerStatSummary.fromJson),
             MaybeChange.fromJson(json.uiStateChanges.actives, actives => actives.map(ActiveAbility.fromJson)),

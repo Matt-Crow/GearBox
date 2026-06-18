@@ -16,9 +16,9 @@ public class GearBoxDbContext(DbContextOptions<GearBoxDbContext> options) : Iden
         base.OnModelCreating(modelBuilder); // must come before customization
 
         modelBuilder.Entity<DbPlayerCharacter>(e => {
-            e.OwnsOne(pc => pc.EquippedWeapon, ew => {
-                ew.Property(e => e.Name).HasColumnName("equipped_weapon_name");
-                ew.Property(e => e.Level).HasColumnName("equipped_weapon_level");
+            e.OwnsOne(pc => pc.EquippedManipulator, ew => {
+                ew.Property(e => e.Name).HasColumnName("equipped_manipulator_name");
+                ew.Property(e => e.Level).HasColumnName("equipped_manipulator_level");
             });
             e.OwnsOne(pc => pc.EquippedTorso, ea => {
                 ea.Property(e => e.Name).HasColumnName("equipped_torso_name");

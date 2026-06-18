@@ -13,7 +13,7 @@ namespace GearBox.Core.Model.GameObjects.Player;
 public class PlayerCharacter : Character
 {
     private int _frameCount = 0; // used for regeneration
-    private readonly EquipmentSlot _weaponSlot = new(EquipmentSlotType.WEAPON);
+    private readonly EquipmentSlot _manipulatorSlot = new(EquipmentSlotType.MANIPULATOR);
     private readonly EquipmentSlot _torsoSlot = new(EquipmentSlotType.TORSO); 
     private readonly List<IActiveAbility> _actives = [];
     private readonly List<IPassiveAbility> _passives = [];
@@ -22,7 +22,7 @@ public class PlayerCharacter : Character
     public PlayerCharacter(string name, int xp = 0, Guid? id = null) : base(name, GetLevelByXp(xp), Color.BLUE, id)
     {
         EquipmentSlots = [
-            _weaponSlot,
+            _manipulatorSlot,
             _torsoSlot
         ];
         Xp = xp;
@@ -45,7 +45,7 @@ public class PlayerCharacter : Character
     public IEnumerable<IActiveAbility> Actives => _actives;
     public IEnumerable<IPassiveAbility> Passives => _passives;
     public Inventory Inventory { get; init; } = new();
-    public Equipment? Weapon => _weaponSlot.Equipment;
+    public Equipment? Manipulator => _manipulatorSlot.Equipment;
     public Equipment? Torso => _torsoSlot.Equipment;
     public List<EquipmentSlot> EquipmentSlots { get; init; }
     
@@ -80,7 +80,7 @@ public class PlayerCharacter : Character
     public override void UpdateStats()
     {
         var boosts = PlayerStatBoosts.Empty()
-            .Combine(Weapon?.StatBoosts)
+            .Combine(Manipulator?.StatBoosts)
             .Combine(Torso?.StatBoosts);
         Stats.SetStatBoosts(boosts);
 
@@ -100,10 +100,10 @@ public class PlayerCharacter : Character
 
         _actives.Clear();
         _passives.Clear();
-        if (Weapon != null)
+        if (Manipulator != null)
         {
-            _actives.AddRange(Weapon.Actives);
-            _passives.AddRange(Weapon.Passives);
+            _actives.AddRange(Manipulator.Actives);
+            _passives.AddRange(Manipulator.Passives);
         }
         if (Torso != null)
         {
