@@ -3,25 +3,25 @@ import { PassiveAbility } from "./passiveAbility.js";
 
 export class Inventory {
     #weapons;
-    #armors;
+    #torsos;
     #materials;
     #gold;
 
     /**
      * @param {Item[]} weapons 
-     * @param {Item[]} armors 
+     * @param {Item[]} torsos 
      * @param {Item[]} materials 
      * @param {number} gold
      */
-    constructor(weapons=[], armors=[], materials=[], gold=0) {
+    constructor(weapons=[], torsos=[], materials=[], gold=0) {
         this.#weapons = weapons;
-        this.#armors = armors;
+        this.#torsos = torsos;
         this.#materials = materials;
         this.#gold = gold;
     }
 
     get weapons() { return this.#weapons; }
-    get armors() { return this.#armors; }
+    get torsos() { return this.#torsos; }
     get materials() { return this.#materials; }
     get gold() { return this.#gold; }
 }
@@ -29,9 +29,9 @@ export class Inventory {
 export class InventoryDeserializer {
     deserialize(json) {
         const weapons = json.weapons.items.map(x => Item.fromJson(x));
-        const armors = json.armors.items.map(x => Item.fromJson(x));
+        const torsos = json.torsos.items.map(x => Item.fromJson(x));
         const materials = json.materials.items.map(x => Item.fromJson(x));
-        return new Inventory(weapons, armors, materials, json.gold);
+        return new Inventory(weapons, torsos, materials, json.gold);
     }
 }
 

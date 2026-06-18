@@ -133,7 +133,7 @@ public class ItemShop
         var result = new List<OpenShopOptionJson>()
             .Concat(GetOptionsFrom(inventory.Materials, playerGold))
             .Concat(GetOptionsFrom(inventory.Weapons, playerGold))
-            .Concat(GetOptionsFrom(inventory.Armors, playerGold))
+            .Concat(GetOptionsFrom(inventory.Torsos, playerGold))
             .ToList();
         return result;
     }

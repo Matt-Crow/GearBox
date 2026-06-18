@@ -1,7 +1,7 @@
 [
     {
         "Name": "Fighter Initiate's Armor",
-        "Slot": "Armor",
+        "Slot": "Torso",
         "GradeName": "Common",
         "Stats": {
             "Offense": 1,
@@ -13,7 +13,7 @@
     },
     {
         "Name": "Mage Initiate's Armor",
-        "Slot": "Armor",
+        "Slot": "Torso",
         "GradeName": "Common",
         "Stats": {
             "Offense": 1,
@@ -25,7 +25,7 @@
     },
     {
         "Name": "Archer Initiate's Armor",
-        "Slot": "Armor",
+        "Slot": "Torso",
         "GradeName": "Common",
         "Stats": {
             "Offense": 1,
@@ -37,7 +37,7 @@
     },
     {
         "Name": "Bronze Armor",
-        "Slot": "Armor",
+        "Slot": "Torso",
         "GradeName": "Uncommon",
         "Stats": {
             "Offense": 1,
@@ -50,7 +50,7 @@
     },
     {
         "Name": "Cactus Armor",
-        "Slot": "Armor",
+        "Slot": "Torso",
         "GradeName": "Uncommon",
         "Stats": {
             "HP": 4,
@@ -62,7 +62,7 @@
     },
     {
         "Name": "Armor of Flight",
-        "Slot": "Armor",
+        "Slot": "Torso",
         "GradeName": "Rare",
         "Stats": {
             "Speed": 1
@@ -73,7 +73,7 @@
     },
     {
         "Name": "Spectral Armor",
-        "Slot": "Armor",
+        "Slot": "Torso",
         "GradeName": "Rare",
         "Stats": {
             "Energy": 1,

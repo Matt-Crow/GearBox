@@ -26,7 +26,7 @@ export class MainModal {
     #recipeTable;
     #craftPreview;
     #weaponTab;
-    #armorTab;
+    #torsoTab;
 
     #currentShop = null;
     #shopBuyTable;
@@ -63,7 +63,7 @@ export class MainModal {
         this.#recipeTable.spawnHtml();
         
         this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equip(id));
-        this.#armorTab = new EquipmentTab("#armorTab", id => client.equip(id));
+        this.#torsoTab = new EquipmentTab("#torsoTab", id => client.equip(id));
 
         this.#shopBuyTable = this.#makeShopTable(".shop-buy", "buy", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopSellTable = this.#makeShopTable(".shop-sell", "sell", opt => client.shopSell(this.#currentShop?.id, opt.item.id, opt.item.name));
@@ -74,7 +74,7 @@ export class MainModal {
             .hide();
     
         this.#weaponTab.setCurrent(null);
-        this.#armorTab.setCurrent(null);
+        this.#torsoTab.setCurrent(null);
         this.#setShop(null);
     }
 
@@ -110,7 +110,7 @@ export class MainModal {
     handleUiStateChanges(uiStateChanges) {
         uiStateChanges.inventory.handleChange(i => this.setInventory(i));
         uiStateChanges.weapon.handleChange(w => this.#weaponTab.setCurrent(w));
-        uiStateChanges.armor.handleChange(a => this.#armorTab.setCurrent(a));
+        uiStateChanges.torso.handleChange(a => this.#torsoTab.setCurrent(a));
         uiStateChanges.summary.handleChange(s => this.setStatSummary(s));
         uiStateChanges.passives.handleChange(p => this.setPassives(p));
         uiStateChanges.openShop.handleChange(os => this.#setShop(os));
@@ -152,7 +152,7 @@ export class MainModal {
     setInventory(inventory) {
         this.#materialTable.setRecords(inventory.materials);
         this.#weaponTab.bindRows(inventory.weapons);
-        this.#armorTab.bindRows(inventory.armors);
+        this.#torsoTab.bindRows(inventory.torsos);
         $("#gold").text(inventory.gold);
     }
 

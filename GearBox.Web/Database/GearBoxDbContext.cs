@@ -20,9 +20,9 @@ public class GearBoxDbContext(DbContextOptions<GearBoxDbContext> options) : Iden
                 ew.Property(e => e.Name).HasColumnName("equipped_weapon_name");
                 ew.Property(e => e.Level).HasColumnName("equipped_weapon_level");
             });
-            e.OwnsOne(pc => pc.EquippedArmor, ea => {
-                ea.Property(e => e.Name).HasColumnName("equipped_armor_name");
-                ea.Property(e => e.Level).HasColumnName("equipped_armor_level");
+            e.OwnsOne(pc => pc.EquippedTorso, ea => {
+                ea.Property(e => e.Name).HasColumnName("equipped_torso_name");
+                ea.Property(e => e.Level).HasColumnName("equipped_torso_level");
             });
         });
     }

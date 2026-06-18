@@ -14,7 +14,7 @@ public class PlayerCharacter : Character
 {
     private int _frameCount = 0; // used for regeneration
     private readonly EquipmentSlot _weaponSlot = new(EquipmentSlotType.WEAPON);
-    private readonly EquipmentSlot _armorSlot = new(EquipmentSlotType.ARMOR); 
+    private readonly EquipmentSlot _torsoSlot = new(EquipmentSlotType.TORSO); 
     private readonly List<EquipmentSlot> _equipmentSlots;
     private readonly List<IActiveAbility> _actives = [];
     private readonly List<IPassiveAbility> _passives = [];
@@ -24,7 +24,7 @@ public class PlayerCharacter : Character
     {
         _equipmentSlots = [
             _weaponSlot,
-            _armorSlot
+            _torsoSlot
         ];
         Xp = xp;
         XpToNextLevel = GetXpByLevel(Level + 1);
@@ -47,7 +47,7 @@ public class PlayerCharacter : Character
     public IEnumerable<IPassiveAbility> Passives => _passives;
     public Inventory Inventory { get; init; } = new();
     public Equipment? Weapon => _weaponSlot.Equipment;
-    public Equipment? Armor => _armorSlot.Equipment;
+    public Equipment? Torso => _torsoSlot.Equipment;
     
     /// <summary>
     /// The shop the player currently has open
@@ -81,7 +81,7 @@ public class PlayerCharacter : Character
     {
         var boosts = PlayerStatBoosts.Empty()
             .Combine(Weapon?.StatBoosts)
-            .Combine(Armor?.StatBoosts);
+            .Combine(Torso?.StatBoosts);
         Stats.SetStatBoosts(boosts);
 
         MaxEnergy = GetMaxEnergyByLevel(Level);
@@ -105,10 +105,10 @@ public class PlayerCharacter : Character
             _actives.AddRange(Weapon.Actives);
             _passives.AddRange(Weapon.Passives);
         }
-        if (Armor != null)
+        if (Torso != null)
         {
-            _actives.AddRange(Armor.Actives);
-            _passives.AddRange(Armor.Passives);
+            _actives.AddRange(Torso.Actives);
+            _passives.AddRange(Torso.Passives);
         }
         foreach (var active in _actives)
         {

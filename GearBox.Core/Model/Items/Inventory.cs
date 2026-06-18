@@ -9,25 +9,24 @@ namespace GearBox.Core.Model.Items;
 public class Inventory 
 {
     public InventoryTab<Equipment> Weapons { get; init; } = new();
-    public InventoryTab<Equipment> Armors { get; init; } = new();
+    public InventoryTab<Equipment> Torsos { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
     public Gold Gold { get; private set; } = Gold.NONE;
-    public bool IsEmpty => Weapons.IsEmpty && Armors.IsEmpty && Materials.IsEmpty && Gold.Quantity == 0;
+    public bool IsEmpty => Weapons.IsEmpty && Torsos.IsEmpty && Materials.IsEmpty && Gold.Quantity == 0;
 
     /// <summary>
     /// Adds all items from the other inventory to this one
     /// </summary>
     public void Add(Inventory other)
     {
-        // todo no stacks for weapons
+        // todo no stacks for equipment
         foreach (var weaponStack in other.Weapons.Content)
         {
             Weapons.Add(weaponStack.Item.ToOwned(), weaponStack.Quantity);
         }
-        // todo no stacks for armors
-        foreach (var armorStack in other.Armors.Content)
+        foreach (var torsoStack in other.Torsos.Content)
         {
-            Armors.Add(armorStack.Item.ToOwned(), armorStack.Quantity);
+            Torsos.Add(torsoStack.Item.ToOwned(), torsoStack.Quantity);
         }
         foreach (var materialStack in other.Materials.Content)
         {
@@ -84,7 +83,7 @@ public class Inventory
 
     public ItemUnion? GetBySpecifier(ItemSpecifier specifier)
     {
-        var equipment = Weapons.GetBySpecifier(specifier) ?? Armors.GetBySpecifier(specifier);
+        var equipment = Weapons.GetBySpecifier(specifier) ?? Torsos.GetBySpecifier(specifier);
         var material = Materials.GetBySpecifier(specifier);
         if (equipment != null)
         {
@@ -123,5 +122,5 @@ public class Inventory
         return result;
     }
 
-    public InventoryJson ToJson() => new(Weapons.ToJson(), Armors.ToJson(), Materials.ToJson(), Gold.Quantity);
+    public InventoryJson ToJson() => new(Weapons.ToJson(), Torsos.ToJson(), Materials.ToJson(), Gold.Quantity);
 }

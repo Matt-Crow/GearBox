@@ -29,7 +29,7 @@ export class UiStateChanges {
     #area;
     #inventory;
     #weapon;
-    #armor;
+    #torso;
     #summary;
     #actives;
     #passives;
@@ -40,7 +40,7 @@ export class UiStateChanges {
      * @param {*} area 
      * @param {MaybeChange<Inventory>} inventory 
      * @param {MaybeChange<Item?>} weapon 
-     * @param {MaybeChange<Item?>} armor 
+     * @param {MaybeChange<Item?>} torso 
      * @param {MaybeChange<PlayerStatSummary>} summary 
      * @param {MaybeChange<ActiveAbility[]} actives 
      * @param {MaybeChange<PassiveAbility[]} passives
@@ -50,7 +50,7 @@ export class UiStateChanges {
         area,
         inventory,
         weapon,
-        armor,
+        torso,
         summary,
         actives,
         passives,
@@ -59,7 +59,7 @@ export class UiStateChanges {
         this.#area = area;
         this.#inventory = inventory;
         this.#weapon = weapon;
-        this.#armor = armor;
+        this.#torso = torso;
         this.#summary = summary;
         this.#actives = actives;
         this.#passives = passives;
@@ -68,7 +68,7 @@ export class UiStateChanges {
 
     get inventory() { return this.#inventory; }
     get weapon() { return this.#weapon; }
-    get armor() { return this.#armor; }
+    get torso() { return this.#torso; }
     get summary() { return this.#summary; }
     get actives() { return this.#actives; }
     get passives() { return this.#passives; }

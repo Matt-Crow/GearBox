@@ -31,7 +31,7 @@ public class DbPlayerCharacter
 
     public DbEquippedItem? EquippedWeapon { get; set; }
 
-    public DbEquippedItem? EquippedArmor { get; set; }
+    public DbEquippedItem? EquippedTorso { get; set; }
 
     [ForeignKey(nameof(AspNetUserId))]
     public IdentityUser AspNetUser { get; set; } = null!;
@@ -63,12 +63,12 @@ public class DbPlayerCharacter
         Gold = gameModel.Inventory.Gold.Quantity;
 
         EquippedWeapon = MakeEquipmentSlot(gameModel.Weapon);
-        EquippedArmor = MakeEquipmentSlot(gameModel.Armor);     
+        EquippedTorso = MakeEquipmentSlot(gameModel.Torso);     
         
         Items.Clear();
         AddInventoryTab(gameModel.Inventory.Materials, i => 0);
         AddInventoryTab(gameModel.Inventory.Weapons, i => i.Level);
-        AddInventoryTab(gameModel.Inventory.Armors, i => i.Level);
+        AddInventoryTab(gameModel.Inventory.Torsos, i => i.Level);
     }
 
     private DbEquippedItem? MakeEquipmentSlot(Equipment? equipmentSlot)
@@ -121,11 +121,11 @@ public class DbPlayerCharacter
             result.Inventory.Add(gameItem);
             result.EquipById(gameItem.Id ?? throw new Exception("Weapon must have ID"));
         }
-        if (EquippedArmor != null)
+        if (EquippedTorso != null)
         {
-            var gameItem = itemFactory.Make(EquippedArmor.Name) ?? throw new Exception($"Invalid item name: {EquippedArmor.Name}");
+            var gameItem = itemFactory.Make(EquippedTorso.Name) ?? throw new Exception($"Invalid item name: {EquippedTorso.Name}");
             result.Inventory.Add(gameItem);
-            result.EquipById(gameItem.Id ?? throw new Exception("Armor must have ID"));
+            result.EquipById(gameItem.Id ?? throw new Exception("Torso must have ID"));
         }
 
         return result;
