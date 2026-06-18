@@ -15,14 +15,13 @@ public class PlayerCharacter : Character
     private int _frameCount = 0; // used for regeneration
     private readonly EquipmentSlot _weaponSlot = new(EquipmentSlotType.WEAPON);
     private readonly EquipmentSlot _torsoSlot = new(EquipmentSlotType.TORSO); 
-    private readonly List<EquipmentSlot> _equipmentSlots;
     private readonly List<IActiveAbility> _actives = [];
     private readonly List<IPassiveAbility> _passives = [];
 
 
     public PlayerCharacter(string name, int xp = 0, Guid? id = null) : base(name, GetLevelByXp(xp), Color.BLUE, id)
     {
-        _equipmentSlots = [
+        EquipmentSlots = [
             _weaponSlot,
             _torsoSlot
         ];
@@ -48,6 +47,7 @@ public class PlayerCharacter : Character
     public Inventory Inventory { get; init; } = new();
     public Equipment? Weapon => _weaponSlot.Equipment;
     public Equipment? Torso => _torsoSlot.Equipment;
+    public List<EquipmentSlot> EquipmentSlots { get; init; }
     
     /// <summary>
     /// The shop the player currently has open
@@ -147,11 +147,8 @@ public class PlayerCharacter : Character
         }
 
         // determine where the equipment goes
-        var slotType = equipment.SlotType;
-        var tab = slotType.GetInventoryTab(Inventory);
-        var slot = _equipmentSlots
-            .FirstOrDefault(slot => slot.SlotType == slotType) 
-            ?? throw new Exception($"PlayerCharacter is missing equipment slot for type {slotType.Name}");
+        var tab = equipment.SlotType.GetInventoryTab(Inventory);
+        var slot = GetSlotFor(equipment);
         
         // swap the old and new ones from the slot to the inventory
         tab.Add(slot.Equipment);
@@ -159,6 +156,18 @@ public class PlayerCharacter : Character
         tab.Remove(equipment);
 
         UpdateStats();
+    }
+
+    /// <summary>
+    /// Returns the slot the given equipment can be slotted into.
+    /// </summary>
+    public EquipmentSlot GetSlotFor(Equipment equipment)
+    {
+        var slotType = equipment.SlotType;
+        var slot = EquipmentSlots
+            .FirstOrDefault(slot => slot.SlotType == slotType) 
+            ?? throw new Exception($"PlayerCharacter is missing equipment slot for type {slotType.Name}");
+        return slot;
     }
 
     public void GainXp(int xp)

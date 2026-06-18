@@ -12,6 +12,7 @@ public class ItemSpecifier
     }
 
     public static ItemSpecifier ById(Guid id) => new ItemSpecifier(id, null);
+    public static ItemSpecifier ByName(string name) => new(null, name);
     
     public Guid? Id { get; init; }
     public string? Name { get; init; }

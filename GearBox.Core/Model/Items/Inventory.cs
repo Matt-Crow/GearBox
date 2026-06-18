@@ -8,25 +8,34 @@ namespace GearBox.Core.Model.Items;
 /// </summary>
 public class Inventory 
 {
+    public Inventory()
+    {
+        EquipmentTabs = [
+            Weapons,
+            Torsos
+        ];    
+    }
+
+
     public InventoryTab<Equipment> Weapons { get; init; } = new();
     public InventoryTab<Equipment> Torsos { get; init; } = new();
     public InventoryTab<Material> Materials { get; init; } = new();
     public Gold Gold { get; private set; } = Gold.NONE;
-    public bool IsEmpty => Weapons.IsEmpty && Torsos.IsEmpty && Materials.IsEmpty && Gold.Quantity == 0;
+    public List<InventoryTab<Equipment>> EquipmentTabs { get; init; }
+    public bool IsEmpty => EquipmentTabs.All(tab => tab.IsEmpty) && Materials.IsEmpty && Gold.Quantity == 0;
 
     /// <summary>
     /// Adds all items from the other inventory to this one
     /// </summary>
     public void Add(Inventory other)
     {
-        // todo no stacks for equipment
-        foreach (var weaponStack in other.Weapons.Content)
+        foreach (var equipmentTab in other.EquipmentTabs)
         {
-            Weapons.Add(weaponStack.Item.ToOwned(), weaponStack.Quantity);
-        }
-        foreach (var torsoStack in other.Torsos.Content)
-        {
-            Torsos.Add(torsoStack.Item.ToOwned(), torsoStack.Quantity);
+            // todo no stacks for equipment
+            foreach (var equipmentStack in equipmentTab.Content)
+            {
+                GetTab(equipmentStack.Item).Add(equipmentStack.Item.ToOwned(), equipmentStack.Quantity);
+            }
         }
         foreach (var materialStack in other.Materials.Content)
         {
@@ -34,6 +43,11 @@ public class Inventory
         }
 
         Gold = Gold.Plus(other.Gold);
+    }
+
+    public void Add(Equipment equipment)
+    {
+        Add(ItemUnion.OfEquipment(equipment));
     }
 
     public void Add(ItemUnion? item, int quantity = 1)

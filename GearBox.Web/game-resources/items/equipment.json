@@ -1,5 +1,65 @@
 [
     {
+        "Name": "Training Sword",
+        "Slot": "Weapon",
+        "GradeName": "Common",
+        "Stats": {
+            "Offense": 1,
+            "HP": 1
+        },
+        "ActiveNames": [
+            "Cleave"
+        ]
+    },
+    {
+        "Name": "Training Staff",
+        "Slot": "Weapon",
+        "GradeName": "Common",
+        "Stats": {
+            "HP": 1,
+            "Energy": 1
+        },
+        "ActiveNames": [
+            "Fire Bolt"
+        ],
+        "PassiveNames": [
+            "Moderately Ranged"
+        ]
+    },
+    {
+        "Name": "Training Bow",
+        "Slot": "Weapon",
+        "GradeName": "Common",
+        "Stats": {
+            "Offense": 1,
+            "Speed": 1
+        },
+        "PassiveNames": [
+            "Long Ranged"
+        ]
+    },
+    {
+        "Name": "Fang",
+        "Slot": "Weapon",
+        "GradeName": "Common",
+        "Stats": {
+            "Offense": 2,
+            "Speed": 1
+        }
+    },
+    {
+        "Name": "Bronze Khopesh",
+        "Slot": "Weapon",
+        "GradeName": "Uncommon",
+        "Stats": {
+            "Offense": 2,
+            "HP": 1
+        },
+        "ActiveNames": [
+            "Cleave"
+        ]
+    },
+    {
         "Name": "Fighter Initiate's Armor",
         "Slot": "Torso",
         "GradeName": "Common",

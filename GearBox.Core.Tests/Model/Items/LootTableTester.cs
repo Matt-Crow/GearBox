@@ -22,7 +22,7 @@ public class LootTableTester
     }
 
     [Fact]
-    public void GetRandomItem_GivenWeapon_ReturnsCopyOfIt()
+    public void GetRandomItem_GivenEquipment_ReturnsCopyOfIt()
     {
         var expected = new Equipment("foo", EquipmentSlotType.WEAPON);
         var sut = new LootTable([
@@ -30,7 +30,11 @@ public class LootTableTester
         ], new RandomNumberGenerator());
 
         var inventory = sut.GetRandomLoot();
-        var actual = inventory.Weapons.Content.First().Item;
+        var actual = inventory
+            .EquipmentTabs
+            .SelectMany(tab => tab.Content)
+            .First()
+            .Item;
 
         // IDs are different
         Assert.NotEqual(expected, actual);
