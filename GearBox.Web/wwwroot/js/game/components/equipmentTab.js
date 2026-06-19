@@ -56,6 +56,7 @@ export class EquipmentTab {
             .spawnHtml();
         this.#compareEquipment = new ItemDisplay(`${selector} .compare-equipment`, "Other")
             .spawnHtml();
+        this.setCurrent(null);
         this.#setCompare(null);
     }
 

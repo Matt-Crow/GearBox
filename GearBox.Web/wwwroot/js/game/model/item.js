@@ -1,27 +1,28 @@
 import { ActiveAbility } from "./activeAbility.js";
 import { PassiveAbility } from "./passiveAbility.js";
 
+export const EQUIPMENT_SLOT_TYPES = {
+    MANIPULATOR: "Manipulator",
+    TORSO: "Torso"
+};
+
 export class Inventory {
-    #manipulators;
-    #torsos;
+    #equipment;
     #materials;
     #gold;
 
     /**
-     * @param {Item[]} manipulators 
-     * @param {Item[]} torsos 
+     * @param {Item[]} equipment 
      * @param {Item[]} materials 
      * @param {number} gold
      */
-    constructor(manipulators=[], torsos=[], materials=[], gold=0) {
-        this.#manipulators = manipulators;
-        this.#torsos = torsos;
+    constructor(equipment=[], materials=[], gold=0) {
+        this.#equipment = equipment;
         this.#materials = materials;
         this.#gold = gold;
     }
 
-    get manipulators() { return this.#manipulators; }
-    get torsos() { return this.#torsos; }
+    get equipment() { return this.#equipment; }
     get materials() { return this.#materials; }
     get gold() { return this.#gold; }
 }
@@ -29,10 +30,8 @@ export class Inventory {
 export class InventoryDeserializer {
     deserialize(json) {
         const equipment = json.equipment.map(x => Item.fromJson(x));
-        const manipulators = equipment.filter(item => item.slotType == "Manipulator");
-        const torsos = equipment.filter(item => item.slotType == "Torso");
         const materials = json.materials.items.map(x => Item.fromJson(x));
-        return new Inventory(manipulators, torsos, materials, json.gold);
+        return new Inventory(equipment, materials, json.gold);
     }
 }
 

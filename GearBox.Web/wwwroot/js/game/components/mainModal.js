@@ -3,9 +3,9 @@
 */
 
 import { Client } from "../infrastructure/client.js";
-import { UiStateChanges } from "../model/areaUpdate.js";
+import { MaybeChange, UiStateChanges } from "../model/areaUpdate.js";
 import { CraftingRecipe } from "../model/crafting.js";
-import { Inventory } from "../model/item.js";
+import { EQUIPMENT_SLOT_TYPES, Inventory } from "../model/item.js";
 import { PassiveAbility } from "../model/passiveAbility.js";
 import { PlayerStatSummary } from "../model/player.js";
 import { OpenShop } from "../model/shop.js";
@@ -25,8 +25,7 @@ export class MainModal {
     #materialTable;
     #recipeTable;
     #craftPreview;
-    #manipulatorTab;
-    #torsoTab;
+    #equipmentTabs;
 
     #currentShop = null;
     #shopBuyTable;
@@ -62,9 +61,6 @@ export class MainModal {
         ], (record, row) => this.#craftPreview.handleRowCreated(record?.makes, row));
         this.#recipeTable.spawnHtml();
         
-        this.#manipulatorTab = new EquipmentTab("#manipulatorTab", id => client.equip(id));
-        this.#torsoTab = new EquipmentTab("#torsoTab", id => client.equip(id));
-
         this.#shopBuyTable = this.#makeShopTable(".shop-buy", "buy", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopSellTable = this.#makeShopTable(".shop-sell", "sell", opt => client.shopSell(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopBuybackTable = this.#makeShopTable(".shop-buyback", "buy back", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
@@ -73,9 +69,11 @@ export class MainModal {
             .spawnHtml()
             .hide();
     
-        this.#manipulatorTab.setCurrent(null);
-        this.#torsoTab.setCurrent(null);
         this.#setShop(null);
+
+        this.#equipmentTabs = new Map();
+        this.#equipmentTabs.set(EQUIPMENT_SLOT_TYPES.MANIPULATOR, new EquipmentTab("#manipulatorTab", id => client.equip(id)));
+        this.#equipmentTabs.set(EQUIPMENT_SLOT_TYPES.TORSO, new EquipmentTab("#torsoTab", id => client.equip(id)));
     }
 
     /**
@@ -108,12 +106,32 @@ export class MainModal {
      * @param {UiStateChanges} uiStateChanges 
      */
     handleUiStateChanges(uiStateChanges) {
+        this.#handleEquippedChange(uiStateChanges.manipulator, EQUIPMENT_SLOT_TYPES.MANIPULATOR);
+        this.#handleEquippedChange(uiStateChanges.torso, EQUIPMENT_SLOT_TYPES.TORSO);
         uiStateChanges.inventory.handleChange(i => this.setInventory(i));
-        uiStateChanges.manipulator.handleChange(w => this.#manipulatorTab.setCurrent(w));
-        uiStateChanges.torso.handleChange(a => this.#torsoTab.setCurrent(a));
         uiStateChanges.summary.handleChange(s => this.setStatSummary(s));
         uiStateChanges.passives.handleChange(p => this.setPassives(p));
         uiStateChanges.openShop.handleChange(os => this.#setShop(os));
+    }
+
+    /**
+     * @param {MaybeChange} maybeChange 
+     * @param {string} slotType from EQUIPMENT_SLOT_TYPE
+     */
+    #handleEquippedChange(maybeChange, slotType) {
+        maybeChange.handleChange(e => this.#getEquipmentTab(slotType).setCurrent(e));
+    }
+
+    /**
+     * @param {string} slotType from EQUIPMENT_SLOT_TYPE
+     * @returns {EquipmentTab}
+     */
+    #getEquipmentTab(slotType) {
+        const result = this.#equipmentTabs.get(slotType);
+        if (!result) {
+            throw new Error(`Missing equipment tab for ${slotType}`);
+        }
+        return result;
     }
 
     /**
@@ -150,9 +168,11 @@ export class MainModal {
      * @param {Inventory} inventory 
      */
     setInventory(inventory) {
+        for (const [slotType, tab] of this.#equipmentTabs.entries()) {
+            const equipmentForThisTab = inventory.equipment.filter(e => e.slotType === slotType);
+            tab.bindRows(equipmentForThisTab);
+        }
         this.#materialTable.setRecords(inventory.materials);
-        this.#manipulatorTab.bindRows(inventory.manipulators);
-        this.#torsoTab.bindRows(inventory.torsos);
         $("#gold").text(inventory.gold);
     }
 
