@@ -79,7 +79,7 @@ public class PlayerCharacterTester
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
-        Assert.True(compared.Manipulator.HasChanged);
+        Assert.True(SlotHasChanged(compared, equipment));
     }
 
     [Fact]
@@ -97,12 +97,18 @@ public class PlayerCharacterTester
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
-        Assert.True(compared.Manipulator.HasChanged);
+        Assert.True(SlotHasChanged(compared, equipment1));
     }
 
     private Guid GetId(Equipment equipment)
     {
         return equipment.Id ?? throw new Exception("ID should not be null");
+    }
+
+    private bool SlotHasChanged(UiStateChangesJson changes, Equipment equipment)
+    {
+        var slot = changes.EquipmentSlots.First(s => s.SlotType == equipment.SlotType.Name);
+        return slot.Equipment.HasChanged;
     }
 
     private Equipment AnEquipment() => new Equipment("Some equipment", EquipmentSlotType.MANIPULATOR);

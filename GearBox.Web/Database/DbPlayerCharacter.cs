@@ -62,8 +62,8 @@ public class DbPlayerCharacter
         Xp = gameModel.Xp;
         Gold = gameModel.Inventory.Gold.Quantity;
 
-        EquippedManipulator = MakeEquipmentSlot(gameModel.Manipulator);
-        EquippedTorso = MakeEquipmentSlot(gameModel.Torso);     
+        EquippedManipulator = MakeEquipmentSlot(gameModel.GetSlotFor(EquipmentSlotType.MANIPULATOR));
+        EquippedTorso = MakeEquipmentSlot(gameModel.GetSlotFor(EquipmentSlotType.TORSO));     
         
         Items.Clear();
         AddInventoryTab(gameModel.Inventory.Materials, i => 0);
@@ -73,14 +73,15 @@ public class DbPlayerCharacter
         }
     }
 
-    private DbEquippedItem? MakeEquipmentSlot(Equipment? equipmentSlot)
+    private DbEquippedItem? MakeEquipmentSlot(EquipmentSlot slot)
     {
-        var dbModel = equipmentSlot == null
+        var equipment = slot.Equipment;
+        var dbModel = equipment == null
             ? null
             : new DbEquippedItem()
             {
-                Name = equipmentSlot.Name,
-                Level = equipmentSlot.Level
+                Name = equipment.Name,
+                Level = equipment.Level
             };
         return dbModel;
     }

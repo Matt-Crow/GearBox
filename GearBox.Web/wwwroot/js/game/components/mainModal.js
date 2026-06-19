@@ -106,32 +106,15 @@ export class MainModal {
      * @param {UiStateChanges} uiStateChanges 
      */
     handleUiStateChanges(uiStateChanges) {
-        this.#handleEquippedChange(uiStateChanges.manipulator, EQUIPMENT_SLOT_TYPES.MANIPULATOR);
-        this.#handleEquippedChange(uiStateChanges.torso, EQUIPMENT_SLOT_TYPES.TORSO);
+        Object.values(EQUIPMENT_SLOT_TYPES).forEach(slotType => {
+            const maybeChange = uiStateChanges.equipment.get(slotType);
+            const tab = this.#equipmentTabs.get(slotType);
+            maybeChange.handleChange(e => tab.setCurrent(e));
+        });
         uiStateChanges.inventory.handleChange(i => this.setInventory(i));
         uiStateChanges.summary.handleChange(s => this.setStatSummary(s));
         uiStateChanges.passives.handleChange(p => this.setPassives(p));
         uiStateChanges.openShop.handleChange(os => this.#setShop(os));
-    }
-
-    /**
-     * @param {MaybeChange} maybeChange 
-     * @param {string} slotType from EQUIPMENT_SLOT_TYPE
-     */
-    #handleEquippedChange(maybeChange, slotType) {
-        maybeChange.handleChange(e => this.#getEquipmentTab(slotType).setCurrent(e));
-    }
-
-    /**
-     * @param {string} slotType from EQUIPMENT_SLOT_TYPE
-     * @returns {EquipmentTab}
-     */
-    #getEquipmentTab(slotType) {
-        const result = this.#equipmentTabs.get(slotType);
-        if (!result) {
-            throw new Error(`Missing equipment tab for ${slotType}`);
-        }
-        return result;
     }
 
     /**

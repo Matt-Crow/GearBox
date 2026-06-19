@@ -13,18 +13,12 @@ namespace GearBox.Core.Model.GameObjects.Player;
 public class PlayerCharacter : Character
 {
     private int _frameCount = 0; // used for regeneration
-    private readonly EquipmentSlot _manipulatorSlot = new(EquipmentSlotType.MANIPULATOR);
-    private readonly EquipmentSlot _torsoSlot = new(EquipmentSlotType.TORSO); 
     private readonly List<IActiveAbility> _actives = [];
     private readonly List<IPassiveAbility> _passives = [];
 
 
     public PlayerCharacter(string name, int xp = 0, Guid? id = null) : base(name, GetLevelByXp(xp), Color.BLUE, id)
     {
-        EquipmentSlots = [
-            _manipulatorSlot,
-            _torsoSlot
-        ];
         Xp = xp;
         XpToNextLevel = GetXpByLevel(Level + 1);
         StatSummary = new PlayerStatSummary(this);
@@ -45,9 +39,7 @@ public class PlayerCharacter : Character
     public IEnumerable<IActiveAbility> Actives => _actives;
     public IEnumerable<IPassiveAbility> Passives => _passives;
     public Inventory Inventory { get; init; } = new();
-    public Equipment? Manipulator => _manipulatorSlot.Equipment;
-    public Equipment? Torso => _torsoSlot.Equipment;
-    public List<EquipmentSlot> EquipmentSlots { get; init; }
+    public List<EquipmentSlot> EquipmentSlots { get; init; } = EquipmentSlotType.ALL.Select(slotType => new EquipmentSlot(slotType)).ToList();
     
     /// <summary>
     /// The shop the player currently has open
@@ -79,9 +71,11 @@ public class PlayerCharacter : Character
 
     public override void UpdateStats()
     {
-        var boosts = PlayerStatBoosts.Empty()
-            .Combine(Manipulator?.StatBoosts)
-            .Combine(Torso?.StatBoosts);
+        var boosts = PlayerStatBoosts.Empty();
+        foreach (var slot in EquipmentSlots)
+        {
+            boosts = boosts.Combine(slot.Equipment?.StatBoosts);
+        }
         Stats.SetStatBoosts(boosts);
 
         MaxEnergy = GetMaxEnergyByLevel(Level);
@@ -100,15 +94,13 @@ public class PlayerCharacter : Character
 
         _actives.Clear();
         _passives.Clear();
-        if (Manipulator != null)
+        foreach (var equipment in EquipmentSlots.Select(slot => slot.Equipment))
         {
-            _actives.AddRange(Manipulator.Actives);
-            _passives.AddRange(Manipulator.Passives);
-        }
-        if (Torso != null)
-        {
-            _actives.AddRange(Torso.Actives);
-            _passives.AddRange(Torso.Passives);
+            if (equipment != null)
+            {
+                _actives.AddRange(equipment.Actives);
+                _passives.AddRange(equipment.Passives);
+            }
         }
         foreach (var active in _actives)
         {
@@ -163,7 +155,14 @@ public class PlayerCharacter : Character
     /// </summary>
     public EquipmentSlot GetSlotFor(Equipment equipment)
     {
-        var slotType = equipment.SlotType;
+        return GetSlotFor(equipment.SlotType);
+    }
+
+    /// <summary>
+    /// Returns the slot the given type of equipment can be slotted into.
+    /// </summary>
+    public EquipmentSlot GetSlotFor(EquipmentSlotType slotType)
+    {
         var slot = EquipmentSlots
             .FirstOrDefault(slot => slot.SlotType == slotType) 
             ?? throw new Exception($"PlayerCharacter is missing equipment slot for type {slotType.Name}");

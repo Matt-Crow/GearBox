@@ -1,4 +1,5 @@
 using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.Items;
 
 namespace GearBox.Core.Model.Json.AreaUpdate;
 
@@ -12,8 +13,10 @@ public readonly struct UiState
         var area = player.CurrentArea ?? player.LastArea;
         Area = area?.ToJson();
         Inventory = player.Inventory.ToJson();
-        Manipulator = player.Manipulator?.ToJson(1);
-        Torso = player.Torso?.ToJson(1);
+        foreach (var slotType in EquipmentSlotType.ALL)
+        {
+            EquipmentSlots[slotType] = player.GetSlotFor(slotType).Equipment?.ToJson(1);
+        }
         Summary = player.StatSummary.ToJson();
         Actives = player.Actives
             .Select(x => new ActiveAbilityJson(x))
@@ -26,8 +29,7 @@ public readonly struct UiState
 
     public AreaJson? Area { get; init; }
     public InventoryJson Inventory { get; init; }
-    public ItemJson? Manipulator { get; init; }
-    public ItemJson? Torso { get; init; }
+    public Dictionary<EquipmentSlotType, ItemJson?> EquipmentSlots { get; init; } = new();
     public PlayerStatSummaryJson Summary { get; init; }
     public List<ActiveAbilityJson> Actives { get; init; }
     public List<PassiveAbilityJson> Passives { get; init; }
@@ -38,12 +40,19 @@ public readonly struct UiState
     /// </summary>
     public static UiStateChangesJson GetChanges(UiState? oldState, UiState newState)
     {
+        var es = new List<EquipmentSlotJson>();
+        foreach (var slotType in EquipmentSlotType.ALL)
+        {
+            var oldValue = oldState?.EquipmentSlots[slotType];
+            var newValue = newState.EquipmentSlots[slotType];
+            es.Add(new EquipmentSlotJson(slotType.Name, CompareNullable(oldValue, newValue)));           
+        }
+
         var result = new UiStateChangesJson()
         {
             Area = CompareNullable(oldState?.Area, newState.Area),
             Inventory = Compare(oldState?.Inventory, newState.Inventory),
-            Manipulator = CompareNullable(oldState?.Manipulator, newState.Manipulator),
-            Torso = CompareNullable(oldState?.Torso, newState.Torso),
+            EquipmentSlots = es,
             Summary = Compare(oldState?.Summary, newState.Summary),
             Actives = CompareList(oldState?.Actives, newState.Actives),
             Passives = CompareList(oldState?.Passives, newState.Passives),
