@@ -1,5 +1,16 @@
 [
     {
+        "Name": "Armor of Flight",
+        "Slot": "Locomotion",
+        "GradeName": "Rare",
+        "Stats": {
+            "Speed": 1
+        },
+        "PassiveNames": [
+            "Levitate"
+        ]
+    },
+    {
         "Name": "Training Sword",
         "Slot": "Manipulator",
         "GradeName": "Common",
@@ -118,17 +129,6 @@
         },
         "PassiveNames": [
             "Spikey"
-        ]
-    },
-    {
-        "Name": "Armor of Flight",
-        "Slot": "Torso",
-        "GradeName": "Rare",
-        "Stats": {
-            "Speed": 1
-        },
-        "PassiveNames": [
-            "Levitate"
         ]
     },
     {

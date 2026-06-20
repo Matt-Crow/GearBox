@@ -2,11 +2,12 @@ namespace GearBox.Core.Model.Items;
 
 /// <summary>
 /// Each piece of equipment goes in a specific slot.
-/// It wouldn't make sense to equip a torso in your manipulator slot!
+/// It wouldn't make sense to equip a circle in your square slot!
 /// </summary>
 public class EquipmentSlotType
 {
     public static readonly IEnumerable<EquipmentSlotType> ALL = [
+        new("Locomotion"),
         new("Manipulator"), 
         new("Torso")
     ];

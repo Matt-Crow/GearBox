@@ -72,6 +72,7 @@ export class MainModal {
         this.#setShop(null);
 
         this.#equipmentTabs = new Map();
+        this.#equipmentTabs.set(EQUIPMENT_SLOT_TYPES.LOCOMOTION, new EquipmentTab("#locomotionTab", id => client.equip(id)));
         this.#equipmentTabs.set(EQUIPMENT_SLOT_TYPES.MANIPULATOR, new EquipmentTab("#manipulatorTab", id => client.equip(id)));
         this.#equipmentTabs.set(EQUIPMENT_SLOT_TYPES.TORSO, new EquipmentTab("#torsoTab", id => client.equip(id)));
     }
