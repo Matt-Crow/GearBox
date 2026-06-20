@@ -14,7 +14,7 @@ public class EquipmentTester
         {
             {stat, 1}
         };
-        var sut = new Equipment("foo", EquipmentSlotType.MANIPULATOR, statWeights: weights, level: 1);
+        var sut = new Equipment("foo", EquipmentSlotType.ALL.First(), statWeights: weights, level: 1);
 
         var other = sut.ToOwned(2);
 

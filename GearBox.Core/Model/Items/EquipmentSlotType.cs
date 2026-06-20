@@ -6,10 +6,10 @@ namespace GearBox.Core.Model.Items;
 /// </summary>
 public class EquipmentSlotType
 {
-    public static readonly EquipmentSlotType MANIPULATOR = new("Manipulator");
-    public static readonly EquipmentSlotType TORSO = new("Torso");
-
-    public static readonly IEnumerable<EquipmentSlotType> ALL = [MANIPULATOR, TORSO];
+    public static readonly IEnumerable<EquipmentSlotType> ALL = [
+        new("Manipulator"), 
+        new("Torso")
+    ];
 
 
     private EquipmentSlotType(string name)

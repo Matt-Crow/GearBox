@@ -43,8 +43,8 @@ public class PlayerCharacterTester
     public void Equip_GivenSlotAlreadyEquipped_AddsToInventory()
     {
         var sut = new PlayerCharacter("foo");
-        var alreadyEquipped = new Equipment("Equipment 1", EquipmentSlotType.MANIPULATOR);
-        var notYetEquipped = new Equipment("Equipment 2", EquipmentSlotType.MANIPULATOR);
+        var alreadyEquipped = new Equipment("Equipment 1", EquipmentSlotType.ALL.First());
+        var notYetEquipped = new Equipment("Equipment 2", EquipmentSlotType.ALL.First());
         sut.Inventory.Add(alreadyEquipped);
         sut.Inventory.Add(notYetEquipped);
         sut.EquipById(GetId(alreadyEquipped));
@@ -59,7 +59,7 @@ public class PlayerCharacterTester
     {
         var sut = new PlayerCharacter("foo");
         sut.SetLevel(1);
-        var equipment = new Equipment("bar", EquipmentSlotType.MANIPULATOR, level: 20);
+        var equipment = new Equipment("bar", EquipmentSlotType.ALL.First(), level: 20);
         sut.Inventory.Add(equipment);
 
         sut.EquipById(GetId(equipment));
@@ -111,5 +111,5 @@ public class PlayerCharacterTester
         return slot.Equipment.HasChanged;
     }
 
-    private Equipment AnEquipment() => new Equipment("Some equipment", EquipmentSlotType.MANIPULATOR);
+    private Equipment AnEquipment() => new Equipment("Some equipment", EquipmentSlotType.ALL.First());
 }
