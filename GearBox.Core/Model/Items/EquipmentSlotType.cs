@@ -7,6 +7,7 @@ namespace GearBox.Core.Model.Items;
 public class EquipmentSlotType
 {
     public static readonly IEnumerable<EquipmentSlotType> ALL = [
+        new("Head"),
         new("Locomotion"),
         new("Manipulator"), 
         new("Torso")

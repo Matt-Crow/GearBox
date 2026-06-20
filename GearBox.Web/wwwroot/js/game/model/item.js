@@ -2,6 +2,7 @@ import { ActiveAbility } from "./activeAbility.js";
 import { PassiveAbility } from "./passiveAbility.js";
 
 export const EQUIPMENT_SLOT_TYPES = {
+    HEAD: "Head",
     LOCOMOTION: "Locomotion",
     MANIPULATOR: "Manipulator",
     TORSO: "Torso"

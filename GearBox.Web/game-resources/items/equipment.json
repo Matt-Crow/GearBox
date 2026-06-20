@@ -1,5 +1,17 @@
 [
     {
+        "Name": "Cactus Armor",
+        "Slot": "Head",
+        "GradeName": "Uncommon",
+        "Stats": {
+            "HP": 4,
+            "Offense": 1
+        },
+        "PassiveNames": [
+            "Spikey"
+        ]
+    },
+    {
         "Name": "Armor of Flight",
         "Slot": "Locomotion",
         "GradeName": "Rare",
@@ -117,18 +129,6 @@
         },
         "PassiveNames": [
             "Heavily Armored"
-        ]
-    },
-    {
-        "Name": "Cactus Armor",
-        "Slot": "Torso",
-        "GradeName": "Uncommon",
-        "Stats": {
-            "HP": 4,
-            "Offense": 1
-        },
-        "PassiveNames": [
-            "Spikey"
         ]
     },
     {
