@@ -29,9 +29,7 @@ public class DbPlayerCharacter
     [Column("gold")]
     public int Gold { get; set; }
 
-    public DbEquippedItem? EquippedManipulator { get; set; }
-
-    public DbEquippedItem? EquippedTorso { get; set; }
+    public List<DbPlayerCharacterEquipmentSlot> EquipmentSlots { get; set; } = [];
 
     [ForeignKey(nameof(AspNetUserId))]
     public IdentityUser AspNetUser { get; set; } = null!;
@@ -62,8 +60,9 @@ public class DbPlayerCharacter
         Xp = gameModel.Xp;
         Gold = gameModel.Inventory.Gold.Quantity;
 
-        EquippedManipulator = MakeEquipmentSlot(gameModel.GetSlotFor(EquipmentSlotType.MANIPULATOR));
-        EquippedTorso = MakeEquipmentSlot(gameModel.GetSlotFor(EquipmentSlotType.TORSO));     
+        EquipmentSlots = gameModel.EquipmentSlots
+            .Select(es => DbPlayerCharacterEquipmentSlot.FromGameModel(this, es))
+            .ToList();
         
         Items.Clear();
         AddInventoryTab(gameModel.Inventory.Materials, i => 0);
@@ -71,19 +70,6 @@ public class DbPlayerCharacter
         {
             AddInventoryTab(equipmentTab, i => i.Level);
         }
-    }
-
-    private DbEquippedItem? MakeEquipmentSlot(EquipmentSlot slot)
-    {
-        var equipment = slot.Equipment;
-        var dbModel = equipment == null
-            ? null
-            : new DbEquippedItem()
-            {
-                Name = equipment.Name,
-                Level = equipment.Level
-            };
-        return dbModel;
     }
 
     private void AddInventoryTab<T>(InventoryTab<T> tab, Func<T, int> getLevel)
@@ -118,17 +104,14 @@ public class DbPlayerCharacter
             result.Inventory.Add(gameItem.ToOwned(dbItem.Level), dbItem.Quantity);
         }
 
-        if (EquippedManipulator != null)
+        foreach (var equipmentSlot in EquipmentSlots)
         {
-            var gameItem = itemFactory.Make(EquippedManipulator.Name) ?? throw new Exception($"Invalid item name: {EquippedManipulator.Name}");
-            result.Inventory.Add(gameItem);
-            result.EquipById(gameItem.Id ?? throw new Exception("Manipulator must have ID"));
-        }
-        if (EquippedTorso != null)
-        {
-            var gameItem = itemFactory.Make(EquippedTorso.Name) ?? throw new Exception($"Invalid item name: {EquippedTorso.Name}");
-            result.Inventory.Add(gameItem);
-            result.EquipById(gameItem.Id ?? throw new Exception("Torso must have ID"));
+            if (equipmentSlot.EquipmentName != null)
+            {
+                var gameItem = itemFactory.Make(equipmentSlot.EquipmentName) ?? throw new Exception($"Invalid item name: {equipmentSlot.EquipmentName}");
+                result.Inventory.Add(gameItem);
+                result.EquipById(gameItem.Id ?? throw new Exception("Item must have ID"));
+            }
         }
 
         return result;
