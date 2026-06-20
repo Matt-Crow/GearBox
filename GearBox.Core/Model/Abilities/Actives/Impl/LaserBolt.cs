@@ -3,9 +3,9 @@ using GearBox.Core.Model.Units;
 
 namespace GearBox.Core.Model.Abilities.Actives.Impl;
 
-public class Firebolt() : ActiveAbility("Fire Bolt", 40, Duration.FromSeconds(3))
+public class LaserBolt() : ActiveAbility("Laser Bolt", 40, Duration.FromSeconds(3))
 {
-    public override IActiveAbility Copy() => new Firebolt();
+    public override IActiveAbility Copy() => new LaserBolt();
 
     public override string GetDescription()
     {

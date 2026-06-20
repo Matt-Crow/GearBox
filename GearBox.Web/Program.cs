@@ -36,7 +36,7 @@ var gameBuilder = new GameBuilder(gearboxConfig, rng);
 // configure actives and passives before items, as items can provide both
 gameBuilder.Actives
     .Add(new Cleave())
-    .Add(new Firebolt())
+    .Add(new LaserBolt())
     ;
 gameBuilder.Passives
     .Add(Armored.Lightly())
@@ -76,13 +76,16 @@ gameBuilder.Enemies
         .Add(Grade.COMMON, new Gold(5))
     )
     .Add("Scorpion", Color.BLACK, loot => loot
-        .AddItem("Fighter Initiate's Armor")
+        .AddItem("Tanky Torso")
         .AddItem("Bronze")
         .Add(Grade.UNCOMMON, new Gold(10))
     )
     .Add("Jackal", Color.TAN, loot => loot
         .AddItem("Fang")
         .Add(Grade.RARE, new Gold(25))
+    )
+    .Add("Specter", Color.BLUE, loot => loot
+        .AddItem("Spectral Shroud")
     );
 
 // we have all the game data, now make areas in that game
@@ -94,7 +97,7 @@ gameBuilder
         .AddLoot(loot => loot
             .AddItem("Stone")
             .AddItem("Bronze")
-            .AddItem("Cactus Armor")
+            .AddItem("Spiney Helm")
             .Add(Grade.COMMON, new Gold(5))
             .Add(Grade.UNCOMMON, new Gold(10))
         )
@@ -109,14 +112,14 @@ gameBuilder
     .WithArea("bazaar", 1, area => area
         .WithMap(bazaarMap)
         .AddShop("Starter Equipment Shop", Coordinates.FromTiles(2, 7), Color.BLUE, shop => shop
-            .AddItem("Spectral Armor")
-            .AddItem("Armor of Flight")
-            .AddItem("Training Sword")
-            .AddItem("Training Bow")
-            .AddItem("Training Staff")
-            .AddItem("Fighter Initiate's Armor")
-            .AddItem("Archer Initiate's Armor")
-            .AddItem("Mage Initiate's Armor")
+            .AddItem("Hard Hat")
+            .AddItem("Laser Lenses")
+            .AddItem("Armored Treads")
+            .AddItem("Rotowheel")
+            .AddItem("Training Club")
+            .AddItem("Training Blaster")
+            .AddItem("Tanky Torso")
+            .AddItem("High-Capacity Torso")
         )
         .WithExit(BorderExit.Top("desert"))
     )
@@ -124,11 +127,13 @@ gameBuilder
         .AddLoot(loot => loot
             .AddItem("Bronze")
             .AddItem("Silver")
+            .AddItem("Antigravity Thrusters")
             .Add(Grade.RARE, new Gold(25))
         )
         .AddEnemies(enemies => enemies
             .Add("Snake")
             .Add("Jackal")
+            .Add("Specter")
         )
         .WithMap(canyonMap)
         .WithExit(BorderExit.Left("desert"))

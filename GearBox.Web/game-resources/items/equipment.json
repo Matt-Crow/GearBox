@@ -1,6 +1,30 @@
 [
     {
-        "Name": "Cactus Armor",
+        "Name": "Hard Hat",
+        "Slot": "Head",
+        "GradeName": "Common",
+        "Stats": {
+            "HP": 2,
+            "Offense": 1
+        },
+        "PassiveNames": [
+            "Moderately Armored"
+        ]
+    },
+    {
+        "Name": "Laser Lenses",
+        "Slot": "Head",
+        "GradeName": "Common",
+        "Stats": {
+            "Energy": 4,
+            "Offense": 1
+        },
+        "ActiveNames": [
+            "Laser Bolt"
+        ]
+    },
+    {
+        "Name": "Spiney Helm",
         "Slot": "Head",
         "GradeName": "Uncommon",
         "Stats": {
@@ -12,7 +36,28 @@
         ]
     },
     {
-        "Name": "Armor of Flight",
+        "Name": "Armored Treads",
+        "Slot": "Locomotion",
+        "GradeName": "Common",
+        "Stats": {
+            "HP": 3,
+            "Speed": 1
+        },
+        "PassiveNames": [
+            "Moderately Armored"
+        ]
+    },
+    {
+        "Name": "Rotowheel",
+        "Slot": "Locomotion",
+        "GradeName": "Common",
+        "Stats": {
+            "Energy": 1,
+            "Speed": 1
+        }
+    },
+    {
+        "Name": "Antigravity Thrusters",
         "Slot": "Locomotion",
         "GradeName": "Rare",
         "Stats": {
@@ -23,7 +68,7 @@
         ]
     },
     {
-        "Name": "Training Sword",
+        "Name": "Training Club",
         "Slot": "Manipulator",
         "GradeName": "Common",
         "Stats": {
@@ -35,28 +80,16 @@
         ]
     },
     {
-        "Name": "Training Staff",
-        "Slot": "Manipulator",
-        "GradeName": "Common",
-        "Stats": {
-            "HP": 1,
-            "Energy": 1
-        },
-        "ActiveNames": [
-            "Fire Bolt"
-        ],
-        "PassiveNames": [
-            "Moderately Ranged"
-        ]
-    },
-    {
-        "Name": "Training Bow",
+        "Name": "Training Blaster",
         "Slot": "Manipulator",
         "GradeName": "Common",
         "Stats": {
             "Offense": 1,
-            "Speed": 1
+            "Energy": 2
         },
+        "ActiveNames": [
+            "Laser Bolt"
+        ],
         "PassiveNames": [
             "Long Ranged"
         ]
@@ -83,7 +116,7 @@
         ]
     },
     {
-        "Name": "Fighter Initiate's Armor",
+        "Name": "Tanky Torso",
         "Slot": "Torso",
         "GradeName": "Common",
         "Stats": {
@@ -95,7 +128,7 @@
         ]
     },
     {
-        "Name": "Mage Initiate's Armor",
+        "Name": "High-Capacity Torso",
         "Slot": "Torso",
         "GradeName": "Common",
         "Stats": {
@@ -104,18 +137,6 @@
         },
         "PassiveNames": [
             "Lightly Armored"
-        ]
-    },
-    {
-        "Name": "Archer Initiate's Armor",
-        "Slot": "Torso",
-        "GradeName": "Common",
-        "Stats": {
-            "Offense": 1,
-            "Speed": 1
-        },
-        "PassiveNames": [
-            "Moderately Armored"
         ]
     },
     {
@@ -132,7 +153,7 @@
         ]
     },
     {
-        "Name": "Spectral Armor",
+        "Name": "Spectral Shroud",
         "Slot": "Torso",
         "GradeName": "Rare",
         "Stats": {
