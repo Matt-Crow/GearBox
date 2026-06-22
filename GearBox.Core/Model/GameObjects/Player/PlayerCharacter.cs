@@ -24,6 +24,7 @@ public class PlayerCharacter : Character
         StatSummary = new PlayerStatSummary(this);
         UpdateStats();
     }
+    
 
     public EventEmitter<AreaChangedEvent> EventAreaChanged { get; } = new();
 
@@ -31,15 +32,18 @@ public class PlayerCharacter : Character
     public int Xp { get; private set; } // experience points
     public int XpToNextLevel { get; private set; }
     public int MaxEnergy { get; private set; }
-    public int EnergyExpended { get; private set; } = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
+    public int EnergyExpended { get; private set; } = 0; // track energy expended instead of remaining energy to avoid issues when swapping parts
     public int EnergyRemaining => MaxEnergy - EnergyExpended;
     public PlayerStats Stats { get; init; } = new();
     public PlayerStatSummary StatSummary { get; init; }
     public IEnumerable<IActiveAbility> Actives => _actives;
     public IEnumerable<IPassiveAbility> Passives => _passives;
     public Inventory Inventory { get; init; } = new();
-    public Equipment? Weapon { get; private set; } = null;
-    public Equipment? Armor { get; private set; } = null;
+
+    /// <summary>
+    /// Slots where parts can be installed
+    /// </summary>
+    public List<PartSlot> PartSlots { get; init; } = PartSlotType.ALL.Select(slotType => new PartSlot(slotType)).ToList();
     
     /// <summary>
     /// The shop the player currently has open
@@ -71,9 +75,11 @@ public class PlayerCharacter : Character
 
     public override void UpdateStats()
     {
-        var boosts = PlayerStatBoosts.Empty()
-            .Combine(Weapon?.StatBoosts)
-            .Combine(Armor?.StatBoosts);
+        var boosts = PlayerStatBoosts.Empty();
+        foreach (var slot in PartSlots)
+        {
+            boosts = boosts.Combine(slot.Part?.StatBoosts);
+        }
         Stats.SetStatBoosts(boosts);
 
         MaxEnergy = GetMaxEnergyByLevel(Level);
@@ -92,15 +98,13 @@ public class PlayerCharacter : Character
 
         _actives.Clear();
         _passives.Clear();
-        if (Weapon != null)
+        foreach (var part in PartSlots.Select(slot => slot.Part))
         {
-            _actives.AddRange(Weapon.Actives);
-            _passives.AddRange(Weapon.Passives);
-        }
-        if (Armor != null)
-        {
-            _actives.AddRange(Armor.Actives);
-            _passives.AddRange(Armor.Passives);
+            if (part != null)
+            {
+                _actives.AddRange(part.Actives);
+                _passives.AddRange(part.Passives);
+            }
         }
         foreach (var active in _actives)
         {
@@ -114,36 +118,59 @@ public class PlayerCharacter : Character
         base.UpdateStats();
     }
 
-    public void EquipWeaponById(Guid id)
+    /// <summary>
+    /// Installs the part with the given ID if it is in the inventory and is installable.
+    /// </summary>
+    public void InstallById(Guid id)
     {
-        var weapon = Inventory.Weapons.GetBySpecifier(ItemSpecifier.ById(id));
-        if (weapon == null || weapon.Level > Level)
+        var maybeItem = Inventory.GetBySpecifier(ItemSpecifier.ById(id));
+        if (maybeItem == null)
         {
             return;
         }
 
-        Inventory.Weapons.Add(Weapon); // put old weapon back in inventory
+        maybeItem.Match(
+            material => {},
+            InstallFromInventory
+        );
+    }
 
-        Weapon = weapon;
-        Inventory.Weapons.Remove(weapon);
+    private void InstallFromInventory(Part part)
+    {
+        if (part.Level > Level)
+        {
+            return;
+        }
+
+        // determine where the part goes
+        var tab = Inventory.GetTab(part);
+        var slot = GetSlotFor(part);
+        
+        // swap the old and new ones from the slot to the inventory
+        tab.Add(slot.Part);
+        slot.Part = part;
+        tab.Remove(part);
 
         UpdateStats();
     }
 
-    public void EquipArmorById(Guid id)
+    /// <summary>
+    /// Returns the slot the given part can be slotted into.
+    /// </summary>
+    public PartSlot GetSlotFor(Part part)
     {
-        var armor = Inventory.Armors.GetBySpecifier(ItemSpecifier.ById(id));
-        if (armor == null || armor.Level > Level)
-        {
-            return;
-        }
+        return GetSlotFor(part.SlotType);
+    }
 
-        Inventory.Armors.Add(Armor); // put old armor back in inventory
-
-        Armor = armor;
-        Inventory.Armors.Remove(armor);
-
-        UpdateStats();
+    /// <summary>
+    /// Returns the slot the given type of part can be slotted into.
+    /// </summary>
+    public PartSlot GetSlotFor(PartSlotType slotType)
+    {
+        var slot = PartSlots
+            .FirstOrDefault(slot => slot.SlotType == slotType) 
+            ?? throw new Exception($"PlayerCharacter is missing part slot for type {slotType.Name}");
+        return slot;
     }
 
     public void GainXp(int xp)

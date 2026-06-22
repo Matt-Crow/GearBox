@@ -46,11 +46,11 @@ public class InventoryTabTester
     }
 
     [Fact]
-    public void Add_GivenEquipment_DoesNotSum()
+    public void Add_GivenPart_DoesNotSum()
     {
-        var sut = new InventoryTab<Equipment>();
-        var item1 = new Equipment("foo", EquipmentSlotType.WEAPON);
-        var item2 = new Equipment("foo", EquipmentSlotType.WEAPON);
+        var sut = new InventoryTab<Part>();
+        var item1 = new Part("foo", PartSlotType.ALL.First());
+        var item2 = new Part("foo", PartSlotType.ALL.First());
     
         sut.Add(item1);
         sut.Add(item2);

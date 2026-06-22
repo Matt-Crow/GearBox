@@ -8,102 +8,108 @@ namespace GearBox.Core.Tests.Model.GameObjects.Player;
 public class PlayerCharacterTester
 {
     [Fact]
-    public void Equip_GivenNotInInventory_DoesNothing()
+    public void Install_GivenNotInInventory_DoesNothing()
     {
         var sut = new PlayerCharacter("foo");
-        sut.EquipWeaponById(Guid.Empty);
-        Assert.Null(sut.Weapon);
+        sut.InstallById(Guid.Empty);
+        Assert.Empty(sut.PartSlots.Where(slot => slot.Part != null));
     }
 
     [Fact]
-    public void Equip_GivenWeapon_SetsWeaponSlot()
+    public void Install_GivenPart_SetsAppropriateSlot()
     {
         var sut = new PlayerCharacter("foo");
-        var weapon = AWeapon();
-        sut.Inventory.Weapons.Add(weapon);
+        var part = APart();
+        sut.Inventory.Add(part);
 
-        sut.EquipWeaponById(GetId(weapon));
+        sut.InstallById(GetId(part));
 
-        Assert.Equal(weapon, sut.Weapon);
+        Assert.Equal(part, sut.GetSlotFor(part).Part);
     }
 
     [Fact]
-    public void Equip_GivenWeapon_RemovesFromInventory()
+    public void Install_GivenPart_RemovesFromInventory()
     {
         var sut = new PlayerCharacter("foo");
-        var weapon = AWeapon();
-        sut.Inventory.Weapons.Add(weapon);
+        var part = APart();
+        sut.Inventory.Add(part);
 
-        sut.EquipWeaponById(GetId(weapon));
+        sut.InstallById(GetId(part));
 
-        Assert.False(sut.Inventory.Weapons.Contains(weapon));
+        Assert.False(sut.Inventory.Contains(ItemUnion.OfPart(part)));
     }
 
     [Fact]
-    public void Equip_GivenWeaponAlreadyEquipped_AddsToInventory()
+    public void Install_GivenSlotAlreadyHasPartInstalled_AddsToInventory()
     {
         var sut = new PlayerCharacter("foo");
-        var alreadyEquipped = new Equipment("weapon 1", EquipmentSlotType.WEAPON);
-        var notYetEquipped = new Equipment("weapon 2", EquipmentSlotType.WEAPON);
-        sut.Inventory.Weapons.Add(alreadyEquipped);
-        sut.Inventory.Weapons.Add(notYetEquipped);
-        sut.EquipWeaponById(GetId(alreadyEquipped));
+        var alreadyInstalled = new Part("Part 1", PartSlotType.ALL.First());
+        var notYetInstalled = new Part("Part 2", PartSlotType.ALL.First());
+        sut.Inventory.Add(alreadyInstalled);
+        sut.Inventory.Add(notYetInstalled);
+        sut.InstallById(GetId(alreadyInstalled));
 
-        sut.EquipWeaponById(GetId(notYetEquipped));
+        sut.InstallById(GetId(notYetInstalled));
 
-        Assert.True(sut.Inventory.Weapons.Contains(alreadyEquipped));
+        Assert.True(sut.Inventory.Contains(ItemUnion.OfPart(alreadyInstalled)));
     }
 
     [Fact]
-    public void CannotEquipWeaponsAboveOwnLevel()
+    public void CannotInstallAboveOwnLevel()
     {
         var sut = new PlayerCharacter("foo");
         sut.SetLevel(1);
-        var weapon = new Equipment("bar", EquipmentSlotType.WEAPON, level: 20);
-        sut.Inventory.Weapons.Add(weapon);
+        var part = new Part("bar", PartSlotType.ALL.First(), level: 20);
+        sut.Inventory.Add(part);
 
-        sut.EquipWeaponById(GetId(weapon));
+        sut.InstallById(GetId(part));
 
-        Assert.Null(sut.Weapon);
+        Assert.Null(sut.GetSlotFor(part).Part);
     }
 
     [Fact]
-    public void DynamicValues_AfterEquipping_Change()
+    public void DynamicValues_AfterInstalling_Change()
     {
         var player = new PlayerCharacter("foo");
-        var weapon1 = AWeapon();
-        player.Inventory.Weapons.Add(weapon1);
+        var part = APart();
+        player.Inventory.Add(part);
         var before = new UiState(player);
         
-        player.EquipWeaponById(GetId(weapon1));
+        player.InstallById(GetId(part));
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
-        Assert.True(compared.Weapon.HasChanged);
+        Assert.True(SlotHasChanged(compared, part));
     }
 
     [Fact]
     public void DynamicValues_AfterSwitching_Change()
     {
         var player = new PlayerCharacter("foo");
-        var weapon1 = AWeapon();
-        var weapon2 = AWeapon(); // same weapon, different ID
-        player.Inventory.Weapons.Add(weapon1);
-        player.Inventory.Weapons.Add(weapon2);
-        player.EquipWeaponById(GetId(weapon1));
+        var part1 = APart();
+        var part2 = APart(); // same part, different ID
+        player.Inventory.Add(part1);
+        player.Inventory.Add(part2);
+        player.InstallById(GetId(part1));
         var before = new UiState(player);
 
-        player.EquipWeaponById(GetId(weapon2));
+        player.InstallById(GetId(part2));
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
-        Assert.True(compared.Weapon.HasChanged);
+        Assert.True(SlotHasChanged(compared, part1));
     }
 
-    private Guid GetId(Equipment equipment)
+    private Guid GetId(Part part)
     {
-        return equipment.Id ?? throw new Exception("ID should not be null");
+        return part.Id ?? throw new Exception("ID should not be null");
     }
 
-    private Equipment AWeapon() => new Equipment("foo", EquipmentSlotType.WEAPON);
+    private bool SlotHasChanged(UiStateChangesJson changes, Part part)
+    {
+        var slot = changes.PartSlots.First(s => s.SlotType == part.SlotType.Name);
+        return slot.Part.HasChanged;
+    }
+
+    private Part APart() => new Part("Some part", PartSlotType.ALL.First());
 }

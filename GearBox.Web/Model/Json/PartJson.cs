@@ -4,7 +4,7 @@ using GearBox.Core.Model.Items;
 
 namespace GearBox.Web.Model.Json;
 
-public class EquipmentJson : IItemJson
+public class PartJson : IItemJson
 {
     public required string Name { get; set; }
     public required string Slot { get; set; }
@@ -16,10 +16,10 @@ public class EquipmentJson : IItemJson
 
     public ItemUnion ToItem(IActiveAbilityFactory actives, IPassiveAbilityFactory passives)
     {
-        var slotType = EquipmentSlotType.GetEquipmentSlotTypeByName(Slot) ?? throw new Exception($"Invalid slot type: \"{Slot}\"");
+        var slotType = PartSlotType.GetPartSlotTypeByName(Slot) ?? throw new Exception($"Invalid slot type: \"{Slot}\"");
         var grade = ItemJsonUtils.GetGradeByName(GradeName);
         var statDictionary = ItemJsonUtils.GetPlayerStats(Stats);
-        var equipment = new Equipment(
+        var part = new Part(
             Name, 
             slotType,
             grade, 
@@ -28,6 +28,6 @@ public class EquipmentJson : IItemJson
             ItemJsonUtils.GetPassives(passives, PassiveNames)
         );
 
-        return ItemUnion.OfEquipment(equipment);
+        return ItemUnion.OfPart(part);
     }
 }

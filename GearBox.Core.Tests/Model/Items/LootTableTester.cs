@@ -22,15 +22,19 @@ public class LootTableTester
     }
 
     [Fact]
-    public void GetRandomItem_GivenWeapon_ReturnsCopyOfIt()
+    public void GetRandomItem_GivenPart_ReturnsCopyOfIt()
     {
-        var expected = new Equipment("foo", EquipmentSlotType.WEAPON);
+        var expected = new Part("foo", PartSlotType.ALL.First());
         var sut = new LootTable([
-            new LootOption(1, ItemUnion.OfEquipment(expected))
+            new LootOption(1, ItemUnion.OfPart(expected))
         ], new RandomNumberGenerator());
 
         var inventory = sut.GetRandomLoot();
-        var actual = inventory.Weapons.Content.First().Item;
+        var actual = inventory
+            .PartTabs
+            .SelectMany(tab => tab.Content)
+            .First()
+            .Item;
 
         // IDs are different
         Assert.NotEqual(expected, actual);

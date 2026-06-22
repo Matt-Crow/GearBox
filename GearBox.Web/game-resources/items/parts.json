@@ -1,0 +1,167 @@
+[
+    {
+        "Name": "Hard Hat",
+        "Slot": "Head",
+        "GradeName": "Common",
+        "Stats": {
+            "HP": 2,
+            "Offense": 1
+        },
+        "PassiveNames": [
+            "Moderately Armored"
+        ]
+    },
+    {
+        "Name": "Laser Lenses",
+        "Slot": "Head",
+        "GradeName": "Common",
+        "Stats": {
+            "Energy": 4,
+            "Offense": 1
+        },
+        "ActiveNames": [
+            "Laser Bolt"
+        ]
+    },
+    {
+        "Name": "Spiney Helm",
+        "Slot": "Head",
+        "GradeName": "Uncommon",
+        "Stats": {
+            "HP": 4,
+            "Offense": 1
+        },
+        "PassiveNames": [
+            "Spikey"
+        ]
+    },
+    {
+        "Name": "Armored Treads",
+        "Slot": "Locomotion",
+        "GradeName": "Common",
+        "Stats": {
+            "HP": 3,
+            "Speed": 1
+        },
+        "PassiveNames": [
+            "Moderately Armored"
+        ]
+    },
+    {
+        "Name": "Rotowheel",
+        "Slot": "Locomotion",
+        "GradeName": "Common",
+        "Stats": {
+            "Energy": 1,
+            "Speed": 1
+        }
+    },
+    {
+        "Name": "Antigravity Thrusters",
+        "Slot": "Locomotion",
+        "GradeName": "Rare",
+        "Stats": {
+            "Speed": 1
+        },
+        "PassiveNames": [
+            "Levitate"
+        ]
+    },
+    {
+        "Name": "Training Club",
+        "Slot": "Manipulator",
+        "GradeName": "Common",
+        "Stats": {
+            "Offense": 1,
+            "HP": 1
+        },
+        "ActiveNames": [
+            "Cleave"
+        ]
+    },
+    {
+        "Name": "Training Blaster",
+        "Slot": "Manipulator",
+        "GradeName": "Common",
+        "Stats": {
+            "Offense": 1,
+            "Energy": 2
+        },
+        "ActiveNames": [
+            "Laser Bolt"
+        ],
+        "PassiveNames": [
+            "Long Ranged"
+        ]
+    },
+    {
+        "Name": "Fang",
+        "Slot": "Manipulator",
+        "GradeName": "Common",
+        "Stats": {
+            "Offense": 2,
+            "Speed": 1
+        }
+    },
+    {
+        "Name": "Bronze Khopesh",
+        "Slot": "Manipulator",
+        "GradeName": "Uncommon",
+        "Stats": {
+            "Offense": 2,
+            "HP": 1
+        },
+        "ActiveNames": [
+            "Cleave"
+        ]
+    },
+    {
+        "Name": "Tanky Torso",
+        "Slot": "Torso",
+        "GradeName": "Common",
+        "Stats": {
+            "Offense": 1,
+            "HP": 1
+        },
+        "PassiveNames": [
+            "Heavily Armored"
+        ]
+    },
+    {
+        "Name": "High-Capacity Torso",
+        "Slot": "Torso",
+        "GradeName": "Common",
+        "Stats": {
+            "Offense": 1,
+            "Energy": 1
+        },
+        "PassiveNames": [
+            "Lightly Armored"
+        ]
+    },
+    {
+        "Name": "Bronze Armor",
+        "Slot": "Torso",
+        "GradeName": "Uncommon",
+        "Stats": {
+            "Offense": 1,
+            "HP": 2,
+            "Energy": 1
+        },
+        "PassiveNames": [
+            "Heavily Armored"
+        ]
+    },
+    {
+        "Name": "Spectral Shroud",
+        "Slot": "Torso",
+        "GradeName": "Rare",
+        "Stats": {
+            "Energy": 1,
+            "Speed": 4
+        },
+        "PassiveNames": [
+            "Intangible"
+        ]
+    }
+]

@@ -7,12 +7,12 @@
     {
         "Name": "Bronze",
         "GradeName": "Uncommon",
-        "Description": "Used to craft low-level melee equipment."
+        "Description": "Used to craft low-level parts."
     },
     {
         "Name": "Silver",
         "GradeName": "Rare",
-        "Description": "Used to craft enhancements for your equipment."
+        "Description": "Used to craft enhancements for your parts."
     },
     {
         "Name": "Gold",
@@ -22,6 +22,6 @@
     {
         "Name": "Titanium",
         "GradeName": "Legendary",
-        "Description": "A high-grade mining material for crafting powerful melee equipment."
+        "Description": "A high-grade mining material for crafting powerful parts."
     }
 ]

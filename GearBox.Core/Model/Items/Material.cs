@@ -45,6 +45,7 @@ public class Material : IItem
             Grade.Order,
             Description,
             0, // no level
+            "", // no slot type
             [], // no details
             quantity,
             [], // no actives

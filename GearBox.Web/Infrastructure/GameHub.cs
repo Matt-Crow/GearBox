@@ -34,8 +34,7 @@ public class GameHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    public Task EquipWeapon(Guid id) => Receive(new EquipWeapon(id));
-    public Task EquipArmor(Guid id) => Receive(new EquipArmor(id));
+    public Task Install(Guid id) => Receive(new Core.Controls.Install(id));
     public Task StartMovingUp() => Receive(StartMoving.UP);
     public Task StartMovingDown() => Receive(StartMoving.DOWN);
     public Task StartMovingLeft() => Receive(StartMoving.LEFT);

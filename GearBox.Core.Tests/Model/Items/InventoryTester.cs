@@ -11,32 +11,32 @@ public class InventoryTester
     public void GetBySpecifier_FindsByIdFirst()
     {
         var sut = new Inventory();
-        var weapon1 = AWeapon();
-        var weapon2 = AWeapon();
-        sut.Weapons.Add(weapon1);
-        sut.Weapons.Add(weapon2);
+        var part1 = APart();
+        var part2 = APart();
+        sut.Add(part1);
+        sut.Add(part2);
 
-        var actual = sut.GetBySpecifier(new ItemSpecifier(weapon2.Id, weapon1.Name));
+        var actual = sut.GetBySpecifier(new ItemSpecifier(part2.Id, part1.Name));
 
-        Assert.Equal(weapon2, actual?.Unwrapped);
+        Assert.Equal(part2, actual?.Unwrapped);
     }
 
     [Fact]
     public void Craft_GivenCannotCraft_DoesNothing()
     {
         var sut = new Inventory();
-        var weapon = AWeapon();
+        var part = APart();
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(new Material("foo")))
-            .Add(ItemUnion.OfEquipment(weapon))
+            .Add(ItemUnion.OfPart(part))
             ;
         var recipe = new CraftingRecipeBuilder(items)
             .And("foo")
-            .Makes(weapon.Name);
+            .Makes(part.Name);
 
         sut.Craft(recipe);
 
-        Assert.Empty(sut.Weapons.Content);
+        Assert.Null(sut.GetBySpecifier(ItemSpecifier.ByName(part.Name)));
     }
 
     [Fact]
@@ -44,15 +44,15 @@ public class InventoryTester
     {
         var ingredient = new Material("foo");
         var sut = new Inventory();
-        var weapon = AWeapon();
+        var part = APart();
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(ingredient))
-            .Add(ItemUnion.OfEquipment(weapon))
+            .Add(ItemUnion.OfPart(part))
             ;
         sut.Materials.Add(ingredient);
         var recipe = new CraftingRecipeBuilder(items)
             .And("foo")
-            .Makes(weapon.Name);
+            .Makes(part.Name);
         
         sut.Craft(recipe);
 
@@ -63,21 +63,21 @@ public class InventoryTester
     public void Craft_GivenCanCraft_AddsItem()
     {
         var ingredient = new Material("foo");
-        var weapon = AWeapon();
+        var part = APart();
         var sut = new Inventory();
         sut.Materials.Add(ingredient);
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(ingredient))
-            .Add(ItemUnion.OfEquipment(weapon))
+            .Add(ItemUnion.OfPart(part))
             ;
         var recipe = new CraftingRecipeBuilder(items)
             .And("foo")
-            .Makes(weapon.Name);
+            .Makes(part.Name);
         
         sut.Craft(recipe);
 
-        Assert.Contains(weapon.Name, sut.Weapons.Content.Select(stack => stack.Item.Name));
+        Assert.NotNull(sut.GetBySpecifier(ItemSpecifier.ByName(part.Name)));
     }
 
-    private Equipment AWeapon() => new Equipment("weapon", EquipmentSlotType.WEAPON);
+    private Part APart() => new Part("Some part", PartSlotType.ALL.First());
 }

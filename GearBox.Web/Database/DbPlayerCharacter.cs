@@ -29,9 +29,7 @@ public class DbPlayerCharacter
     [Column("gold")]
     public int Gold { get; set; }
 
-    public DbEquippedItem? EquippedWeapon { get; set; }
-
-    public DbEquippedItem? EquippedArmor { get; set; }
+    public List<DbPlayerCharacterPartSlot> PartSlots { get; set; } = [];
 
     [ForeignKey(nameof(AspNetUserId))]
     public IdentityUser AspNetUser { get; set; } = null!;
@@ -62,25 +60,16 @@ public class DbPlayerCharacter
         Xp = gameModel.Xp;
         Gold = gameModel.Inventory.Gold.Quantity;
 
-        EquippedWeapon = MakeEquipmentSlot(gameModel.Weapon);
-        EquippedArmor = MakeEquipmentSlot(gameModel.Armor);     
+        PartSlots = gameModel.PartSlots
+            .Select(es => DbPlayerCharacterPartSlot.FromGameModel(this, es))
+            .ToList();
         
         Items.Clear();
         AddInventoryTab(gameModel.Inventory.Materials, i => 0);
-        AddInventoryTab(gameModel.Inventory.Weapons, i => i.Level);
-        AddInventoryTab(gameModel.Inventory.Armors, i => i.Level);
-    }
-
-    private DbEquippedItem? MakeEquipmentSlot(Equipment? equipmentSlot)
-    {
-        var dbModel = equipmentSlot == null
-            ? null
-            : new DbEquippedItem()
-            {
-                Name = equipmentSlot.Name,
-                Level = equipmentSlot.Level
-            };
-        return dbModel;
+        foreach (var partTab in gameModel.Inventory.PartTabs)
+        {
+            AddInventoryTab(partTab, i => i.Level);
+        }
     }
 
     private void AddInventoryTab<T>(InventoryTab<T> tab, Func<T, int> getLevel)
@@ -115,17 +104,14 @@ public class DbPlayerCharacter
             result.Inventory.Add(gameItem.ToOwned(dbItem.Level), dbItem.Quantity);
         }
 
-        if (EquippedWeapon != null)
+        foreach (var partSlot in PartSlots)
         {
-            var gameItem = itemFactory.Make(EquippedWeapon.Name) ?? throw new Exception($"Invalid item name: {EquippedWeapon.Name}");
-            result.Inventory.Add(gameItem);
-            result.EquipWeaponById(gameItem.Id ?? throw new Exception("Weapon must have ID"));
-        }
-        if (EquippedArmor != null)
-        {
-            var gameItem = itemFactory.Make(EquippedArmor.Name) ?? throw new Exception($"Invalid item name: {EquippedArmor.Name}");
-            result.Inventory.Add(gameItem);
-            result.EquipArmorById(gameItem.Id ?? throw new Exception("Armor must have ID"));
+            if (partSlot.PartName != null)
+            {
+                var gameItem = itemFactory.Make(partSlot.PartName) ?? throw new Exception($"Invalid item name: {partSlot.PartName}");
+                result.Inventory.Add(gameItem);
+                result.InstallById(gameItem.Id ?? throw new Exception("Item must have ID"));
+            }
         }
 
         return result;

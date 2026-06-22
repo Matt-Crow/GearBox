@@ -1,37 +1,39 @@
 import { ActiveAbility } from "./activeAbility.js";
 import { PassiveAbility } from "./passiveAbility.js";
 
+export const PART_SLOT_TYPES = {
+    HEAD: "Head",
+    LOCOMOTION: "Locomotion",
+    MANIPULATOR: "Manipulator",
+    TORSO: "Torso"
+};
+
 export class Inventory {
-    #weapons;
-    #armors;
+    #parts;
     #materials;
     #gold;
 
     /**
-     * @param {Item[]} weapons 
-     * @param {Item[]} armors 
+     * @param {Item[]} parts 
      * @param {Item[]} materials 
      * @param {number} gold
      */
-    constructor(weapons=[], armors=[], materials=[], gold=0) {
-        this.#weapons = weapons;
-        this.#armors = armors;
+    constructor(parts=[], materials=[], gold=0) {
+        this.#parts = parts;
         this.#materials = materials;
         this.#gold = gold;
     }
 
-    get weapons() { return this.#weapons; }
-    get armors() { return this.#armors; }
+    get parts() { return this.#parts; }
     get materials() { return this.#materials; }
     get gold() { return this.#gold; }
 }
 
 export class InventoryDeserializer {
     deserialize(json) {
-        const weapons = json.weapons.items.map(x => Item.fromJson(x));
-        const armors = json.armors.items.map(x => Item.fromJson(x));
+        const parts = json.parts.map(x => Item.fromJson(x));
         const materials = json.materials.items.map(x => Item.fromJson(x));
-        return new Inventory(weapons, armors, materials, json.gold);
+        return new Inventory(parts, materials, json.gold);
     }
 }
 
@@ -42,6 +44,7 @@ export class Item {
     #gradeOrder;
     #description;
     #level;
+    #slotType;
     #details;
     #quantity;
     #actives;
@@ -54,18 +57,20 @@ export class Item {
      * @param {number} gradeOrder  
      * @param {string} description 
      * @param {number} level
+     * @param {string} slotType
      * @param {string[]} details 
      * @param {number} quantity 
      * @param {ActiveAbility[]} actives 
      * @param {PassiveAbility[]} passives
      */
-    constructor(id, name, gradeName, gradeOrder, description, level, details, quantity, actives, passives) {
+    constructor(id, name, gradeName, gradeOrder, description, level, slotType, details, quantity, actives, passives) {
         this.#id = id;
         this.#name = name;
         this.#gradeName = gradeName;
         this.#gradeOrder = gradeOrder;
         this.#description = description;
         this.#level = level;
+        this.#slotType = slotType;
         this.#details = details;
         this.#quantity = quantity;
         this.#actives = actives;
@@ -78,6 +83,7 @@ export class Item {
     get gradeOrder() { return this.#gradeOrder; }
     get description() { return this.#description; }
     get level() { return this.#level; }
+    get slotType() { return this.#slotType; }
     get details() { return this.#details; }
     get quantity() { return this.#quantity; }
     get actives() { return this.#actives; }
@@ -99,6 +105,7 @@ export class Item {
             json.gradeOrder,
             json.description,
             json.level,
+            json.slotType,
             json.details.slice(),
             json.quantity,
             json.actives.map(ActiveAbility.fromJson),

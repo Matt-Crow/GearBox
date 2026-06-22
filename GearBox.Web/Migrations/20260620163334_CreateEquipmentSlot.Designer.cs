@@ -3,6 +3,7 @@ using System;
 using GearBox.Web.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GearBox.Web.Migrations
 {
     [DbContext(typeof(GearBoxDbContext))]
-    partial class GearBoxDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260620163334_CreateEquipmentSlot")]
+    partial class CreateEquipmentSlot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,20 +296,64 @@ namespace GearBox.Web.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("GearBox.Web.Database.DbPlayerCharacterPartSlot", "PartSlots", b1 =>
+                    b.OwnsOne("GearBox.Web.Database.DbEquippedItem", "EquippedManipulator", b1 =>
+                        {
+                            b1.Property<Guid>("DbPlayerCharacterId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Level")
+                                .HasColumnType("integer")
+                                .HasColumnName("equipped_manipulator_level");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("equipped_manipulator_name");
+
+                            b1.HasKey("DbPlayerCharacterId");
+
+                            b1.ToTable("gb_player_character");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DbPlayerCharacterId");
+                        });
+
+                    b.OwnsOne("GearBox.Web.Database.DbEquippedItem", "EquippedTorso", b1 =>
+                        {
+                            b1.Property<Guid>("DbPlayerCharacterId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Level")
+                                .HasColumnType("integer")
+                                .HasColumnName("equipped_torso_level");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("equipped_torso_name");
+
+                            b1.HasKey("DbPlayerCharacterId");
+
+                            b1.ToTable("gb_player_character");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DbPlayerCharacterId");
+                        });
+
+                    b.OwnsMany("GearBox.Web.Database.DbPlayerCharacterEquipmentSlot", "EquipmentSlots", b1 =>
                         {
                             b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid")
                                 .HasColumnName("id");
 
-                            b1.Property<int?>("PartLevel")
+                            b1.Property<int?>("EquipmentLevel")
                                 .HasColumnType("integer")
-                                .HasColumnName("part_level");
+                                .HasColumnName("equipment_level");
 
-                            b1.Property<string>("PartName")
+                            b1.Property<string>("EquipmentName")
                                 .HasColumnType("text")
-                                .HasColumnName("part_name");
+                                .HasColumnName("equipment_name");
 
                             b1.Property<Guid>("PlayerCharacterId")
                                 .HasColumnType("uuid")
@@ -322,7 +369,7 @@ namespace GearBox.Web.Migrations
                             b1.HasIndex("PlayerCharacterId", "SlotType")
                                 .IsUnique();
 
-                            b1.ToTable("gb_player_character_part_slot");
+                            b1.ToTable("gb_player_character_equipment_slot");
 
                             b1.WithOwner("PlayerCharacter")
                                 .HasForeignKey("PlayerCharacterId");
@@ -332,7 +379,11 @@ namespace GearBox.Web.Migrations
 
                     b.Navigation("AspNetUser");
 
-                    b.Navigation("PartSlots");
+                    b.Navigation("EquipmentSlots");
+
+                    b.Navigation("EquippedManipulator");
+
+                    b.Navigation("EquippedTorso");
                 });
 
             modelBuilder.Entity("GearBox.Web.Database.DbPlayerCharacterItem", b =>

@@ -14,6 +14,7 @@ public readonly struct ItemJson : IChange, IJson
         int gradeOrder,
         string description,
         int level,
+        string slotType,
         IEnumerable<string> details,
         int quantity,
         List<ActiveAbilityJson> actives,
@@ -26,6 +27,7 @@ public readonly struct ItemJson : IChange, IJson
         GradeOrder = gradeOrder;
         Description = description;
         Level = level;
+        SlotType = slotType;
         Details = details;
         Quantity = quantity;
         Actives = actives;
@@ -38,6 +40,7 @@ public readonly struct ItemJson : IChange, IJson
     public int GradeOrder { get; init; }
     public string Description { get; init; }
     public int Level { get; init; }
+    public string SlotType { get; init; }
     public IEnumerable<string> Details { get; init; }
 
     /// <summary>
@@ -48,5 +51,5 @@ public readonly struct ItemJson : IChange, IJson
     public List<ActiveAbilityJson> Actives { get; init; }
     public List<PassiveAbilityJson> Passives { get; init; }
 
-    public IEnumerable<object?> DynamicValues => [Id, Name, Description, Level, .. Details, Quantity, .. Actives.SelectMany(a => a.DynamicValues), .. Passives.SelectMany(p => p.DynamicValues)];
+    public IEnumerable<object?> DynamicValues => [Id, Name, Description, Level, SlotType, .. Details, Quantity, .. Actives.SelectMany(a => a.DynamicValues), .. Passives.SelectMany(p => p.DynamicValues)];
 }

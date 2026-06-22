@@ -3,13 +3,13 @@
 */
 
 import { Client } from "../infrastructure/client.js";
-import { UiStateChanges } from "../model/areaUpdate.js";
+import { MaybeChange, UiStateChanges } from "../model/areaUpdate.js";
 import { CraftingRecipe } from "../model/crafting.js";
-import { Inventory } from "../model/item.js";
+import { PART_SLOT_TYPES, Inventory } from "../model/item.js";
 import { PassiveAbility } from "../model/passiveAbility.js";
 import { PlayerStatSummary } from "../model/player.js";
 import { OpenShop } from "../model/shop.js";
-import { EquipmentTab } from "./equipmentTab.js";
+import { PartTab } from "./partTab.js";
 import { ItemDisplay } from "./itemDisplay.js";
 import { Switcher } from "./shared/switcher.js";
 import { ActionColumn, ConditionalActionColumn, DataColumn, Table } from "./table.js";
@@ -25,8 +25,7 @@ export class MainModal {
     #materialTable;
     #recipeTable;
     #craftPreview;
-    #weaponTab;
-    #armorTab;
+    #partTabs;
 
     #currentShop = null;
     #shopBuyTable;
@@ -62,9 +61,6 @@ export class MainModal {
         ], (record, row) => this.#craftPreview.handleRowCreated(record?.makes, row));
         this.#recipeTable.spawnHtml();
         
-        this.#weaponTab = new EquipmentTab("#weaponTab", id => client.equipWeapon(id));
-        this.#armorTab = new EquipmentTab("#armorTab", id => client.equipArmor(id));
-
         this.#shopBuyTable = this.#makeShopTable(".shop-buy", "buy", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopSellTable = this.#makeShopTable(".shop-sell", "sell", opt => client.shopSell(this.#currentShop?.id, opt.item.id, opt.item.name));
         this.#shopBuybackTable = this.#makeShopTable(".shop-buyback", "buy back", opt => client.shopBuy(this.#currentShop?.id, opt.item.id, opt.item.name));
@@ -73,9 +69,13 @@ export class MainModal {
             .spawnHtml()
             .hide();
     
-        this.#weaponTab.setCurrent(null);
-        this.#armorTab.setCurrent(null);
         this.#setShop(null);
+
+        this.#partTabs = new Map();
+        this.#partTabs.set(PART_SLOT_TYPES.HEAD, new PartTab("#headTab", id => client.install(id)));
+        this.#partTabs.set(PART_SLOT_TYPES.LOCOMOTION, new PartTab("#locomotionTab", id => client.install(id)));
+        this.#partTabs.set(PART_SLOT_TYPES.MANIPULATOR, new PartTab("#manipulatorTab", id => client.install(id)));
+        this.#partTabs.set(PART_SLOT_TYPES.TORSO, new PartTab("#torsoTab", id => client.install(id)));
     }
 
     /**
@@ -108,9 +108,12 @@ export class MainModal {
      * @param {UiStateChanges} uiStateChanges 
      */
     handleUiStateChanges(uiStateChanges) {
+        Object.values(PART_SLOT_TYPES).forEach(slotType => {
+            const maybeChange = uiStateChanges.parts.get(slotType);
+            const tab = this.#partTabs.get(slotType);
+            maybeChange.handleChange(e => tab.setCurrent(e));
+        });
         uiStateChanges.inventory.handleChange(i => this.setInventory(i));
-        uiStateChanges.weapon.handleChange(w => this.#weaponTab.setCurrent(w));
-        uiStateChanges.armor.handleChange(a => this.#armorTab.setCurrent(a));
         uiStateChanges.summary.handleChange(s => this.setStatSummary(s));
         uiStateChanges.passives.handleChange(p => this.setPassives(p));
         uiStateChanges.openShop.handleChange(os => this.#setShop(os));
@@ -150,9 +153,11 @@ export class MainModal {
      * @param {Inventory} inventory 
      */
     setInventory(inventory) {
+        for (const [slotType, tab] of this.#partTabs.entries()) {
+            const partsForThisTab = inventory.parts.filter(e => e.slotType === slotType);
+            tab.bindRows(partsForThisTab);
+        }
         this.#materialTable.setRecords(inventory.materials);
-        this.#weaponTab.bindRows(inventory.weapons);
-        this.#armorTab.bindRows(inventory.armors);
         $("#gold").text(inventory.gold);
     }
 

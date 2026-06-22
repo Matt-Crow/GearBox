@@ -8,16 +8,16 @@ using GearBox.Core.Model.Json.AreaUpdate;
 namespace GearBox.Core.Model.Items;
 
 /// <summary>
-/// An Equipment is a type of item which a player can wield
+/// A part is a type of item which can be installed in a player
 /// </summary>
-public class Equipment : IItem
+public class Part : IItem
 {
     private readonly Dictionary<PlayerStatType, int> _statWeights;
 
 
-    public Equipment(
+    public Part(
         string name, 
-        EquipmentSlotType slotType,
+        PartSlotType slotType,
         Grade? grade = null,
         Dictionary<PlayerStatType, int>? statWeights = null,
         IEnumerable<IActiveAbility>? actives = null,
@@ -40,14 +40,14 @@ public class Equipment : IItem
     public string Name { get; init; }
 
     /// <summary>
-    /// The type of slot this can be equipped in
+    /// The type of slot this can be installed in
     /// </summary>
-    public EquipmentSlotType SlotType { get; init; }
+    public PartSlotType SlotType { get; init; }
 
     public Grade Grade { get; init; }
 
     /// <summary>
-    /// The minimum level players must have to equip this
+    /// The minimum level players must have to install this
     /// </summary>
     public int Level { get; init; }
     
@@ -59,35 +59,35 @@ public class Equipment : IItem
     public IEnumerable<string> Details => StatBoosts.Details;
     
     /// <summary>
-    /// The stat boosts this provides when equipped
+    /// The stat boosts this provides when installed
     /// </summary>
     public PlayerStatBoosts StatBoosts { get; init; }
 
     /// <summary>
-    /// The active abilities this provides when equipped
+    /// The active abilities this provides when installed
     /// </summary>
     public IEnumerable<IActiveAbility> Actives { get; init; }
 
     /// <summary>
-    /// The passive abilities this provides when equipped
+    /// The passive abilities this provides when installed
     /// </summary>
     public IEnumerable<IPassiveAbility> Passives { get; init; }
 
     /// <summary>
     /// Returns this if it is immutable, or a clone otherwise
     /// </summary>
-    public Equipment ToOwned(int? level=null)
+    public Part ToOwned(int? level=null)
     {
         var newLevel = level ?? Level;
         var newActives = Actives.Select(a => a.Copy()).ToList();
         var newPassives = Passives.Select(p => p.Copy()).ToList();
-        var result = new Equipment(Name, SlotType, Grade, _statWeights, newActives, newPassives, newLevel);
+        var result = new Part(Name, SlotType, Grade, _statWeights, newActives, newPassives, newLevel);
         return result;
     }
 
     public override bool Equals(object? obj)
     {
-        var other = obj as Equipment;
+        var other = obj as Part;
         return other?.Id == Id;
     }
     
@@ -105,6 +105,7 @@ public class Equipment : IItem
             Grade.Order,
             "", // no description
             Level,
+            SlotType.Name,
             Details,
             quantity,
             Actives
@@ -119,11 +120,11 @@ public class Equipment : IItem
 
     public static int GetStatPoints(int level, Grade grade)
     {
-        var maxPoints = 1000;
-        var minPoints = 100;
+        var maxPoints = 2000;
+        var minPoints = 200;
         var maxLevel = Character.MAX_LEVEL;
         var percentage = ((double)level) / maxLevel;
         var result = (int)(minPoints + percentage*(maxPoints - minPoints));
-        return (int)(result * grade.PointMultiplier);
+        return (int)(result * grade.PointMultiplier / PartSlotType.ALL.Count());
     }
 }
