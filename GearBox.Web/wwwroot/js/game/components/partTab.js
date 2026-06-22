@@ -2,27 +2,27 @@ import { Item } from "../model/item.js";
 import { ItemDisplay } from "./itemDisplay.js";
 import { ActionColumn, DataColumn, Table } from "./table.js";
 
-export class EquipmentTab {
+export class PartTab {
     #selector;
     #table;
-    #onEquip;
-    #currentEquipment;
+    #onInstall;
+    #currentPart;
     #compareCurrent;
-    #compareEquipment;
+    #comparePart;
 
     /**
      * 
      * @param {string} selector 
-     * @param {(string) => any} onEquip 
+     * @param {(string) => any} onInstall 
      */
-    constructor(selector, onEquip) {
+    constructor(selector, onInstall) {
         this.#selector = selector;
-        this.#onEquip = onEquip;
-        this.#table = new Table(`${this.#selector} .equipment-table`, [
+        this.#onInstall = onInstall;
+        this.#table = new Table(`${this.#selector} .part-table`, [
             new DataColumn("Name", e => e.name),
             new DataColumn("Grade", e => e.gradeName),
             new DataColumn("Level", e => e.level),
-            new ActionColumn("Action", "Equip", e => this.#onEquip(e.id))
+            new ActionColumn("Action", "Install", e => this.#onInstall(e.id))
         ], (record, row) => {
             row.addEventListener("mouseenter", _ => {
                 this.#setCompare(record);
@@ -50,11 +50,11 @@ export class EquipmentTab {
             });
         });
         this.#spawnHtml();
-        this.#currentEquipment = new ItemDisplay(`${selector} .current-equipment`, "Current equipment", "Nothing equipped")
+        this.#currentPart = new ItemDisplay(`${selector} .current-part`, "Current Part", "Nothing installed")
             .spawnHtml();
         this.#compareCurrent = new ItemDisplay(`${selector} .compare-current`, "Current")
             .spawnHtml();
-        this.#compareEquipment = new ItemDisplay(`${selector} .compare-equipment`, "Other")
+        this.#comparePart = new ItemDisplay(`${selector} .compare-part`, "Other")
             .spawnHtml();
         this.setCurrent(null);
         this.#setCompare(null);
@@ -65,15 +65,15 @@ export class EquipmentTab {
             .empty()
             .append($("<div>").addClass("row")
                 .append($("<div>").addClass("table-responsive").addClass("col-8")
-                    .append($("<div>").addClass("equipment-table"))
+                    .append($("<div>").addClass("part-table"))
                 )
                 .append($("<div>").addClass("h-50").addClass("col-4")
-                    .append($("<div>").addClass("current-equipment"))
+                    .append($("<div>").addClass("current-part"))
                 )
             )
             .append($("<div>").addClass("gb-tooltip compare row")
                 .append($("<div>").addClass("compare-current col"))
-                .append($("<div>").addClass("compare-equipment col"))
+                .append($("<div>").addClass("compare-part col"))
                 .hide()
             );
         this.#table.spawnHtml();
@@ -87,7 +87,7 @@ export class EquipmentTab {
     }
 
     setCurrent(item) {
-        this.#currentEquipment.bind(item);
+        this.#currentPart.bind(item);
         this.#compareCurrent.bind(item);
         if (item) {
             this.#compareCurrent.show();
@@ -97,6 +97,6 @@ export class EquipmentTab {
     }
 
     #setCompare(item) {
-        this.#compareEquipment.bind(item);
+        this.#comparePart.bind(item);
     }
 }

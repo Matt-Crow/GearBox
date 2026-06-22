@@ -13,9 +13,9 @@ public readonly struct UiState
         var area = player.CurrentArea ?? player.LastArea;
         Area = area?.ToJson();
         Inventory = player.Inventory.ToJson();
-        foreach (var slotType in EquipmentSlotType.ALL)
+        foreach (var slotType in PartSlotType.ALL)
         {
-            EquipmentSlots[slotType] = player.GetSlotFor(slotType).Equipment?.ToJson(1);
+            PartSlots[slotType] = player.GetSlotFor(slotType).Part?.ToJson(1);
         }
         Summary = player.StatSummary.ToJson();
         Actives = player.Actives
@@ -29,7 +29,7 @@ public readonly struct UiState
 
     public AreaJson? Area { get; init; }
     public InventoryJson Inventory { get; init; }
-    public Dictionary<EquipmentSlotType, ItemJson?> EquipmentSlots { get; init; } = new();
+    public Dictionary<PartSlotType, ItemJson?> PartSlots { get; init; } = new();
     public PlayerStatSummaryJson Summary { get; init; }
     public List<ActiveAbilityJson> Actives { get; init; }
     public List<PassiveAbilityJson> Passives { get; init; }
@@ -40,19 +40,19 @@ public readonly struct UiState
     /// </summary>
     public static UiStateChangesJson GetChanges(UiState? oldState, UiState newState)
     {
-        var es = new List<EquipmentSlotJson>();
-        foreach (var slotType in EquipmentSlotType.ALL)
+        var es = new List<PartSlotJson>();
+        foreach (var slotType in PartSlotType.ALL)
         {
-            var oldValue = oldState?.EquipmentSlots[slotType];
-            var newValue = newState.EquipmentSlots[slotType];
-            es.Add(new EquipmentSlotJson(slotType.Name, CompareNullable(oldValue, newValue)));           
+            var oldValue = oldState?.PartSlots[slotType];
+            var newValue = newState.PartSlots[slotType];
+            es.Add(new PartSlotJson(slotType.Name, CompareNullable(oldValue, newValue)));           
         }
 
         var result = new UiStateChangesJson()
         {
             Area = CompareNullable(oldState?.Area, newState.Area),
             Inventory = Compare(oldState?.Inventory, newState.Inventory),
-            EquipmentSlots = es,
+            PartSlots = es,
             Summary = Compare(oldState?.Summary, newState.Summary),
             Actives = CompareList(oldState?.Actives, newState.Actives),
             Passives = CompareList(oldState?.Passives, newState.Passives),

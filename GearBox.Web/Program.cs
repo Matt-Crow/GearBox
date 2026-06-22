@@ -111,7 +111,7 @@ gameBuilder
     )
     .WithArea("bazaar", 1, area => area
         .WithMap(bazaarMap)
-        .AddShop("Starter Equipment Shop", Coordinates.FromTiles(2, 7), Color.BLUE, shop => shop
+        .AddShop("Starter Part Shop", Coordinates.FromTiles(2, 7), Color.BLUE, shop => shop
             .AddItem("Hard Hat")
             .AddItem("Laser Lenses")
             .AddItem("Armored Treads")

@@ -98,18 +98,18 @@ export class AreaUpdateHandler {
         
         this.#updateListeners.forEach(listener => listener(this.#area));
         
-        const equipmentSlots = new Map();
-        json.uiStateChanges.equipmentSlots.forEach(slot => {
-            equipmentSlots.set(
+        const partSlots = new Map();
+        json.uiStateChanges.partSlots.forEach(slot => {
+            partSlots.set(
                 slot.slotType, 
-                MaybeChange.fromJson(slot.equipment, Item.fromJson)
+                MaybeChange.fromJson(slot.part, Item.fromJson)
             );
         });
 
         const uiStateChanges = new UiStateChanges(
             null, // todo area
             MaybeChange.fromJson(json.uiStateChanges.inventory, v => this.#inventoryDeserializer.deserialize(v)),
-            equipmentSlots,
+            partSlots,
             MaybeChange.fromJson(json.uiStateChanges.summary, PlayerStatSummary.fromJson),
             MaybeChange.fromJson(json.uiStateChanges.actives, actives => actives.map(ActiveAbility.fromJson)),
             MaybeChange.fromJson(json.uiStateChanges.passives, passives => passives.map(PassiveAbility.fromJson)),

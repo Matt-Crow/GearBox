@@ -28,7 +28,7 @@ export class AreaUpdate {
 export class UiStateChanges {
     #area;
     #inventory;
-    #equipment;
+    #parts;
     #summary;
     #actives;
     #passives;
@@ -38,7 +38,7 @@ export class UiStateChanges {
      * 
      * @param {*} area 
      * @param {MaybeChange<Inventory>} inventory 
-     * @param {Map<string, MaybeChange<Item?>>} equipment
+     * @param {Map<string, MaybeChange<Item?>>} parts
      * @param {MaybeChange<PlayerStatSummary>} summary 
      * @param {MaybeChange<ActiveAbility[]} actives 
      * @param {MaybeChange<PassiveAbility[]} passives
@@ -47,7 +47,7 @@ export class UiStateChanges {
     constructor(
         area,
         inventory,
-        equipment,
+        parts,
         summary,
         actives,
         passives,
@@ -55,7 +55,7 @@ export class UiStateChanges {
     ) {
         this.#area = area;
         this.#inventory = inventory;
-        this.#equipment = equipment;
+        this.#parts = parts;
         this.#summary = summary;
         this.#actives = actives;
         this.#passives = passives;
@@ -63,7 +63,7 @@ export class UiStateChanges {
     }
 
     get inventory() { return this.#inventory; }
-    get equipment() { return this.#equipment; }
+    get parts() { return this.#parts; }
     get summary() { return this.#summary; }
     get actives() { return this.#actives; }
     get passives() { return this.#passives; }

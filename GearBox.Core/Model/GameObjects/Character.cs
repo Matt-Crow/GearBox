@@ -41,7 +41,7 @@ public abstract class Character : IGameObject
     public BodyBehavior Body { get; init; } = new();
     public TerminateBehavior Termination { get; init; }
     public Coordinates Coordinates { get => Body.Location; set => Body.Location = value; }
-    public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping equipment which changes max HP
+    public int DamageTaken {get; private set; } = 0; // track damage taken instead of remaining HP to avoid issues when swapping parts which changes max HP
     public int MaxHitPoints { get; set; }
     public int HitPointsRemaining => MaxHitPoints - DamageTaken;
     protected virtual string Type => "character";

@@ -10,23 +10,23 @@ public class Inventory
 {
     public Gold Gold { get; private set; } = Gold.NONE;
     public InventoryTab<Material> Materials { get; init; } = new();
-    public List<EquipmentTab> EquipmentTabs { get; init; } = EquipmentSlotType.ALL
-        .Select(slotType => new EquipmentTab(slotType))
+    public List<PartTab> PartTabs { get; init; } = PartSlotType.ALL
+        .Select(slotType => new PartTab(slotType))
         .ToList();
     
-    public bool IsEmpty => EquipmentTabs.All(tab => tab.IsEmpty) && Materials.IsEmpty && Gold.Quantity == 0;
+    public bool IsEmpty => PartTabs.All(tab => tab.IsEmpty) && Materials.IsEmpty && Gold.Quantity == 0;
 
     /// <summary>
     /// Adds all items from the other inventory to this one
     /// </summary>
     public void Add(Inventory other)
     {
-        foreach (var equipmentTab in other.EquipmentTabs)
+        foreach (var partTab in other.PartTabs)
         {
-            // todo no stacks for equipment
-            foreach (var equipmentStack in equipmentTab.Content)
+            // todo no stacks for parts
+            foreach (var partStack in partTab.Content)
             {
-                GetTab(equipmentStack.Item).Add(equipmentStack.Item.ToOwned(), equipmentStack.Quantity);
+                GetTab(partStack.Item).Add(partStack.Item.ToOwned(), partStack.Quantity);
             }
         }
         foreach (var materialStack in other.Materials.Content)
@@ -37,9 +37,9 @@ public class Inventory
         Gold = Gold.Plus(other.Gold);
     }
 
-    public void Add(Equipment equipment)
+    public void Add(Part part)
     {
-        Add(ItemUnion.OfEquipment(equipment));
+        Add(ItemUnion.OfPart(part));
     }
 
     public void Add(ItemUnion? item, int quantity = 1)
@@ -50,9 +50,9 @@ public class Inventory
         );
     }
 
-    public InventoryTab<Equipment> GetTab(Equipment e)
+    public InventoryTab<Part> GetTab(Part e)
     {
-        return EquipmentTabs.First(tab => tab.SlotType == e.SlotType);
+        return PartTabs.First(tab => tab.SlotType == e.SlotType);
     }
 
     public void Add(Gold? gold)
@@ -92,13 +92,13 @@ public class Inventory
 
     public ItemUnion? GetBySpecifier(ItemSpecifier specifier)
     {
-        var equipment = EquipmentTabs
+        var part = PartTabs
             .Select(tab => tab.GetBySpecifier(specifier))
             .FirstOrDefault(e => e != null);
         var material = Materials.GetBySpecifier(specifier);
-        if (equipment != null)
+        if (part != null)
         {
-            return ItemUnion.OfEquipment(equipment);
+            return ItemUnion.OfPart(part);
         }
         if (material != null)
         {
@@ -135,10 +135,10 @@ public class Inventory
 
     public InventoryJson ToJson()
     {
-        var equipmentJson = EquipmentTabs
+        var partsJson = PartTabs
             .SelectMany(tab => tab.Content)
             .Select(stack => stack.ToJson())
             .ToList();
-        return new(equipmentJson, Materials.ToJson(), Gold.Quantity);
+        return new(partsJson, Materials.ToJson(), Gold.Quantity);
     }
 }

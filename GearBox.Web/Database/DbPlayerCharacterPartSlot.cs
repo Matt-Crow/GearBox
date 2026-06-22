@@ -4,8 +4,8 @@ using GearBox.Core.Model.Items;
 
 namespace GearBox.Web.Database;
 
-[Table("gb_player_character_equipment_slot")]
-public class DbPlayerCharacterEquipmentSlot
+[Table("gb_player_character_part_slot")]
+public class DbPlayerCharacterPartSlot
 {
     [Key]
     [Column("id")]
@@ -19,11 +19,11 @@ public class DbPlayerCharacterEquipmentSlot
     [Column("slot_type")]
     public required string SlotType { get; set; }
 
-    [Column("equipment_name")]
-    public string? EquipmentName { get; set; }
+    [Column("part_name")]
+    public string? PartName { get; set; }
 
-    [Column("equipment_level")]
-    public int? EquipmentLevel { get; set; }
+    [Column("part_level")]
+    public int? PartLevel { get; set; }
 
     [ForeignKey(nameof(PlayerCharacterId))]
     public required virtual DbPlayerCharacter PlayerCharacter { get; set; }
@@ -31,15 +31,15 @@ public class DbPlayerCharacterEquipmentSlot
     /// <summary>
     /// Converts from the game model to the database model
     /// </summary>
-    public static DbPlayerCharacterEquipmentSlot FromGameModel(DbPlayerCharacter parent, EquipmentSlot gameModel)
+    public static DbPlayerCharacterPartSlot FromGameModel(DbPlayerCharacter parent, PartSlot gameModel)
     {
-        var dbModel = new DbPlayerCharacterEquipmentSlot()
+        var dbModel = new DbPlayerCharacterPartSlot()
         {
             //Id = gameModel.Id ?? new Guid(), setting Id makes EFCore think it already exists in the DB, but it doesn't
             PlayerCharacterId = parent.Id,
             SlotType = gameModel.SlotType.Name,
-            EquipmentName = gameModel.Equipment?.Name,
-            EquipmentLevel = gameModel.Equipment?.Level,
+            PartName = gameModel.Part?.Name,
+            PartLevel = gameModel.Part?.Level,
             PlayerCharacter = parent
         };
         return dbModel;

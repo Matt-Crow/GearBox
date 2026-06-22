@@ -46,8 +46,8 @@ public class GameResourceLoader
         var materials = await LoadItems<MaterialJson>(Path.Combine(itemsFolder, "materials.json"));
         allItems.AddRange(materials);
 
-        var equipment = await LoadItems<EquipmentJson>(Path.Combine(itemsFolder, "equipment.json"));
-        allItems.AddRange(equipment);
+        var parts = await LoadItems<PartJson>(Path.Combine(itemsFolder, "parts.json"));
+        allItems.AddRange(parts);
 
         return allItems;
     }

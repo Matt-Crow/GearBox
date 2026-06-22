@@ -32,14 +32,18 @@ public class PlayerCharacter : Character
     public int Xp { get; private set; } // experience points
     public int XpToNextLevel { get; private set; }
     public int MaxEnergy { get; private set; }
-    public int EnergyExpended { get; private set; } = 0; // track energy expended instead of remaining energy to avoid issues when swapping equipment
+    public int EnergyExpended { get; private set; } = 0; // track energy expended instead of remaining energy to avoid issues when swapping parts
     public int EnergyRemaining => MaxEnergy - EnergyExpended;
     public PlayerStats Stats { get; init; } = new();
     public PlayerStatSummary StatSummary { get; init; }
     public IEnumerable<IActiveAbility> Actives => _actives;
     public IEnumerable<IPassiveAbility> Passives => _passives;
     public Inventory Inventory { get; init; } = new();
-    public List<EquipmentSlot> EquipmentSlots { get; init; } = EquipmentSlotType.ALL.Select(slotType => new EquipmentSlot(slotType)).ToList();
+
+    /// <summary>
+    /// Slots where parts can be installed
+    /// </summary>
+    public List<PartSlot> PartSlots { get; init; } = PartSlotType.ALL.Select(slotType => new PartSlot(slotType)).ToList();
     
     /// <summary>
     /// The shop the player currently has open
@@ -72,9 +76,9 @@ public class PlayerCharacter : Character
     public override void UpdateStats()
     {
         var boosts = PlayerStatBoosts.Empty();
-        foreach (var slot in EquipmentSlots)
+        foreach (var slot in PartSlots)
         {
-            boosts = boosts.Combine(slot.Equipment?.StatBoosts);
+            boosts = boosts.Combine(slot.Part?.StatBoosts);
         }
         Stats.SetStatBoosts(boosts);
 
@@ -94,12 +98,12 @@ public class PlayerCharacter : Character
 
         _actives.Clear();
         _passives.Clear();
-        foreach (var equipment in EquipmentSlots.Select(slot => slot.Equipment))
+        foreach (var part in PartSlots.Select(slot => slot.Part))
         {
-            if (equipment != null)
+            if (part != null)
             {
-                _actives.AddRange(equipment.Actives);
-                _passives.AddRange(equipment.Passives);
+                _actives.AddRange(part.Actives);
+                _passives.AddRange(part.Passives);
             }
         }
         foreach (var active in _actives)
@@ -115,9 +119,9 @@ public class PlayerCharacter : Character
     }
 
     /// <summary>
-    /// Equips the equipment with the given ID if it is in the inventory and is equippable.
+    /// Installs the part with the given ID if it is in the inventory and is installable.
     /// </summary>
-    public void EquipById(Guid id)
+    public void InstallById(Guid id)
     {
         var maybeItem = Inventory.GetBySpecifier(ItemSpecifier.ById(id));
         if (maybeItem == null)
@@ -127,45 +131,45 @@ public class PlayerCharacter : Character
 
         maybeItem.Match(
             material => {},
-            EquipFromInventory
+            InstallFromInventory
         );
     }
 
-    private void EquipFromInventory(Equipment equipment)
+    private void InstallFromInventory(Part part)
     {
-        if (equipment.Level > Level)
+        if (part.Level > Level)
         {
             return;
         }
 
-        // determine where the equipment goes
-        var tab = Inventory.GetTab(equipment);
-        var slot = GetSlotFor(equipment);
+        // determine where the part goes
+        var tab = Inventory.GetTab(part);
+        var slot = GetSlotFor(part);
         
         // swap the old and new ones from the slot to the inventory
-        tab.Add(slot.Equipment);
-        slot.Equipment = equipment;
-        tab.Remove(equipment);
+        tab.Add(slot.Part);
+        slot.Part = part;
+        tab.Remove(part);
 
         UpdateStats();
     }
 
     /// <summary>
-    /// Returns the slot the given equipment can be slotted into.
+    /// Returns the slot the given part can be slotted into.
     /// </summary>
-    public EquipmentSlot GetSlotFor(Equipment equipment)
+    public PartSlot GetSlotFor(Part part)
     {
-        return GetSlotFor(equipment.SlotType);
+        return GetSlotFor(part.SlotType);
     }
 
     /// <summary>
-    /// Returns the slot the given type of equipment can be slotted into.
+    /// Returns the slot the given type of part can be slotted into.
     /// </summary>
-    public EquipmentSlot GetSlotFor(EquipmentSlotType slotType)
+    public PartSlot GetSlotFor(PartSlotType slotType)
     {
-        var slot = EquipmentSlots
+        var slot = PartSlots
             .FirstOrDefault(slot => slot.SlotType == slotType) 
-            ?? throw new Exception($"PlayerCharacter is missing equipment slot for type {slotType.Name}");
+            ?? throw new Exception($"PlayerCharacter is missing part slot for type {slotType.Name}");
         return slot;
     }
 

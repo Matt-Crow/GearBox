@@ -3,6 +3,7 @@ using System;
 using GearBox.Web.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GearBox.Web.Migrations
 {
     [DbContext(typeof(GearBoxDbContext))]
-    partial class GearBoxDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260622155018_RenameEquipmentToPartMigration1")]
+    partial class RenameEquipmentToPartMigration1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -322,7 +325,7 @@ namespace GearBox.Web.Migrations
                             b1.HasIndex("PlayerCharacterId", "SlotType")
                                 .IsUnique();
 
-                            b1.ToTable("gb_player_character_part_slot");
+                            b1.ToTable("gb_player_character_equipment_slot");
 
                             b1.WithOwner("PlayerCharacter")
                                 .HasForeignKey("PlayerCharacterId");

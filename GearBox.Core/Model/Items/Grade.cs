@@ -34,7 +34,7 @@ public class Grade
     public int BuyValueBase { get; init; }
 
     /// <summary>
-    /// Equipment of this grade has its total stat points multiplied by this
+    /// Parts with this grade has its total stat points multiplied by this
     /// </summary>
     public double PointMultiplier { get; init; }
 }

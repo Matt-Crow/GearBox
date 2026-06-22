@@ -5,11 +5,11 @@
 import { Client } from "../infrastructure/client.js";
 import { MaybeChange, UiStateChanges } from "../model/areaUpdate.js";
 import { CraftingRecipe } from "../model/crafting.js";
-import { EQUIPMENT_SLOT_TYPES, Inventory } from "../model/item.js";
+import { PART_SLOT_TYPES, Inventory } from "../model/item.js";
 import { PassiveAbility } from "../model/passiveAbility.js";
 import { PlayerStatSummary } from "../model/player.js";
 import { OpenShop } from "../model/shop.js";
-import { EquipmentTab } from "./equipmentTab.js";
+import { PartTab } from "./partTab.js";
 import { ItemDisplay } from "./itemDisplay.js";
 import { Switcher } from "./shared/switcher.js";
 import { ActionColumn, ConditionalActionColumn, DataColumn, Table } from "./table.js";
@@ -25,7 +25,7 @@ export class MainModal {
     #materialTable;
     #recipeTable;
     #craftPreview;
-    #equipmentTabs;
+    #partTabs;
 
     #currentShop = null;
     #shopBuyTable;
@@ -71,11 +71,11 @@ export class MainModal {
     
         this.#setShop(null);
 
-        this.#equipmentTabs = new Map();
-        this.#equipmentTabs.set(EQUIPMENT_SLOT_TYPES.HEAD, new EquipmentTab("#headTab", id => client.equip(id)));
-        this.#equipmentTabs.set(EQUIPMENT_SLOT_TYPES.LOCOMOTION, new EquipmentTab("#locomotionTab", id => client.equip(id)));
-        this.#equipmentTabs.set(EQUIPMENT_SLOT_TYPES.MANIPULATOR, new EquipmentTab("#manipulatorTab", id => client.equip(id)));
-        this.#equipmentTabs.set(EQUIPMENT_SLOT_TYPES.TORSO, new EquipmentTab("#torsoTab", id => client.equip(id)));
+        this.#partTabs = new Map();
+        this.#partTabs.set(PART_SLOT_TYPES.HEAD, new PartTab("#headTab", id => client.install(id)));
+        this.#partTabs.set(PART_SLOT_TYPES.LOCOMOTION, new PartTab("#locomotionTab", id => client.install(id)));
+        this.#partTabs.set(PART_SLOT_TYPES.MANIPULATOR, new PartTab("#manipulatorTab", id => client.install(id)));
+        this.#partTabs.set(PART_SLOT_TYPES.TORSO, new PartTab("#torsoTab", id => client.install(id)));
     }
 
     /**
@@ -108,9 +108,9 @@ export class MainModal {
      * @param {UiStateChanges} uiStateChanges 
      */
     handleUiStateChanges(uiStateChanges) {
-        Object.values(EQUIPMENT_SLOT_TYPES).forEach(slotType => {
-            const maybeChange = uiStateChanges.equipment.get(slotType);
-            const tab = this.#equipmentTabs.get(slotType);
+        Object.values(PART_SLOT_TYPES).forEach(slotType => {
+            const maybeChange = uiStateChanges.parts.get(slotType);
+            const tab = this.#partTabs.get(slotType);
             maybeChange.handleChange(e => tab.setCurrent(e));
         });
         uiStateChanges.inventory.handleChange(i => this.setInventory(i));
@@ -153,9 +153,9 @@ export class MainModal {
      * @param {Inventory} inventory 
      */
     setInventory(inventory) {
-        for (const [slotType, tab] of this.#equipmentTabs.entries()) {
-            const equipmentForThisTab = inventory.equipment.filter(e => e.slotType === slotType);
-            tab.bindRows(equipmentForThisTab);
+        for (const [slotType, tab] of this.#partTabs.entries()) {
+            const partsForThisTab = inventory.parts.filter(e => e.slotType === slotType);
+            tab.bindRows(partsForThisTab);
         }
         this.#materialTable.setRecords(inventory.materials);
         $("#gold").text(inventory.gold);

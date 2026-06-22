@@ -4,7 +4,7 @@ using Xunit;
 
 namespace GearBox.Core.Tests.Model.Items;
 
-public class EquipmentTester
+public class PartTester
 {
     [Fact]
     public void ToOwned_GivenHigherLevel_HasHigherStats()
@@ -14,11 +14,11 @@ public class EquipmentTester
         {
             {stat, 1}
         };
-        var sut = new Equipment("foo", EquipmentSlotType.ALL.First(), statWeights: weights, level: 1);
+        var sut = new Part("foo", PartSlotType.ALL.First(), statWeights: weights, level: 1);
 
         var other = sut.ToOwned(2);
 
-        int GetStat(Equipment w) => w.StatBoosts.Get(stat);
+        int GetStat(Part w) => w.StatBoosts.Get(stat);
         Assert.True(GetStat(other) > GetStat(sut));
     }
 }

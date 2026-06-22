@@ -16,7 +16,7 @@ public class GearBoxDbContext(DbContextOptions<GearBoxDbContext> options) : Iden
         base.OnModelCreating(modelBuilder); // must come before customization
 
         modelBuilder.Entity<DbPlayerCharacter>(e => {
-            e.OwnsMany(pc => pc.EquipmentSlots, es =>
+            e.OwnsMany(pc => pc.PartSlots, es =>
             {
                 // set up a composite unique constraint on player character ID & slot type
                 es

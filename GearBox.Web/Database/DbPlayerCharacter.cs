@@ -29,7 +29,7 @@ public class DbPlayerCharacter
     [Column("gold")]
     public int Gold { get; set; }
 
-    public List<DbPlayerCharacterEquipmentSlot> EquipmentSlots { get; set; } = [];
+    public List<DbPlayerCharacterPartSlot> PartSlots { get; set; } = [];
 
     [ForeignKey(nameof(AspNetUserId))]
     public IdentityUser AspNetUser { get; set; } = null!;
@@ -60,15 +60,15 @@ public class DbPlayerCharacter
         Xp = gameModel.Xp;
         Gold = gameModel.Inventory.Gold.Quantity;
 
-        EquipmentSlots = gameModel.EquipmentSlots
-            .Select(es => DbPlayerCharacterEquipmentSlot.FromGameModel(this, es))
+        PartSlots = gameModel.PartSlots
+            .Select(es => DbPlayerCharacterPartSlot.FromGameModel(this, es))
             .ToList();
         
         Items.Clear();
         AddInventoryTab(gameModel.Inventory.Materials, i => 0);
-        foreach (var equipmentTab in gameModel.Inventory.EquipmentTabs)
+        foreach (var partTab in gameModel.Inventory.PartTabs)
         {
-            AddInventoryTab(equipmentTab, i => i.Level);
+            AddInventoryTab(partTab, i => i.Level);
         }
     }
 
@@ -104,13 +104,13 @@ public class DbPlayerCharacter
             result.Inventory.Add(gameItem.ToOwned(dbItem.Level), dbItem.Quantity);
         }
 
-        foreach (var equipmentSlot in EquipmentSlots)
+        foreach (var partSlot in PartSlots)
         {
-            if (equipmentSlot.EquipmentName != null)
+            if (partSlot.PartName != null)
             {
-                var gameItem = itemFactory.Make(equipmentSlot.EquipmentName) ?? throw new Exception($"Invalid item name: {equipmentSlot.EquipmentName}");
+                var gameItem = itemFactory.Make(partSlot.PartName) ?? throw new Exception($"Invalid item name: {partSlot.PartName}");
                 result.Inventory.Add(gameItem);
-                result.EquipById(gameItem.Id ?? throw new Exception("Item must have ID"));
+                result.InstallById(gameItem.Id ?? throw new Exception("Item must have ID"));
             }
         }
 

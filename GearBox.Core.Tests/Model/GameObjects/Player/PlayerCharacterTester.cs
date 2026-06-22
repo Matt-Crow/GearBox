@@ -8,108 +8,108 @@ namespace GearBox.Core.Tests.Model.GameObjects.Player;
 public class PlayerCharacterTester
 {
     [Fact]
-    public void Equip_GivenNotInInventory_DoesNothing()
+    public void Install_GivenNotInInventory_DoesNothing()
     {
         var sut = new PlayerCharacter("foo");
-        sut.EquipById(Guid.Empty);
-        Assert.Empty(sut.EquipmentSlots.Where(slot => slot.Equipment != null));
+        sut.InstallById(Guid.Empty);
+        Assert.Empty(sut.PartSlots.Where(slot => slot.Part != null));
     }
 
     [Fact]
-    public void Equip_GivenEquipment_SetsAppropriateSlot()
+    public void Install_GivenPart_SetsAppropriateSlot()
     {
         var sut = new PlayerCharacter("foo");
-        var equipment = AnEquipment();
-        sut.Inventory.Add(equipment);
+        var part = APart();
+        sut.Inventory.Add(part);
 
-        sut.EquipById(GetId(equipment));
+        sut.InstallById(GetId(part));
 
-        Assert.Equal(equipment, sut.GetSlotFor(equipment).Equipment);
+        Assert.Equal(part, sut.GetSlotFor(part).Part);
     }
 
     [Fact]
-    public void Equip_GivenEquipment_RemovesFromInventory()
+    public void Install_GivenPart_RemovesFromInventory()
     {
         var sut = new PlayerCharacter("foo");
-        var equipment = AnEquipment();
-        sut.Inventory.Add(equipment);
+        var part = APart();
+        sut.Inventory.Add(part);
 
-        sut.EquipById(GetId(equipment));
+        sut.InstallById(GetId(part));
 
-        Assert.False(sut.Inventory.Contains(ItemUnion.OfEquipment(equipment)));
+        Assert.False(sut.Inventory.Contains(ItemUnion.OfPart(part)));
     }
 
     [Fact]
-    public void Equip_GivenSlotAlreadyEquipped_AddsToInventory()
+    public void Install_GivenSlotAlreadyHasPartInstalled_AddsToInventory()
     {
         var sut = new PlayerCharacter("foo");
-        var alreadyEquipped = new Equipment("Equipment 1", EquipmentSlotType.ALL.First());
-        var notYetEquipped = new Equipment("Equipment 2", EquipmentSlotType.ALL.First());
-        sut.Inventory.Add(alreadyEquipped);
-        sut.Inventory.Add(notYetEquipped);
-        sut.EquipById(GetId(alreadyEquipped));
+        var alreadyInstalled = new Part("Part 1", PartSlotType.ALL.First());
+        var notYetInstalled = new Part("Part 2", PartSlotType.ALL.First());
+        sut.Inventory.Add(alreadyInstalled);
+        sut.Inventory.Add(notYetInstalled);
+        sut.InstallById(GetId(alreadyInstalled));
 
-        sut.EquipById(GetId(notYetEquipped));
+        sut.InstallById(GetId(notYetInstalled));
 
-        Assert.True(sut.Inventory.Contains(ItemUnion.OfEquipment(alreadyEquipped)));
+        Assert.True(sut.Inventory.Contains(ItemUnion.OfPart(alreadyInstalled)));
     }
 
     [Fact]
-    public void CannotEquipAboveOwnLevel()
+    public void CannotInstallAboveOwnLevel()
     {
         var sut = new PlayerCharacter("foo");
         sut.SetLevel(1);
-        var equipment = new Equipment("bar", EquipmentSlotType.ALL.First(), level: 20);
-        sut.Inventory.Add(equipment);
+        var part = new Part("bar", PartSlotType.ALL.First(), level: 20);
+        sut.Inventory.Add(part);
 
-        sut.EquipById(GetId(equipment));
+        sut.InstallById(GetId(part));
 
-        Assert.Null(sut.GetSlotFor(equipment).Equipment);
+        Assert.Null(sut.GetSlotFor(part).Part);
     }
 
     [Fact]
-    public void DynamicValues_AfterEquipping_Change()
+    public void DynamicValues_AfterInstalling_Change()
     {
         var player = new PlayerCharacter("foo");
-        var equipment = AnEquipment();
-        player.Inventory.Add(equipment);
+        var part = APart();
+        player.Inventory.Add(part);
         var before = new UiState(player);
         
-        player.EquipById(GetId(equipment));
+        player.InstallById(GetId(part));
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
-        Assert.True(SlotHasChanged(compared, equipment));
+        Assert.True(SlotHasChanged(compared, part));
     }
 
     [Fact]
     public void DynamicValues_AfterSwitching_Change()
     {
         var player = new PlayerCharacter("foo");
-        var equipment1 = AnEquipment();
-        var equipment2 = AnEquipment(); // same equipment, different ID
-        player.Inventory.Add(equipment1);
-        player.Inventory.Add(equipment2);
-        player.EquipById(GetId(equipment1));
+        var part1 = APart();
+        var part2 = APart(); // same part, different ID
+        player.Inventory.Add(part1);
+        player.Inventory.Add(part2);
+        player.InstallById(GetId(part1));
         var before = new UiState(player);
 
-        player.EquipById(GetId(equipment2));
+        player.InstallById(GetId(part2));
         var after = new UiState(player);
         var compared = UiState.GetChanges(before, after);
         
-        Assert.True(SlotHasChanged(compared, equipment1));
+        Assert.True(SlotHasChanged(compared, part1));
     }
 
-    private Guid GetId(Equipment equipment)
+    private Guid GetId(Part part)
     {
-        return equipment.Id ?? throw new Exception("ID should not be null");
+        return part.Id ?? throw new Exception("ID should not be null");
     }
 
-    private bool SlotHasChanged(UiStateChangesJson changes, Equipment equipment)
+    private bool SlotHasChanged(UiStateChangesJson changes, Part part)
     {
-        var slot = changes.EquipmentSlots.First(s => s.SlotType == equipment.SlotType.Name);
-        return slot.Equipment.HasChanged;
+        var slot = changes.PartSlots.First(s => s.SlotType == part.SlotType.Name);
+        return slot.Part.HasChanged;
     }
 
-    private Equipment AnEquipment() => new Equipment("Some equipment", EquipmentSlotType.ALL.First());
+    private Part APart() => new Part("Some part", PartSlotType.ALL.First());
 }

@@ -5,8 +5,8 @@ export class Client {
         this.#signalr = signalr;    
     }
 
-    equip(id) {
-        this.#signalr.invoke("Equip", id);
+    install(id) {
+        this.#signalr.invoke("Install", id);
     }
 
     startMovingUp() {

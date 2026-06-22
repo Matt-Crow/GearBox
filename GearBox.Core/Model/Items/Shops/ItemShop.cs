@@ -131,9 +131,9 @@ public class ItemShop
     private static List<OpenShopOptionJson> GetOptionsFrom(Inventory inventory, Gold? playerGold)
     {
         var result = new List<OpenShopOptionJson>(GetOptionsFrom(inventory.Materials, playerGold));
-        foreach (var equipmentTab in inventory.EquipmentTabs)
+        foreach (var partTab in inventory.PartTabs)
         {
-            result.AddRange(GetOptionsFrom(equipmentTab, playerGold));
+            result.AddRange(GetOptionsFrom(partTab, playerGold));
         }
         return result;
     }
