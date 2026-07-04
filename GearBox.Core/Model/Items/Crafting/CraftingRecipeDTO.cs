@@ -8,10 +8,24 @@ public class CraftingRecipeDTO
     public CraftingRecipeDTO(List<ItemStackDTO> ingredients, string resultItemName, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
+
+        /* 
+            group stacks by item name to remove duplicates
+
+            Before:
+                Apple x1
+                Bananas x2
+                Bananas x3
+            
+            After:
+                Apple x1
+                Bananas x5
+        */
         Ingredients = ingredients
             .GroupBy(i => i.ItemName)
             .Select(group => new ItemStackDTO(group.Key, group.Sum(stack => stack.Quantity)))
             .ToList();
+        
         ResultItemName = resultItemName;
     }
 

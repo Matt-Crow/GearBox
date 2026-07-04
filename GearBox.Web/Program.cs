@@ -59,9 +59,10 @@ foreach (var item in itemResources)
 }
 
 // configure crafting recipes after items
-gameBuilder
-    .AddCraftingRecipe(new CraftingRecipeDTO([new ItemStackDTO("Bronze", 25)], "Bronze Khopesh"))
-    .AddCraftingRecipe(new CraftingRecipeDTO([new ItemStackDTO("Bronze", 25)], "Bronze Armor"));
+foreach (var recipe in await resourceLoader.LoadCraftingRecipes())
+{
+    gameBuilder.AddCraftingRecipe(recipe);
+}
 
 // configure enemies after items
 gameBuilder.Enemies

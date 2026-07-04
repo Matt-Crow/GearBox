@@ -1,0 +1,20 @@
+[
+    {
+        "Ingredients": [
+            {
+                "ItemName": "Bronze",
+                "Quantity": 25
+            }
+        ],
+        "ResultItemName": "Bronze Khopesh"
+    },
+    {
+        "Ingredients": [
+            {
+                "ItemName": "Bronze",
+                "Quantity": 25
+            }
+        ],
+        "ResultItemName": "Bronze Armor"
+    }
+]
