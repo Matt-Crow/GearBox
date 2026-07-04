@@ -15,7 +15,7 @@ public class CraftingRecipeRepositoryTester
     [Fact]
     public void GetById_GivenFound_ReturnsIt()
     {
-        var expected = new CraftingRecipe([], () => throw new NotImplementedException());
+        var expected = new CraftingRecipeDTO([], "foo");
         var sut = CraftingRecipeRepository.Of([expected]);
 
         var actual = sut.GetById(expected.Id);

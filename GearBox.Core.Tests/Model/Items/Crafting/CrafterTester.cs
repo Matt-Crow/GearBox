@@ -15,8 +15,8 @@ public class CrafterTester
             .Add(ItemUnion.OfMaterial(new Material("foo")))
             .Add(ItemUnion.OfPart(part))
             ;
-        var recipe = items.MakeCraftingRecipe(new CraftingRecipeDTO([new ItemStackDTO("foo")], part.Name));
-        var sut = new Crafter(CraftingRecipeRepository.Of([recipe]));
+        var recipe = new CraftingRecipeDTO([new ItemStackDTO("foo")], part.Name);
+        var sut = new Crafter(items, CraftingRecipeRepository.Of([recipe]));
         var inventory = new Inventory();
 
         sut.Craft(recipe.Id, inventory);
@@ -35,8 +35,8 @@ public class CrafterTester
             .Add(ItemUnion.OfPart(part))
             ;
         inventory.Materials.Add(ingredient);
-        var recipe = items.MakeCraftingRecipe(new CraftingRecipeDTO([new ItemStackDTO("foo")], part.Name));
-        var sut = new Crafter(CraftingRecipeRepository.Of([recipe]));
+        var recipe = new CraftingRecipeDTO([new ItemStackDTO("foo")], part.Name);
+        var sut = new Crafter(items, CraftingRecipeRepository.Of([recipe]));
         
         sut.Craft(recipe.Id, inventory);
 
@@ -54,8 +54,8 @@ public class CrafterTester
             .Add(ItemUnion.OfMaterial(ingredient))
             .Add(ItemUnion.OfPart(part))
             ;
-        var recipe = items.MakeCraftingRecipe(new CraftingRecipeDTO([new ItemStackDTO("foo")], part.Name));
-        var sut = new Crafter(CraftingRecipeRepository.Of([recipe]));
+        var recipe = new CraftingRecipeDTO([new ItemStackDTO("foo")], part.Name);
+        var sut = new Crafter(items, CraftingRecipeRepository.Of([recipe]));
 
         sut.Craft(recipe.Id, inventory);
 

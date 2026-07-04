@@ -1,5 +1,3 @@
-using GearBox.Core.Model.Items.Crafting;
-
 namespace GearBox.Core.Model.Items.Infrastructure;
 
 /// <summary>
@@ -18,20 +16,13 @@ public interface IItemFactory
     /// </summary>
     ItemUnion? Make(string key);
 
-    public CraftingRecipe MakeCraftingRecipe(CraftingRecipeDTO craftingRecipe)
+    public ItemUnion MakeOrThrow(string key)
     {
-        var ingredients = craftingRecipe.Ingredients
-            .GroupBy(stack => stack.ItemName)
-            .Select(group => new ItemStack<Material>(
-                MakeMaterial(group.Key),
-                group.Sum(stack => stack.Quantity)
-            ));
-
-        var anItem = Make(craftingRecipe.ResultItemName) ?? throw new ArgumentException($"Bad item name: '{craftingRecipe.ResultItemName}'");
-        return new CraftingRecipe(ingredients, () => anItem);
+        var item = Make(key) ?? throw new ArgumentException($"Invalid item name: {key}");
+        return item;
     }
     
-    private Material MakeMaterial(string key)
+    public Material MakeMaterial(string key)
     {
         var item = Make(key) ?? throw new ArgumentException($"No item registered with name '{key}'");
         

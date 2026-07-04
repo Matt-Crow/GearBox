@@ -13,7 +13,7 @@ public class GameBuilder : IGameBuilder
 {
     private readonly GearBoxConfig _config;
     private readonly IRandomNumberGenerator _rng;
-    private readonly HashSet<CraftingRecipe> _craftingRecipes = [];
+    private readonly HashSet<CraftingRecipeDTO> _craftingRecipes = [];
     private readonly List<AreaBuilder> _areas = []; // must be ordered so the first area added is the default area
 
     public GameBuilder(GearBoxConfig config, IRandomNumberGenerator rng)
@@ -30,7 +30,7 @@ public class GameBuilder : IGameBuilder
 
     public IGameBuilder AddCraftingRecipe(CraftingRecipeDTO craftingRecipe)
     {
-        _craftingRecipes.Add(Items.MakeCraftingRecipe(craftingRecipe));
+        _craftingRecipes.Add(craftingRecipe);
         return this;
     }
 
@@ -47,7 +47,7 @@ public class GameBuilder : IGameBuilder
 
     public IGame Build()
     {
-        var result = new Game(CraftingRecipeRepository.Of(_craftingRecipes));
+        var result = new Game(Items, CraftingRecipeRepository.Of(_craftingRecipes));
         foreach (var area in _areas)
         {
             result.AddArea(area.Build(result));

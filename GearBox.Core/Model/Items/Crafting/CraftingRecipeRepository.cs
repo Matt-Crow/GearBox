@@ -1,18 +1,17 @@
 using System.Collections.Frozen;
-using GearBox.Core.Model.Json.GameInit;
 
 namespace GearBox.Core.Model.Items.Crafting;
 
 public class CraftingRecipeRepository
 {
-    private readonly FrozenDictionary<Guid, CraftingRecipe> _recipes;
+    private readonly FrozenDictionary<Guid, CraftingRecipeDTO> _recipes;
 
-    private CraftingRecipeRepository(IEnumerable<CraftingRecipe> recipes)
+    private CraftingRecipeRepository(IEnumerable<CraftingRecipeDTO> recipes)
     {
         _recipes = recipes.ToFrozenDictionary(recipe => recipe.Id, recipe => recipe);
     }
 
-    public static CraftingRecipeRepository Of(IEnumerable<CraftingRecipe> recipes)
+    public static CraftingRecipeRepository Of(IEnumerable<CraftingRecipeDTO> recipes)
     {
         return new CraftingRecipeRepository(recipes);
     }
@@ -22,17 +21,13 @@ public class CraftingRecipeRepository
         return Of([]);
     }
 
-    public List<CraftingRecipeJson> ToJson()
-    {
-        var result = _recipes.Values
-            .Select(recipe => recipe.ToJson())
-            .ToList();
-        return result;
-    }
 
-    public CraftingRecipe? GetById(Guid id)
+    public IEnumerable<CraftingRecipeDTO> All => _recipes.Values;
+
+
+    public CraftingRecipeDTO? GetById(Guid id)
     {
-        _recipes.TryGetValue(id, out CraftingRecipe? result);
+        _recipes.TryGetValue(id, out CraftingRecipeDTO? result);
         return result;
     }
 }

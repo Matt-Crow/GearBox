@@ -3,9 +3,9 @@ using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
 using Xunit;
 
-namespace GearBox.Core.Tests.Model.Items.Infrastructure;
+namespace GearBox.Core.Tests.Model.Items.Crafting;
 
-public class ItemFactoryTester
+public class CraftingRecipeDTOTester
 {
     [Fact]
     public void MakeCraftingRecipe_GivenDuplicate_CombinesStacks()
@@ -15,10 +15,10 @@ public class ItemFactoryTester
             .Add(ItemUnion.OfPart(new Part("bar", PartSlotType.ALL.First())))
             ;
 
-        var result = items.MakeCraftingRecipe(new CraftingRecipeDTO([
+        var result = new CraftingRecipeDTO([
             new ItemStackDTO("foo"),
             new ItemStackDTO("foo")
-        ], "bar"));
+        ], "bar");
 
         Assert.Single(result.Ingredients);
     }
