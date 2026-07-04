@@ -13,9 +13,12 @@ public class Game : IGame
     public Game(CraftingRecipeRepository? craftingRecipes = null)
     {
         _craftingRecipes = craftingRecipes ?? CraftingRecipeRepository.Empty();
+        Crafter = new Crafter(_craftingRecipes);
     }
 
-    public CraftingRecipe? GetCraftingRecipeById(Guid id) => _craftingRecipes.GetById(id);
+
+    public Crafter Crafter { get; init; }
+
 
     // cannot create game & area at the same time due to circular dependency
     public void AddArea(IArea area)

@@ -13,7 +13,6 @@ namespace GearBox.Core.Model.Areas;
 
 public class Area : IArea
 {
-    private readonly IGame _game;
     private readonly GameObjectCollection<Character> _characters = new();
     private readonly GameObjectCollection<Projectile> _projectiles = new();
     private readonly GameObjectCollection<LootChest> _lootChests = new(); 
@@ -39,7 +38,7 @@ public class Area : IArea
     {
         Name = name ?? "an area";
         Level = level;
-        _game = game ?? new Game();
+        Game = game ?? new Game();
         _map = map ?? new();
         Shops = shops ?? [];
         _loot = loot ?? new LootTable([], new RandomNumberGenerator());
@@ -49,6 +48,7 @@ public class Area : IArea
         AddTimer(_enemyFactory.MakeSpawnTimer(this));
     }
 
+    public IGame Game { get; init; }
     public string Name { get; init; }
     public int Level { get; init; }
     public Dimensions Bounds => _map.Bounds;
@@ -115,11 +115,6 @@ public class Area : IArea
         _players.Remove(player);
     }
 
-    /// <summary>
-    /// might be able to remove this once commands operate on the game instead of area
-    /// </summary>
-    public CraftingRecipe? GetCraftingRecipeById(Guid id) => _game.GetCraftingRecipeById(id);
-
     public PlayerCharacter? GetNearestPlayerTo(EnemyCharacter enemy)
     {
         var result = _players.AsEnumerable()
@@ -165,7 +160,7 @@ public class Area : IArea
             var firstExit = _exits.FirstOrDefault(x => x.ShouldExit(player, this));
             if (firstExit != null)
             {
-                var newArea = _game.GetAreaByName(firstExit.DestinationName) ?? throw new Exception($"Invalid destination name: {firstExit.DestinationName}");
+                var newArea = Game.GetAreaByName(firstExit.DestinationName) ?? throw new Exception($"Invalid destination name: {firstExit.DestinationName}");
                 RemovePlayer(player);
                 newArea.SpawnPlayer(player);
                 firstExit.OnExit(player, newArea);

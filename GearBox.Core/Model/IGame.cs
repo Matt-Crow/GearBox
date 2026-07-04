@@ -10,7 +10,8 @@ namespace GearBox.Core.Model;
 /// </summary>
 public interface IGame
 {
-    CraftingRecipe? GetCraftingRecipeById(Guid id);
+    Crafter Crafter { get; }
+    
 
     void AddArea(IArea area);
 

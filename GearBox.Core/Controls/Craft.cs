@@ -15,11 +15,9 @@ public class Craft : IControlCommand
     {
         // this will change once recipes are stored in an aggregate of areas
         var area = target.CurrentArea ?? throw new Exception("Cannot craft when not in an area");
-
-        var recipe = area.GetCraftingRecipeById(_recipeId);
-        if (recipe != null)
-        {
-            target.Inventory.Craft(recipe);
-        }
+        area
+            .Game
+            .Crafter
+            .Craft(_recipeId, target.Inventory);
     }
 }

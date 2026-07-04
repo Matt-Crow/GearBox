@@ -1,4 +1,3 @@
-using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Json.AreaUpdate;
 
 namespace GearBox.Core.Model.Items;
@@ -105,32 +104,6 @@ public class Inventory
             return ItemUnion.OfMaterial(material);
         }
         return null;
-    }
-
-    public void Craft(CraftingRecipe recipe)
-    {
-        if (!CanCraft(recipe))
-        {
-            return;
-        }
-
-        foreach (var ingredient in recipe.Ingredients)
-        {
-            Materials.Remove(ingredient.Item, ingredient.Quantity);
-        }
-
-        /*
-            Craft the item at level 1.
-            This prevents players from getting overleveled items in low level areas
-        */
-        var item = recipe.Maker.Invoke();
-        Add(item);
-    }
-
-    private bool CanCraft(CraftingRecipe recipe)
-    {
-        var result = recipe.Ingredients.All(ingredient => Materials.Contains(ingredient.Item, ingredient.Quantity));
-        return result;
     }
 
     public InventoryJson ToJson()
