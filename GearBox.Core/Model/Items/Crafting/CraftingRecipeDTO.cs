@@ -11,6 +11,6 @@ public class CraftingRecipeDTO
         ResultItemName = resultItemName;
     }
 
-    public List<ItemStackDTO> Ingredients { get; set; }
-    public string ResultItemName { get; set; }
+    public List<ItemStackDTO> Ingredients { get; init; }
+    public string ResultItemName { get; init; }
 }

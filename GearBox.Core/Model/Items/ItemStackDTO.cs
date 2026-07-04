@@ -11,6 +11,6 @@ public class ItemStackDTO
         Quantity = quantity;    
     }
 
-    public string ItemName { get; set; }
-    public int Quantity { get; set; }
+    public string ItemName { get; init; }
+    public int Quantity { get; init; }
 }
