@@ -30,9 +30,7 @@ public class InventoryTester
             .Add(ItemUnion.OfMaterial(new Material("foo")))
             .Add(ItemUnion.OfPart(part))
             ;
-        var recipe = new CraftingRecipeBuilder(items)
-            .And("foo")
-            .Makes(part.Name);
+        var recipe = items.MakeCraftingRecipe(new CraftingRecipeDTO([new ItemStackDTO("foo")], part.Name));
 
         sut.Craft(recipe);
 
@@ -50,9 +48,7 @@ public class InventoryTester
             .Add(ItemUnion.OfPart(part))
             ;
         sut.Materials.Add(ingredient);
-        var recipe = new CraftingRecipeBuilder(items)
-            .And("foo")
-            .Makes(part.Name);
+        var recipe = items.MakeCraftingRecipe(new CraftingRecipeDTO([new ItemStackDTO("foo")], part.Name));
         
         sut.Craft(recipe);
 
@@ -70,9 +66,7 @@ public class InventoryTester
             .Add(ItemUnion.OfMaterial(ingredient))
             .Add(ItemUnion.OfPart(part))
             ;
-        var recipe = new CraftingRecipeBuilder(items)
-            .And("foo")
-            .Makes(part.Name);
+        var recipe = items.MakeCraftingRecipe(new CraftingRecipeDTO([new ItemStackDTO("foo")], part.Name));
         
         sut.Craft(recipe);
 

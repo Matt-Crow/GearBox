@@ -3,23 +3,22 @@ using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
 using Xunit;
 
-namespace GearBox.Core.Tests.Model.Items.Crafting;
+namespace GearBox.Core.Tests.Model.Items.Infrastructure;
 
-public class CraftingRecipeBuilderTester
+public class ItemFactoryTester
 {
     [Fact]
-    public void And_GivenDuplicate_CombinesStacks()
+    public void MakeCraftingRecipe_GivenDuplicate_CombinesStacks()
     {
         var items = new ItemFactory()
             .Add(ItemUnion.OfMaterial(new Material("foo")))
             .Add(ItemUnion.OfPart(new Part("bar", PartSlotType.ALL.First())))
             ;
-        var sut = new CraftingRecipeBuilder(items);
 
-        var result = sut
-            .And("foo")
-            .And("foo")
-            .Makes("bar");
+        var result = items.MakeCraftingRecipe(new CraftingRecipeDTO([
+            new ItemStackDTO("foo"),
+            new ItemStackDTO("foo")
+        ], "bar"));
 
         Assert.Single(result.Ingredients);
     }

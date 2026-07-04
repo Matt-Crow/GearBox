@@ -29,7 +29,7 @@ public interface IGameBuilder
     /// </summary>
     IEnemyRepository Enemies { get; }
 
-    IGameBuilder AddCraftingRecipe(Func<CraftingRecipeBuilder, CraftingRecipe> recipe);
+    IGameBuilder AddCraftingRecipe(CraftingRecipeDTO craftingRecipe);
 
     /// <summary>
     /// Defines an area in the game. The name must be unique within the game.

@@ -28,10 +28,9 @@ public class GameBuilder : IGameBuilder
     public IItemFactory Items { get; init; } = new ItemFactory();
     public IEnemyRepository Enemies { get; init; }
 
-    public IGameBuilder AddCraftingRecipe(Func<CraftingRecipeBuilder, CraftingRecipe> recipe)
+    public IGameBuilder AddCraftingRecipe(CraftingRecipeDTO craftingRecipe)
     {
-        var builder = new CraftingRecipeBuilder(Items);
-        _craftingRecipes.Add(recipe(builder));
+        _craftingRecipes.Add(Items.MakeCraftingRecipe(craftingRecipe));
         return this;
     }
 
