@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Identity;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Utils;
 using GearBox.Core.Model.Abilities.Passives.Impl;
-using GearBox.Core.Model.Items.Crafting;
 
 /*
     Need to load some of the game resources in a specific order:
@@ -59,7 +58,7 @@ foreach (var item in itemResources)
 }
 
 // configure crafting recipes after items
-foreach (var recipe in await resourceLoader.LoadCraftingRecipes())
+foreach (var recipe in await resourceLoader.LoadCraftingRecipes(gameBuilder.Items))
 {
     gameBuilder.AddCraftingRecipe(recipe);
 }

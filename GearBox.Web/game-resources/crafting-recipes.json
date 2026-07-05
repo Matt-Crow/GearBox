@@ -2,6 +2,15 @@
     {
         "Ingredients": [
             {
+                "ItemName": "Stone",
+                "Quantity": 10
+            }
+        ],
+        "ResultItemName": "Hard Hat"
+    },
+    {
+        "Ingredients": [
+            {
                 "ItemName": "Bronze",
                 "Quantity": 25
             }

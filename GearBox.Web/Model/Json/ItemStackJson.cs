@@ -1,15 +1,17 @@
 using GearBox.Core.Model.Items;
+using GearBox.Core.Model.Items.Infrastructure;
 
 namespace GearBox.Web.Model.Json;
 
-public class ItemStackJson
+public class ItemStackJson<T>
+where T : IItem
 {
     public required string ItemName { get; set; }
     public required int Quantity { get; set; }
 
-    public ItemStackDTO ToItemStackDTO()
+    public ItemStack<Material> ToItemStackOfMaterial(IItemFactory items)
     {
-        var result = new ItemStackDTO(ItemName, Quantity);
+        var result = new ItemStack<Material>(items.MakeMaterial(ItemName), Quantity);
         return result;
     }
 }

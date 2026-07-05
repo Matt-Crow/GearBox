@@ -4,6 +4,7 @@ using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
+using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Utils;
 using GearBox.Web.Model.Json;
 
@@ -64,13 +65,13 @@ public class GameResourceLoader
         return items;
     }
 
-    public async Task<List<CraftingRecipeDTO>> LoadCraftingRecipes()
+    public async Task<List<CraftingRecipe>> LoadCraftingRecipes(IItemFactory items)
     {
         var filePath = Path.Combine("game-resources", "crafting-recipes.json");
         var text = await File.ReadAllTextAsync(filePath);
         var json = JsonSerializer.Deserialize<List<CraftingRecipeJson>>(text) ?? throw new Exception($"Failed to deserialize {filePath}");
         var craftingRecipes = json
-            .Select(crJson => crJson.ToCraftingRecipeDTO())
+            .Select(recipeJson => recipeJson.ToCraftingRecipe(items))
             .ToList();
         return craftingRecipes;
     }

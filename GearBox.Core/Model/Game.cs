@@ -1,8 +1,6 @@
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
-using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
-using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Model.Json.GameInit;
 
 namespace GearBox.Core.Model;
@@ -10,14 +8,12 @@ namespace GearBox.Core.Model;
 public class Game : IGame
 {
     private readonly List<IArea> _areas = [];
-    private readonly IItemFactory _items;
     private readonly CraftingRecipeRepository _craftingRecipes;
 
-    public Game(IItemFactory? items = null, CraftingRecipeRepository? craftingRecipes = null)
+    public Game(CraftingRecipeRepository? craftingRecipes = null)
     {
-        _items = items ?? new ItemFactory();
         _craftingRecipes = craftingRecipes ?? CraftingRecipeRepository.Empty();
-        Crafter = new Crafter(_items, _craftingRecipes);
+        Crafter = new Crafter(_craftingRecipes);
     }
 
 
@@ -44,20 +40,9 @@ public class Game : IGame
         var result = new GameInitJson(
             player.Id,
             _craftingRecipes.All
-                .Select(ToJson)
+                .Select(recipe => recipe.ToJson())
                 .ToList()
         );
-        return result;
-    }
-
-    private CraftingRecipeJson ToJson(CraftingRecipeDTO craftingRecipe)
-    {
-        var ingredients = craftingRecipe.Ingredients
-            .Select(dto => new ItemStack<Material>(_items.MakeMaterial(dto.ItemName), dto.Quantity))
-            .Select(stack => stack.ToJson())
-            .ToList();
-        var makes = _items.MakeOrThrow(craftingRecipe.ResultItemName).ToJson();
-        var result = new CraftingRecipeJson(craftingRecipe.Id, ingredients, makes);
         return result;
     }
 

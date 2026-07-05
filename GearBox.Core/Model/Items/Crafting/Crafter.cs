@@ -1,15 +1,11 @@
-using GearBox.Core.Model.Items.Infrastructure;
-
 namespace GearBox.Core.Model.Items.Crafting;
 
 public class Crafter
 {
-    private readonly IItemFactory _items;
     private readonly CraftingRecipeRepository _craftingRecipes;
 
-    public Crafter(IItemFactory items, CraftingRecipeRepository craftingRecipes)
+    public Crafter(CraftingRecipeRepository craftingRecipes)
     {
-        _items = items;
         _craftingRecipes = craftingRecipes;
     }
 
@@ -21,15 +17,13 @@ public class Crafter
             return;
         }
 
-        var ingredients = craftingRecipe.Ingredients
-            .Select(dto => new ItemStack<Material>(_items.MakeMaterial(dto.ItemName), dto.Quantity));
-        var canBeCrafted = ingredients.All(ingredient => inventory.Materials.Contains(ingredient.Item, ingredient.Quantity));
+        var canBeCrafted = craftingRecipe.Ingredients.All(ingredient => inventory.Materials.Contains(ingredient.Item, ingredient.Quantity));
         if (!canBeCrafted)
         {
             return;
         }
 
-        foreach (var ingredient in ingredients)
+        foreach (var ingredient in craftingRecipe.Ingredients)
         {
             inventory.Materials.Remove(ingredient.Item, ingredient.Quantity);
         }
@@ -38,7 +32,6 @@ public class Crafter
             Craft the item at level 1.
             This prevents players from getting overleveled items in low level areas
         */
-        var maybeItem = _items.Make(craftingRecipe.ResultItemName);
-        inventory.Add(maybeItem);
+        inventory.Add(craftingRecipe.Makes.ToOwned(1));
     }
 }

@@ -4,14 +4,14 @@ namespace GearBox.Core.Model.Items.Crafting;
 
 public class CraftingRecipeRepository
 {
-    private readonly FrozenDictionary<Guid, CraftingRecipeDTO> _recipes;
+    private readonly FrozenDictionary<Guid, CraftingRecipe> _recipes;
 
-    private CraftingRecipeRepository(IEnumerable<CraftingRecipeDTO> recipes)
+    private CraftingRecipeRepository(IEnumerable<CraftingRecipe> recipes)
     {
         _recipes = recipes.ToFrozenDictionary(recipe => recipe.Id, recipe => recipe);
     }
 
-    public static CraftingRecipeRepository Of(IEnumerable<CraftingRecipeDTO> recipes)
+    public static CraftingRecipeRepository Of(IEnumerable<CraftingRecipe> recipes)
     {
         return new CraftingRecipeRepository(recipes);
     }
@@ -22,12 +22,12 @@ public class CraftingRecipeRepository
     }
 
 
-    public IEnumerable<CraftingRecipeDTO> All => _recipes.Values;
+    public IEnumerable<CraftingRecipe> All => _recipes.Values;
 
 
-    public CraftingRecipeDTO? GetById(Guid id)
+    public CraftingRecipe? GetById(Guid id)
     {
-        _recipes.TryGetValue(id, out CraftingRecipeDTO? result);
+        _recipes.TryGetValue(id, out CraftingRecipe? result);
         return result;
     }
 }
