@@ -1,26 +1,28 @@
 using GearBox.Core.Model.Items;
-using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.GameObjects.Enemies;
 
 public class EnemyRepository : IEnemyRepository
 {
-    private readonly IItemFactory _itemFactory;
     private readonly IRandomNumberGenerator _rng;
     private readonly Dictionary<string, EnemyCharacterBuilder> _enemyBuilders = [];
 
-    public EnemyRepository(IItemFactory itemFactory, IRandomNumberGenerator rng)
+
+    public EnemyRepository(IRandomNumberGenerator rng)
     {
-        _itemFactory = itemFactory;
         _rng = rng;
     }
 
-    public IEnemyRepository Add(string name, Color color, Func<LootTableBuilder, LootTableBuilder> loot)
+    public IEnemyRepository Add(EnemyCharacterTemplate enemy)
     {
-        var lootTableBuilder = new LootTableBuilder(_itemFactory, _rng);
-        var enemyBuilder = new EnemyCharacterBuilder(name, color, loot(lootTableBuilder));
-        _enemyBuilders[name] = enemyBuilder;
+        var lootTableBuilder = new LootTableBuilder(_rng);
+        foreach (var option in enemy.LootOptions)
+        {
+            lootTableBuilder = lootTableBuilder.AddOption(option);
+        }
+        var enemyBuilder = new EnemyCharacterBuilder(enemy.Name, enemy.Color, lootTableBuilder);
+        _enemyBuilders[enemy.Name] = enemyBuilder;
         return this;
     }
 

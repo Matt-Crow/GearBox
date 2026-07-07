@@ -39,7 +39,7 @@ public class EnemyFactoryTester
 
     private class EnemyRepositoryMock : IEnemyRepository
     {
-        public IEnemyRepository Add(string name, Color color, Func<LootTableBuilder, LootTableBuilder> loot) => this;
+        public IEnemyRepository Add(EnemyCharacterTemplate enemy) => this;
 
         public EnemyCharacter? GetEnemyByName(string name, int level) => new EnemyCharacter(name, level);
     }

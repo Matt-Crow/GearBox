@@ -22,7 +22,7 @@ public class AreaBuilder
         Name = name;
         _level = level;
         _itemFactory = itemFactory;
-        _lootBuilder = new(itemFactory, rng);
+        _lootBuilder = new(rng);
         _enemies = enemies;
     }
 

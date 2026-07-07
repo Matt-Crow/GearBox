@@ -2,7 +2,6 @@ using GearBox.Core.Config;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies.Ai;
 using GearBox.Core.Model.GameObjects.Player;
-using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Utils;
 
 namespace GearBox.Core.Model.GameObjects.Enemies;
@@ -22,7 +21,7 @@ public class EnemyFactory : IEnemyFactory
         _rng = rng;
     }
 
-    public static EnemyFactory MakeDefault() => new EnemyFactory(new GearBoxConfig(), new EnemyRepository(new ItemFactory(), new RandomNumberGenerator()), new RandomNumberGenerator());
+    public static EnemyFactory MakeDefault() => new EnemyFactory(new GearBoxConfig(), new EnemyRepository(new RandomNumberGenerator()), new RandomNumberGenerator());
 
     public IEnemyFactory Add(string name)
     {

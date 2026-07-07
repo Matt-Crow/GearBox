@@ -11,7 +11,7 @@ public class LootTableTester
     {
         var expected = new Material("foo");
         var sut = new LootTable([
-            new LootOption(1, ItemUnion.OfMaterial(expected))
+            new LootOption(ItemUnion.OfMaterial(expected))
         ], new RandomNumberGenerator());
 
         var inventory = sut.GetRandomLoot();
@@ -26,7 +26,7 @@ public class LootTableTester
     {
         var expected = new Part("foo", PartSlotType.ALL.First());
         var sut = new LootTable([
-            new LootOption(1, ItemUnion.OfPart(expected))
+            new LootOption(ItemUnion.OfPart(expected))
         ], new RandomNumberGenerator());
 
         var inventory = sut.GetRandomLoot();

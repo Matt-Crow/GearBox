@@ -20,7 +20,7 @@ public class GameBuilder : IGameBuilder
     {
         _config = config;
         _rng = rng;
-        Enemies = new EnemyRepository(Items, rng);
+        Enemies = new EnemyRepository(rng);
     }
 
     public IActiveAbilityFactory Actives { get; init; } = new ActiveAbilityFactory();

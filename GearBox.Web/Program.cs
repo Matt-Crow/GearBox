@@ -64,24 +64,12 @@ foreach (var recipe in await resourceLoader.LoadCraftingRecipes(gameBuilder.Item
 }
 
 // configure enemies after items
-gameBuilder.Enemies
-    .Add("Snake", Color.LIGHT_GREEN, loot => loot
-        .AddItem("Fang")
-        .AddItem("Bronze")
-        .Add(Grade.COMMON, new Gold(5))
-    )
-    .Add("Scorpion", Color.BLACK, loot => loot
-        .AddItem("Tanky Torso")
-        .AddItem("Bronze")
-        .Add(Grade.UNCOMMON, new Gold(10))
-    )
-    .Add("Jackal", Color.TAN, loot => loot
-        .AddItem("Fang")
-        .Add(Grade.RARE, new Gold(25))
-    )
-    .Add("Specter", Color.BLUE, loot => loot
-        .AddItem("Spectral Shroud")
-    );
+foreach (var enemy in await resourceLoader.LoadEnemies(gameBuilder.Items))
+{
+    gameBuilder.Enemies.Add(enemy);
+}
+
+
 
 // we have all the game data, now make areas in that game
 var bazaarMap = await resourceLoader.LoadMapByName("bazaar");
@@ -90,11 +78,11 @@ var canyonMap = await resourceLoader.LoadMapByName("canyon");
 gameBuilder
     .WithArea("desert", 1, area => area
         .AddLoot(loot => loot
-            .AddItem("Stone")
-            .AddItem("Bronze")
-            .AddItem("Spiney Helm")
-            .Add(Grade.COMMON, new Gold(5))
-            .Add(Grade.UNCOMMON, new Gold(10))
+            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Stone")))
+            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Bronze")))
+            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Spiney Helm")))
+            .AddOption(new LootOption(Grade.COMMON, new Gold(5)))
+            .AddOption(new LootOption(Grade.UNCOMMON, new Gold(10)))
         )
         .AddEnemies(enemies => enemies
             .Add("Snake")
@@ -120,10 +108,10 @@ gameBuilder
     )
     .WithArea("canyon", 2, area => area
         .AddLoot(loot => loot
-            .AddItem("Bronze")
-            .AddItem("Silver")
-            .AddItem("Antigravity Thrusters")
-            .Add(Grade.RARE, new Gold(25))
+            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Bronze")))
+            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Silver")))
+            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Antigravity Thrusters")))
+            .AddOption(new LootOption(Grade.RARE, new Gold(25)))
         )
         .AddEnemies(enemies => enemies
             .Add("Snake")

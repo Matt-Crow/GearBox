@@ -5,17 +5,18 @@ public class LootOption
     private readonly ItemUnion? _item;
     private readonly Gold? _gold;
 
-    public LootOption(int weight, ItemUnion item)
+    public LootOption(ItemUnion item)
     {
-        Weight = weight;
+        Weight = item.Grade.Weight;
         _item = item;
     }
 
-    public LootOption(int weight, Gold gold)
+    public LootOption(Grade grade, Gold gold)
     {
-        Weight = weight;
+        Weight = grade.Weight;
         _gold = gold;
     }
+
 
     public int Weight { get; init; }
 

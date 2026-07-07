@@ -2,6 +2,7 @@ using System.Text.Json;
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
+using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
@@ -74,6 +75,17 @@ public class GameResourceLoader
             .Select(recipeJson => recipeJson.ToCraftingRecipe(items))
             .ToList();
         return craftingRecipes;
+    }
+
+    public async Task<List<EnemyCharacterTemplate>> LoadEnemies(IItemFactory items)
+    {
+        var filePath = Path.Combine("game-resources", "enemies.json");
+        var text = await File.ReadAllTextAsync(filePath);
+        var json = JsonSerializer.Deserialize<List<EnemyJson>>(text) ?? throw new Exception($"Failed to deserialize {filePath}");
+        var enemies = json
+            .Select(enemyJson => enemyJson.ToEnemyCharacterTemplate(items))
+            .ToList();
+        return enemies;
     }
 
     /// <summary>
