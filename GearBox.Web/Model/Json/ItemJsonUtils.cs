@@ -2,6 +2,7 @@ using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
+using GearBox.Core.Utils.Lookups;
 
 namespace GearBox.Web.Model.Json;
 
@@ -24,10 +25,10 @@ public static class ItemJsonUtils
         return result;
     }
 
-    public static IEnumerable<IActiveAbility> GetActives(IActiveAbilityFactory factory, List<string> activeNames)
+    public static IEnumerable<IActiveAbility> GetActives(Lookup<IActiveAbility> actives, List<string> activeNames)
     {
         var result = activeNames
-            .Select(name => factory.Make(name) ?? throw new ArgumentException($"Invalid active name: \"{name}\""))
+            .Select(actives.GetOrThrow)
             .ToList();
         return result;
     }

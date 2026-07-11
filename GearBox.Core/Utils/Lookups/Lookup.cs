@@ -42,4 +42,9 @@ where T : ILookupValue
         }
         return result;
     }
+
+    public T GetOrThrow(string key)
+    {
+        return Get(key) ?? throw new ArgumentException($"Not found: '{key}'");
+    }
 }

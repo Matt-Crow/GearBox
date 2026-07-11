@@ -1,12 +1,13 @@
 using GearBox.Core.Model.GameObjects;
 using GearBox.Core.Model.Units;
+using GearBox.Core.Utils.Lookups;
 
 namespace GearBox.Core.Model.Abilities.Actives;
 
 /// <summary>
 /// An ability players can actively choose when to trigger
 /// </summary>
-public interface IActiveAbility
+public interface IActiveAbility : ILookupValue
 {
     /// <summary>
     /// Must be unique within a game

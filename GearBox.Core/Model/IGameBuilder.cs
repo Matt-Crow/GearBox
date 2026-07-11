@@ -4,6 +4,7 @@ using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Utils.Lookups;
 
 namespace GearBox.Core.Model;
 
@@ -12,7 +13,7 @@ public interface IGameBuilder
     /// <summary>
     /// A reference to the actives available in the game this is building.
     /// </summary>
-    IActiveAbilityFactory Actives { get; }
+    Lookup<IActiveAbility> Actives { get; }
 
     /// <summary>
     /// A reference to the passives available in the game this is building.

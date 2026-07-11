@@ -4,6 +4,7 @@ using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Utils;
+using GearBox.Core.Utils.Lookups;
 using GearBox.Web.Model.Json;
 
 namespace GearBox.Web.Infrastructure;
@@ -13,11 +14,11 @@ namespace GearBox.Web.Infrastructure;
 /// </summary>
 public class GameResourceLoader
 {
-    private readonly IActiveAbilityFactory _actives;
+    private readonly Lookup<IActiveAbility> _actives;
     private readonly IPassiveAbilityFactory _passives;
     private readonly IRandomNumberGenerator _rng;
 
-    public GameResourceLoader(IActiveAbilityFactory actives, IPassiveAbilityFactory passives, IRandomNumberGenerator rng)
+    public GameResourceLoader(Lookup<IActiveAbility> actives, IPassiveAbilityFactory passives, IRandomNumberGenerator rng)
     {
         _actives = actives;
         _passives = passives;
