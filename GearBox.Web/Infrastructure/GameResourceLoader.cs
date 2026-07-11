@@ -1,11 +1,7 @@
 using System.Text.Json;
-using GearBox.Core.Model;
-using GearBox.Core.Model.Abilities.Actives;
-using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Utils;
-using GearBox.Core.Utils.Factories;
 using GearBox.Web.Model.Json;
 
 namespace GearBox.Web.Infrastructure;
@@ -15,45 +11,19 @@ namespace GearBox.Web.Infrastructure;
 /// </summary>
 public class GameResourceLoader
 {
-    private readonly Factory<IActiveAbility> _actives;
-    private readonly Factory<IPassiveAbility> _passives;
     private readonly IRandomNumberGenerator _rng;
 
-    public GameResourceLoader(Factory<IActiveAbility> actives, Factory<IPassiveAbility> passives, IRandomNumberGenerator rng)
+    public GameResourceLoader(IRandomNumberGenerator rng)
     {
-        _actives = actives;
-        _passives = passives;
         _rng = rng;
     }
 
 
-    /// <summary>
-    /// Loads all resources from the default resource pack into the given game builder.
-    /// </summary>
-    public async Task LoadResourcesInto(IGameBuilder gameBuilder)
+    public async Task<ResourcePack> LoadDefaultResourcePack()
     {
         var resourceFilePath = Path.Combine("game-resources", "default.json");
-        var resourcesJson = await TryDeserialize<ResourcePack>(resourceFilePath);
-
-        // load items first, as crafting recipes and enemies depend on them
-        foreach (var material in resourcesJson.Materials)
-        {
-            gameBuilder.Items.Add(material.ToItem(_actives, _passives));
-        }
-        foreach (var part in resourcesJson.Parts)
-        {
-            gameBuilder.Items.Add(part.ToItem(_actives, _passives));
-        }
-
-        foreach (var recipe in resourcesJson.CraftingRecipes)
-        {
-            gameBuilder.AddCraftingRecipe(recipe.ToCraftingRecipe(gameBuilder.Items));
-        }
-
-        foreach (var enemy in resourcesJson.Enemies)
-        {
-            gameBuilder.Enemies.Add(enemy.ToEnemyCharacterTemplate(gameBuilder.Items));
-        }
+        var resourcePack = await TryDeserialize<ResourcePack>(resourceFilePath);
+        return resourcePack;
     }
 
     public async Task<Map> LoadMapByName(string name)

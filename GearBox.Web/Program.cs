@@ -29,12 +29,15 @@ using GearBox.Core.Model.Abilities.Passives.Impl;
 
 // need to grab configuration before most other things
 var webAppBuilder = WebApplication.CreateBuilder(args);
-
 var gearboxConfig = new GearBoxConfig();
 webAppBuilder.Configuration
     .GetSection("GearBox")
     .Bind(gearboxConfig);
+
 var rng = new RandomNumberGenerator();
+
+var resourceLoader = new GameResourceLoader(rng);
+
 var gameBuilder = new GameBuilder(
     gearboxConfig, 
     rng, 
@@ -53,13 +56,12 @@ var gameBuilder = new GameBuilder(
             new Intangible(),
             new Levitate(),
             new Spikey()
+        ],
+        ResourcePacks = [
+            await resourceLoader.LoadDefaultResourcePack()
         ]
     }
 );
-
-
-var resourceLoader = new GameResourceLoader(gameBuilder.Actives, gameBuilder.Passives, rng);
-await resourceLoader.LoadResourcesInto(gameBuilder);
 
 
 

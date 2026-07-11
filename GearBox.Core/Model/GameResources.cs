@@ -1,5 +1,6 @@
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
+using GearBox.Core.Model.ResourcePacks;
 
 namespace GearBox.Core.Model;
 
@@ -12,4 +13,5 @@ public class GameResources
 {
     public List<IActiveAbility> Actives { get; set; } = [];
     public List<IPassiveAbility> Passives { get; set; } = [];
+    public List<ResourcePack> ResourcePacks { get; set; } = [];
 }

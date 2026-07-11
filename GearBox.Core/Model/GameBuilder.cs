@@ -5,6 +5,7 @@ using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Utils;
 using GearBox.Core.Utils.Factories;
 
@@ -25,6 +26,10 @@ public class GameBuilder : IGameBuilder
         Actives = Factory<IActiveAbility>.Of(a => a.Copy(), resources.Actives);
         Passives = Factory<IPassiveAbility>.Of(p => p.Copy(), resources.Passives);
         Enemies = new EnemyRepository(rng);
+        foreach (var resourcePack in resources.ResourcePacks)
+        {
+            LoadResourcePack(resourcePack);
+        }
     }
 
 
@@ -33,6 +38,29 @@ public class GameBuilder : IGameBuilder
     public IItemFactory Items { get; init; } = new ItemFactory();
     public IEnemyRepository Enemies { get; init; }
 
+
+    public void LoadResourcePack(ResourcePack resourcePack)
+    {
+        // load items first, as crafting recipes and enemies depend on them
+        foreach (var material in resourcePack.Materials)
+        {
+            Items.Add(material.ToItem(Actives, Passives));
+        }
+        foreach (var part in resourcePack.Parts)
+        {
+            Items.Add(part.ToItem(Actives, Passives));
+        }
+
+        foreach (var recipe in resourcePack.CraftingRecipes)
+        {
+            AddCraftingRecipe(recipe.ToCraftingRecipe(Items));
+        }
+
+        foreach (var enemy in resourcePack.Enemies)
+        {
+            Enemies.Add(enemy.ToEnemyCharacterTemplate(Items));
+        }
+    }
 
     public IGameBuilder AddCraftingRecipe(CraftingRecipe craftingRecipe)
     {
