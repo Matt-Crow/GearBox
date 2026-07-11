@@ -94,7 +94,7 @@ public class GameServerTester
 
     public static IGame MakeGame()
     {
-        var result = new GameBuilder(new GearBoxConfig(), new RandomNumberGenerator())
+        var result = new GameBuilder(new GearBoxConfig(), new RandomNumberGenerator(), new GameResources())
             .WithArea("foo", 1, area => area.WithMap(new()))
             .Build();
         return result;

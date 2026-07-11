@@ -13,8 +13,6 @@ using Microsoft.AspNetCore.Identity;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Utils;
 using GearBox.Core.Model.Abilities.Passives.Impl;
-using GearBox.Core.Model.Abilities.Actives;
-using GearBox.Core.Model.Abilities.Passives;
 
 /*
     Actives and passives cannot be stored in a JSON file,
@@ -37,23 +35,27 @@ webAppBuilder.Configuration
     .GetSection("GearBox")
     .Bind(gearboxConfig);
 var rng = new RandomNumberGenerator();
-var actives = new List<IActiveAbility>()
-{
-    new Cleave(),
-    new LaserBolt()
-};
-var passives = new List<IPassiveAbility>()
-{
-    Armored.Lightly(),
-    Armored.Moderately(),
-    Armored.Heavily(),
-    Ranged.Moderately(),
-    Ranged.Long(),
-    new Intangible(),
-    new Levitate(),
-    new Spikey()
-};
-var gameBuilder = new GameBuilder(gearboxConfig, rng, actives, passives);
+var gameBuilder = new GameBuilder(
+    gearboxConfig, 
+    rng, 
+    new GameResources()
+    {
+        Actives = [
+            new Cleave(),
+            new LaserBolt()
+        ],
+        Passives = [
+            Armored.Lightly(),
+            Armored.Moderately(),
+            Armored.Heavily(),
+            Ranged.Moderately(),
+            Ranged.Long(),
+            new Intangible(),
+            new Levitate(),
+            new Spikey()
+        ]
+    }
+);
 
 
 var resourceLoader = new GameResourceLoader(gameBuilder.Actives, gameBuilder.Passives, rng);

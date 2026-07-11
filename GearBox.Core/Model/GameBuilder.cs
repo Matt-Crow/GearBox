@@ -17,19 +17,22 @@ public class GameBuilder : IGameBuilder
     private readonly HashSet<CraftingRecipe> _craftingRecipes = [];
     private readonly List<AreaBuilder> _areas = []; // must be ordered so the first area added is the default area
 
-    public GameBuilder(GearBoxConfig config, IRandomNumberGenerator rng, IEnumerable<IActiveAbility>? actives = null, IEnumerable<IPassiveAbility>? passives = null)
+
+    public GameBuilder(GearBoxConfig config, IRandomNumberGenerator rng, GameResources resources)
     {
         _config = config;
         _rng = rng;
-        Actives = Factory<IActiveAbility>.Of(a => a.Copy(), actives ?? []);
-        Passives = Factory<IPassiveAbility>.Of(p => p.Copy(), passives ?? []);
+        Actives = Factory<IActiveAbility>.Of(a => a.Copy(), resources.Actives);
+        Passives = Factory<IPassiveAbility>.Of(p => p.Copy(), resources.Passives);
         Enemies = new EnemyRepository(rng);
     }
+
 
     public Factory<IActiveAbility> Actives { get; init; }
     public Factory<IPassiveAbility> Passives { get; init; }
     public IItemFactory Items { get; init; } = new ItemFactory();
     public IEnemyRepository Enemies { get; init; }
+
 
     public IGameBuilder AddCraftingRecipe(CraftingRecipe craftingRecipe)
     {
