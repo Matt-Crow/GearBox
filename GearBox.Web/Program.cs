@@ -15,12 +15,16 @@ using GearBox.Core.Utils;
 using GearBox.Core.Model.Abilities.Passives.Impl;
 
 /*
-    Need to load some of the game resources in a specific order:
-    1. actives
-    2. items, which use actives
-    3. crafting recipes, which use items
-    4. enemies, which use items
-    5. areas, which use items and enemies
+    Actives and passives cannot be stored in a JSON file,
+    as they contain executable code,
+    so they are initialized outside of the GameResourceLoader.
+
+    Items can provide actives and passives,
+    and thus must be loaded after loading actives and passives.
+
+    Each area depends on game-wide resources,
+    such as items,
+    so each area is loaded after all game-wide resources have been loaded.
 */
 
 // need to grab configuration before most other things
@@ -33,7 +37,6 @@ webAppBuilder.Configuration
 var rng = new RandomNumberGenerator();
 var gameBuilder = new GameBuilder(gearboxConfig, rng);
 
-// configure actives and passives before items, as items can provide both
 gameBuilder.Actives
     .Add(new Cleave())
     .Add(new LaserBolt())
@@ -49,25 +52,8 @@ gameBuilder.Passives
     .Add(new Spikey())
     ;
 
-// configure items before crafting recipes and enemies
 var resourceLoader = new GameResourceLoader(gameBuilder.Actives, gameBuilder.Passives, rng);
-var itemResources = await resourceLoader.LoadAllItems();
-foreach (var item in itemResources)
-{
-    gameBuilder.Items.Add(item);
-}
-
-// configure crafting recipes after items
-foreach (var recipe in await resourceLoader.LoadCraftingRecipes(gameBuilder.Items))
-{
-    gameBuilder.AddCraftingRecipe(recipe);
-}
-
-// configure enemies after items
-foreach (var enemy in await resourceLoader.LoadEnemies(gameBuilder.Items))
-{
-    gameBuilder.Enemies.Add(enemy);
-}
+await resourceLoader.LoadResourcesInto(gameBuilder);
 
 
 

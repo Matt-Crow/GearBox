@@ -1,11 +1,8 @@
 using System.Text.Json;
+using GearBox.Core.Model;
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
-using GearBox.Core.Model.GameObjects.Enemies;
-using GearBox.Core.Model.Items;
-using GearBox.Core.Model.Items.Crafting;
-using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Utils;
 using GearBox.Web.Model.Json;
 
@@ -27,6 +24,36 @@ public class GameResourceLoader
         _rng = rng;
     }
 
+
+    /// <summary>
+    /// Loads all resources from the default resource pack into the given game builder.
+    /// </summary>
+    public async Task LoadResourcesInto(IGameBuilder gameBuilder)
+    {
+        var resourceFilePath = Path.Combine("game-resources", "default.json");
+        var resourcesJson = await TryDeserialize<ResourcesJson>(resourceFilePath);
+
+        // load items first, as crafting recipes and enemies depend on them
+        foreach (var material in resourcesJson.Materials)
+        {
+            gameBuilder.Items.Add(material.ToItem(_actives, _passives));
+        }
+        foreach (var part in resourcesJson.Parts)
+        {
+            gameBuilder.Items.Add(part.ToItem(_actives, _passives));
+        }
+
+        foreach (var recipe in resourcesJson.CraftingRecipes)
+        {
+            gameBuilder.AddCraftingRecipe(recipe.ToCraftingRecipe(gameBuilder.Items));
+        }
+
+        foreach (var enemy in resourcesJson.Enemies)
+        {
+            gameBuilder.Enemies.Add(enemy.ToEnemyCharacterTemplate(gameBuilder.Items));
+        }
+    }
+
     public async Task<Map> LoadMapByName(string name)
     {
         if (!name.All(IsAllowedFileNameCharacter))
@@ -34,58 +61,16 @@ public class GameResourceLoader
             throw new ArgumentException($"Invalid map name: {name}");
         }
 
-        var path = Path.Combine("game-resources", "maps", name + ".json");
-        var text = await File.ReadAllTextAsync(path);
-        var json = JsonSerializer.Deserialize<MapResourceJson>(text) ?? throw new ArgumentException($"Map not found: {name}");
+        var filePath = Path.Combine("game-resources", "maps", name + ".json");
+        var json = await TryDeserialize<MapResourceJson>(filePath);
         return json.ToMap(_rng);
     }
 
-    public async Task<List<ItemUnion>> LoadAllItems()
-    {
-        var allItems = new List<ItemUnion>();
-        var itemsFolder = Path.Combine("game-resources", "items");
-
-        // materials are probably better off stored in CSV files though
-        var materials = await LoadItems<MaterialJson>(Path.Combine(itemsFolder, "materials.json"));
-        allItems.AddRange(materials);
-
-        var parts = await LoadItems<PartJson>(Path.Combine(itemsFolder, "parts.json"));
-        allItems.AddRange(parts);
-
-        return allItems;
-    }
-
-    private async Task<List<ItemUnion>> LoadItems<T>(string filePath)
-    where T : IItemJson
+    private static async Task<T> TryDeserialize<T>(string filePath)
     {
         var text = await File.ReadAllTextAsync(filePath);
-        var json = JsonSerializer.Deserialize<List<T>>(text) ?? throw new Exception($"Failed to deserialize {filePath}");
-        var items = json
-            .Select(itemJson => itemJson.ToItem(_actives, _passives))
-            .ToList();
-        return items;
-    }
-
-    public async Task<List<CraftingRecipe>> LoadCraftingRecipes(IItemFactory items)
-    {
-        var filePath = Path.Combine("game-resources", "crafting-recipes.json");
-        var text = await File.ReadAllTextAsync(filePath);
-        var json = JsonSerializer.Deserialize<List<CraftingRecipeJson>>(text) ?? throw new Exception($"Failed to deserialize {filePath}");
-        var craftingRecipes = json
-            .Select(recipeJson => recipeJson.ToCraftingRecipe(items))
-            .ToList();
-        return craftingRecipes;
-    }
-
-    public async Task<List<EnemyCharacterTemplate>> LoadEnemies(IItemFactory items)
-    {
-        var filePath = Path.Combine("game-resources", "enemies.json");
-        var text = await File.ReadAllTextAsync(filePath);
-        var json = JsonSerializer.Deserialize<List<EnemyJson>>(text) ?? throw new Exception($"Failed to deserialize {filePath}");
-        var enemies = json
-            .Select(enemyJson => enemyJson.ToEnemyCharacterTemplate(items))
-            .ToList();
-        return enemies;
+        var json = JsonSerializer.Deserialize<T>(text) ?? throw new Exception($"Failed to deserialize {filePath}");
+        return json;
     }
 
     /// <summary>
