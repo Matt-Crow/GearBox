@@ -3,9 +3,9 @@ using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Utils.Factories;
 
-namespace GearBox.Web.Model.Json;
+namespace GearBox.Core.Model.ResourcePacks;
 
-public class MaterialJson : IItemJson
+public class MaterialResource : IItemResource
 {
     public required string Name { get; set; }
     public required string GradeName { get; set; }
@@ -13,7 +13,7 @@ public class MaterialJson : IItemJson
 
     public ItemUnion ToItem(Factory<IActiveAbility> actives, Factory<IPassiveAbility> passives)
     {
-        var grade = ItemJsonUtils.GetGradeByName(GradeName);
+        var grade = ItemResourceUtils.GetGradeByName(GradeName);
         var result = ItemUnion.OfMaterial(new Material(Name, grade, Description));
         return result;
     }

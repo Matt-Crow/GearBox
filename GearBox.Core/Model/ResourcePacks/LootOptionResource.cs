@@ -1,9 +1,9 @@
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Infrastructure;
 
-namespace GearBox.Web.Model.Json;
+namespace GearBox.Core.Model.ResourcePacks;
 
-public class LootOptionJson
+public class LootOptionResource
 {
     /// <summary>
     /// Either "item" or "gold"

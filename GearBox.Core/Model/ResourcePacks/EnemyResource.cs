@@ -1,13 +1,13 @@
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Infrastructure;
 
-namespace GearBox.Web.Model.Json;
+namespace GearBox.Core.Model.ResourcePacks;
 
-public class EnemyJson
+public class EnemyResource
 {
     public required string Name { get; set; }
     public required string Color { get; set; }
-    public required List<LootOptionJson> Loot { get; set; }
+    public required List<LootOptionResource> Loot { get; set; }
 
 
     public EnemyCharacterTemplate ToEnemyCharacterTemplate(IItemFactory items)

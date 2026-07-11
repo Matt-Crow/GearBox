@@ -3,6 +3,7 @@ using GearBox.Core.Model;
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
+using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Utils;
 using GearBox.Core.Utils.Factories;
 using GearBox.Web.Model.Json;
@@ -32,7 +33,7 @@ public class GameResourceLoader
     public async Task LoadResourcesInto(IGameBuilder gameBuilder)
     {
         var resourceFilePath = Path.Combine("game-resources", "default.json");
-        var resourcesJson = await TryDeserialize<ResourcesJson>(resourceFilePath);
+        var resourcesJson = await TryDeserialize<ResourcePack>(resourceFilePath);
 
         // load items first, as crafting recipes and enemies depend on them
         foreach (var material in resourcesJson.Materials)

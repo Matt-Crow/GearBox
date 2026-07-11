@@ -1,9 +1,9 @@
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Infrastructure;
 
-namespace GearBox.Web.Model.Json;
+namespace GearBox.Core.Model.ResourcePacks;
 
-public class ItemStackJson<T>
+public class ItemStackResource<T>
 where T : IItem
 {
     public required string ItemName { get; set; }

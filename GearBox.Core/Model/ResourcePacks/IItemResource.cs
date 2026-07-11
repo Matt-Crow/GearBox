@@ -3,9 +3,9 @@ using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Utils.Factories;
 
-namespace GearBox.Web.Model.Json;
+namespace GearBox.Core.Model.ResourcePacks;
 
-public interface IItemJson
+public interface IItemResource
 {
     /// <summary>
     /// Converts this from JSON to an item,

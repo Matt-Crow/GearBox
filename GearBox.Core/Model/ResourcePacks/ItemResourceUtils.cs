@@ -4,9 +4,9 @@ using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Utils.Factories;
 
-namespace GearBox.Web.Model.Json;
+namespace GearBox.Core.Model.ResourcePacks;
 
-public static class ItemJsonUtils
+public static class ItemResourceUtils
 {
     public static Grade GetGradeByName(string name)
     {
