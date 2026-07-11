@@ -1,7 +1,7 @@
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Items;
-using GearBox.Core.Utils.Lookups;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Web.Model.Json;
 
@@ -15,7 +15,7 @@ public class PartJson : IItemJson
     public List<string> PassiveNames { get; set; } = [];
 
 
-    public ItemUnion ToItem(Lookup<IActiveAbility> actives, Lookup<IPassiveAbility> passives)
+    public ItemUnion ToItem(Factory<IActiveAbility> actives, Factory<IPassiveAbility> passives)
     {
         var slotType = PartSlotType.GetPartSlotTypeByName(Slot) ?? throw new Exception($"Invalid slot type: \"{Slot}\"");
         var grade = ItemJsonUtils.GetGradeByName(GradeName);

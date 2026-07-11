@@ -1,18 +1,18 @@
-namespace GearBox.Core.Utils.Lookups;
+namespace GearBox.Core.Utils.Factories;
 
 /// <summary>
 /// Useful adapter class.
-/// e.g. KeyValue<string>() if you just want a lookup of strings
+/// e.g. KeyValue<string>() if you just want a Factory of strings
 /// </summary>
-public class KeyValue<T> : ILookupValue
+public class FactoryProductWrapper<T> : IFactoryProduct
 {
-    public KeyValue(string key, T value)
+    public FactoryProductWrapper(string key, T value)
     {
         Key = key;
         Value = value;
     }
 
-    public KeyValue(T value)
+    public FactoryProductWrapper(T value)
     {
         Key = value?.ToString() ?? "null";
         Value = value;

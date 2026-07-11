@@ -2,7 +2,7 @@ using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
-using GearBox.Core.Utils.Lookups;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Web.Model.Json;
 
@@ -25,7 +25,7 @@ public static class ItemJsonUtils
         return result;
     }
 
-    public static IEnumerable<IActiveAbility> GetActives(Lookup<IActiveAbility> actives, List<string> activeNames)
+    public static IEnumerable<IActiveAbility> GetActives(Factory<IActiveAbility> actives, List<string> activeNames)
     {
         var result = activeNames
             .Select(actives.GetOrThrow)
@@ -33,7 +33,7 @@ public static class ItemJsonUtils
         return result;
     }
 
-    public static IEnumerable<IPassiveAbility> GetPassives(Lookup<IPassiveAbility> passives, List<string> passiveNames)
+    public static IEnumerable<IPassiveAbility> GetPassives(Factory<IPassiveAbility> passives, List<string> passiveNames)
     {
         var result = passiveNames
             .Select(passives.GetOrThrow)

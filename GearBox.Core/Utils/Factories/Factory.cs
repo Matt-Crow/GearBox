@@ -1,17 +1,17 @@
-namespace GearBox.Core.Utils.Lookups;
+namespace GearBox.Core.Utils.Factories;
 
 /// <summary>
-/// General purpose lookup table.
+/// General purpose Factory.
 /// </summary>
-public class Lookup<T>
-where T : ILookupValue
+public class Factory<T>
+where T : IFactoryProduct
 {
     private readonly Dictionary<string, T> _values;
     private readonly Func<T, T> _toOwned;
     private readonly Func<T, T> SELF = (x) => x;
 
 
-    private Lookup(Dictionary<string, T> values, Func<T, T>? toOwned)
+    private Factory(Dictionary<string, T> values, Func<T, T>? toOwned)
     {
         _values = values;
         _toOwned = toOwned ?? SELF;
@@ -19,14 +19,14 @@ where T : ILookupValue
 
 
     /// <summary>
-    /// Creates a lookup with the given value.
+    /// Creates a factory with the given values.
     /// Duplicate keys throw an exception.
     /// You can additionally provide a function to copy values retrieved from this.
     /// </summary>
-    public static Lookup<T> Of(IEnumerable<T> values, Func<T, T>? toOwned = null)
+    public static Factory<T> Of(IEnumerable<T> values, Func<T, T>? toOwned = null)
     {
         var dict = values.ToDictionary(v => v.Key);
-        return new Lookup<T>(dict, toOwned);
+        return new Factory<T>(dict, toOwned);
     }
 
     /// <summary>

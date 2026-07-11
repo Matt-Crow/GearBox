@@ -6,7 +6,7 @@ using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Utils;
-using GearBox.Core.Utils.Lookups;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model;
 
@@ -21,13 +21,13 @@ public class GameBuilder : IGameBuilder
     {
         _config = config;
         _rng = rng;
-        Actives = Lookup<IActiveAbility>.Of(actives ?? [], a => a.Copy());
-        Passives = Lookup<IPassiveAbility>.Of(passives ?? [], p => p.Copy());
+        Actives = Factory<IActiveAbility>.Of(actives ?? [], a => a.Copy());
+        Passives = Factory<IPassiveAbility>.Of(passives ?? [], p => p.Copy());
         Enemies = new EnemyRepository(rng);
     }
 
-    public Lookup<IActiveAbility> Actives { get; init; }
-    public Lookup<IPassiveAbility> Passives { get; init; }
+    public Factory<IActiveAbility> Actives { get; init; }
+    public Factory<IPassiveAbility> Passives { get; init; }
     public IItemFactory Items { get; init; } = new ItemFactory();
     public IEnemyRepository Enemies { get; init; }
 
