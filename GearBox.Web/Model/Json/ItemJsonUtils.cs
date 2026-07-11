@@ -28,7 +28,7 @@ public static class ItemJsonUtils
     public static IEnumerable<IActiveAbility> GetActives(Factory<IActiveAbility> actives, List<string> activeNames)
     {
         var result = activeNames
-            .Select(actives.GetOrThrow)
+            .Select(actives.Make)
             .ToList();
         return result;
     }
@@ -36,7 +36,7 @@ public static class ItemJsonUtils
     public static IEnumerable<IPassiveAbility> GetPassives(Factory<IPassiveAbility> passives, List<string> passiveNames)
     {
         var result = passiveNames
-            .Select(passives.GetOrThrow)
+            .Select(passives.Make)
             .ToList();
         return result;
     }

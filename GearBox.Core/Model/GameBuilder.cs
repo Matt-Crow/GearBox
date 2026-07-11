@@ -21,8 +21,8 @@ public class GameBuilder : IGameBuilder
     {
         _config = config;
         _rng = rng;
-        Actives = Factory<IActiveAbility>.Of(actives ?? [], a => a.Copy());
-        Passives = Factory<IPassiveAbility>.Of(passives ?? [], p => p.Copy());
+        Actives = Factory<IActiveAbility>.Of(a => a.Copy(), actives ?? []);
+        Passives = Factory<IPassiveAbility>.Of(p => p.Copy(), passives ?? []);
         Enemies = new EnemyRepository(rng);
     }
 

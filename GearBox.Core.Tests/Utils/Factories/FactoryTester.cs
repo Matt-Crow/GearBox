@@ -14,28 +14,27 @@ public class FactoryTester
             new FactoryProductWrapper<string>("foo")
         };
 
-        Assert.Throws<ArgumentException>(() => Factory<FactoryProductWrapper<string>>.Of(values));
+        Assert.Throws<ArgumentException>(() => Factory<FactoryProductWrapper<string>>.Of(It, values));
     }
 
     [Fact]
-    public void Get_GivenInvalidName_ReturnsNull()
+    public void Make_GivenInvalidName_Throws()
     {
-        var sut = Factory<FactoryProductWrapper<string>>.Of([]);
-        var actual = sut.Get("foo");
-        Assert.Null(actual);
+        var sut = Factory<FactoryProductWrapper<string>>.Of(It, []);
+        Assert.Throws<ArgumentException>(() => sut.Make("foo"));
     }
 
     [Fact]
-    public void Get_GivenCopier_ReturnsCopy()
+    public void Make_GivenCopier_ReturnsCopy()
     {
         var value = new FactoryProductWrapper<string>("foo");
-        var sut = Factory<FactoryProductWrapper<string>>.Of([value], CopyIt);
+        var sut = Factory<FactoryProductWrapper<string>>.Of(CopyIt, [value]);
 
-        var actual = sut.Get(value.Key);
+        var actual = sut.Make(value.Key);
 
-        Assert.NotNull(actual);
         Assert.False(value == actual); // referential equality should fail
     }
 
+    private static FactoryProductWrapper<string> It(FactoryProductWrapper<string> it) => it;
     private static FactoryProductWrapper<string> CopyIt(FactoryProductWrapper<string> it) => new FactoryProductWrapper<string>(it.Key);
 }

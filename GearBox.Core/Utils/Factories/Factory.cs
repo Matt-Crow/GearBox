@@ -8,43 +8,40 @@ where T : IFactoryProduct
 {
     private readonly Dictionary<string, T> _values;
     private readonly Func<T, T> _toOwned;
-    private readonly Func<T, T> SELF = (x) => x;
 
 
-    private Factory(Dictionary<string, T> values, Func<T, T>? toOwned)
+    private Factory(Dictionary<string, T> values, Func<T, T> toOwned)
     {
         _values = values;
-        _toOwned = toOwned ?? SELF;
+        _toOwned = toOwned;
     }
 
 
     /// <summary>
-    /// Creates a factory with the given values.
+    /// Creates a factory with the given ownership method and values.
     /// Duplicate keys throw an exception.
-    /// You can additionally provide a function to copy values retrieved from this.
     /// </summary>
-    public static Factory<T> Of(IEnumerable<T> values, Func<T, T>? toOwned = null)
+    /// <param name="toOwned">A method which converts the shared value to one the caller owns. For mutable data, this should return a copy.</param>
+    /// <param name="values">The values this factory should be able to make.</param>
+    /// <returns>the new factory</returns>
+    public static Factory<T> Of(Func<T, T> toOwned, IEnumerable<T> values)
     {
         var dict = values.ToDictionary(v => v.Key);
         return new Factory<T>(dict, toOwned);
     }
 
     /// <summary>
-    /// Returns the value with the given key,
-    /// or null if no such value exists.
+    /// Returns an owned version of the value with the given key.
+    /// Throws an exception if no such value exists.
     /// </summary>
-    public T? Get(string key)
+    public T Make(string key)
     {
-        _values.TryGetValue(key, out var result);
-        if (result != null)
+        _values.TryGetValue(key, out var value);
+        if (value == null)
         {
-            return _toOwned(result);
+            throw new ArgumentException($"Not found: '{key}'");
         }
-        return result;
-    }
-
-    public T GetOrThrow(string key)
-    {
-        return Get(key) ?? throw new ArgumentException($"Not found: '{key}'");
+        var owned = _toOwned(value);
+        return owned;
     }
 }
