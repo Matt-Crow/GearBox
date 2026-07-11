@@ -11,7 +11,7 @@ public class MaterialJson : IItemJson
     public required string GradeName { get; set; }
     public required string Description { get; set; }
 
-    public ItemUnion ToItem(Lookup<IActiveAbility> actives, IPassiveAbilityFactory passives)
+    public ItemUnion ToItem(Lookup<IActiveAbility> actives, Lookup<IPassiveAbility> passives)
     {
         var grade = ItemJsonUtils.GetGradeByName(GradeName);
         var result = ItemUnion.OfMaterial(new Material(Name, grade, Description));

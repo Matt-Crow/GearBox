@@ -33,10 +33,10 @@ public static class ItemJsonUtils
         return result;
     }
 
-    public static IEnumerable<IPassiveAbility> GetPassives(IPassiveAbilityFactory factory, List<string> passiveNames)
+    public static IEnumerable<IPassiveAbility> GetPassives(Lookup<IPassiveAbility> passives, List<string> passiveNames)
     {
         var result = passiveNames
-            .Select(name => factory.Make(name) ?? throw new ArgumentException($"Invalid passive name: \"{name}\""))
+            .Select(passives.GetOrThrow)
             .ToList();
         return result;
     }

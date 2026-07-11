@@ -18,7 +18,7 @@ public interface IGameBuilder
     /// <summary>
     /// A reference to the passives available in the game this is building.
     /// </summary>
-    IPassiveAbilityFactory Passives { get; }
+    Lookup<IPassiveAbility> Passives { get; }
 
     /// <summary>
     /// A reference to the items available in the game this is building.

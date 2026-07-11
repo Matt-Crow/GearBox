@@ -15,10 +15,10 @@ namespace GearBox.Web.Infrastructure;
 public class GameResourceLoader
 {
     private readonly Lookup<IActiveAbility> _actives;
-    private readonly IPassiveAbilityFactory _passives;
+    private readonly Lookup<IPassiveAbility> _passives;
     private readonly IRandomNumberGenerator _rng;
 
-    public GameResourceLoader(Lookup<IActiveAbility> actives, IPassiveAbilityFactory passives, IRandomNumberGenerator rng)
+    public GameResourceLoader(Lookup<IActiveAbility> actives, Lookup<IPassiveAbility> passives, IRandomNumberGenerator rng)
     {
         _actives = actives;
         _passives = passives;

@@ -14,6 +14,7 @@ using GearBox.Core.Model.Areas;
 using GearBox.Core.Utils;
 using GearBox.Core.Model.Abilities.Passives.Impl;
 using GearBox.Core.Model.Abilities.Actives;
+using GearBox.Core.Model.Abilities.Passives;
 
 /*
     Actives and passives cannot be stored in a JSON file,
@@ -41,17 +42,19 @@ var actives = new List<IActiveAbility>()
     new Cleave(),
     new LaserBolt()
 };
-var gameBuilder = new GameBuilder(gearboxConfig, rng, actives);
-gameBuilder.Passives
-    .Add(Armored.Lightly())
-    .Add(Armored.Moderately())
-    .Add(Armored.Heavily())
-    .Add(Ranged.Moderately())
-    .Add(Ranged.Long())
-    .Add(new Intangible())
-    .Add(new Levitate())
-    .Add(new Spikey())
-    ;
+var passives = new List<IPassiveAbility>()
+{
+    Armored.Lightly(),
+    Armored.Moderately(),
+    Armored.Heavily(),
+    Ranged.Moderately(),
+    Ranged.Long(),
+    new Intangible(),
+    new Levitate(),
+    new Spikey()
+};
+var gameBuilder = new GameBuilder(gearboxConfig, rng, actives, passives);
+
 
 var resourceLoader = new GameResourceLoader(gameBuilder.Actives, gameBuilder.Passives, rng);
 await resourceLoader.LoadResourcesInto(gameBuilder);

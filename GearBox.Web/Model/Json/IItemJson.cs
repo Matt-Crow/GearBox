@@ -11,5 +11,5 @@ public interface IItemJson
     /// Converts this from JSON to an item,
     /// and uses the given lookups if required
     /// </summary>
-    ItemUnion ToItem(Lookup<IActiveAbility> actives, IPassiveAbilityFactory passives);
+    ItemUnion ToItem(Lookup<IActiveAbility> actives, Lookup<IPassiveAbility> passives);
 }

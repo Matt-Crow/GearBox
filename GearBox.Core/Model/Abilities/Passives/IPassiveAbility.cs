@@ -1,11 +1,12 @@
 using GearBox.Core.Model.GameObjects;
+using GearBox.Core.Utils.Lookups;
 
 namespace GearBox.Core.Model.Abilities.Passives;
 
 /// <summary>
 /// A player ability which is passively triggered by events 
 /// </summary>
-public interface IPassiveAbility
+public interface IPassiveAbility : ILookupValue
 {
     /// <summary>
     /// Must be unique within a game
