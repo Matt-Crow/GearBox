@@ -1,22 +1,19 @@
+using GearBox.Core.Utils.Factories;
+
 namespace GearBox.Core.Model.Items.Crafting;
 
 public class Crafter
 {
-    private readonly CraftingRecipeRepository _craftingRecipes;
+    private readonly Factory<CraftingRecipe> _craftingRecipes;
 
-    public Crafter(CraftingRecipeRepository craftingRecipes)
+    public Crafter(Factory<CraftingRecipe> craftingRecipes)
     {
         _craftingRecipes = craftingRecipes;
     }
 
     public void Craft(Guid craftingRecipeId, Inventory inventory)
     {
-        var craftingRecipe = _craftingRecipes.GetById(craftingRecipeId);
-        if (craftingRecipe == null)
-        {
-            return;
-        }
-
+        var craftingRecipe = _craftingRecipes.Make(craftingRecipeId.ToString());
         var canBeCrafted = craftingRecipe.Ingredients.All(ingredient => inventory.Materials.Contains(ingredient.Item, ingredient.Quantity));
         if (!canBeCrafted)
         {

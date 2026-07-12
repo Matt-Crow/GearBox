@@ -17,6 +17,9 @@ where T : IFactoryProduct
     }
 
 
+    public IEnumerable<T> AllValues => _values.Values;
+
+
     /// <summary>
     /// Creates a factory with the given ownership method and values.
     /// Duplicate keys throw an exception.

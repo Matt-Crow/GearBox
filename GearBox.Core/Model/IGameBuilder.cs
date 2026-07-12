@@ -2,7 +2,6 @@ using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
-using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Utils.Factories;
 
@@ -29,8 +28,6 @@ public interface IGameBuilder
     /// A reference to the enemies which can be encountered in the game this is building.
     /// </summary>
     IEnemyRepository Enemies { get; }
-
-    IGameBuilder AddCraftingRecipe(CraftingRecipe craftingRecipe);
 
     /// <summary>
     /// Defines an area in the game. The name must be unique within the game.

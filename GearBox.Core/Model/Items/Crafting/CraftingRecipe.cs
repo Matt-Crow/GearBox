@@ -1,11 +1,12 @@
 using GearBox.Core.Model.Json.GameInit;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model.Items.Crafting;
 
 /// <summary>
 /// The raw data about a CraftingRecipe
 /// </summary>
-public class CraftingRecipe
+public class CraftingRecipe : IFactoryProduct
 {
     public CraftingRecipe(List<ItemStack<Material>> ingredients, ItemUnion makes, Guid? id = null)
     {
@@ -35,6 +36,7 @@ public class CraftingRecipe
     public Guid Id { get; init; }
     public List<ItemStack<Material>> Ingredients { get; init; }
     public ItemUnion Makes { get; init; }
+    public string Key => Id.ToString();
 
 
     public CraftingRecipeJson ToJson()
