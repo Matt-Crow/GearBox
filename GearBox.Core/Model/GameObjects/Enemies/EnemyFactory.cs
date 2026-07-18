@@ -2,30 +2,32 @@ using GearBox.Core.Config;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies.Ai;
 using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.Items;
 using GearBox.Core.Utils;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model.GameObjects.Enemies;
 
 public class EnemyFactory : IEnemyFactory
 {
     private readonly GearBoxConfig _config;
-    private readonly IEnemyRepository _allEnemies;
+    private readonly Factory<EnemyCharacterTemplate> _allEnemies;
     private readonly IRandomNumberGenerator _rng;
     private readonly List<string> _names = [];
     private int _childCount = 0;
 
-    public EnemyFactory(GearBoxConfig config, IEnemyRepository allEnemies, IRandomNumberGenerator rng)
+    public EnemyFactory(GearBoxConfig config, Factory<EnemyCharacterTemplate> allEnemies, IRandomNumberGenerator rng)
     {
         _config = config;
         _allEnemies = allEnemies;
         _rng = rng;
     }
 
-    public static EnemyFactory MakeDefault() => new EnemyFactory(new GearBoxConfig(), new EnemyRepository(new RandomNumberGenerator()), new RandomNumberGenerator());
+    public static EnemyFactory MakeDefault() => new EnemyFactory(new GearBoxConfig(), Factory<EnemyCharacterTemplate>.Of(e => e, []), new RandomNumberGenerator());
 
     public IEnemyFactory Add(string name)
     {
-        var _ = _allEnemies.GetEnemyByName(name, 1) ?? throw new ArgumentException($"Bad enemy name: {name}", nameof(name));
+        var _ = _allEnemies.Make(name) ?? throw new ArgumentException($"Bad enemy name: {name}", nameof(name));
         _names.Add(name);
         return this;
     }
@@ -37,7 +39,7 @@ public class EnemyFactory : IEnemyFactory
             return null;
         }
         var name = _rng.ChooseRandom(_names);
-        var result = _allEnemies.GetEnemyByName(name, level) ?? throw new Exception($"Bad enemy name: {name}");
+        var result = GetEnemyByName(name, level) ?? throw new Exception($"Bad enemy name: {name}");
 
         if (!_config.DisableAI)
         {
@@ -47,6 +49,23 @@ public class EnemyFactory : IEnemyFactory
         result.EventKilled.AddListener(e => HandleKilled(result, e));
 
         return result;
+    }
+
+    private EnemyCharacter? GetEnemyByName(string name, int level)
+    {
+        var template = _allEnemies.Make(name);
+        if (template == null)
+        {
+            return null;
+        }
+
+        var lootTableBuilder = new LootTableBuilder(_rng);
+        foreach (var option in template.LootOptions)
+        {
+            lootTableBuilder = lootTableBuilder.AddOption(option);
+        }
+        var enemyBuilder = new EnemyCharacterBuilder(template.Name, template.Color, lootTableBuilder);
+        return enemyBuilder.Build(level);
     }
 
     private void HandleKilled(EnemyCharacter enemy, KilledEvent e)

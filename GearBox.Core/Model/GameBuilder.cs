@@ -18,7 +18,7 @@ public class GameBuilder : IGameBuilder
     private readonly Factory<IActiveAbility> _actives;
     private readonly Factory<IPassiveAbility> _passives;
     private readonly List<CraftingRecipe> _craftingRecipes = [];
-    private readonly IEnemyRepository _enemies;
+    private readonly Factory<EnemyCharacterTemplate> _enemies;
     private readonly List<AreaBuilder> _areas = []; // must be ordered so the first area added is the default area
 
 
@@ -28,11 +28,18 @@ public class GameBuilder : IGameBuilder
         _rng = rng;
         _actives = Factory<IActiveAbility>.Of(a => a.Copy(), resources.Actives);
         _passives = Factory<IPassiveAbility>.Of(p => p.Copy(), resources.Passives);
-        _enemies = new EnemyRepository(rng);
+        
         foreach (var resourcePack in resources.ResourcePacks)
         {
             LoadResourcePack(resourcePack);
         }
+
+        var enemyTemplates = resources.ResourcePacks
+            .SelectMany(rp => rp.Enemies)
+            .Select(er => er.ToEnemyCharacterTemplate(Items))
+            .ToList();
+        
+        _enemies = Factory<EnemyCharacterTemplate>.Of(e => e, enemyTemplates);
     }
 
 
@@ -54,11 +61,6 @@ public class GameBuilder : IGameBuilder
         foreach (var recipe in resourcePack.CraftingRecipes)
         {
             _craftingRecipes.Add(recipe.ToCraftingRecipe(Items));
-        }
-
-        foreach (var enemy in resourcePack.Enemies)
-        {
-            _enemies.Add(enemy.ToEnemyCharacterTemplate(Items));
         }
     }
 

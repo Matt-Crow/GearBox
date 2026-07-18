@@ -2,8 +2,8 @@ using GearBox.Core.Config;
 using GearBox.Core.Model;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.GameObjects.Enemies.Ai;
-using GearBox.Core.Model.Items;
 using GearBox.Core.Utils;
+using GearBox.Core.Utils.Factories;
 using Xunit;
 
 namespace GearBox.Core.Tests.Model.GameObjects.Enemies;
@@ -14,7 +14,8 @@ public class EnemyFactoryTester
     public void MakeRandom_GivenAiNotDisabled_ShouldNotHaveNullAi()
     {
         var config = new GearBoxConfig();
-        var sut = new EnemyFactory(config, new EnemyRepositoryMock(), new RandomNumberGenerator())
+        var template = new EnemyCharacterTemplate("foo", Color.ALL.First(), []);
+        var sut = new EnemyFactory(config, Factory<EnemyCharacterTemplate>.Of(ect => ect, [template]), new RandomNumberGenerator())
             .Add("foo");
 
         var result = sut.MakeRandom(1) ?? throw new Exception("Mock should be configured to return non-null");
@@ -29,18 +30,12 @@ public class EnemyFactoryTester
         {
             DisableAI = true
         };
-        var sut = new EnemyFactory(config, new EnemyRepositoryMock(), new RandomNumberGenerator())
+        var template = new EnemyCharacterTemplate("foo", Color.ALL.First(), []);
+        var sut = new EnemyFactory(config, Factory<EnemyCharacterTemplate>.Of(ect => ect, [template]), new RandomNumberGenerator())
             .Add("foo");
 
         var result = sut.MakeRandom(1) ?? throw new Exception("Mock should be configured to return non-null");
 
         Assert.NotNull(result.AiBehavior as NullAiBehavior);
-    }
-
-    private class EnemyRepositoryMock : IEnemyRepository
-    {
-        public IEnemyRepository Add(EnemyCharacterTemplate enemy) => this;
-
-        public EnemyCharacter? GetEnemyByName(string name, int level) => new EnemyCharacter(name, level);
     }
 }
