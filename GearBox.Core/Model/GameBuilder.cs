@@ -3,9 +3,8 @@ using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
+using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
-using GearBox.Core.Model.Items.Infrastructure;
-using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Utils;
 using GearBox.Core.Utils.Factories;
 
@@ -17,7 +16,7 @@ public class GameBuilder : IGameBuilder
     private readonly IRandomNumberGenerator _rng;
     private readonly Factory<IActiveAbility> _actives;
     private readonly Factory<IPassiveAbility> _passives;
-    private readonly List<CraftingRecipe> _craftingRecipes = [];
+    private readonly List<CraftingRecipe> _craftingRecipes;
     private readonly Factory<EnemyCharacterTemplate> _enemies;
     private readonly List<AreaBuilder> _areas = []; // must be ordered so the first area added is the default area
 
@@ -29,10 +28,23 @@ public class GameBuilder : IGameBuilder
         _actives = Factory<IActiveAbility>.Of(a => a.Copy(), resources.Actives);
         _passives = Factory<IPassiveAbility>.Of(p => p.Copy(), resources.Passives);
         
-        foreach (var resourcePack in resources.ResourcePacks)
-        {
-            LoadResourcePack(resourcePack);
-        }
+        // load items first, as crafting recipes and enemies depend on them
+        var allMaterials = resources.ResourcePacks
+            .SelectMany(rp => rp.Materials)
+            .Select(material => material.ToItem(_actives, _passives));
+        var allParts = resources.ResourcePacks
+            .SelectMany(rp => rp.Parts)
+            .Select(part => part.ToItem(_actives, _passives));
+        var allItems = new List<ItemUnion>()
+            .Concat(allMaterials)
+            .Concat(allParts)
+            .ToList();
+        Items = Factory<ItemUnion>.Of(item => item.ToOwned(), allItems);
+
+        _craftingRecipes = resources.ResourcePacks
+            .SelectMany(rp => rp.CraftingRecipes)
+            .Select(recipe => recipe.ToCraftingRecipe(Items))
+            .ToList();
 
         var enemyTemplates = resources.ResourcePacks
             .SelectMany(rp => rp.Enemies)
@@ -43,26 +55,8 @@ public class GameBuilder : IGameBuilder
     }
 
 
-    public IItemFactory Items { get; init; } = new ItemFactory();
+    public Factory<ItemUnion> Items { get; init; }
 
-
-    private void LoadResourcePack(ResourcePack resourcePack)
-    {
-        // load items first, as crafting recipes and enemies depend on them
-        foreach (var material in resourcePack.Materials)
-        {
-            Items.Add(material.ToItem(_actives, _passives));
-        }
-        foreach (var part in resourcePack.Parts)
-        {
-            Items.Add(part.ToItem(_actives, _passives));
-        }
-
-        foreach (var recipe in resourcePack.CraftingRecipes)
-        {
-            _craftingRecipes.Add(recipe.ToCraftingRecipe(Items));
-        }
-    }
 
     public IGameBuilder WithArea(string name, int level, Func<AreaBuilder, AreaBuilder> defineArea)
     {

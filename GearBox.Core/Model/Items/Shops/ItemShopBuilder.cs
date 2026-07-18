@@ -1,5 +1,5 @@
-using GearBox.Core.Model.Items.Infrastructure;
 using GearBox.Core.Model.Units;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model.Items.Shops;
 
@@ -8,10 +8,10 @@ public class ItemShopBuilder
     private readonly string _name;
     private readonly Coordinates _coordinates;
     private readonly Color _color;
-    private readonly IItemFactory _itemFactory;
+    private readonly Factory<ItemUnion> _itemFactory;
     private readonly List<string> _itemNames = [];
 
-    public ItemShopBuilder(string name, Coordinates coordinates, Color color, IItemFactory itemFactory)
+    public ItemShopBuilder(string name, Coordinates coordinates, Color color, Factory<ItemUnion> itemFactory)
     {
         _name = name;
         _coordinates = coordinates;
@@ -30,7 +30,7 @@ public class ItemShopBuilder
         var stock = new Inventory();
         foreach (var itemName in _itemNames)
         {
-            var item = _itemFactory.Make(itemName) ?? throw new Exception($"Bad item name: {itemName}");
+            var item = _itemFactory.Make(itemName);
             stock.Add(item);
         }
         var result = new ItemShop(

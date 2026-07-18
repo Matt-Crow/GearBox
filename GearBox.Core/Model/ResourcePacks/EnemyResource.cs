@@ -1,5 +1,6 @@
 using GearBox.Core.Model.GameObjects.Enemies;
-using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Model.Items;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model.ResourcePacks;
 
@@ -10,7 +11,7 @@ public class EnemyResource
     public required List<LootOptionResource> Loot { get; set; }
 
 
-    public EnemyCharacterTemplate ToEnemyCharacterTemplate(IItemFactory items)
+    public EnemyCharacterTemplate ToEnemyCharacterTemplate(Factory<ItemUnion> items)
     {
         var color = GearBox.Core.Model.Color.FromName(Color) ?? throw new Exception($"Invalid color: '{Color}'");
         var loot = Loot

@@ -72,9 +72,9 @@ var canyonMap = await resourceLoader.LoadMapByName("canyon");
 gameBuilder
     .WithArea("desert", 1, area => area
         .AddLoot(loot => loot
-            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Stone")))
-            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Bronze")))
-            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Spiney Helm")))
+            .AddOption(new LootOption(gameBuilder.Items.Make("Stone")))
+            .AddOption(new LootOption(gameBuilder.Items.Make("Bronze")))
+            .AddOption(new LootOption(gameBuilder.Items.Make("Spiney Helm")))
             .AddOption(new LootOption(Grade.COMMON, new Gold(5)))
             .AddOption(new LootOption(Grade.UNCOMMON, new Gold(10)))
         )
@@ -102,9 +102,9 @@ gameBuilder
     )
     .WithArea("canyon", 2, area => area
         .AddLoot(loot => loot
-            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Bronze")))
-            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Silver")))
-            .AddOption(new LootOption(gameBuilder.Items.MakeOrThrow("Antigravity Thrusters")))
+            .AddOption(new LootOption(gameBuilder.Items.Make("Bronze")))
+            .AddOption(new LootOption(gameBuilder.Items.Make("Silver")))
+            .AddOption(new LootOption(gameBuilder.Items.Make("Antigravity Thrusters")))
             .AddOption(new LootOption(Grade.RARE, new Gold(25)))
         )
         .AddEnemies(enemies => enemies

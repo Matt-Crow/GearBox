@@ -1,5 +1,5 @@
 using GearBox.Core.Model.Items;
-using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model.ResourcePacks;
 
@@ -26,7 +26,7 @@ public class LootOptionResource
     public string Grade { get; set; } = "";
 
 
-    public LootOption ToLootOption(IItemFactory items)
+    public LootOption ToLootOption(Factory<ItemUnion> items)
     {
         if (Type == "item")
         {
@@ -42,7 +42,7 @@ public class LootOptionResource
             {
                 throw new Exception("Grade is ignored when Type = \"item\"");
             }
-            var item = items.MakeOrThrow(Name);
+            var item = items.Make(Name);
             return new LootOption(item);
         }
         else if (Type == "gold")

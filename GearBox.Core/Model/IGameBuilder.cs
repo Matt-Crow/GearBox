@@ -1,14 +1,15 @@
 using GearBox.Core.Model.Areas;
-using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Model.Items;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model;
 
 public interface IGameBuilder
 {
     /// <summary>
-    /// A reference to the items available in the game this is building.
+    /// Makes the items available in the game this is building.
     /// </summary>
-    IItemFactory Items { get;}
+    Factory<ItemUnion> Items { get; }
 
     /// <summary>
     /// Defines an area in the game. The name must be unique within the game.
