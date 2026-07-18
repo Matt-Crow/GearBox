@@ -5,6 +5,12 @@ namespace GearBox.Core.Model.ResourcePacks;
 
 public class LootOptionResource
 {
+    public LootOptionResource()
+    {
+        
+    }
+
+
     /// <summary>
     /// Either "item" or "gold"
     /// </summary>
@@ -24,6 +30,26 @@ public class LootOptionResource
     /// Only required when Type = "gold"
     /// </summary>
     public string Grade { get; set; } = "";
+
+
+    public static LootOptionResource OfItem(string name)
+    {
+        return new LootOptionResource()
+        {
+            Type = "item",
+            Name = name
+        };
+    } 
+
+    public static LootOptionResource OfGold(Grade grade, int quantity)
+    {
+        return new LootOptionResource()
+        {
+            Type = "gold",
+            Grade = grade.Name,
+            Quantity = quantity
+        };
+    } 
 
 
     public LootOption ToLootOption(Factory<ItemUnion> items)

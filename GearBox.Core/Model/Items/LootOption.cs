@@ -48,4 +48,15 @@ public class LootOption
         }
         throw new Exception($"Missing case in {nameof(Select)}");
     }
+
+    /// <summary>
+    /// Returns a copy of this, scaled to the given level.
+    /// </summary>
+    public LootOption ToLevel(int level)
+    {
+        return Select(
+            item => new LootOption(item.ToOwned(level)),
+            gold => this
+        );
+    }
 }

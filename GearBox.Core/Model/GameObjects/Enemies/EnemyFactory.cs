@@ -54,18 +54,18 @@ public class EnemyFactory : IEnemyFactory
     private EnemyCharacter? GetEnemyByName(string name, int level)
     {
         var template = _allEnemies.Make(name);
-        if (template == null)
-        {
-            return null;
-        }
 
-        var lootTableBuilder = new LootTableBuilder(_rng);
-        foreach (var option in template.LootOptions)
-        {
-            lootTableBuilder = lootTableBuilder.AddOption(option);
-        }
-        var enemyBuilder = new EnemyCharacterBuilder(template.Name, template.Color, lootTableBuilder);
-        return enemyBuilder.Build(level);
+        var lootOptions = template.LootOptions
+            .Select(opt => opt.ToLevel(level))
+            .ToList();
+
+        var enemy = new EnemyCharacter(
+            template.Name, 
+            level, 
+            template.Color, 
+            new LootTable(lootOptions, _rng)
+        );
+        return enemy;
     }
 
     private void HandleKilled(EnemyCharacter enemy, KilledEvent e)

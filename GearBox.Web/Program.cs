@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Utils;
 using GearBox.Core.Model.Abilities.Passives.Impl;
+using GearBox.Core.Model.ResourcePacks;
 
 /*
     Actives and passives cannot be stored in a JSON file,
@@ -71,13 +72,13 @@ var desertMap = await resourceLoader.LoadMapByName("desert");
 var canyonMap = await resourceLoader.LoadMapByName("canyon");
 gameBuilder
     .WithArea("desert", 1, area => area
-        .AddLoot(loot => loot
-            .AddOption(new LootOption(gameBuilder.Items.Make("Stone")))
-            .AddOption(new LootOption(gameBuilder.Items.Make("Bronze")))
-            .AddOption(new LootOption(gameBuilder.Items.Make("Spiney Helm")))
-            .AddOption(new LootOption(Grade.COMMON, new Gold(5)))
-            .AddOption(new LootOption(Grade.UNCOMMON, new Gold(10)))
-        )
+        .AddLoot([
+            LootOptionResource.OfItem("Stone"),
+            LootOptionResource.OfItem("Bronze"),
+            LootOptionResource.OfItem("Spiney Helm"),
+            LootOptionResource.OfGold(Grade.COMMON, 5),
+            LootOptionResource.OfGold(Grade.UNCOMMON, 10)
+        ])
         .AddEnemies(enemies => enemies
             .Add("Snake")
             .Add("Scorpion")
@@ -101,12 +102,12 @@ gameBuilder
         .WithExit(BorderExit.Top("desert"))
     )
     .WithArea("canyon", 2, area => area
-        .AddLoot(loot => loot
-            .AddOption(new LootOption(gameBuilder.Items.Make("Bronze")))
-            .AddOption(new LootOption(gameBuilder.Items.Make("Silver")))
-            .AddOption(new LootOption(gameBuilder.Items.Make("Antigravity Thrusters")))
-            .AddOption(new LootOption(Grade.RARE, new Gold(25)))
-        )
+        .AddLoot([
+            LootOptionResource.OfItem("Bronze"),
+            LootOptionResource.OfItem("Silver"),
+            LootOptionResource.OfItem("Antigravity Thrusters"),
+            LootOptionResource.OfGold(Grade.RARE, 25)
+        ])
         .AddEnemies(enemies => enemies
             .Add("Snake")
             .Add("Jackal")
