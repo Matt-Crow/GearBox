@@ -15,7 +15,10 @@ public class GameBuilder : IGameBuilder
 {
     private readonly GearBoxConfig _config;
     private readonly IRandomNumberGenerator _rng;
+    private readonly Factory<IActiveAbility> _actives;
+    private readonly Factory<IPassiveAbility> _passives;
     private readonly List<CraftingRecipe> _craftingRecipes = [];
+    private readonly IEnemyRepository _enemies;
     private readonly List<AreaBuilder> _areas = []; // must be ordered so the first area added is the default area
 
 
@@ -23,9 +26,9 @@ public class GameBuilder : IGameBuilder
     {
         _config = config;
         _rng = rng;
-        Actives = Factory<IActiveAbility>.Of(a => a.Copy(), resources.Actives);
-        Passives = Factory<IPassiveAbility>.Of(p => p.Copy(), resources.Passives);
-        Enemies = new EnemyRepository(rng);
+        _actives = Factory<IActiveAbility>.Of(a => a.Copy(), resources.Actives);
+        _passives = Factory<IPassiveAbility>.Of(p => p.Copy(), resources.Passives);
+        _enemies = new EnemyRepository(rng);
         foreach (var resourcePack in resources.ResourcePacks)
         {
             LoadResourcePack(resourcePack);
@@ -33,22 +36,19 @@ public class GameBuilder : IGameBuilder
     }
 
 
-    public Factory<IActiveAbility> Actives { get; init; }
-    public Factory<IPassiveAbility> Passives { get; init; }
     public IItemFactory Items { get; init; } = new ItemFactory();
-    public IEnemyRepository Enemies { get; init; }
 
 
-    public void LoadResourcePack(ResourcePack resourcePack)
+    private void LoadResourcePack(ResourcePack resourcePack)
     {
         // load items first, as crafting recipes and enemies depend on them
         foreach (var material in resourcePack.Materials)
         {
-            Items.Add(material.ToItem(Actives, Passives));
+            Items.Add(material.ToItem(_actives, _passives));
         }
         foreach (var part in resourcePack.Parts)
         {
-            Items.Add(part.ToItem(Actives, Passives));
+            Items.Add(part.ToItem(_actives, _passives));
         }
 
         foreach (var recipe in resourcePack.CraftingRecipes)
@@ -58,7 +58,7 @@ public class GameBuilder : IGameBuilder
 
         foreach (var enemy in resourcePack.Enemies)
         {
-            Enemies.Add(enemy.ToEnemyCharacterTemplate(Items));
+            _enemies.Add(enemy.ToEnemyCharacterTemplate(Items));
         }
     }
 
@@ -69,7 +69,7 @@ public class GameBuilder : IGameBuilder
             throw new ArgumentException("Name must be unique within each game", nameof(name));
         }
 
-        _areas.Add(defineArea(new AreaBuilder(name, level, Items, new EnemyFactory(_config, Enemies, _rng), _rng)));
+        _areas.Add(defineArea(new AreaBuilder(name, level, Items, new EnemyFactory(_config, _enemies, _rng), _rng)));
         return this;
     }
 
