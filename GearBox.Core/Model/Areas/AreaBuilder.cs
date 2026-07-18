@@ -15,11 +15,11 @@ public class AreaBuilder
     private readonly List<ItemShopBuilder> _shopBuilders = [];
     private readonly Factory<ItemUnion> _itemFactory;
     private readonly List<LootOption> _lootOptions = [];
-    private readonly IEnemyFactory _enemies;
+    private readonly EnemyFactory _enemies;
     private readonly List<IExit> _exits = [];
     private readonly IRandomNumberGenerator _rng;
 
-    public AreaBuilder(string name, int level, Factory<ItemUnion> itemFactory, IEnemyFactory enemies, IRandomNumberGenerator rng)
+    public AreaBuilder(string name, int level, Factory<ItemUnion> itemFactory, EnemyFactory enemies, IRandomNumberGenerator rng)
     {
         Name = name;
         _level = level;
@@ -40,9 +40,9 @@ public class AreaBuilder
         return this;
     }
 
-    public AreaBuilder AddEnemies(Action<IEnemyFactory> withEnemies)
+    public AreaBuilder AddEnemies(List<string> enemyNames)
     {
-        withEnemies(_enemies);
+        _enemies.CanSpawn(enemyNames);
         return this;
     }
 

@@ -79,10 +79,10 @@ gameBuilder
             LootOptionResource.OfGold(Grade.COMMON, 5),
             LootOptionResource.OfGold(Grade.UNCOMMON, 10)
         ])
-        .AddEnemies(enemies => enemies
-            .Add("Snake")
-            .Add("Scorpion")
-        )
+        .AddEnemies([
+            "Snake",
+            "Scorpion"
+        ])
         .WithMap(desertMap)
         .WithExit(BorderExit.Bottom("bazaar"))
         .WithExit(BorderExit.Right("canyon"))
@@ -108,11 +108,11 @@ gameBuilder
             LootOptionResource.OfItem("Antigravity Thrusters"),
             LootOptionResource.OfGold(Grade.RARE, 25)
         ])
-        .AddEnemies(enemies => enemies
-            .Add("Snake")
-            .Add("Jackal")
-            .Add("Specter")
-        )
+        .AddEnemies([
+            "Snake",
+            "Jackal",
+            "Specter"
+        ])
         .WithMap(canyonMap)
         .WithExit(BorderExit.Left("desert"))
     );

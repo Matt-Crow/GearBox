@@ -22,7 +22,7 @@ public class Area : IArea
     private readonly Team _enemyTeam = new("Enemies");
     private readonly Map _map;
     private readonly LootTable _loot;
-    private readonly IEnemyFactory _enemyFactory;
+    private readonly EnemyFactory _enemyFactory;
     private readonly List<IExit> _exits = [];
 
     public Area(
@@ -32,7 +32,7 @@ public class Area : IArea
         Map? map = null, 
         List<ItemShop>? shops = null,
         LootTable? loot = null,
-        IEnemyFactory? enemyFactory = null,
+        EnemyFactory? enemyFactory = null,
         List<IExit>? exits = null 
     )
     {

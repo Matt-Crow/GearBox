@@ -15,8 +15,8 @@ public class EnemyFactoryTester
     {
         var config = new GearBoxConfig();
         var template = new EnemyCharacterTemplate("foo", Color.ALL.First(), []);
-        var sut = new EnemyFactory(config, Factory<EnemyCharacterTemplate>.Of(ect => ect, [template]), new RandomNumberGenerator())
-            .Add("foo");
+        var sut = new EnemyFactory(config, Factory<EnemyCharacterTemplate>.Of(ect => ect, [template]), new RandomNumberGenerator());
+        sut.CanSpawn(["foo"]);
 
         var result = sut.MakeRandom(1) ?? throw new Exception("Mock should be configured to return non-null");
 
@@ -31,8 +31,8 @@ public class EnemyFactoryTester
             DisableAI = true
         };
         var template = new EnemyCharacterTemplate("foo", Color.ALL.First(), []);
-        var sut = new EnemyFactory(config, Factory<EnemyCharacterTemplate>.Of(ect => ect, [template]), new RandomNumberGenerator())
-            .Add("foo");
+        var sut = new EnemyFactory(config, Factory<EnemyCharacterTemplate>.Of(ect => ect, [template]), new RandomNumberGenerator());
+        sut.CanSpawn(["foo"]);
 
         var result = sut.MakeRandom(1) ?? throw new Exception("Mock should be configured to return non-null");
 

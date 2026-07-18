@@ -8,7 +8,10 @@ using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model.GameObjects.Enemies;
 
-public class EnemyFactory : IEnemyFactory
+/// <summary>
+/// Handles enemies players may encounter in an area
+/// </summary>
+public class EnemyFactory
 {
     private readonly GearBoxConfig _config;
     private readonly Factory<EnemyCharacterTemplate> _allEnemies;
@@ -25,11 +28,10 @@ public class EnemyFactory : IEnemyFactory
 
     public static EnemyFactory MakeDefault() => new EnemyFactory(new GearBoxConfig(), Factory<EnemyCharacterTemplate>.Of(e => e, []), new RandomNumberGenerator());
 
-    public IEnemyFactory Add(string name)
+
+    public void CanSpawn(List<string> enemyNames)
     {
-        var _ = _allEnemies.Make(name) ?? throw new ArgumentException($"Bad enemy name: {name}", nameof(name));
-        _names.Add(name);
-        return this;
+        _names.AddRange(enemyNames);
     }
 
     public EnemyCharacter? MakeRandom(int level)
