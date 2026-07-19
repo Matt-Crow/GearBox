@@ -58,9 +58,9 @@ public class AreaBuilder
         return this;
     }
 
-    public AreaBuilder WithExit(IExit exit)
+    public AreaBuilder WithExit(ExitResource exit)
     {
-        _exits.Add(exit);
+        _exits.Add(exit.ToExit());
         return this;
     }
 

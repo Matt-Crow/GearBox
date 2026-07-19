@@ -9,7 +9,6 @@ using GearBox.Web.Email;
 using GearBox.Core.Model.GameObjects.Player;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
-using GearBox.Core.Model.Areas;
 using GearBox.Core.Utils;
 using GearBox.Core.Model.Abilities.Passives.Impl;
 using GearBox.Core.Model.ResourcePacks;
@@ -83,8 +82,16 @@ gameBuilder
             "Scorpion"
         ])
         .WithMap(desertMap)
-        .WithExit(BorderExit.Bottom("bazaar"))
-        .WithExit(BorderExit.Right("canyon"))
+        .WithExit(new ExitResource()
+        {
+            Type = "bottom",
+            DestinationName = "bazaar"
+        })
+        .WithExit(new ExitResource()
+        {
+            Type = "right",
+            DestinationName = "canyon"
+        })
     )
     .WithArea("bazaar", 1, area => area
         .WithMap(bazaarMap)
@@ -105,7 +112,11 @@ gameBuilder
                 "High-Capacity Torso"
             ]
         })
-        .WithExit(BorderExit.Top("desert"))
+        .WithExit(new ExitResource()
+        {
+            Type = "top",
+            DestinationName = "desert"
+        })
     )
     .WithArea("canyon", 2, area => area
         .AddLoot([
@@ -120,7 +131,11 @@ gameBuilder
             "Specter"
         ])
         .WithMap(canyonMap)
-        .WithExit(BorderExit.Left("desert"))
+        .WithExit(new ExitResource()
+        {
+            Type = "left",
+            DestinationName = "desert"
+        })
     );
 
 // done defining - time to build
