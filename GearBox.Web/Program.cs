@@ -2,7 +2,6 @@ using GearBox.Core.Config;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Abilities.Actives.Impl;
 using GearBox.Core.Model.Items;
-using GearBox.Core.Model.Units;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 using GearBox.Web.Database;
@@ -89,16 +88,23 @@ gameBuilder
     )
     .WithArea("bazaar", 1, area => area
         .WithMap(bazaarMap)
-        .AddShop("Starter Part Shop", Coordinates.FromTiles(2, 7), Color.BLUE, shop => shop
-            .AddItem("Hard Hat")
-            .AddItem("Laser Lenses")
-            .AddItem("Armored Treads")
-            .AddItem("Rotowheel")
-            .AddItem("Training Club")
-            .AddItem("Training Blaster")
-            .AddItem("Tanky Torso")
-            .AddItem("High-Capacity Torso")
-        )
+        .AddShop(new ItemShopResource()
+        {
+            Name = "Starter Part Shop", 
+            XInTiles = 2,
+            YInTiles = 7,
+            Color = "blue",
+            Stock = [
+                "Hard Hat",
+                "Laser Lenses",
+                "Armored Treads",
+                "Rotowheel",
+                "Training Club",
+                "Training Blaster",
+                "Tanky Torso",
+                "High-Capacity Torso"
+            ]
+        })
         .WithExit(BorderExit.Top("desert"))
     )
     .WithArea("canyon", 2, area => area

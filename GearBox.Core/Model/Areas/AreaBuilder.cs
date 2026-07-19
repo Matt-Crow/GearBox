@@ -12,7 +12,7 @@ public class AreaBuilder
 {
     private readonly int _level;
     private Map? _map;
-    private readonly List<ItemShopBuilder> _shopBuilders = [];
+    private readonly List<ItemShop> _shops = [];
     private readonly Factory<ItemUnion> _itemFactory;
     private readonly List<LootOption> _lootOptions = [];
     private readonly EnemyFactory _enemies;
@@ -52,11 +52,9 @@ public class AreaBuilder
         return this;
     }
 
-    public AreaBuilder AddShop(string name, Coordinates coordinates, Color color, Func<ItemShopBuilder, ItemShopBuilder> withShopBuilder)
+    public AreaBuilder AddShop(ItemShopResource shop)
     {
-        var sb = new ItemShopBuilder(name, coordinates, color, _itemFactory);
-        withShopBuilder(sb);
-        _shopBuilders.Add(sb);
+        _shops.Add(shop.ToItemShop(_itemFactory));
         return this;
     }
 
@@ -78,7 +76,7 @@ public class AreaBuilder
             _level,
             game,
             _map,
-            _shopBuilders.Select(sb => sb.Build()).ToList(),
+            _shops,
             new LootTable(_lootOptions, _rng),
             _enemies,
             _exits
