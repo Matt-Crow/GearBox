@@ -2,7 +2,6 @@ using System.Text.Json;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Utils;
-using GearBox.Web.Model.Json;
 
 namespace GearBox.Web.Infrastructure;
 
@@ -34,7 +33,7 @@ public class GameResourceLoader
         }
 
         var filePath = Path.Combine("game-resources", "maps", name + ".json");
-        var json = await TryDeserialize<MapResourceJson>(filePath);
+        var json = await TryDeserialize<MapResource>(filePath);
         return json.ToMap(_rng);
     }
 

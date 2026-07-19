@@ -1,17 +1,16 @@
-using GearBox.Core.Model;
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Units;
 using GearBox.Core.Utils;
 
-namespace GearBox.Web.Model.Json;
+namespace GearBox.Core.Model.ResourcePacks;
 
 /// <summary>
 /// Represents a map from the maps folder.
 /// </summary>
-public class MapResourceJson
+public class MapResource
 {
     public List<List<int>> Tiles { get; set; } = [];
-    public List<TileTypeResourceJson> TileTypes { get; set; } = [];
+    public List<TileTypeResource> TileTypes { get; set; } = [];
 
     /// <summary>
     /// Attempts to convert from JSON to a map.

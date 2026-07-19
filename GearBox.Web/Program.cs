@@ -69,74 +69,88 @@ var bazaarMap = await resourceLoader.LoadMapByName("bazaar");
 var desertMap = await resourceLoader.LoadMapByName("desert");
 var canyonMap = await resourceLoader.LoadMapByName("canyon");
 gameBuilder
-    .WithArea("desert", 1, area => area
-        .AddLoot([
+    .WithArea(new AreaResource()
+    {
+        Name = "desert",
+        Level = 1,
+        LootOptions = [
             LootOptionResource.OfItem("Stone"),
             LootOptionResource.OfItem("Bronze"),
             LootOptionResource.OfItem("Spiney Helm"),
             LootOptionResource.OfGold(Grade.COMMON, 5),
             LootOptionResource.OfGold(Grade.UNCOMMON, 10)
-        ])
-        .AddEnemies([
+        ],
+        EnemyNames = [
             "Snake",
             "Scorpion"
-        ])
-        .WithMap(desertMap)
-        .WithExit(new ExitResource()
-        {
-            Type = "bottom",
-            DestinationName = "bazaar"
-        })
-        .WithExit(new ExitResource()
-        {
-            Type = "right",
-            DestinationName = "canyon"
-        })
-    )
-    .WithArea("bazaar", 1, area => area
-        .WithMap(bazaarMap)
-        .AddShop(new ItemShopResource()
-        {
-            Name = "Starter Part Shop", 
-            XInTiles = 2,
-            YInTiles = 7,
-            Color = "blue",
-            Stock = [
-                "Hard Hat",
-                "Laser Lenses",
-                "Armored Treads",
-                "Rotowheel",
-                "Training Club",
-                "Training Blaster",
-                "Tanky Torso",
-                "High-Capacity Torso"
-            ]
-        })
-        .WithExit(new ExitResource()
-        {
-            Type = "top",
-            DestinationName = "desert"
-        })
-    )
-    .WithArea("canyon", 2, area => area
-        .AddLoot([
+        ],
+        Exits = [
+            new ExitResource()
+            {
+                Type = "bottom",
+                DestinationName = "bazaar"
+            },
+            new ExitResource()
+            {
+                Type = "right",
+                DestinationName = "canyon"
+            }
+        ]
+    }, area => area.WithMap(desertMap))
+    .WithArea(new AreaResource()
+    {
+        Name = "bazaar",
+        Level = 1,
+        Shops = [
+            new ItemShopResource()
+            {
+                Name = "Starter Part Shop", 
+                XInTiles = 2,
+                YInTiles = 7,
+                Color = "blue",
+                Stock = [
+                    "Hard Hat",
+                    "Laser Lenses",
+                    "Armored Treads",
+                    "Rotowheel",
+                    "Training Club",
+                    "Training Blaster",
+                    "Tanky Torso",
+                    "High-Capacity Torso"
+                ]
+            }
+        ],
+        Exits = [
+            new ExitResource()
+            {
+                Type = "top",
+                DestinationName = "desert"
+            }
+        ]
+    }, area => area.WithMap(bazaarMap))
+    .WithArea(new AreaResource()
+    {
+        Name = "canyon",
+        Level = 2,
+        LootOptions = [
             LootOptionResource.OfItem("Bronze"),
             LootOptionResource.OfItem("Silver"),
             LootOptionResource.OfItem("Antigravity Thrusters"),
             LootOptionResource.OfGold(Grade.RARE, 25)
-        ])
-        .AddEnemies([
+        ],
+        EnemyNames = [
             "Snake",
             "Jackal",
             "Specter"
-        ])
-        .WithMap(canyonMap)
-        .WithExit(new ExitResource()
-        {
-            Type = "left",
-            DestinationName = "desert"
-        })
-    );
+        ],
+        Exits = [
+            new ExitResource()
+            {
+                Type = "left",
+                DestinationName = "desert"
+            }
+        ]
+    }, area => area.WithMap(canyonMap));
 
 // done defining - time to build
 var game = gameBuilder.Build();

@@ -5,6 +5,7 @@ using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
+using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Utils;
 using GearBox.Core.Utils.Factories;
 
@@ -58,14 +59,14 @@ public class GameBuilder : IGameBuilder
     public Factory<ItemUnion> Items { get; init; }
 
 
-    public IGameBuilder WithArea(string name, int level, Func<AreaBuilder, AreaBuilder> defineArea)
+    public IGameBuilder WithArea(AreaResource area, Func<AreaBuilder, AreaBuilder> defineArea)
     {
-        if (_areas.Any(b => b.Name == name))
+        if (_areas.Any(b => b.Name == area.Name))
         {
-            throw new ArgumentException("Name must be unique within each game", nameof(name));
+            throw new ArgumentException("Name must be unique within each game", nameof(area.Name));
         }
 
-        _areas.Add(defineArea(new AreaBuilder(name, level, Items, new EnemyFactory(_config, _enemies, _rng), _rng)));
+        _areas.Add(defineArea(new AreaBuilder(area, Items, new EnemyFactory(_config, _enemies, _rng), _rng)));
         return this;
     }
 

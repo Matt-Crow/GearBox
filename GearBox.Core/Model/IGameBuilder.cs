@@ -1,5 +1,6 @@
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.Items;
+using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model;
@@ -14,7 +15,7 @@ public interface IGameBuilder
     /// <summary>
     /// Defines an area in the game. The name must be unique within the game.
     /// </summary>
-    IGameBuilder WithArea(string name, int level, Func<AreaBuilder, AreaBuilder> defineArea);
+    IGameBuilder WithArea(AreaResource area, Func<AreaBuilder, AreaBuilder> defineArea);
     
     IGame Build();
 }

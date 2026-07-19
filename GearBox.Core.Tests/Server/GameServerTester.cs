@@ -1,6 +1,7 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model;
 using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Server;
 using GearBox.Core.Utils;
 using Xunit;
@@ -95,7 +96,11 @@ public class GameServerTester
     public static IGame MakeGame()
     {
         var result = new GameBuilder(new GearBoxConfig(), new RandomNumberGenerator(), new GameResources())
-            .WithArea("foo", 1, area => area.WithMap(new()))
+            .WithArea(new AreaResource()
+            {
+                Name = "foo",
+                Level = 1
+            }, area => area.WithMap(new()))
             .Build();
         return result;
     }
