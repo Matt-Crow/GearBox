@@ -226,6 +226,13 @@ public class Map : ISerializable<MapJson>
                 return curr;
             }
         }
+
+        // check if the end is a valid tile
+        if (IsValid(end) && GetTileAt(end).Height == TileHeight.FLOOR)
+        {
+            return end;
+        }
+
         return null;
     }
 
