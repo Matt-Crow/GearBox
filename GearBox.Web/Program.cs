@@ -35,8 +35,6 @@ webAppBuilder.Configuration
 
 var rng = new RandomNumberGenerator();
 
-var resourceLoader = new GameResourceLoader();
-
 var gameBuilder = new GameBuilder(
     gearboxConfig, 
     rng, 
@@ -57,17 +55,10 @@ var gameBuilder = new GameBuilder(
             new Spikey()
         ],
         ResourcePacks = [
-            await resourceLoader.LoadDefaultResourcePack()
+            await GameResourceLoader.LoadDefaultResourcePack()
         ]
     }
 );
-
-
-// we have all the game data, now make areas in that game
-gameBuilder
-    .WithArea(await resourceLoader.LoadAreaByName("desert"))
-    .WithArea(await resourceLoader.LoadAreaByName("bazaar"))
-    .WithArea(await resourceLoader.LoadAreaByName("canyon"));
 
 // done defining - time to build
 var game = gameBuilder.Build();

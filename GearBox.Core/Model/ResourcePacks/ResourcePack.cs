@@ -5,8 +5,9 @@ namespace GearBox.Core.Model.ResourcePacks;
 /// </summary>
 public class ResourcePack
 {
-    public required List<MaterialResource> Materials { get; set; }
-    public required List<PartResource> Parts { get; set; }
-    public required List<CraftingRecipeResource> CraftingRecipes { get; set; }
-    public required List<EnemyResource> Enemies { get; set; }
+    public List<MaterialResource> Materials { get; init; } = [];
+    public List<PartResource> Parts { get; init; } = [];
+    public List<CraftingRecipeResource> CraftingRecipes { get; init; } = [];
+    public List<EnemyResource> Enemies { get; init; } = [];
+    public List<AreaResource> Areas { get; init; } = [];
 }

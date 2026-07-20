@@ -4,7 +4,6 @@ using GearBox.Core.Model.Abilities.Passives;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
-using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Utils;
 using GearBox.Core.Utils.Factories;
 
@@ -18,7 +17,7 @@ public class GameBuilder : IGameBuilder
     private readonly Factory<IPassiveAbility> _passives;
     private readonly List<CraftingRecipe> _craftingRecipes;
     private readonly Factory<EnemyCharacterTemplate> _enemies;
-    private readonly List<AreaResource> _areas = []; // must be ordered so the first area added is the default area
+    private readonly GameResources _resources;
 
 
     public GameBuilder(GearBoxConfig config, IRandomNumberGenerator rng, GameResources resources)
@@ -52,27 +51,31 @@ public class GameBuilder : IGameBuilder
             .ToList();
         
         _enemies = Factory<EnemyCharacterTemplate>.Of(e => e, enemyTemplates);
+
+        _resources = resources;
     }
 
 
     public Factory<ItemUnion> Items { get; init; }
 
 
-    public IGameBuilder WithArea(AreaResource area)
-    {
-        if (_areas.Any(b => b.Name == area.Name))
-        {
-            throw new ArgumentException("Name must be unique within each game", nameof(area.Name));
-        }
-
-        _areas.Add(area);
-        return this;
-    }
-
     public IGame Build()
     {
+        var areaResources = _resources.ResourcePacks.SelectMany(rp => rp.Areas);
+
+        // check for duplicate area names
+        var firstDuplicatedAreaName = areaResources
+            .GroupBy(ar => ar.Name)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key)
+            .FirstOrDefault();
+        if (firstDuplicatedAreaName != null)
+        {
+            throw new Exception($"Duplicated area name: '{firstDuplicatedAreaName}'");
+        }
+
         var result = new Game(Factory<CraftingRecipe>.Of(cr => cr, _craftingRecipes));
-        foreach (var area in _areas)
+        foreach (var area in areaResources)
         {
             result.AddArea(area.ToArea(result, Items, new EnemyFactory(_config, _enemies, _rng), _rng));
         }

@@ -12,10 +12,23 @@ public class GameBuilderTester
     [Fact]
     public void AreaNameMustBeUnique()
     {
-        var sut = new GameBuilder(new GearBoxConfig(), new RandomNumberGenerator(), new GameResources())
-            .WithArea(AnArea());
+        var sut = new GameBuilder(
+            new GearBoxConfig(), 
+            new RandomNumberGenerator(), 
+            new GameResources()
+            {
+                ResourcePacks = [
+                    new ResourcePack()
+                    {
+                        Areas = [
+                            AnArea(),
+                            AnArea()
+                        ]
+                    }
+                ]
+            });
         
-        Assert.Throws<ArgumentException>(() => sut.WithArea(AnArea()));
+        Assert.Throws<Exception>(() => sut.Build());
     }
 
     private static AreaResource AnArea()
