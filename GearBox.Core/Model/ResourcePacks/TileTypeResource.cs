@@ -2,7 +2,7 @@ namespace GearBox.Core.Model.ResourcePacks;
 
 public class TileTypeResource
 {
-    public int Key { get; set; }
-    public string ColorName { get; set; } = "";
-    public string HeightName { get; set; } = "";
+    public required int Key { get; init; }
+    public required string ColorName { get; init; }
+    public required string HeightName { get; init; }
 }

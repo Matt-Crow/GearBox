@@ -1,5 +1,6 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Server;
@@ -99,8 +100,20 @@ public class GameServerTester
             .WithArea(new AreaResource()
             {
                 Name = "foo",
-                Level = 1
-            }, area => area.WithMap(new()))
+                Level = 1,
+                Map = new()
+                {
+                    Tiles = [[0]],
+                    TileTypes = [
+                        new TileTypeResource()
+                        {
+                            Key = 0,
+                            ColorName = Color.ALL.First().Name,
+                            HeightName = TileHeight.FLOOR.Name
+                        }
+                    ]
+                }
+            })
             .Build();
         return result;
     }

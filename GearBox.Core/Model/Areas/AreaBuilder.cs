@@ -10,7 +10,6 @@ namespace GearBox.Core.Model.Areas;
 public class AreaBuilder
 {
     private readonly AreaResource _area;
-    private Map? _map;
     private readonly Factory<ItemUnion> _itemFactory;
     private readonly EnemyFactory _enemies;
     private readonly IRandomNumberGenerator _rng;
@@ -29,19 +28,8 @@ public class AreaBuilder
     public string Name => _area.Name;
 
 
-    public AreaBuilder WithMap(Map map)
-    {
-        _map = map;
-        return this;
-    }
-
     public Area Build(IGame game)
     {
-        if (_map == null)
-        {
-            throw new Exception("map is required");
-        }
-
         var lootOptions = _area.LootOptions
             .Select(resource => resource.ToLootOption(_itemFactory).ToLevel(_area.Level))
             .ToList();
@@ -52,7 +40,7 @@ public class AreaBuilder
             _area.Name,
             _area.Level,
             game,
-            _map,
+            _area.Map.ToMap(_rng),
             _area.Shops
                 .Select(resource => resource.ToItemShop(_itemFactory))
                 .ToList(),

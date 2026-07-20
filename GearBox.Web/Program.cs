@@ -35,7 +35,7 @@ webAppBuilder.Configuration
 
 var rng = new RandomNumberGenerator();
 
-var resourceLoader = new GameResourceLoader(rng);
+var resourceLoader = new GameResourceLoader();
 
 var gameBuilder = new GameBuilder(
     gearboxConfig, 
@@ -65,14 +65,12 @@ var gameBuilder = new GameBuilder(
 
 
 // we have all the game data, now make areas in that game
-var bazaarMap = await resourceLoader.LoadMapByName("bazaar");
-var desertMap = await resourceLoader.LoadMapByName("desert");
-var canyonMap = await resourceLoader.LoadMapByName("canyon");
 gameBuilder
     .WithArea(new AreaResource()
     {
         Name = "desert",
         Level = 1,
+        Map = await resourceLoader.LoadMapByName("desert"),
         LootOptions = [
             LootOptionResource.OfItem("Stone"),
             LootOptionResource.OfItem("Bronze"),
@@ -96,11 +94,12 @@ gameBuilder
                 DestinationName = "canyon"
             }
         ]
-    }, area => area.WithMap(desertMap))
+    })
     .WithArea(new AreaResource()
     {
         Name = "bazaar",
         Level = 1,
+        Map = await resourceLoader.LoadMapByName("bazaar"),
         Shops = [
             new ItemShopResource()
             {
@@ -127,11 +126,12 @@ gameBuilder
                 DestinationName = "desert"
             }
         ]
-    }, area => area.WithMap(bazaarMap))
+    })
     .WithArea(new AreaResource()
     {
         Name = "canyon",
         Level = 2,
+        Map = await resourceLoader.LoadMapByName("canyon"),
         LootOptions = [
             LootOptionResource.OfItem("Bronze"),
             LootOptionResource.OfItem("Silver"),
@@ -150,7 +150,7 @@ gameBuilder
                 DestinationName = "desert"
             }
         ]
-    }, area => area.WithMap(canyonMap));
+    });
 
 // done defining - time to build
 var game = gameBuilder.Build();

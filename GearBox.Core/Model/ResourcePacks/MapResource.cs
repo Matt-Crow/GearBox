@@ -9,7 +9,7 @@ namespace GearBox.Core.Model.ResourcePacks;
 /// </summary>
 public class MapResource
 {
-    public List<List<int>> Tiles { get; set; } = [];
+    public required List<List<int>> Tiles { get; init; }
     public List<TileTypeResource> TileTypes { get; set; } = [];
 
     /// <summary>

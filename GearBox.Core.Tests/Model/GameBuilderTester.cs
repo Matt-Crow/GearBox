@@ -1,5 +1,6 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Utils;
 using Xunit;
@@ -12,16 +13,30 @@ public class GameBuilderTester
     public void AreaNameMustBeUnique()
     {
         var sut = new GameBuilder(new GearBoxConfig(), new RandomNumberGenerator(), new GameResources())
-            .WithArea(new AreaResource()
-            {
-                Name = "foo",
-                Level = 1
-            }, area => area);
+            .WithArea(AnArea());
         
-        Assert.Throws<ArgumentException>(() => sut.WithArea(new AreaResource()
+        Assert.Throws<ArgumentException>(() => sut.WithArea(AnArea()));
+    }
+
+    private static AreaResource AnArea()
+    {
+        var result = new AreaResource()
         {
             Name = "foo",
-            Level = 1
-        }, area => area));
+            Level = 1,
+            Map = new()
+            {
+                Tiles = [[0]],
+                TileTypes = [
+                    new TileTypeResource()
+                    {
+                        Key = 0,
+                        ColorName = Color.ALL.First().Name,
+                        HeightName = TileHeight.FLOOR.Name
+                    }
+                ]
+            }
+        };
+        return result;
     }
 }

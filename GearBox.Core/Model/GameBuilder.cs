@@ -59,14 +59,14 @@ public class GameBuilder : IGameBuilder
     public Factory<ItemUnion> Items { get; init; }
 
 
-    public IGameBuilder WithArea(AreaResource area, Func<AreaBuilder, AreaBuilder> defineArea)
+    public IGameBuilder WithArea(AreaResource area)
     {
         if (_areas.Any(b => b.Name == area.Name))
         {
             throw new ArgumentException("Name must be unique within each game", nameof(area.Name));
         }
 
-        _areas.Add(defineArea(new AreaBuilder(area, Items, new EnemyFactory(_config, _enemies, _rng), _rng)));
+        _areas.Add(new AreaBuilder(area, Items, new EnemyFactory(_config, _enemies, _rng), _rng));
         return this;
     }
 

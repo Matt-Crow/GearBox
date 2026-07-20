@@ -1,7 +1,5 @@
 using System.Text.Json;
-using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.ResourcePacks;
-using GearBox.Core.Utils;
 
 namespace GearBox.Web.Infrastructure;
 
@@ -10,14 +8,6 @@ namespace GearBox.Web.Infrastructure;
 /// </summary>
 public class GameResourceLoader
 {
-    private readonly IRandomNumberGenerator _rng;
-
-    public GameResourceLoader(IRandomNumberGenerator rng)
-    {
-        _rng = rng;
-    }
-
-
     public async Task<ResourcePack> LoadDefaultResourcePack()
     {
         var resourceFilePath = Path.Combine("game-resources", "default.json");
@@ -25,7 +15,7 @@ public class GameResourceLoader
         return resourcePack;
     }
 
-    public async Task<Map> LoadMapByName(string name)
+    public async Task<MapResource> LoadMapByName(string name)
     {
         if (!name.All(IsAllowedFileNameCharacter))
         {
@@ -34,7 +24,7 @@ public class GameResourceLoader
 
         var filePath = Path.Combine("game-resources", "maps", name + ".json");
         var json = await TryDeserialize<MapResource>(filePath);
-        return json.ToMap(_rng);
+        return json;
     }
 
     private static async Task<T> TryDeserialize<T>(string filePath)
