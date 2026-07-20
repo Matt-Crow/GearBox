@@ -15,15 +15,15 @@ public class GameResourceLoader
         return resourcePack;
     }
 
-    public async Task<MapResource> LoadMapByName(string name)
+    public async Task<AreaResource> LoadAreaByName(string name)
     {
         if (!name.All(IsAllowedFileNameCharacter))
         {
-            throw new ArgumentException($"Invalid map name: {name}");
+            throw new ArgumentException($"Invalid area name: {name}");
         }
 
         var filePath = Path.Combine("game-resources", "maps", name + ".json");
-        var json = await TryDeserialize<MapResource>(filePath);
+        var json = await TryDeserialize<AreaResource>(filePath);
         return json;
     }
 

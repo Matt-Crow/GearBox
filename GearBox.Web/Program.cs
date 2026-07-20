@@ -63,94 +63,11 @@ var gameBuilder = new GameBuilder(
 );
 
 
-
 // we have all the game data, now make areas in that game
 gameBuilder
-    .WithArea(new AreaResource()
-    {
-        Name = "desert",
-        Level = 1,
-        Map = await resourceLoader.LoadMapByName("desert"),
-        LootOptions = [
-            LootOptionResource.OfItem("Stone"),
-            LootOptionResource.OfItem("Bronze"),
-            LootOptionResource.OfItem("Spiney Helm"),
-            LootOptionResource.OfGold(Grade.COMMON, 5),
-            LootOptionResource.OfGold(Grade.UNCOMMON, 10)
-        ],
-        EnemyNames = [
-            "Snake",
-            "Scorpion"
-        ],
-        Exits = [
-            new ExitResource()
-            {
-                Type = "bottom",
-                DestinationName = "bazaar"
-            },
-            new ExitResource()
-            {
-                Type = "right",
-                DestinationName = "canyon"
-            }
-        ]
-    })
-    .WithArea(new AreaResource()
-    {
-        Name = "bazaar",
-        Level = 1,
-        Map = await resourceLoader.LoadMapByName("bazaar"),
-        Shops = [
-            new ItemShopResource()
-            {
-                Name = "Starter Part Shop", 
-                XInTiles = 2,
-                YInTiles = 7,
-                Color = "blue",
-                Stock = [
-                    "Hard Hat",
-                    "Laser Lenses",
-                    "Armored Treads",
-                    "Rotowheel",
-                    "Training Club",
-                    "Training Blaster",
-                    "Tanky Torso",
-                    "High-Capacity Torso"
-                ]
-            }
-        ],
-        Exits = [
-            new ExitResource()
-            {
-                Type = "top",
-                DestinationName = "desert"
-            }
-        ]
-    })
-    .WithArea(new AreaResource()
-    {
-        Name = "canyon",
-        Level = 2,
-        Map = await resourceLoader.LoadMapByName("canyon"),
-        LootOptions = [
-            LootOptionResource.OfItem("Bronze"),
-            LootOptionResource.OfItem("Silver"),
-            LootOptionResource.OfItem("Antigravity Thrusters"),
-            LootOptionResource.OfGold(Grade.RARE, 25)
-        ],
-        EnemyNames = [
-            "Snake",
-            "Jackal",
-            "Specter"
-        ],
-        Exits = [
-            new ExitResource()
-            {
-                Type = "left",
-                DestinationName = "desert"
-            }
-        ]
-    });
+    .WithArea(await resourceLoader.LoadAreaByName("desert"))
+    .WithArea(await resourceLoader.LoadAreaByName("bazaar"))
+    .WithArea(await resourceLoader.LoadAreaByName("canyon"));
 
 // done defining - time to build
 var game = gameBuilder.Build();

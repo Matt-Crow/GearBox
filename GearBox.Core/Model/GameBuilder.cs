@@ -1,7 +1,6 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model.Abilities.Actives;
 using GearBox.Core.Model.Abilities.Passives;
-using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Enemies;
 using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
@@ -19,7 +18,7 @@ public class GameBuilder : IGameBuilder
     private readonly Factory<IPassiveAbility> _passives;
     private readonly List<CraftingRecipe> _craftingRecipes;
     private readonly Factory<EnemyCharacterTemplate> _enemies;
-    private readonly List<AreaBuilder> _areas = []; // must be ordered so the first area added is the default area
+    private readonly List<AreaResource> _areas = []; // must be ordered so the first area added is the default area
 
 
     public GameBuilder(GearBoxConfig config, IRandomNumberGenerator rng, GameResources resources)
@@ -66,7 +65,7 @@ public class GameBuilder : IGameBuilder
             throw new ArgumentException("Name must be unique within each game", nameof(area.Name));
         }
 
-        _areas.Add(new AreaBuilder(area, Items, new EnemyFactory(_config, _enemies, _rng), _rng));
+        _areas.Add(area);
         return this;
     }
 
@@ -75,7 +74,7 @@ public class GameBuilder : IGameBuilder
         var result = new Game(Factory<CraftingRecipe>.Of(cr => cr, _craftingRecipes));
         foreach (var area in _areas)
         {
-            result.AddArea(area.Build(result));
+            result.AddArea(area.ToArea(result, Items, new EnemyFactory(_config, _enemies, _rng), _rng));
         }
         return result;
     }

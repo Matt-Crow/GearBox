@@ -1,25 +1,53 @@
 {
-    "Tiles": [
-        [1, 1, 1, 0, 0, 0, 1, 1, 1],
-        [1, 1, 1, 0, 0, 0, 1, 1, 1],
-        [1, 1, 1, 0, 0, 0, 1, 1, 1],
-        [1, 1, 1, 0, 0, 0, 1, 1, 1],
-        [1, 1, 1, 0, 0, 0, 1, 1, 1],
-        [1, 1, 1, 0, 0, 0, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1]
+    "Name": "bazaar",
+    "Level": 1,
+    "Map": {
+        "Tiles": [
+            [1, 1, 1, 0, 0, 0, 1, 1, 1],
+            [1, 1, 1, 0, 0, 0, 1, 1, 1],
+            [1, 1, 1, 0, 0, 0, 1, 1, 1],
+            [1, 1, 1, 0, 0, 0, 1, 1, 1],
+            [1, 1, 1, 0, 0, 0, 1, 1, 1],
+            [1, 1, 1, 0, 0, 0, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 1]
+        ],
+        "TileTypes": [
+            {
+                "Key": 0,
+                "ColorName": "tan",
+                "HeightName": "floor"
+            },
+            {
+                "Key": 1,
+                "ColorName": "gray",
+                "HeightName": "wall"
+            }
+        ]
+    },
+    "Shops": [
+        {
+            "Name": "Starter Part Shop",
+            "XInTiles": 2,
+            "YInTiles": 7,
+            "Color": "blue",
+            "Stock": [
+                "Hard Hat",
+                "Laser Lenses",
+                "Armored Treads",
+                "Rotowheel",
+                "Training Club",
+                "Training Blaster",
+                "Tanky Torso",
+                "High-Capacity Torso"
+            ]
+        }
     ],
-    "TileTypes": [
+    "Exits": [
         {
-            "Key": 0,
-            "ColorName": "tan",
-            "HeightName": "floor"
-        },
-        {
-            "Key": 1,
-            "ColorName": "gray",
-            "HeightName": "wall"
+            "Type": "top",
+            "DestinationName": "desert"
         }
     ]
 }
