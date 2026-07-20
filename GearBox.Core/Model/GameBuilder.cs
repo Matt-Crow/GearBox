@@ -9,59 +9,42 @@ using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model;
 
-public class GameBuilder : IGameBuilder
+public class GameBuilder
 {
-    private readonly GearBoxConfig _config;
-    private readonly IRandomNumberGenerator _rng;
-    private readonly Factory<IActiveAbility> _actives;
-    private readonly Factory<IPassiveAbility> _passives;
-    private readonly List<CraftingRecipe> _craftingRecipes;
-    private readonly Factory<EnemyCharacterTemplate> _enemies;
-    private readonly GameResources _resources;
-
-
-    public GameBuilder(GearBoxConfig config, IRandomNumberGenerator rng, GameResources resources)
+    public static IGame Build(GearBoxConfig config, IRandomNumberGenerator rng, GameResources resources)
     {
-        _config = config;
-        _rng = rng;
-        _actives = Factory<IActiveAbility>.Of(a => a.Copy(), resources.Actives);
-        _passives = Factory<IPassiveAbility>.Of(p => p.Copy(), resources.Passives);
-        
+        var actives = Factory<IActiveAbility>.Of(a => a.Copy(), resources.Actives);
+        var passives = Factory<IPassiveAbility>.Of(p => p.Copy(), resources.Passives);
+
         // load items first, as crafting recipes and enemies depend on them
         var allMaterials = resources.ResourcePacks
             .SelectMany(rp => rp.Materials)
-            .Select(material => material.ToItem(_actives, _passives));
+            .Select(material => material.ToItem(actives, passives));
         var allParts = resources.ResourcePacks
             .SelectMany(rp => rp.Parts)
-            .Select(part => part.ToItem(_actives, _passives));
+            .Select(part => part.ToItem(actives, passives));
         var allItems = new List<ItemUnion>()
             .Concat(allMaterials)
             .Concat(allParts)
             .ToList();
-        Items = Factory<ItemUnion>.Of(item => item.ToOwned(), allItems);
+        var items = Factory<ItemUnion>.Of(item => item.ToOwned(), allItems);
 
-        _craftingRecipes = resources.ResourcePacks
+        // load crafting recipes
+        var craftingRecipes = resources.ResourcePacks
             .SelectMany(rp => rp.CraftingRecipes)
-            .Select(recipe => recipe.ToCraftingRecipe(Items))
+            .Select(recipe => recipe.ToCraftingRecipe(items))
             .ToList();
 
+        // load enemies
         var enemyTemplates = resources.ResourcePacks
             .SelectMany(rp => rp.Enemies)
-            .Select(er => er.ToEnemyCharacterTemplate(Items))
+            .Select(er => er.ToEnemyCharacterTemplate(items))
             .ToList();
-        
-        _enemies = Factory<EnemyCharacterTemplate>.Of(e => e, enemyTemplates);
-
-        _resources = resources;
-    }
+        var enemies = Factory<EnemyCharacterTemplate>.Of(e => e, enemyTemplates);
 
 
-    public Factory<ItemUnion> Items { get; init; }
-
-
-    public IGame Build()
-    {
-        var areaResources = _resources.ResourcePacks.SelectMany(rp => rp.Areas);
+        // done loading game-wide resources, so we can load areas
+        var areaResources = resources.ResourcePacks.SelectMany(rp => rp.Areas);
 
         // check for duplicate area names
         var firstDuplicatedAreaName = areaResources
@@ -74,10 +57,10 @@ public class GameBuilder : IGameBuilder
             throw new Exception($"Duplicated area name: '{firstDuplicatedAreaName}'");
         }
 
-        var result = new Game(Factory<CraftingRecipe>.Of(cr => cr, _craftingRecipes));
+        var result = new Game(items, Factory<CraftingRecipe>.Of(cr => cr, craftingRecipes));
         foreach (var area in areaResources)
         {
-            result.AddArea(area.ToArea(result, Items, new EnemyFactory(_config, _enemies, _rng), _rng));
+            result.AddArea(area.ToArea(result, items, new EnemyFactory(config, enemies, rng), rng));
         }
         return result;
     }

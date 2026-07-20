@@ -1,7 +1,9 @@
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Json.GameInit;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model;
 
@@ -10,6 +12,7 @@ namespace GearBox.Core.Model;
 /// </summary>
 public interface IGame
 {
+    Factory<ItemUnion> Items { get; }
     Crafter Crafter { get; }
     
 

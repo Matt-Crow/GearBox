@@ -12,7 +12,7 @@ public class GameBuilderTester
     [Fact]
     public void AreaNameMustBeUnique()
     {
-        var sut = new GameBuilder(
+        Assert.Throws<Exception>(() => GameBuilder.Build(
             new GearBoxConfig(), 
             new RandomNumberGenerator(), 
             new GameResources()
@@ -26,9 +26,8 @@ public class GameBuilderTester
                         ]
                     }
                 ]
-            });
-        
-        Assert.Throws<Exception>(() => sut.Build());
+            })
+        );
     }
 
     private static AreaResource AnArea()

@@ -1,5 +1,6 @@
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Json.GameInit;
 using GearBox.Core.Utils.Factories;
@@ -11,13 +12,15 @@ public class Game : IGame
     private readonly List<IArea> _areas = [];
     private readonly Factory<CraftingRecipe> _craftingRecipes;
 
-    public Game(Factory<CraftingRecipe>? craftingRecipes = null)
+    public Game(Factory<ItemUnion>? items = null, Factory<CraftingRecipe>? craftingRecipes = null)
     {
         _craftingRecipes = craftingRecipes ?? Factory<CraftingRecipe>.Of(cr => cr, []);
+        Items = items ?? Factory<ItemUnion>.Of(i => i.ToOwned(), []);
         Crafter = new Crafter(_craftingRecipes);
     }
 
 
+    public Factory<ItemUnion> Items { get; init; }
     public Crafter Crafter { get; init; }
 
 

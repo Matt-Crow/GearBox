@@ -1,7 +1,6 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model;
 using GearBox.Core.Model.Abilities.Actives.Impl;
-using GearBox.Core.Model.Items;
 using GearBox.Core.Server;
 using GearBox.Web.Infrastructure;
 using GearBox.Web.Database;
@@ -11,19 +10,14 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
 using GearBox.Core.Utils;
 using GearBox.Core.Model.Abilities.Passives.Impl;
-using GearBox.Core.Model.ResourcePacks;
 
 /*
     Actives and passives cannot be stored in a JSON file,
     as they contain executable code,
     so they are initialized outside of the GameResourceLoader.
 
-    Items can provide actives and passives,
-    and thus must be loaded after loading actives and passives.
-
-    Each area depends on game-wide resources,
-    such as items,
-    so each area is loaded after all game-wide resources have been loaded.
+    The rest of the game data can be loaded from a JSON file,
+    which GameResourceLoader handlers.
 */
 
 // need to grab configuration before most other things
@@ -33,11 +27,9 @@ webAppBuilder.Configuration
     .GetSection("GearBox")
     .Bind(gearboxConfig);
 
-var rng = new RandomNumberGenerator();
-
-var gameBuilder = new GameBuilder(
-    gearboxConfig, 
-    rng, 
+var game = GameBuilder.Build(
+    gearboxConfig,
+    new RandomNumberGenerator(),
     new GameResources()
     {
         Actives = [
@@ -60,9 +52,6 @@ var gameBuilder = new GameBuilder(
     }
 );
 
-// done defining - time to build
-var game = gameBuilder.Build();
-
 // Add services to the container.
 var config = webAppBuilder.Configuration;
 webAppBuilder.Services.AddDbContextFactory<GearBoxDbContext>(ConnectionStringHelper.UsePostgresOrInMemory(config, "GearBoxDbContext"));
@@ -73,7 +62,7 @@ webAppBuilder.Services
 webAppBuilder.Services.AddRazorPages();
 webAppBuilder.Services.AddSignalR();
 webAppBuilder.Services
-    .AddSingleton(gameBuilder.Items)
+    .AddSingleton(game.Items)
     .AddSingleton<IPlayerCharacterRepository, PlayerCharacterRepository>()
     .AddSingleton<GameServer>()
     .AddSingleton(game)

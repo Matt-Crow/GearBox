@@ -96,7 +96,7 @@ public class GameServerTester
 
     public static IGame MakeGame()
     {
-        var result = new GameBuilder(
+        var result = GameBuilder.Build(
             new GearBoxConfig(), 
             new RandomNumberGenerator(), 
             new GameResources()
@@ -125,8 +125,7 @@ public class GameServerTester
                         ]
                     }
                 ]
-            })
-            .Build();
+            });
         return result;
     }
 
