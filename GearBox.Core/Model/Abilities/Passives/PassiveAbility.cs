@@ -13,6 +13,8 @@ public abstract class PassiveAbility : IPassiveAbility
 
     public Character? User { get; private set; }
 
+    public string Key => Name;
+
     public void SetUser(Character? newUser)
     {
         if (User != null)

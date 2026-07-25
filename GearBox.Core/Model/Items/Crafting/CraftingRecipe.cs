@@ -1,39 +1,51 @@
 using GearBox.Core.Model.Json.GameInit;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model.Items.Crafting;
 
 /// <summary>
-/// Details how to convert materials into another item
+/// The raw data about a CraftingRecipe
 /// </summary>
-public class CraftingRecipe
+public class CraftingRecipe : IFactoryProduct
 {
-    public CraftingRecipe(IEnumerable<ItemStack<Material>> ingredients, Func<ItemUnion> maker)
+    public CraftingRecipe(List<ItemStack<Material>> ingredients, ItemUnion makes, Guid? id = null)
     {
-        Ingredients = ingredients;
-        Maker = maker;
+        Id = id ?? Guid.NewGuid();
+
+        /* 
+            group stacks by item name to remove duplicates
+
+            Before:
+                Apple x1
+                Bananas x2
+                Bananas x3
+            
+            After:
+                Apple x1
+                Bananas x5
+        */
+        Ingredients = ingredients
+            .GroupBy(stack => stack.Item)
+            .Select(group => new ItemStack<Material>(group.Key, group.Sum(stack => stack.Quantity)))
+            .ToList();
+        
+        Makes = makes;
     }
 
-    public Guid Id { get; init; } = Guid.NewGuid();
-    public IEnumerable<ItemStack<Material>> Ingredients { get; init; }
-    public Func<ItemUnion> Maker { get; init; }
+
+    public Guid Id { get; init; }
+    public List<ItemStack<Material>> Ingredients { get; init; }
+    public ItemUnion Makes { get; init; }
+    public string Key => Id.ToString();
+
 
     public CraftingRecipeJson ToJson()
     {
         var ingredients = Ingredients
             .Select(stack => stack.ToJson())
             .ToList();
-        var makes = Maker.Invoke().ToJson();
+        var makes = Makes.ToJson();
         var result = new CraftingRecipeJson(Id, ingredients, makes);
         return result;
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return obj is CraftingRecipe other && other.Id == Id;
-    }
-
-    public override int GetHashCode()
-    {
-        return Id.GetHashCode();
     }
 }

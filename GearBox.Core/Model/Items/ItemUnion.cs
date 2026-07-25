@@ -1,4 +1,5 @@
 using GearBox.Core.Model.Json;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model.Items;
 
@@ -6,7 +7,7 @@ namespace GearBox.Core.Model.Items;
 /// Implementation of a C union.
 /// Contains a single item.
 /// </summary>
-public class ItemUnion : IItem
+public class ItemUnion : IItem, IFactoryProduct
 {
     private readonly Material? _material;
     private readonly Part? _part;
@@ -33,6 +34,7 @@ public class ItemUnion : IItem
     public string Name => Unwrapped.Name;
     public Grade Grade => Unwrapped.Grade;
     public Gold BuyValue => Unwrapped.BuyValue;
+    public string Key => Name;
 
 
     public ItemJson ToJson() => Select(

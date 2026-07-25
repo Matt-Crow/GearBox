@@ -1,21 +1,28 @@
 using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.Items;
 using GearBox.Core.Model.Items.Crafting;
 using GearBox.Core.Model.Json.GameInit;
+using GearBox.Core.Utils.Factories;
 
 namespace GearBox.Core.Model;
 
 public class Game : IGame
 {
     private readonly List<IArea> _areas = [];
-    private readonly CraftingRecipeRepository _craftingRecipes;
+    private readonly Factory<CraftingRecipe> _craftingRecipes;
 
-    public Game(CraftingRecipeRepository? craftingRecipes = null)
+    public Game(Factory<ItemUnion>? items = null, Factory<CraftingRecipe>? craftingRecipes = null)
     {
-        _craftingRecipes = craftingRecipes ?? CraftingRecipeRepository.Empty();
+        _craftingRecipes = craftingRecipes ?? Factory<CraftingRecipe>.Of(cr => cr, []);
+        Items = items ?? Factory<ItemUnion>.Of(i => i.ToOwned(), []);
+        Crafter = new Crafter(_craftingRecipes);
     }
 
-    public CraftingRecipe? GetCraftingRecipeById(Guid id) => _craftingRecipes.GetById(id);
+
+    public Factory<ItemUnion> Items { get; init; }
+    public Crafter Crafter { get; init; }
+
 
     // cannot create game & area at the same time due to circular dependency
     public void AddArea(IArea area)
@@ -36,7 +43,9 @@ public class Game : IGame
     {
         var result = new GameInitJson(
             player.Id,
-            _craftingRecipes.ToJson()
+            _craftingRecipes.AllValues
+                .Select(recipe => recipe.ToJson())
+                .ToList()
         );
         return result;
     }

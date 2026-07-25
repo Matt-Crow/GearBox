@@ -1,6 +1,8 @@
 using GearBox.Core.Config;
 using GearBox.Core.Model;
+using GearBox.Core.Model.Areas;
 using GearBox.Core.Model.GameObjects.Player;
+using GearBox.Core.Model.ResourcePacks;
 using GearBox.Core.Server;
 using GearBox.Core.Utils;
 using Xunit;
@@ -94,9 +96,36 @@ public class GameServerTester
 
     public static IGame MakeGame()
     {
-        var result = new GameBuilder(new GearBoxConfig(), new RandomNumberGenerator())
-            .WithArea("foo", 1, area => area.WithMap(new()))
-            .Build();
+        var result = new GameResources()
+        {
+            ResourcePacks = [
+                new ResourcePack()
+                {
+                    Areas = [
+                        new AreaResource()
+                        {
+                            Name = "foo",
+                            Level = 1,
+                            Map = new()
+                            {
+                                Tiles = [[0]],
+                                TileTypes = [
+                                    new TileTypeResource()
+                                    {
+                                        Key = 0,
+                                        ColorName = Color.ALL.First().Name,
+                                        HeightName = TileHeight.FLOOR.Name
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }.ToGame(
+            new GearBoxConfig(), 
+            new RandomNumberGenerator()
+        );
         return result;
     }
 

@@ -20,6 +20,8 @@ public abstract class ActiveAbility : IActiveAbility
     public Duration Cooldown { get; init; }
     public Character? User { get; set; }
     public Duration TimeUntilNextUse => Duration.FromFrames(_framesUntilNextUse);
+    public string Key => Name;
+
 
     public bool CanBeUsed()
     {

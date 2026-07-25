@@ -22,7 +22,7 @@ public class Grade
         PointMultiplier = pointMultiplier;
     }
 
-    public static Grade? GetGradeByName(string name) => ALL.FirstOrDefault(x => x.Name == name);
+    public static Grade? GetGradeByName(string name) => ALL.FirstOrDefault(x => x.Name.ToLower() == name.ToLower());
 
     public int Order { get; init; }
     public string Name { get; init; }

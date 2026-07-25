@@ -16,6 +16,11 @@ namespace GearBox.Core.Model.Areas;
 public interface IArea
 {
     /// <summary>
+    /// The game this area belongs to
+    /// </summary>
+    IGame Game { get; }
+
+    /// <summary>
     /// An identifier for this area, unique to the game it occupies
     /// </summary>
     string Name { get; }
@@ -51,8 +56,6 @@ public interface IArea
     void AddTimer(GameTimer timer);
 
     void RemovePlayer(PlayerCharacter player);
-
-    CraftingRecipe? GetCraftingRecipeById(Guid id);
 
     PlayerCharacter? GetNearestPlayerTo(EnemyCharacter enemy);
 

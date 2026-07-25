@@ -1,5 +1,6 @@
 using GearBox.Core.Model.GameObjects.Player;
-using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Model.Items;
+using GearBox.Core.Utils.Factories;
 using Microsoft.EntityFrameworkCore;
 
 namespace GearBox.Web.Database;
@@ -7,9 +8,9 @@ namespace GearBox.Web.Database;
 public class PlayerCharacterRepository : IPlayerCharacterRepository
 {
     private readonly IDbContextFactory<GearBoxDbContext> _dbContextFactory;
-    private readonly IItemFactory _itemFactory;
+    private readonly Factory<ItemUnion> _itemFactory;
 
-    public PlayerCharacterRepository(IDbContextFactory<GearBoxDbContext> dbContextFactory, IItemFactory itemFactory)
+    public PlayerCharacterRepository(IDbContextFactory<GearBoxDbContext> dbContextFactory, Factory<ItemUnion> itemFactory)
     {
         _dbContextFactory = dbContextFactory;
         _itemFactory = itemFactory;

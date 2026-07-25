@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using GearBox.Core.Model.GameObjects.Player;
 using GearBox.Core.Model.Items;
-using GearBox.Core.Model.Items.Infrastructure;
+using GearBox.Core.Utils.Factories;
 using Microsoft.AspNetCore.Identity;
 
 namespace GearBox.Web.Database;
@@ -87,7 +87,7 @@ public class DbPlayerCharacter
         }
     }
 
-    public PlayerCharacter ToGameModel(IItemFactory itemFactory)
+    public PlayerCharacter ToGameModel(Factory<ItemUnion> itemFactory)
     {
         // don't need to store AspNetUserId in game model
         var result = new PlayerCharacter(Name, Xp, Id);
@@ -100,7 +100,7 @@ public class DbPlayerCharacter
                 which has no way of storing quantity,
                 so it would be confusing to put a ToGameModel method in DbPlayerCharacterItems
             */
-            var gameItem = itemFactory.Make(dbItem.Name) ?? throw new Exception($"Invalid item name: {dbItem.Name}");
+            var gameItem = itemFactory.Make(dbItem.Name);
             result.Inventory.Add(gameItem.ToOwned(dbItem.Level), dbItem.Quantity);
         }
 
@@ -108,7 +108,7 @@ public class DbPlayerCharacter
         {
             if (partSlot.PartName != null)
             {
-                var gameItem = itemFactory.Make(partSlot.PartName) ?? throw new Exception($"Invalid item name: {partSlot.PartName}");
+                var gameItem = itemFactory.Make(partSlot.PartName);
                 result.Inventory.Add(gameItem);
                 result.InstallById(gameItem.Id ?? throw new Exception("Item must have ID"));
             }
