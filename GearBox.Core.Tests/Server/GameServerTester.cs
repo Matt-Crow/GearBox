@@ -96,36 +96,36 @@ public class GameServerTester
 
     public static IGame MakeGame()
     {
-        var result = GameBuilder.Build(
-            new GearBoxConfig(), 
-            new RandomNumberGenerator(), 
-            new GameResources()
-            {
-                ResourcePacks = [
-                    new ResourcePack()
-                    {
-                        Areas = [
-                            new AreaResource()
+        var result = new GameResources()
+        {
+            ResourcePacks = [
+                new ResourcePack()
+                {
+                    Areas = [
+                        new AreaResource()
+                        {
+                            Name = "foo",
+                            Level = 1,
+                            Map = new()
                             {
-                                Name = "foo",
-                                Level = 1,
-                                Map = new()
-                                {
-                                    Tiles = [[0]],
-                                    TileTypes = [
-                                        new TileTypeResource()
-                                        {
-                                            Key = 0,
-                                            ColorName = Color.ALL.First().Name,
-                                            HeightName = TileHeight.FLOOR.Name
-                                        }
-                                    ]
-                                }
+                                Tiles = [[0]],
+                                TileTypes = [
+                                    new TileTypeResource()
+                                    {
+                                        Key = 0,
+                                        ColorName = Color.ALL.First().Name,
+                                        HeightName = TileHeight.FLOOR.Name
+                                    }
+                                ]
                             }
-                        ]
-                    }
-                ]
-            });
+                        }
+                    ]
+                }
+            ]
+        }.ToGame(
+            new GearBoxConfig(), 
+            new RandomNumberGenerator()
+        );
         return result;
     }
 

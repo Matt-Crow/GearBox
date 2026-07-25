@@ -7,27 +7,27 @@ using Xunit;
 
 namespace GearBox.Core.Tests.Model;
 
-public class GameBuilderTester
+public class GameResourcesTester
 {
     [Fact]
     public void AreaNameMustBeUnique()
     {
-        Assert.Throws<Exception>(() => GameBuilder.Build(
+        var sut = new GameResources()
+        {
+            ResourcePacks = [
+                new ResourcePack()
+                {
+                    Areas = [
+                        AnArea(),
+                        AnArea()
+                    ]
+                }
+            ]
+        };
+        Assert.Throws<Exception>(() => sut.ToGame(
             new GearBoxConfig(), 
-            new RandomNumberGenerator(), 
-            new GameResources()
-            {
-                ResourcePacks = [
-                    new ResourcePack()
-                    {
-                        Areas = [
-                            AnArea(),
-                            AnArea()
-                        ]
-                    }
-                ]
-            })
-        );
+            new RandomNumberGenerator()
+        ));
     }
 
     private static AreaResource AnArea()

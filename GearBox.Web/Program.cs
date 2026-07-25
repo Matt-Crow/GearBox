@@ -27,30 +27,26 @@ webAppBuilder.Configuration
     .GetSection("GearBox")
     .Bind(gearboxConfig);
 
-var game = GameBuilder.Build(
-    gearboxConfig,
-    new RandomNumberGenerator(),
-    new GameResources()
-    {
-        Actives = [
-            new Cleave(),
-            new LaserBolt()
-        ],
-        Passives = [
-            Armored.Lightly(),
-            Armored.Moderately(),
-            Armored.Heavily(),
-            Ranged.Moderately(),
-            Ranged.Long(),
-            new Intangible(),
-            new Levitate(),
-            new Spikey()
-        ],
-        ResourcePacks = [
-            await GameResourceLoader.LoadDefaultResourcePack()
-        ]
-    }
-);
+var game = new GameResources()
+{
+    Actives = [
+        new Cleave(),
+        new LaserBolt()
+    ],
+    Passives = [
+        Armored.Lightly(),
+        Armored.Moderately(),
+        Armored.Heavily(),
+        Ranged.Moderately(),
+        Ranged.Long(),
+        new Intangible(),
+        new Levitate(),
+        new Spikey()
+    ],
+    ResourcePacks = [
+        await GameResourceLoader.LoadDefaultResourcePack()
+    ]
+}.ToGame(gearboxConfig, new RandomNumberGenerator());
 
 // Add services to the container.
 var config = webAppBuilder.Configuration;
